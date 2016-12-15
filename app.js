@@ -1,8 +1,10 @@
 var app = require("express")();
+var pug = require("pug");
+app.set("view engine", "pug");
 
 app.get("/", function(req, res, next){
     console.log("Request Recieved");
-    res.send("<h1>Content Developer CMS</h1>");
+    res.render("index", {});
 });
 
 app.listen(3000, function () {
