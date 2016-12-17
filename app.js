@@ -13,8 +13,8 @@ app.set("views", "./views");
 
 app.use(express.static("./www"));
 
-app.listen(3000, function () {
-  console.log("Listening on localhost:3000");
+app.listen(process.env.PORT, function () {
+  console.log("Listening on port: " + process.env.PORT);
 });
 
 console.log("Initialised");
