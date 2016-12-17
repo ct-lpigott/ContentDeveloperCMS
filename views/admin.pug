@@ -3,4 +3,7 @@ extends view_components/layout.pug
 block main-body
 
     h1 Content Developer Admin
-    p= #{dbTables}
+    h2 Database Tables
+    ul
+        each obj in dbTables
+            li= obj.Tables_in_db1281003_ContentDeveloperCMS
