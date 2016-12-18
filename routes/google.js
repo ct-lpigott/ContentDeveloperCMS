@@ -10,7 +10,7 @@ router.get("/oauthRedirectURL", function(req, res, next){
         if (error) {
             console.log("Error while trying to retrieve access token", error);
         } else {
-            dbconn.query("INSERT into Users(google_token) VALUES(" + token + ")", function(err, rows, fields){
+            dbconn.query("INSERT into User(google_token) VALUES(" + token + ")", function(err, rows, fields){
                 if(err) {
                     console.log(err);
                 } else {
