@@ -17,10 +17,11 @@ router.get("/oauthRedirectURL", function(req, res, next){
                     console.log(rows);
                 }
             });
+
+            res.send(err, rows, fields);
             oauth2Client.credentials = token;
         }
     });
-    res.send("Google ID: " + req.query.code);
 });
 
 module.exports = router;
