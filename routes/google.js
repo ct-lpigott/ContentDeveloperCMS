@@ -16,9 +16,8 @@ router.get("/oauthRedirectURL", function(req, res, next){
                 } else {
                     console.log(rows);
                 }
+                res.send(err, rows, fields);
             });
-
-            res.send(err, rows, fields);
             oauth2Client.credentials = token;
         }
     });
