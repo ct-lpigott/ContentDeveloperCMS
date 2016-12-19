@@ -1,6 +1,10 @@
 var express = require("express");
 var app = express();
 var pug = require("pug");
+var bodyParser = require('body-parser');
+
+app.use(bodyParser.json()); // for parsing application/json
+app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 
 app.use("/", require("./routes/general.js"));
 app.use("/admin", require("./routes/admin.js"));

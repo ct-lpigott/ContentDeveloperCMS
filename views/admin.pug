@@ -5,3 +5,10 @@ block main-body
     h1 Content Developer Admin
     h2 Welcome back #{userDisplayName}
     img(src=userProfileImage title=userDisplayName class="profileImage")
+
+    form(method="POST" action="/feeds/")
+        label User
+            input(type="number" name="userID")
+        label Project Name
+            input(type="text" name="projectName")
+        input(type="submit" value="Create New Project")
