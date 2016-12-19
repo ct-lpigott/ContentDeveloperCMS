@@ -6,9 +6,11 @@ block main-body
     h2 Welcome back #{userDisplayName}
     img(src=userProfileImage title=userDisplayName class="profileImage")
 
-    form(method="POST" action="/feeds/")
-        label User
-            input(type="number" name="userID")
+    form(method="POST" action="/feeds/"+userID)
         label Project Name
             input(type="text" name="projectName")
         input(type="submit" value="Create New Project")
+    
+    ul#userProjects
+
+    script(src='/js/admin_script.js')
