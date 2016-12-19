@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-var googleOAuth = require("../google/googleOAuthClient");
+var googleOAuth = require("../google/googleOAuth");
 
 router.get("/", function(req, res, next){
     var oauthURL = googleOAuth.oauthURL;

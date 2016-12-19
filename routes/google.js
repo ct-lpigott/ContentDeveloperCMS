@@ -3,7 +3,7 @@ var router = express.Router();
 var google = require("googleapis");
 
 var dbconn = require("../database/connection.js");
-var googleOAuth = require("../google/googleOAuthClient");
+var googleOAuth = require("../google/googleOAuth");
 
 router.get("/oauthRedirectURL", function(req, res, next){
     var authCode = req.query.code;

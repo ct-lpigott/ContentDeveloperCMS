@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 var dbconn = require("../database/connection.js");
 var google = require("googleapis");
-var googleOAuth = require("../google/googleOAuthClient");
+var googleOAuth = require("../google/googleOAuth");
 
 router.get("/", function(req, res, next){
     console.log("Request recieved in admin route");
