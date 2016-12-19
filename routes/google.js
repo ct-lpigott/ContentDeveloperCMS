@@ -26,34 +26,43 @@ router.get("/oauthRedirectURL", function(req, res, next){
                         console.log(err);
                     } else {
                         var jsonToken = JSON.stringify(token);
+                        
                         if(rows.length > 0){
+                            req.userID = rows[0].id;
                             console.log("This is an existing user");
-
-                            dbconn.query("UPDATE User SET google_auth_token = " + dbconn.escape(jsonToken) + " WHERE id = " + dbconn.escape(rows[0].id), function(err, rows, fields){
+                            dbconn.query("UPDATE User SET google_auth_token = " + dbconn.escape(jsonToken) + " WHERE id = " + dbconn.escape(rows[0].id), function(err, result){
                                 if(err) {
                                     console.log(err);
                                 } else {
                                     console.log("Existing user auth token updated");
+                                    next();
                                 }
                             });
                         } else {
                             console.log("This is a new user");
 
-                            dbconn.query("INSERT into User(google_profile_id, google_auth_token) VALUES(" + dbconn.escape(user.id) + ", " + dbconn.escape(jsonToken) + ")", function(err, rows, fields){
+                            dbconn.query("INSERT into User(google_profile_id, google_auth_token) VALUES(" + dbconn.escape(user.id) + ", " + dbconn.escape(jsonToken) + ")", function(err, result){
                                 if(err) {
                                     console.log(err);
                                 } else {
                                     console.log("New user created in DB");
+                                    req.userID = result.insertId;
+                                    next();
                                 }
                             });
                         }
-                        res.redirect("/admin?id=" + rows[0].id);
                     }
                 });
             });
             
         }
     });
+});
+
+router.get("/oauthRedirectURL", function(req, res, next){
+    if(req.userID != null){
+        res.redirect("/admin/" + req.userID);
+    }
 });
 
 module.exports = router;

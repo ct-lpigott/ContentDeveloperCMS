@@ -4,9 +4,9 @@ var dbconn = require("../database/connection.js");
 var google = require("googleapis");
 var googleOAuth = require("../google/googleOAuth");
 
-router.get("/", function(req, res, next){
-    console.log("Request recieved in admin route");
-    dbconn.query("SELECT * FROM User WHERE id=" + dbconn.escape(req.query.id), function (err, rows, fields){
+router.get("/:id", function(req, res, next){
+    console.log("Request recieved in admin route. ID=" + req.params.id);
+    dbconn.query("SELECT * FROM User WHERE id=" + dbconn.escape(req.params.id), function (err, rows, fields){
         if(err){
             console.log(err);
         } else {
