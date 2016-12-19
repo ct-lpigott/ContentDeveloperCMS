@@ -22,13 +22,14 @@ router.get("/:id", function(req, res, next){
                     auth: oauth2Client
                 }, function (err, user) {
                     if(err) {
-                        console.log(err);
+                        console.log("Error loading user profile " + err);
                     } else {
-                        //console.log(user);
+                        console.log(user);
                         res.render("admin", {
                             pageTitle: "Admin Panel",
                             userDisplayName: user.displayName,
-                            userProfileImage: user.image.url.replace("?sz=50", "")
+                            userProfileImage: user.image.url.replace("?sz=50", ""),
+                            userID: req.params.id 
                         });
                     }
                 });

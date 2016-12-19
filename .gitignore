@@ -1,3 +1,5 @@
 node_modules
 .vscode
 sql_script.sql
+projects/*
+!projects/project_template.json
