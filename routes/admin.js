@@ -6,7 +6,7 @@ var googleOAuth = require("../google/googleOAuthClient");
 
 router.get("/", function(req, res, next){
     console.log("Request recieved in admin route");
-    dbconn.query("SELECT * FROM User WHERE id=" + dbconn.escape(req.params.id), function (err, rows, fields){
+    dbconn.query("SELECT * FROM User WHERE id=" + dbconn.escape(req.query.id), function (err, rows, fields){
         if(err){
             console.log(err);
         } else {
@@ -24,7 +24,7 @@ router.get("/", function(req, res, next){
                     if(err) {
                         console.log(err);
                     } else {
-                        console.log(user);
+                        //console.log(user);
                         res.render("admin", {
                             pageTitle: "Admin Panel",
                             userDisplayName: user.displayName,
