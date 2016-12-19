@@ -3,35 +3,47 @@ var router = express.Router();
 var googleOAuth = require("../google/googleOAuth");
 
 // CREATE
-router.post("/:collection", function(req, res, next){
-    res.send("POST request received for collection=" + req.params.collection);
+router.post("/:project", function(req, res, next){
+    res.send("POST request received for project=" + req.params.project);
 });
-router.post("/:collection/:item", function(req, res, next){
-    res.send("POST request received for collection=" + req.params.collection + " and item=" + req.params.item);
+router.post("/:project/:collection", function(req, res, next){
+    res.send("POST request received for project=" + req.params.project + " collection=" + req.params.collection);
+});
+router.post("/:project/:collection/:item", function(req, res, next){
+    res.send("POST request received for project=" + req.params.project + " collection=" + req.params.collection + " and item=" + req.params.item);
 });
 
 // READ
-router.get("/:collection", function(req, res, next){
-    res.send("GET request received for collection=" + req.params.collection);
+router.get("/:project", function(req, res, next){
+    res.send("GET request received for project=" + req.params.project);
 });
-router.get("/:collection/:item", function(req, res, next){
-    res.send("GET request received for collection=" + req.params.collection + " and item=" + req.params.item);
+router.get("/:project/:collection", function(req, res, next){
+    res.send("GET request received for project=" + req.params.project + " collection=" + req.params.collection);
+});
+router.get("/:project/:collection/:item", function(req, res, next){
+    res.send("GET request received for project=" + req.params.project + " collection=" + req.params.collection + " and item=" + req.params.item);
 });
 
 // UPDATE
-router.put("/:collection", function(req, res, next){
-    res.send("PUT request received for collection=" + req.params.collection);
+router.put("/:project", function(req, res, next){
+    res.send("PUT request received for project=" + req.params.project);
 });
-router.put("/:collection/:item", function(req, res, next){
-    res.send("PUT request received for collection=" + req.params.collection + " and item=" + req.params.item);
+router.put("/:project/:collection", function(req, res, next){
+    res.send("PUT request received for project=" + req.params.project + " collection=" + req.params.collection);
+});
+router.put("/:project/:collection/:item", function(req, res, next){
+    res.send("PUT request received for project=" + req.params.project + " collection=" + req.params.collection + " and item=" + req.params.item);
 });
 
 // DELETE
-router.delete("/:collection", function(req, res, next){
-    res.send("DELETE request received for collection=" + req.params.collection);
+router.delete("/:project", function(req, res, next){
+    res.send("DELETE request received for project=" + req.params.project);
 });
-router.delete("/:collection/:item", function(req, res, next){
-    res.send("DELETE request received for collection=" + req.params.collection + " and item=" + req.params.item);
+router.delete("/:project/:collection", function(req, res, next){
+    res.send("DELETE request received for project=" + req.params.project + " collection=" + req.params.collection);
+});
+router.delete("/:project/:collection/:item", function(req, res, next){
+    res.send("DELETE request received for project=" + req.params.project + " collection=" + req.params.collection + " and item=" + req.params.item);
 });
 
 module.exports = router;
