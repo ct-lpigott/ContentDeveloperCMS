@@ -3,7 +3,5 @@ extends view_components/layout.pug
 block main-body
 
     h1 Content Developer Admin
-    h2 Database Tables
-    ul
-        each obj in dbTables
-            li= obj.Tables_in_db1281003_ContentDeveloperCMS
+    h2 Welcome back #{userDisplayName}
+    img(src=userProfileImage title=userDisplayName class="profileImage")
