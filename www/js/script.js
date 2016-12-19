@@ -19,13 +19,15 @@ function clickEventHandler(e){
     }
 }
 
-function loadDataFromURL(url, callback){
+function sendAjaxRequest(url, requestData, callback, method="GET"){
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
             callback(JSON.parse(xhttp.responseText));
         }
     };
-    xhttp.open("GET", url, true);
-    xhttp.send();
+    xhttp.open(method, url, true);
+    xhttp.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+    xhttp.setRequestHeader("Content-Type", "application/json");
+    xhttp.send(JSON.stringify(requestData));
 }

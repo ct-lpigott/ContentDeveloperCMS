@@ -8,6 +8,7 @@ var dbconn = require("../database/connection.js");
 router.post("/:userID", function(req, res, next){
     console.log("POST to create new project");
     if(req.body != null){
+        console.log(req.body.projectName);
         dbconn.query("INSERT INTO Project(project_name) VALUES(" + dbconn.escape(req.body.projectName) + ")", function(err, result){
             if(err){
                 console.log(err);
@@ -36,7 +37,7 @@ router.post("/:userID", function(req, res, next){
                                                 console.log("Error making file " + err);
                                             } else {
                                                 console.log("Project file created");
-                                                res.redirect("/admin/" + req.params.userID);
+                                                res.redirect("/feeds/" + req.params.userID);
                                             }
                                         });
                                     }
@@ -63,6 +64,7 @@ router.post("/:userID/:project/:collection/:item", function(req, res, next){
 
 // READ
 router.get("/:userID", function(req, res, next){
+    console.log("GET request from " + req.params.userID + " to view all projects");
     dbconn.query("SELECT p.project_name FROM Project p LEFT JOIN User_Project as up ON p.id = up.project_id WHERE up.user_id =" + dbconn.escape(req.params.userID), function(err, rows, fields){
         if(err){
             console.log(err);

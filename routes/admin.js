@@ -24,7 +24,7 @@ router.get("/:id", function(req, res, next){
                     if(err) {
                         console.log("Error loading user profile " + err);
                     } else {
-                        console.log(user);
+                        //console.log(user);
                         res.render("admin", {
                             pageTitle: "Admin Panel",
                             userDisplayName: user.displayName,
