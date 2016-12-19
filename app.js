@@ -2,13 +2,10 @@ var express = require("express");
 var app = express();
 var pug = require("pug");
 
-var general_route = require("./routes/general.js");
-var admin_route = require("./routes/admin.js");
-var google_route = require("./routes/google.js");
-
-app.use("/", general_route);
-app.use("/admin", admin_route);
-app.use("/google", google_route);
+app.use("/", require("./routes/general.js"));
+app.use("/admin", require("./routes/admin.js"));
+app.use("/google", require("./routes/google.js"));
+app.use("/feeds", require("./routes/feeds.js"));
 
 app.set("view engine", "pug");
 app.set("views", "./views");
