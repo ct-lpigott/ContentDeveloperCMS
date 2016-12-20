@@ -72,7 +72,7 @@ router.post("/:userID/:project/:collection/:item", function(req, res, next){
 // READ
 router.get("/:userID", function(req, res, next){
     console.log("GET request from " + req.params.userID + " to view all projects");
-    dbconn.query("SELECT p.project_name FROM Project p LEFT JOIN User_Project as up ON p.id = up.project_id WHERE up.user_id =" + dbconn.escape(req.params.userID), function(err, rows, fields){
+    dbconn.query("SELECT * FROM Project p LEFT JOIN User_Project as up ON p.id = up.project_id WHERE up.user_id =" + dbconn.escape(req.params.userID), function(err, rows, fields){
         if(err){
             console.log(err);
         } else {
@@ -87,7 +87,7 @@ router.get("/:userID/:projectID", function(req, res, next){
         } else {
             var projectRow = rows[0];
             var filename = "content.json";
-            
+
             if(projectRow.user_access_level == 1){
                 filename = "admin.json";
             }

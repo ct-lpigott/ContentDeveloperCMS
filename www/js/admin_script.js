@@ -1,11 +1,21 @@
 var userID;
+var projectID;
 
 function customWindowOnload(){
     userID = document.getElementById("userID").value;
 
-    sendAjaxRequest("/feeds/" + userID, {}, function(responseObject){
-        updateUserProjects(responseObject);
-    });  
+    if(document.getElementById("userProjects")){
+        sendAjaxRequest("/feeds/" + userID, {}, function(responseObject){
+            updateUserProjects(responseObject);
+        });
+    }
+
+    if(document.getElementById("projectID")){
+        projectID = document.getElementById("projectID").value;
+        sendAjaxRequest("/feeds/" + userID + "/" + projectID, {}, function(responseObject){
+            updateProjectJSON(responseObject.project_structure);
+        }); 
+    }    
 }
 
 function customClickEventHandler(e){
@@ -28,7 +38,17 @@ function updateUserProjects(userProjects){
 
     for(var i=0; i<userProjects.length; i++){
         var newLi = document.createElement("li");
-        newLi.innerHTML = userProjects[i].project_name;
+
+        var newA = document.createElement("a");
+        newA.setAttribute("href", "/admin/" + userProjects[i].user_id + "/" + userProjects[i].project_id);
+        newA.innerHTML = userProjects[i].project_name;
+        newLi.appendChild(newA);
+
         userProjectsUL.appendChild(newLi);
     }
+}
+
+function updateProjectJSON(projectJSON){
+    var formattedJSON = JSON.stringify(projectJSON, null, 4);
+    document.getElementById("projectJSON").innerHTML = formattedJSON;
 }
