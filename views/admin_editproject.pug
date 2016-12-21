@@ -4,9 +4,9 @@ block main-body
 
     h1 #{projectName}
 
-    div(contenteditable="true")
-        pre
-            code(id="projectJSON")
+    textarea(id="projectStructure" contenteditable="true")
+
+    button(id="updateProjectStructure") Save
 
     input(id="userID" type="hidden" value=userID)
     input(id="projectID" type="hidden" value=projectID)

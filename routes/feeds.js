@@ -96,7 +96,9 @@ router.get("/:userID/:projectID", function(req, res, next){
                 if(err){
                     console.log(err);
                 } else {
-                    res.send(data);
+                    var projectAdmin = JSON.parse(data);
+                    var projectStructure = projectAdmin.project_structure;
+                    res.send(JSON.stringify(projectStructure));
                 }
             });
         }
@@ -111,7 +113,40 @@ router.get("/:userID/:projectID/:collection/:item", function(req, res, next){
 
 // UPDATE
 router.put("/:userID/:projectID", function(req, res, next){
-    res.send("PUT request received from userID=" + req.params.userID + " for projectID=" + req.params.project);
+    dbconn.query("SELECT p.id as 'project_id', up.user_id as 'user_id', up.user_access_level as 'user_access_level' FROM Project p LEFT JOIN User_Project up ON p.id = up.project_id WHERE p.id = " + dbconn.escape(req.params.projectID) + " AND up.user_id = " + dbconn.escape(req.params.userID), function(err, rows, fields){
+        if(err){
+            console.log(err);
+        } else {
+            var projectRow = rows[0];
+
+            if(projectRow.user_access_level == 1){
+                if(req.body.projectStructure == null || req.body.projectStructure.length == 0){
+                    req.body.projectStructure = {};
+                }
+
+                var adminFilePath = "./projects/" + req.params.projectID + "/admin.json";
+                fs.readFile(adminFilePath, {encoding: "utf-8"}, function(err, data){
+                    if(err){
+                        console.log(err);
+                    } else {
+                        var adminProjectFile = JSON.parse(data);
+                        adminProjectFile.date_updated = Date.now();
+                        adminProjectFile.last_updated_by = req.params.userID;
+                        adminProjectFile.project_structure = JSON.parse(req.body.projectStructure);
+
+                        fs.writeFile(adminFilePath, JSON.stringify(adminProjectFile), function(err){
+                            if(err) {
+                                console.log("Error updating file " + err);
+                            } else {
+                                console.log("Project admin file updated");
+                                res.send(JSON.stringify(adminProjectFile.project_structure));
+                            }
+                        });
+                    }
+                });
+            }
+        }
+    });
 });
 router.put("/:userID/:projectID/:collection", function(req, res, next){
     res.send("PUT request received from userID=" + req.params.userID + " for projectID=" + req.params.project + " collection=" + req.params.collection);

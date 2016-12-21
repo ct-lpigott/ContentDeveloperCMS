@@ -10,6 +10,10 @@ window.onload = function(){
 
 function setupEventListeners(){
     document.addEventListener("click", clickEventHandler);
+
+    if(typeof customSetupEventListeners == "function"){
+        customSetupEventListeners();
+    }
 }
 
 function clickEventHandler(e){

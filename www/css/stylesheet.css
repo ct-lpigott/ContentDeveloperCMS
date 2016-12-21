@@ -3,6 +3,16 @@
     height: auto;
 }
 
+textarea {
+    display: block;
+}
+
+#projectStructure {
+    min-height: 200px;
+    width: 100%;
+    tab-size: 4;
+}
+
 /* FOOTER */
 footer {
     text-align: center;
