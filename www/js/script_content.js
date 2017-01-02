@@ -25,7 +25,7 @@ function updateProjectHTML(projectDetails){
 
     for(var collection in projectStructure){
         var collectionHeading = document.createElement("h3");
-        collectionHeading.innerHTML = collection;
+        collectionHeading.innerHTML = upperCamelCaseAll(underscoreToSpace(collection));
         projectContentContainer.appendChild(collectionHeading);
         switch(projectStructure[collection].type){
             case "array": {

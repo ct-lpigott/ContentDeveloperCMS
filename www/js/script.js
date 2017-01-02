@@ -35,3 +35,22 @@ function sendAjaxRequest(url, requestData, callback, method="GET"){
     xhttp.setRequestHeader("Content-Type", "application/json");
     xhttp.send(JSON.stringify(requestData));
 }
+
+function upperCamelCase(stringVal){
+    return stringVal[0].toUpperCase() + stringVal.slice(1);
+}
+
+function underscoreToSpace(stringVal){
+    return stringVal.replace(/_/g, " ");
+}
+
+function upperCamelCaseAll(stringVal){
+    var words = stringVal.split(" ");
+    var result = "";
+
+    for(var word in words){
+        result += upperCamelCase(words[word]) + " ";
+    }
+
+    return result;
+}
