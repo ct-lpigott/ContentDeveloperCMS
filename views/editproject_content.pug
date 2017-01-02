@@ -1,0 +1,14 @@
+extends view_components/layout.pug
+
+block main-body
+
+    h1 #{projectName}
+
+    div(id="projectContent")
+
+    button(id="updateProjectContent") Save
+
+    input(id="userID" type="hidden" value=userID)
+    input(id="projectID" type="hidden" value=projectID)
+
+    script(src='/js/script_content.js')

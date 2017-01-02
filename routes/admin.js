@@ -43,7 +43,18 @@ router.get("/:userID/:projectID", function(req, res, next){
         if(err){
             console.log(err);
         } else {
-            res.render("admin_editproject", {
+            var templateToRender;
+            switch(rows[0].user_access_level) {
+                case 1: {
+                    templateToRender = "editproject_admin";
+                    break;
+                }
+                default: {
+                    templateToRender = "editproject_content";
+                    break;
+                }
+            }
+            res.render(templateToRender, {
                 pageTitle: rows[0].project_name,
                 userID: req.params.userID,
                 projectID: req.params.projectID,
