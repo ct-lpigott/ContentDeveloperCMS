@@ -44,6 +44,7 @@ router.get("/:userID/:projectID", function(req, res, next){
             console.log(err);
         } else {
             res.render("admin_editproject", {
+                pageTitle: rows[0].project_name,
                 userID: req.params.userID,
                 projectID: req.params.projectID,
                 projectName: rows[0].project_name 

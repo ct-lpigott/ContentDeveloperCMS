@@ -148,6 +148,53 @@ router.put("/:userID/:projectID", function(req, res, next){
         }
     });
 });
+router.put("/:userID/:projectID/addCollaborator", function(req, res, next){
+    if(req.body.email != null && req.body.email.length > 0){
+        dbconn.query("SELECT id FROM User WHERE email_address=" + dbconn.escape(req.body.email), function(err, rows, fields){
+            if(err){
+                console.log("Error checking if user exists " + err);
+            } else {
+                if(rows.length > 0){
+                    console.log("This is an existing user");
+                    req.newCollaboratorID = rows[0].id;
+                    next();
+                } else {
+                    console.log("This is a new user");
+                    dbconn.query("INSERT INTO User(email_address) VALUES(" + dbconn.escape(req.body.email) +")", function(err, result){
+                        if(err){
+                            console.log("Error adding new user " + err);
+                        } else {
+                            req.newCollaboratorID = result.insertId;
+                            next();
+                        }
+                    });
+                }
+            }
+        });
+    }
+});
+router.put("/:userID/:projectID/addCollaborator", function(req, res, next){
+    dbconn.query("SELECT * FROM User_Project WHERE user_id=" + req.newCollaboratorID + " AND project_id=" + req.params.projectID, function(err, rows, fields){
+        if(err){
+            console.log("Error checking if user is already a contributor to project " + err);
+        } else {
+            if(rows.length > 0){
+                console.log("This user is already a collaborator on this project");
+                res.send();
+            } else {
+                var accessLevel = req.body.accessLevel == null || req.body.accessLevel < 1 ? 1 : req.body.accessLevel;
+                dbconn.query("INSERT INTO User_Project(user_id, project_id, user_access_level) VALUES(" + req.newCollaboratorID + ", " + req.params.projectID + ", " + dbconn.escape(accessLevel) + ")", function(err, result) {
+                    if(err){
+                        console.log("Error adding user to project " + err);
+                    } else {
+                        console.log("New collaborator added to project");
+                        res.send();
+                    }
+                });
+            }
+        }
+    });
+});
 router.put("/:userID/:projectID/:collection", function(req, res, next){
     res.send("PUT request received from userID=" + req.params.userID + " for projectID=" + req.params.project + " collection=" + req.params.collection);
 });

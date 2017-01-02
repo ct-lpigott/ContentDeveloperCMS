@@ -48,6 +48,16 @@ function customClickEventHandler(e){
                 updateProjectJSON(responseObject);
             }, "PUT");
         }
+        case "addNewCollab": {
+            var email = document.getElementById("newCollabEmail").value;
+            var accessLevel = document.getElementById("accessLevel").value;
+            console.log(email, accessLevel);
+            if(email.length > 0 && accessLevel > 0){
+                sendAjaxRequest("/feeds/" + userID + "/" + projectID + "/addCollaborator", {email: email, accessLevel: accessLevel}, function(responseObject){
+                    
+                }, "PUT");
+            }
+        }
     }
 }
 

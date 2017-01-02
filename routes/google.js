@@ -21,7 +21,8 @@ router.get("/oauthRedirectURL", function(req, res, next){
                 userId: 'me',
                 auth: oauth2Client
             }, function (err, user) {
-                dbconn.query("SELECT * FROM User WHERE google_profile_id=" + dbconn.escape(user.id), function(err, rows, fields){
+                console.log(user.emails[0].value);
+                dbconn.query("SELECT * FROM User WHERE email_address=" + dbconn.escape(user.emails[0].value), function(err, rows, fields){
                     if(err) {
                         console.log(err);
                     } else {
@@ -30,7 +31,7 @@ router.get("/oauthRedirectURL", function(req, res, next){
                         if(rows.length > 0){
                             req.userID = rows[0].id;
                             console.log("This is an existing user");
-                            dbconn.query("UPDATE User SET google_auth_token = " + dbconn.escape(jsonToken) + " WHERE id = " + dbconn.escape(rows[0].id), function(err, result){
+                            dbconn.query("UPDATE User SET google_profile_id = " + user.id + ", google_auth_token = " + dbconn.escape(jsonToken) + " WHERE id = " + dbconn.escape(rows[0].id), function(err, result){
                                 if(err) {
                                     console.log(err);
                                 } else {
@@ -41,7 +42,7 @@ router.get("/oauthRedirectURL", function(req, res, next){
                         } else {
                             console.log("This is a new user");
 
-                            dbconn.query("INSERT into User(google_profile_id, google_auth_token) VALUES(" + dbconn.escape(user.id) + ", " + dbconn.escape(jsonToken) + ")", function(err, result){
+                            dbconn.query("INSERT into User(email_address, google_profile_id, google_auth_token) VALUES(" + dbconn.escape(user.emails[0].value) + ", " + dbconn.escape(user.id) + ", " + dbconn.escape(jsonToken) + ")", function(err, result){
                                 if(err) {
                                     console.log(err);
                                 } else {

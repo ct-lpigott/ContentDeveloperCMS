@@ -8,6 +8,15 @@ block main-body
 
     button(id="updateProjectStructure") Save
 
+    h2 Add Collaborator
+    label Email Address:
+        input(id="newCollabEmail" type="email")
+    label Access Level
+        select(id="accessLevel")
+            option(value=1) Administrator
+            option(value=2) Content Editor
+    button(id="addNewCollab") Add
+
     input(id="userID" type="hidden" value=userID)
     input(id="projectID" type="hidden" value=projectID)
 
