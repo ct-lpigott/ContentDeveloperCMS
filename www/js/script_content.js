@@ -19,7 +19,7 @@ function customClickEventHandler(e){
         case "updateProjectContent": {
             var projectContent = parseProjectContentToJSON();
             sendAjaxRequest("/feeds/" + userID + "/" + projectID, {projectContent: projectContent}, function(responseObject){
-                updateProjectHTML(responseObject);
+                
             }, "PUT");  
             break;
         }
@@ -31,10 +31,17 @@ function customClickEventHandler(e){
     }
 
     if(e.target.classList.contains("add")){
-        var collection = e.target.parentNode.querySelector("[data-collection]").getAttribute("data-collection");
-        console.log(collection);
+        var collection = e.target.parentNode.getAttribute("data-collection");
+        var collectionContainer = document.querySelector(".collection." + collection);
+        var newItemIndex = document.querySelectorAll(".item-container." + collection + "-item").length;
+        var newItemContainerElement = createItemInputElements(collection, null, newItemIndex);
+        collectionContainer.insertBefore(newItemContainerElement, e.target);
     } else if(e.target.classList.contains("delete")){
-        e.target.parentNode.remove();
+        var collection = e.target.parentNode.querySelector("[data-collection]").getAttribute("data-collection");
+        var itemIndex = e.target.parentNode.querySelector("[data-index]").getAttribute("data-index");
+        sendAjaxRequest("/feeds/" + userID + "/" + projectID + "/" + collection + "/" + itemIndex, {}, function(responseObject){
+            e.target.parentNode.remove();
+        }, "DELETE");
     }
 }
 
@@ -45,63 +52,29 @@ function updateProjectHTML(projectDetails){
     projectContentContainer.innerHTML = "";
 
     for(var collection in projectStructure){
+        var collectionContainer = document.createElement("div");
+        collectionContainer.setAttribute("class", "collection " + collection);
+        collectionContainer.setAttribute("data-collection", collection);
+
         var collectionHeading = document.createElement("h3");
         collectionHeading.innerHTML = upperCamelCaseAll(underscoreToSpace(collection));
-        projectContentContainer.appendChild(collectionHeading);
+        collectionContainer.appendChild(collectionHeading);
         switch(projectStructure[collection].type){
             case "array": {
                 var itemIndex = 0;
                 for(var item in projectContent[collection]){
-                    for(var itemDefinition in projectStructure[collection]){  
-                        var itemContainerElement = document.createElement("div");
-                        itemContainerElement.setAttribute("class", "item-container " + collection + "-item");                     
-                        for(var itemInput in projectStructure[collection][itemDefinition]){
-                            if(projectStructure[collection][itemDefinition][itemInput]["input_type"] != null){
-                                var newElement = document.createElement(projectStructure[collection][itemDefinition][itemInput]["input_type"]);
-                                newElement.setAttribute("data-collection", collection);
-                                newElement.setAttribute("data-index", itemIndex);
-                                newElement.setAttribute("data-key", itemInput);
-                                for(var inputAttribute in projectStructure[collection][itemDefinition][itemInput]["attributes"]){
-                                    newElement.setAttribute(inputAttribute, projectStructure[collection][itemDefinition][itemInput]["attributes"][inputAttribute]);
-                                }
-                                if(projectContent[collection][item][itemInput] != null){
-                                    switch(projectStructure[collection][itemDefinition][itemInput]["input_type"]){
-                                        case "select": {
-                                            for(var option in projectStructure[collection][itemDefinition][itemInput]["options"]){
-                                                var newOption = document.createElement("option");
-                                                newOption.innerHTML = projectStructure[collection][itemDefinition][itemInput]["options"][option];
-                                                if(projectStructure[collection][itemDefinition][itemInput]["options"][option] == projectContent[collection][item][itemInput]){
-                                                    newOption.setAttribute("selected", "selected");
-                                                }
-                                                newElement.appendChild(newOption);
-                                            }
-                                            break;
-                                        }
-                                        default: {
-                                            newElement.setAttribute("value", projectContent[collection][item][itemInput]);
-                                            break;
-                                        }
-                                    }
-                                }
-                                
-                                itemContainerElement.appendChild(newElement);
-                                projectContentContainer.appendChild(itemContainerElement);
-                            }                            
-                        }                        
-                    }
-                    var deleteButtonElement = document.createElement("button");
-                    deleteButtonElement.innerHTML = "Delete";
-                    deleteButtonElement.setAttribute("class", "delete");
-                    itemContainerElement.appendChild(deleteButtonElement);
+                    var itemContainerElement = createItemInputElements(collection, projectContent[collection][item], itemIndex);
+                    collectionContainer.appendChild(itemContainerElement);
 
-                    projectContentContainer.appendChild(document.createElement("br"));
                     itemIndex++;
                 }
 
                 var addButtonElement = document.createElement("button");
                 addButtonElement.innerHTML = "Add " + collection;
                 addButtonElement.setAttribute("class", "add");
-                projectContentContainer.appendChild(addButtonElement);
+                collectionContainer.appendChild(addButtonElement);
+
+                projectContentContainer.appendChild(collectionContainer);
             }
         }
     }
@@ -133,4 +106,52 @@ function parseProjectContentToJSON(){
     
 
     return JSON.stringify(projectContent);
+}
+
+function createItemInputElements(collection, itemContent=null, itemIndex=-1){
+    var itemContainerElement = document.createElement("div");
+    for(var itemDefinition in projectStructure[collection]){  
+        itemContainerElement.setAttribute("class", "item-container " + collection + "-item");                     
+        for(var itemInput in projectStructure[collection][itemDefinition]){
+            if(projectStructure[collection][itemDefinition][itemInput]["input_type"] != null){
+                var newElement = document.createElement(projectStructure[collection][itemDefinition][itemInput]["input_type"]);
+                newElement.setAttribute("data-collection", collection);
+                newElement.setAttribute("data-index", itemIndex);
+                newElement.setAttribute("data-key", itemInput);
+                for(var inputAttribute in projectStructure[collection][itemDefinition][itemInput]["attributes"] && itemContent != null){
+                    newElement.setAttribute(inputAttribute, projectStructure[collection][itemDefinition][itemInput]["attributes"][inputAttribute]);
+                }
+                
+                switch(projectStructure[collection][itemDefinition][itemInput]["input_type"]){
+                    case "select": {
+                        for(var option in projectStructure[collection][itemDefinition][itemInput]["options"]){
+                            var newOption = document.createElement("option");
+                            newOption.innerHTML = projectStructure[collection][itemDefinition][itemInput]["options"][option];
+                            if(itemContent != null && itemContent[itemInput] != null){
+                                if(projectStructure[collection][itemDefinition][itemInput]["options"][option] == itemContent[itemInput]){
+                                    newOption.setAttribute("selected", "selected");
+                                }
+                            }
+                            newElement.appendChild(newOption);
+                        }
+                        break;
+                    }
+                    default: {
+                        if(itemContent != null && itemContent[itemInput] != null){
+                            newElement.setAttribute("value", itemContent[itemInput]);
+                        }
+                        break;
+                    }
+                }
+                
+                itemContainerElement.appendChild(newElement);
+            }                            
+        }                        
+    }
+    var deleteButtonElement = document.createElement("button");
+    deleteButtonElement.innerHTML = "Delete";
+    deleteButtonElement.setAttribute("class", "delete");
+    itemContainerElement.appendChild(deleteButtonElement);
+
+    return itemContainerElement;
 }

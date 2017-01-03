@@ -170,7 +170,7 @@ router.put("/:userID/:projectID", function(req, res, next){
                                 console.log("Error updating file " + err);
                             } else {
                                 console.log("Project content file updated");
-                                res.send(req.body.projectContent);
+                                res.send("{}");
                             }
                         }); 
                     }
@@ -242,7 +242,46 @@ router.delete("/:userID/:projectID/:collection", function(req, res, next){
     res.send("DELETE request received from userID=" + req.params.userID + " for projectID=" + req.params.project + " collection=" + req.params.collection);
 });
 router.delete("/:userID/:projectID/:collection/:item", function(req, res, next){
-    res.send("DELETE request received from userID=" + req.params.userID + " for projectID=" + req.params.project + " collection=" + req.params.collection + " and item=" + req.params.item);
+    dbconn.query("SELECT p.id as 'project_id', up.user_id as 'user_id', up.user_access_level as 'user_access_level' FROM Project p LEFT JOIN User_Project up ON p.id = up.project_id WHERE p.id = " + dbconn.escape(req.params.projectID) + " AND up.user_id = " + dbconn.escape(req.params.userID), function(err, rows, fields){
+        if(err){
+            console.log(err);
+        } else {
+            var projectRow = rows[0];
+
+            switch(projectRow.user_access_level) {
+                case 1: {
+                }
+                default: {
+                    var contentFilePath = "./projects/" + projectRow.project_id + "/content.json";
+                    fs.readFile(contentFilePath, {encoding: "utf-8"}, function(err, projectContent){
+                        if(err){
+                            console.log(err);
+                        } else {
+                            var updatedProjectContent = JSON.parse(projectContent);
+                            
+                            switch(updatedProjectContent[req.params.collection].constructor){
+                                case Array: {
+                                    console.log("array");
+                                    updatedProjectContent[req.params.collection].splice([req.params.item], 1);
+                                }
+                            }
+                            if(JSON.stringify(updatedProjectContent) != projectContent){
+                                fs.writeFile(contentFilePath, JSON.stringify(updatedProjectContent), function(err){
+                                    if(err) {
+                                        console.log("Error updating file " + err);
+                                    } else {
+                                        console.log("Project content file updated");
+                                        res.send("{}");
+                                    }
+                                });
+                            }
+                        }
+                    });
+                    break;
+                }
+            }          
+        }
+    });
 });
 
 module.exports = router;
