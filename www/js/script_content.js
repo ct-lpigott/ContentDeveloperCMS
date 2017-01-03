@@ -23,6 +23,18 @@ function customClickEventHandler(e){
             }, "PUT");  
             break;
         }
+        case "resetProjectContent": {
+           sendAjaxRequest("/feeds/" + userID + "/" + projectID, {}, function(responseObject){
+               updateProjectHTML(responseObject);
+            });  
+        }
+    }
+
+    if(e.target.classList.contains("add")){
+        var collection = e.target.parentNode.querySelector("[data-collection]").getAttribute("data-collection");
+        console.log(collection);
+    } else if(e.target.classList.contains("delete")){
+        e.target.parentNode.remove();
     }
 }
 
@@ -30,6 +42,7 @@ function updateProjectHTML(projectDetails){
     projectStructure = projectDetails.projectStructure;
     var projectContent = projectDetails.projectContent;
     var projectContentContainer = document.getElementById("projectContent");
+    projectContentContainer.innerHTML = "";
 
     for(var collection in projectStructure){
         var collectionHeading = document.createElement("h3");
@@ -70,14 +83,25 @@ function updateProjectHTML(projectDetails){
                                         }
                                     }
                                 }
+                                
                                 itemContainerElement.appendChild(newElement);
                                 projectContentContainer.appendChild(itemContainerElement);
                             }                            
                         }                        
                     }
+                    var deleteButtonElement = document.createElement("button");
+                    deleteButtonElement.innerHTML = "Delete";
+                    deleteButtonElement.setAttribute("class", "delete");
+                    itemContainerElement.appendChild(deleteButtonElement);
+
                     projectContentContainer.appendChild(document.createElement("br"));
                     itemIndex++;
                 }
+
+                var addButtonElement = document.createElement("button");
+                addButtonElement.innerHTML = "Add " + collection;
+                addButtonElement.setAttribute("class", "add");
+                projectContentContainer.appendChild(addButtonElement);
             }
         }
     }
