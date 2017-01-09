@@ -62,6 +62,7 @@ function customClickEventHandler(e){
             }
             
             updateProjectHTML(tempProjectObj, false);
+            reformatJSON();
             break;
         }
         case "resetProjectStructure": {
@@ -102,7 +103,6 @@ function projectStructureKeyDownHandler(e){
     if(e.key.toLowerCase() == "enter" || e.keyCode == 13){
         e.preventDefault();
         appendChar = "\n";
-        insertionPoint += 1;
     }
 
     if(e.key.toLowerCase() == "tab" || e.keyCode == 9){
@@ -111,24 +111,21 @@ function projectStructureKeyDownHandler(e){
             deletePrevChar = true;
         } else {
             appendChar = "\t";
-            insertionPoint += 1;
         }
     }
 
     if(deletePrevChar){
-        projectStructureContainer.value = contents.slice(0, insertionPoint-2) + contents.slice(insertionPoint);
-        projectStructureContainer.setSelectionRange(insertionPoint-2, insertionPoint-2);
+        prevChar = contents.slice(insertionPoint-1, insertionPoint);
+        console.log(prevChar.replace(/\s/g, "").length);
+        if(prevChar.replace(/\s/g, "").length == 0){
+            projectStructureContainer.value = contents.slice(0, insertionPoint-1) + contents.slice(insertionPoint);
+            updateSelectionRange(insertionPoint-1);
+        }
+        
     } else if(appendChar.length > 0) {
-        projectStructureContainer.value = contents.slice(0, insertionPoint-1) + appendChar + contents.slice(insertionPoint-1);
-        projectStructureContainer.setSelectionRange(insertionPoint, insertionPoint);
-    }   
-
-
-    try{
-        var updatedJSON = JSON.parse(projectStructureContainer.value);
-        updateProjectJSON(updatedJSON);
-    } catch(e){}
-    
+        projectStructureContainer.value = contents.slice(0, insertionPoint) + appendChar + contents.slice(insertionPoint);
+        updateSelectionRange(insertionPoint+1);
+    }
 }
 
 function parseProjectStructureToJSON(){
@@ -147,4 +144,16 @@ function resetProjectStructure(){
         updateProjectJSON(responseObject.projectStructure);
         updateProjectHTML(responseObject, false);
     }); 
+}
+
+function reformatJSON(){
+    var projectStructureContainer = document.getElementById("projectStructure");
+    try{
+        var updatedJSON = JSON.parse(projectStructureContainer.value);
+        updateProjectJSON(updatedJSON);
+    } catch(e){}
+}
+
+function updateSelectionRange(insertionPoint){
+    var projectStructureContainer = document.getElementById("projectStructure").setSelectionRange(insertionPoint, insertionPoint);
 }
