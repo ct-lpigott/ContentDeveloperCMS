@@ -1,6 +1,6 @@
 function updateProjectHTML(projectDetails, includeContent=true){
-    projectStructure = projectDetails.projectStructure;
-    var projectContent = projectDetails.projectContent;
+    projectStructure = projectDetails.project_structure;
+    var projectContent = projectDetails.project_content;
     var projectContentContainer = document.getElementById("projectContent");
     projectContentContainer.innerHTML = "";
 

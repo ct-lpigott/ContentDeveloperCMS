@@ -102,15 +102,15 @@ router.get("/:userID/:projectID", function(req, res, next){
 
                             if(req.query.fullContext != null && req.query.fullContext == true){
                                 responseObject = {
-                                    projectStructure: projectStructure,
-                                    projectContent: JSON.parse(projectContent)
+                                    project_structure: projectStructure,
+                                    project_content: JSON.parse(projectContent)
                                 }
                             } else {
                                 switch(projectRow.user_access_level){
                                     case 1: {
                                         responseObject = {
-                                            projectStructure: projectStructure,
-                                            projectContent: JSON.parse(projectContent)
+                                            project_structure: projectStructure,
+                                            project_content: JSON.parse(projectContent)
                                         }
                                         break;
                                     }

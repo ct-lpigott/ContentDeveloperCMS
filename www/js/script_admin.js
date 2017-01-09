@@ -141,7 +141,7 @@ function parseProjectStructureToJSON(){
 
 function resetProjectStructure(){
     sendAjaxRequest("/feeds/" + userID + "/" + projectID, {}, function(responseObject){
-        updateProjectJSON(responseObject.projectStructure);
+        updateProjectJSON(responseObject.project_structure);
         updateProjectHTML(responseObject, false);
     }); 
 }
