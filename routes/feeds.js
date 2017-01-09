@@ -72,16 +72,16 @@ router.post("/:userID/:project/:collection/:item", function(req, res, next){
 // READ
 router.get("/:userID", function(req, res, next){
     console.log("GET request from " + req.params.userID + " to view all projects");
-    dbconn.query("SELECT * FROM Project p LEFT JOIN User_Project as up ON p.id = up.project_id WHERE up.user_id =" + dbconn.escape(req.params.userID), function(err, rows, fields){
+    dbconn.query("SELECT up.project_id, p.project_name, up.user_access_level FROM Project p LEFT JOIN User_Project as up ON p.id = up.project_id WHERE up.user_id =" + dbconn.escape(req.params.userID), function(err, projects, fields){
         if(err){
             console.log(err);
         } else {
-            res.send(rows);
+            res.send(projects);
         }
     });
 });
 router.get("/:userID/:projectID", function(req, res, next){
-    dbconn.query("SELECT p.id as 'project_id', up.user_id as 'user_id', up.user_access_level as 'user_access_level' FROM Project p LEFT JOIN User_Project up ON p.id = up.project_id WHERE p.id = " + dbconn.escape(req.params.projectID) + " AND up.user_id = " + dbconn.escape(req.params.userID), function(err, rows, fields){
+    dbconn.query("SELECT up.project_id, up.user_id, up.user_access_level FROM Project p LEFT JOIN User_Project up ON p.id = up.project_id WHERE p.id = " + dbconn.escape(req.params.projectID) + " AND up.user_id = " + dbconn.escape(req.params.userID), function(err, rows, fields){
         if(err){
             console.log(err);
         } else {
@@ -98,9 +98,27 @@ router.get("/:userID/:projectID", function(req, res, next){
                         if(err){
                             console.log(err);
                         } else {
-                            var responseObject = {
-                                projectStructure: projectStructure,
-                                projectContent: JSON.parse(projectContent)
+                            var responseObject;
+
+                            if(req.query.fullContext != null && req.query.fullContext == true){
+                                responseObject = {
+                                    projectStructure: projectStructure,
+                                    projectContent: JSON.parse(projectContent)
+                                }
+                            } else {
+                                switch(projectRow.user_access_level){
+                                    case 1: {
+                                        responseObject = {
+                                            projectStructure: projectStructure,
+                                            projectContent: JSON.parse(projectContent)
+                                        }
+                                        break;
+                                    }
+                                    default: {
+                                        responseObject = JSON.parse(projectContent);
+                                        break;
+                                    }
+                                }             
                             }
                             res.send(responseObject);
                         }
@@ -112,7 +130,26 @@ router.get("/:userID/:projectID", function(req, res, next){
     });
 });
 router.get("/:userID/:projectID/:collection", function(req, res, next){
-    res.send("GET request received from userID=" + req.params.userID + " for projectID=" + req.params.project + " collection=" + req.params.collection);
+    dbconn.query("SELECT up.project_id, up.user_access_level FROM Project p LEFT JOIN User_Project up ON p.id = up.project_id WHERE p.id = " + dbconn.escape(req.params.projectID) + " AND up.user_id = " + dbconn.escape(req.params.userID), function(err, rows, fields){
+        if(err){
+            console.log(err);
+        } else {
+            var projectRow = rows[0];
+
+            fs.readFile("./projects/" + projectRow.project_id + "/content.json", {encoding: "utf-8"}, function(err, projectContent){
+                if(err){
+                    console.log(err);
+                } else {
+                    var collectionName = req.params.collection.toLowerCase();
+                    projectContent = JSON.parse(projectContent);
+                    var collectionContent = projectContent[collectionName] != null ? projectContent[collectionName] : {};
+                    var responseObject = {};
+                    responseObject[collectionName] = collectionContent;
+                    res.send(responseObject);
+                }
+            });           
+        }
+    });
 });
 router.get("/:userID/:projectID/:collection/:item", function(req, res, next){
     res.send("GET request received from userID=" + req.params.userID + " for projectID=" + req.params.project + " collection=" + req.params.collection + " and item=" + req.params.item);

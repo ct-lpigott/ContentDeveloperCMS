@@ -30,7 +30,7 @@ function sendAjaxRequest(url, requestData, callback, method="GET"){
             callback(JSON.parse(xhttp.responseText));
         }
     };
-    xhttp.open(method, url, true);
+    xhttp.open(method, url + "?fullContext=true", true);
     xhttp.setRequestHeader("X-Requested-With", "XMLHttpRequest");
     xhttp.setRequestHeader("Content-Type", "application/json");
     xhttp.send(JSON.stringify(requestData));
