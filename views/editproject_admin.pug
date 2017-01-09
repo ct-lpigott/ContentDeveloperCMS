@@ -4,9 +4,17 @@ block main-body
 
     h1 #{projectName}
 
-    textarea(id="projectStructure" contenteditable="true")
+    div.col-2
+        h2 Project Structure Editor
+        textarea(id="projectStructure")
 
-    button(id="updateProjectStructure") Save
+        button(id="previewProjectStructure") Preview
+        button(id="updateProjectStructure") Save
+        button(id="resetProjectStructure") Reset
+        
+    div.col-2
+        h2 Project Structure Preview
+        div(id="projectContent")
 
     h2 Add Collaborator
     label Email Address:
@@ -21,3 +29,4 @@ block main-body
     input(id="projectID" type="hidden" value=projectID)
 
     script(src='/js/script_admin.js')
+    script(src='/js/script_console.js')

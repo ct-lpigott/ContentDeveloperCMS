@@ -12,9 +12,7 @@ function customWindowOnload(){
 
     if(document.getElementById("projectID")){
         projectID = document.getElementById("projectID").value;
-        sendAjaxRequest("/feeds/" + userID + "/" + projectID, {}, function(responseObject){
-            updateProjectJSON(responseObject);
-        }); 
+        resetProjectStructure();
     }    
 }
 
@@ -33,20 +31,18 @@ function customClickEventHandler(e){
                     updateUserProjects(responseObject);
                 }, "POST");
             }
+            break;
             
         }
         case "updateProjectStructure": {
-            var projectStructure = document.getElementById("projectStructure").value;
-            var escapeCharsRemoved = projectStructure.replace(/\n/gm, "").replace(/\t/gm, "");
-
-            if(escapeCharsRemoved == null || escapeCharsRemoved.length == 0){
-                escapeCharsRemoved = "{}";
-            }
+            parsedProjectStructure = parseProjectStructureToJSON();
             
 
-            sendAjaxRequest("/feeds/" + userID + "/" + projectID, {projectStructure: escapeCharsRemoved}, function(responseObject){
+            sendAjaxRequest("/feeds/" + userID + "/" + projectID, {projectStructure: parsedProjectStructure}, function(responseObject){
                 updateProjectJSON(responseObject);
             }, "PUT");
+
+            break;
         }
         case "addNewCollab": {
             var email = document.getElementById("newCollabEmail").value;
@@ -57,6 +53,19 @@ function customClickEventHandler(e){
                     
                 }, "PUT");
             }
+            break;
+        }
+        case "previewProjectStructure": {
+            var tempProjectObj = {
+                projectStructure: JSON.parse(parseProjectStructureToJSON())
+            }
+            
+            updateProjectHTML(tempProjectObj, false);
+            break;
+        }
+        case "resetProjectStructure": {
+            resetProjectStructure();
+            break;
         }
     }
 }
@@ -79,7 +88,7 @@ function updateUserProjects(userProjects){
 
 function updateProjectJSON(projectStructureOBJ){
     var formattedJSON = JSON.stringify(projectStructureOBJ, null, 4);
-    document.getElementById("projectStructure").innerHTML = formattedJSON;
+    document.getElementById("projectStructure").value = formattedJSON;
 }
 
 function projectStructureKeyDownHandler(e){
@@ -119,4 +128,22 @@ function projectStructureKeyDownHandler(e){
         updateProjectJSON(updatedJSON);
     } catch(e){}
     
+}
+
+function parseProjectStructureToJSON(){
+    var projectStructure = document.getElementById("projectStructure").value;
+    var escapeCharsRemoved = projectStructure.replace(/\n/gm, "").replace(/\t/gm, "");
+
+    if(escapeCharsRemoved == null || escapeCharsRemoved.length == 0){
+        escapeCharsRemoved = "{}";
+    }
+
+    return escapeCharsRemoved;
+}
+
+function resetProjectStructure(){
+    sendAjaxRequest("/feeds/" + userID + "/" + projectID, {}, function(responseObject){
+        updateProjectJSON(responseObject.projectStructure);
+        updateProjectHTML(responseObject, false);
+    }); 
 }

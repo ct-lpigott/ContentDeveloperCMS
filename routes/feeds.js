@@ -94,26 +94,17 @@ router.get("/:userID/:projectID", function(req, res, next){
                     var projectAdmin = JSON.parse(data);
                     var projectStructure = projectAdmin.project_structure;
 
-                    switch(projectRow.user_access_level) {
-                        case 1: {
-                            res.send(JSON.stringify(projectStructure));
-                            break;
+                    fs.readFile("./projects/" + projectRow.project_id + "/content.json", {encoding: "utf-8"}, function(err, projectContent){
+                        if(err){
+                            console.log(err);
+                        } else {
+                            var responseObject = {
+                                projectStructure: projectStructure,
+                                projectContent: JSON.parse(projectContent)
+                            }
+                            res.send(responseObject);
                         }
-                        default: {
-                            fs.readFile("./projects/" + projectRow.project_id + "/content.json", {encoding: "utf-8"}, function(err, projectContent){
-                                if(err){
-                                    console.log(err);
-                                } else {
-                                    var responseObject = {
-                                        projectStructure: projectStructure,
-                                        projectContent: JSON.parse(projectContent)
-                                    }
-                                    res.send(responseObject);
-                                }
-                            });
-                            break;
-                        }
-                    }
+                    });
                     
                 }
             });            
