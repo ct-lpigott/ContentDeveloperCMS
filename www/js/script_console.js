@@ -63,7 +63,9 @@ function createItemInputElements(collection, itemContent=null, itemIndex=-1){
                     newElement.setAttribute("id", itemID);
                     
                     for(var inputAttribute in projectStructure[collection][itemDefinition][itemInput]["attributes"] && itemContent != null){
-                        newElement.setAttribute(inputAttribute, projectStructure[collection][itemDefinition][itemInput]["attributes"][inputAttribute]);
+                        if((inputAttribute != "value") || (inputAttribute == "value" && itemContent != null)){
+                            newElement.setAttribute(inputAttribute, projectStructure[collection][itemDefinition][itemInput]["attributes"][inputAttribute]);
+                        }
                     }
                     
                     switch(projectStructure[collection][itemDefinition][itemInput]["input_type"]){
@@ -105,8 +107,10 @@ function createItemInputElements(collection, itemContent=null, itemIndex=-1){
             newInputElement.setAttribute("id", itemID);
             newInputElement.setAttribute("type", inputType);
             
-            for(var inputAttribute in projectStructure[collection]["attributes"] && itemContent != null){
-                newElement.setAttribute(inputAttribute, projectStructure[collection]["attributes"][inputAttribute]);
+            for(var inputAttribute in projectStructure[collection]["attributes"]){
+                if((inputAttribute != "value") || (inputAttribute == "value" && itemContent != null)){
+                    newInputElement.setAttribute(inputAttribute, projectStructure[collection]["attributes"][inputAttribute]);
+                }
             }
 
             itemContainerElement.appendChild(newLabel);
