@@ -20,7 +20,7 @@ function customClickEventHandler(e){
             var projectContent = parseProjectContentToJSON();
             sendAjaxRequest("/feeds/" + userID + "/" + projectID, {projectContent: projectContent}, function(responseObject){
                 
-            }, "PUT");  
+            }, "PUT"); 
             break;
         }
         case "resetProjectContent": {
@@ -65,6 +65,12 @@ function parseProjectContentToJSON(){
                     }
                     projectContent[collection].push(itemDetails);
                 }
+                break;
+            }
+            default: {
+                projectContent[collection] = document.getElementById(collection + "-0").value;
+                break;
+
             }
         }
     }

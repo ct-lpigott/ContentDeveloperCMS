@@ -31,61 +31,88 @@ function updateProjectHTML(projectDetails, includeContent=true){
                 addButtonElement.innerHTML = "Add " + collection;
                 addButtonElement.setAttribute("class", "add");
                 collectionContainer.appendChild(addButtonElement);
-
-                projectContentContainer.appendChild(collectionContainer);
+                break;
+            }
+            default: {
+                var itemContainerElement = createItemInputElements(collection, null, 0);
+                collectionContainer.appendChild(itemContainerElement);
+                break;
             }
         }
+        projectContentContainer.appendChild(collectionContainer);
     }
 }
 
 function createItemInputElements(collection, itemContent=null, itemIndex=-1){
     var itemContainerElement = document.createElement("div");
     for(var itemDefinition in projectStructure[collection]){  
-        itemContainerElement.setAttribute("class", "item-container " + collection + "-item");                     
-        for(var itemInput in projectStructure[collection][itemDefinition]){
-            if(projectStructure[collection][itemDefinition][itemInput]["input_type"] != null){
-                var itemID = collection + "-" + itemIndex + "-" + itemInput;
+        itemContainerElement.setAttribute("class", "item-container " + collection + "-item");
+        if(projectStructure[collection]["items"] != null){
+            for(var itemInput in projectStructure[collection][itemDefinition]){
+                if(projectStructure[collection][itemDefinition][itemInput]["input_type"] != null){
+                    var itemID = collection + "-" + itemIndex + "-" + itemInput;
 
-                var newLabel = document.createElement("label");
-                newLabel.innerHTML = upperCamelCaseAll(underscoreToSpace(itemInput));
-                newLabel.setAttribute("for", itemID);
+                    var newLabel = document.createElement("label");
+                    newLabel.innerHTML = upperCamelCaseAll(underscoreToSpace(itemInput));
+                    newLabel.setAttribute("for", itemID);
 
-                var newElement = document.createElement(projectStructure[collection][itemDefinition][itemInput]["input_type"]);
-                newElement.setAttribute("data-collection", collection);
-                newElement.setAttribute("data-index", itemIndex);
-                newElement.setAttribute("data-key", itemInput);
-                newElement.setAttribute("id", itemID);
-                
-                for(var inputAttribute in projectStructure[collection][itemDefinition][itemInput]["attributes"] && itemContent != null){
-                    newElement.setAttribute(inputAttribute, projectStructure[collection][itemDefinition][itemInput]["attributes"][inputAttribute]);
-                }
-                
-                switch(projectStructure[collection][itemDefinition][itemInput]["input_type"]){
-                    case "select": {
-                        for(var option in projectStructure[collection][itemDefinition][itemInput]["options"]){
-                            var newOption = document.createElement("option");
-                            newOption.innerHTML = projectStructure[collection][itemDefinition][itemInput]["options"][option];
-                            if(itemContent != null && itemContent[itemInput] != null){
-                                if(projectStructure[collection][itemDefinition][itemInput]["options"][option] == itemContent[itemInput]){
-                                    newOption.setAttribute("selected", "selected");
+                    var newElement = document.createElement(projectStructure[collection][itemDefinition][itemInput]["input_type"]);
+                    newElement.setAttribute("data-collection", collection);
+                    newElement.setAttribute("data-index", itemIndex);
+                    newElement.setAttribute("data-key", itemInput);
+                    newElement.setAttribute("id", itemID);
+                    
+                    for(var inputAttribute in projectStructure[collection][itemDefinition][itemInput]["attributes"] && itemContent != null){
+                        newElement.setAttribute(inputAttribute, projectStructure[collection][itemDefinition][itemInput]["attributes"][inputAttribute]);
+                    }
+                    
+                    switch(projectStructure[collection][itemDefinition][itemInput]["input_type"]){
+                        case "select": {
+                            for(var option in projectStructure[collection][itemDefinition][itemInput]["options"]){
+                                var newOption = document.createElement("option");
+                                newOption.innerHTML = projectStructure[collection][itemDefinition][itemInput]["options"][option];
+                                if(itemContent != null && itemContent[itemInput] != null){
+                                    if(projectStructure[collection][itemDefinition][itemInput]["options"][option] == itemContent[itemInput]){
+                                        newOption.setAttribute("selected", "selected");
+                                    }
                                 }
+                                newElement.appendChild(newOption);
                             }
-                            newElement.appendChild(newOption);
+                            break;
                         }
-                        break;
-                    }
-                    default: {
-                        if(itemContent != null && itemContent[itemInput] != null){
-                            newElement.setAttribute("value", itemContent[itemInput]);
+                        default: {
+                            if(itemContent != null && itemContent[itemInput] != null){
+                                newElement.setAttribute("value", itemContent[itemInput]);
+                            }
+                            break;
                         }
-                        break;
                     }
-                }
-                
-                itemContainerElement.appendChild(newLabel);
-                itemContainerElement.appendChild(newElement);
-            }                            
-        }                        
+                    
+                    itemContainerElement.appendChild(newLabel);
+                    itemContainerElement.appendChild(newElement);
+                }                            
+            }
+        } else if(projectStructure[collection]["attributes"] != null){
+            var inputType = projectStructure[collection]["attributes"]["type"];
+            var itemID = collection + "-0";
+
+            var newLabel = document.createElement("label");
+            newLabel.innerHTML = upperCamelCaseAll(underscoreToSpace(collection));
+            newLabel.setAttribute("for", itemID);
+
+            var newInputElement = document.createElement("input");
+            newInputElement.setAttribute("data-collection", collection);
+            newInputElement.setAttribute("id", itemID);
+            newInputElement.setAttribute("type", inputType);
+            
+            for(var inputAttribute in projectStructure[collection]["attributes"] && itemContent != null){
+                newElement.setAttribute(inputAttribute, projectStructure[collection]["attributes"][inputAttribute]);
+            }
+
+            itemContainerElement.appendChild(newLabel);
+            itemContainerElement.appendChild(newInputElement);
+        }              
+                                
     }
 
     if(itemContent != null){
