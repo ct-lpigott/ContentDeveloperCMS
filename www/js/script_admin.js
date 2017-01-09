@@ -40,6 +40,7 @@ function customClickEventHandler(e){
 
             sendAjaxRequest("/feeds/" + userID + "/" + projectID, {projectStructure: parsedProjectStructure}, function(responseObject){
                 updateProjectJSON(responseObject);
+                document.getElementById("previewProjectStructure").click();
             }, "PUT");
 
             break;

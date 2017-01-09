@@ -128,30 +128,30 @@ router.put("/:userID/:projectID", function(req, res, next){
 
             switch(projectRow.user_access_level){
                 case 1: {
-                    if(req.body.projectStructure == null || req.body.projectStructure.length == 0){
-                        req.body.projectStructure = {};
+                    if(req.body.projectStructure != null || req.body.projectStructure.length > 0){
+                        req.body.projectStructure = req.body.projectStructure.toLowerCase();                   
+
+                        var adminFilePath = "./projects/" + req.params.projectID + "/admin.json";
+                        fs.readFile(adminFilePath, {encoding: "utf-8"}, function(err, data){
+                            if(err){
+                                console.log(err);
+                            } else {
+                                var adminProjectFile = JSON.parse(data);
+                                adminProjectFile.date_updated = Date.now();
+                                adminProjectFile.last_updated_by = req.params.userID;
+                                adminProjectFile.project_structure = JSON.parse(req.body.projectStructure);
+
+                                fs.writeFile(adminFilePath, JSON.stringify(adminProjectFile), function(err){
+                                    if(err) {
+                                        console.log("Error updating file " + err);
+                                    } else {
+                                        console.log("Project admin file updated");
+                                        res.send(JSON.stringify(adminProjectFile.project_structure));
+                                    }
+                                });
+                            }
+                        });
                     }
-
-                    var adminFilePath = "./projects/" + req.params.projectID + "/admin.json";
-                    fs.readFile(adminFilePath, {encoding: "utf-8"}, function(err, data){
-                        if(err){
-                            console.log(err);
-                        } else {
-                            var adminProjectFile = JSON.parse(data);
-                            adminProjectFile.date_updated = Date.now();
-                            adminProjectFile.last_updated_by = req.params.userID;
-                            adminProjectFile.project_structure = JSON.parse(req.body.projectStructure);
-
-                            fs.writeFile(adminFilePath, JSON.stringify(adminProjectFile), function(err){
-                                if(err) {
-                                    console.log("Error updating file " + err);
-                                } else {
-                                    console.log("Project admin file updated");
-                                    res.send(JSON.stringify(adminProjectFile.project_structure));
-                                }
-                            });
-                        }
-                    });
                     break;
                 }
                 default: {
