@@ -34,7 +34,8 @@ function updateProjectHTML(projectDetails, includeContent=true){
                 break;
             }
             default: {
-                var itemContainerElement = createItemInputElements(collection, null, 0);
+                var elementValue = includeContent ? projectContent[collection] : null;
+                var itemContainerElement = createItemInputElements(collection, elementValue, 0);
                 collectionContainer.appendChild(itemContainerElement);
                 break;
             }
@@ -62,10 +63,8 @@ function createItemInputElements(collection, itemContent=null, itemIndex=-1){
                     newElement.setAttribute("data-key", itemInput);
                     newElement.setAttribute("id", itemID);
                     
-                    for(var inputAttribute in projectStructure[collection][itemDefinition][itemInput]["attributes"] && itemContent != null){
-                        if((inputAttribute != "value") || (inputAttribute == "value" && itemContent != null)){
-                            newElement.setAttribute(inputAttribute, projectStructure[collection][itemDefinition][itemInput]["attributes"][inputAttribute]);
-                        }
+                    for(var inputAttribute in projectStructure[collection][itemDefinition][itemInput]["attributes"]){
+                        newElement.setAttribute(inputAttribute, projectStructure[collection][itemDefinition][itemInput]["attributes"][inputAttribute]);
                     }
                     
                     switch(projectStructure[collection][itemDefinition][itemInput]["input_type"]){
@@ -108,9 +107,10 @@ function createItemInputElements(collection, itemContent=null, itemIndex=-1){
             newInputElement.setAttribute("type", inputType);
             
             for(var inputAttribute in projectStructure[collection]["attributes"]){
-                if((inputAttribute != "value") || (inputAttribute == "value" && itemContent != null)){
-                    newInputElement.setAttribute(inputAttribute, projectStructure[collection]["attributes"][inputAttribute]);
-                }
+                newInputElement.setAttribute(inputAttribute, projectStructure[collection]["attributes"][inputAttribute]);
+            }
+            if(itemContent != null){
+                newInputElement.setAttribute("value", itemContent);
             }
 
             itemContainerElement.appendChild(newLabel);
