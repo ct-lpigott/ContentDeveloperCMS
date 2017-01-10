@@ -100,7 +100,7 @@ router.get("/:userID/:projectID", function(req, res, next){
                         } else {
                             var responseObject;
 
-                            if(req.query.fullContext != null && req.query.fullContext == true){
+                            if(req.query.fullContext != null){
                                 responseObject = {
                                     project_structure: projectStructure,
                                     project_content: JSON.parse(projectContent)
