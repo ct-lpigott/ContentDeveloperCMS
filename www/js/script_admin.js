@@ -58,7 +58,7 @@ function customClickEventHandler(e){
         }
         case "previewProjectStructure": {
             var tempProjectObj = {
-                projectStructure: JSON.parse(parseProjectStructureToJSON())
+                project_structure: JSON.parse(parseProjectStructureToJSON())
             }
             
             updateProjectHTML(tempProjectObj, false);
@@ -80,7 +80,7 @@ function updateUserProjects(userProjects){
         var newLi = document.createElement("li");
 
         var newA = document.createElement("a");
-        newA.setAttribute("href", "/admin/" + userProjects[i].user_id + "/" + userProjects[i].project_id);
+        newA.setAttribute("href", "/admin/" + userID + "/" + userProjects[i].project_id);
         newA.innerHTML = userProjects[i].project_name;
         newLi.appendChild(newA);
 
