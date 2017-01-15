@@ -3,7 +3,7 @@ var google = require("googleapis");
 var googleAuth = require("google-auth-library");
 
 var clientSecretData = JSON.parse(fs.readFileSync("./google/client_secret.json"));
-var redirectURL = "http://contentdevelopercms.azurewebsites.net/google/oauthRedirectURL";
+var redirectURL = process.env.GOOGLE_OAUTH_REDIRECT_URL;
 
 var auth = new googleAuth();
 var oauth2Client = new auth.OAuth2(
