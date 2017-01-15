@@ -24,6 +24,6 @@ var oauthURL = oauth2Client.generateAuthUrl({
 module.exports = {
   oauth2Client: oauth2Client,
   oauthURL: oauthURL,
-}
+};
   
 
