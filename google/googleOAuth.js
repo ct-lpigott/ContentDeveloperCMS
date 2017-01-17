@@ -12,18 +12,19 @@ var oauth2Client = new auth.OAuth2(
   redirectURL
 );
 
-var oauthURL = oauth2Client.generateAuthUrl({
-    access_type: "offline",
-    scope: [
-    "https://www.googleapis.com/auth/drive",
-    "https://www.googleapis.com/auth/userinfo.profile",
-    "https://www.googleapis.com/auth/userinfo.email"
-    ]
-});
-
 module.exports = {
   oauth2Client: oauth2Client,
-  oauthURL: oauthURL,
+  generateOAuthUrl: function(){
+    var oauthURL = oauth2Client.generateAuthUrl({
+        access_type: "offline",
+        scope: [
+        "https://www.googleapis.com/auth/drive",
+        "https://www.googleapis.com/auth/userinfo.profile",
+        "https://www.googleapis.com/auth/userinfo.email"
+        ]
+    });
+    return oauthURL;
+  }
 };
   
 
