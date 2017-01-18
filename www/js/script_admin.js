@@ -5,7 +5,7 @@ function customWindowOnload(){
     userID = document.getElementById("userID").value;
 
     if(document.getElementById("userProjects")){
-        sendAjaxRequest("/feeds/" + userID, {}, function(responseObject){
+        sendAjaxRequest("/feeds/", {}, function(responseObject){
             updateUserProjects(responseObject);
         });
     }
@@ -27,7 +27,7 @@ function customClickEventHandler(e){
         case "createNewProject": {
             var newProjectName = document.getElementById("newProjectName").value;
             if(newProjectName != null && newProjectName.length > 0){
-                sendAjaxRequest("/feeds/" + userID, {projectName: newProjectName}, function(responseObject){
+                sendAjaxRequest("/feeds/", {projectName: newProjectName}, function(responseObject){
                     updateUserProjects(responseObject);
                 }, "POST");
             }
@@ -38,7 +38,7 @@ function customClickEventHandler(e){
             parsedProjectStructure = parseProjectStructureToJSON();
             
 
-            sendAjaxRequest("/feeds/" + userID + "/" + projectID, {projectStructure: parsedProjectStructure}, function(responseObject){
+            sendAjaxRequest("/feeds/" + projectID, {projectStructure: parsedProjectStructure}, function(responseObject){
                 updateProjectJSON(responseObject);
                 document.getElementById("previewProjectStructure").click();
             }, "PUT");
@@ -48,9 +48,9 @@ function customClickEventHandler(e){
         case "addNewCollab": {
             var email = document.getElementById("newCollabEmail").value;
             var accessLevel = document.getElementById("accessLevel").value;
-            console.log(email, accessLevel);
+
             if(email.length > 0 && accessLevel > 0){
-                sendAjaxRequest("/feeds/" + userID + "/" + projectID + "/addCollaborator", {email: email, accessLevel: accessLevel}, function(responseObject){
+                sendAjaxRequest("/feeds/" + projectID + "/addCollaborator", {email: email, accessLevel: accessLevel}, function(responseObject){
                     
                 }, "PUT");
             }
@@ -58,7 +58,7 @@ function customClickEventHandler(e){
         }
         case "previewProjectStructure": {
             var tempProjectObj = {
-                project_structure: JSON.parse(parseProjectStructureToJSON())
+                structure: JSON.parse(parseProjectStructureToJSON())
             }
             
             updateProjectHTML(tempProjectObj, false);
@@ -140,8 +140,8 @@ function parseProjectStructureToJSON(){
 }
 
 function resetProjectStructure(){
-    sendAjaxRequest("/feeds/" + userID + "/" + projectID, {}, function(responseObject){
-        updateProjectJSON(responseObject.project_structure);
+    sendAjaxRequest("/feeds/" + projectID, {}, function(responseObject){
+        updateProjectJSON(responseObject.structure);
         updateProjectHTML(responseObject, false);
     }); 
 }

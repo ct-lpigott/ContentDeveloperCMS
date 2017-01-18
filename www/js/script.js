@@ -27,10 +27,18 @@ function sendAjaxRequest(url, requestData, callback, method="GET"){
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
-            callback(JSON.parse(xhttp.responseText));
+            var response;
+
+            try {
+                response = JSON.parse(xhttp.responseText);
+            } catch(e) {
+                response = xhttp.responseText;
+            }
+
+            callback(response);
         }
     };
-    xhttp.open(method, url + "?fullContext=true", true);
+    xhttp.open(method, url + "?userID=" + userID, true);
     xhttp.setRequestHeader("X-Requested-With", "XMLHttpRequest");
     xhttp.setRequestHeader("Content-Type", "application/json");
     xhttp.send(JSON.stringify(requestData));

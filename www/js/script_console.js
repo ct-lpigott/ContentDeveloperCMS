@@ -1,6 +1,6 @@
 function updateProjectHTML(projectDetails, includeContent=true){
-    projectStructure = projectDetails.project_structure;
-    var projectContent = projectDetails.project_content;
+    projectStructure = projectDetails.structure;
+    var projectContent = projectDetails.content;
     var projectContentContainer = document.getElementById("projectContent");
     projectContentContainer.innerHTML = "";
 
@@ -119,7 +119,7 @@ function createItemInputElements(collection, itemContent=null, itemIndex=-1){
                                 
     }
 
-    if(itemContent != null){
+    if(itemContent != null && projectStructure[collection]["items"] != null){
         var deleteButtonElement = document.createElement("button");
         deleteButtonElement.innerHTML = "Delete";
         deleteButtonElement.setAttribute("class", "delete");

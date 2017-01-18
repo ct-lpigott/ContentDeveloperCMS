@@ -5,7 +5,7 @@ var projectStructure;
 function customWindowOnload(){
     userID = document.getElementById("userID").value;
     projectID = document.getElementById("projectID").value;
-    sendAjaxRequest("/feeds/" + userID + "/" + projectID, {}, function(responseObject){
+    sendAjaxRequest("/feeds/" + projectID, {}, function(responseObject){
         updateProjectHTML(responseObject);
     });   
 }
@@ -18,13 +18,13 @@ function customClickEventHandler(e){
     switch(e.target.id){
         case "updateProjectContent": {
             var projectContent = parseProjectContentToJSON();
-            sendAjaxRequest("/feeds/" + userID + "/" + projectID, {projectContent: projectContent}, function(responseObject){
+            sendAjaxRequest("/feeds/" + projectID, {projectContent: projectContent}, function(responseObject){
                 
             }, "PUT"); 
             break;
         }
         case "resetProjectContent": {
-           sendAjaxRequest("/feeds/" + userID + "/" + projectID, {}, function(responseObject){
+           sendAjaxRequest("/feeds/" + projectID, {}, function(responseObject){
                updateProjectHTML(responseObject);
             });  
         }
@@ -39,7 +39,7 @@ function customClickEventHandler(e){
     } else if(e.target.classList.contains("delete")){
         var collection = e.target.parentNode.querySelector("[data-collection]").getAttribute("data-collection");
         var itemIndex = e.target.parentNode.querySelector("[data-index]").getAttribute("data-index");
-        sendAjaxRequest("/feeds/" + userID + "/" + projectID + "/" + collection + "/" + itemIndex, {}, function(responseObject){
+        sendAjaxRequest("/feeds/" + projectID + "/" + collection + "/" + itemIndex, {}, function(responseObject){
             e.target.parentNode.remove();
         }, "DELETE");
     }
