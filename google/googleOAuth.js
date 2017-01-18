@@ -6,16 +6,22 @@ var clientSecretData = JSON.parse(fs.readFileSync("./google/client_secret.json")
 var redirectURL = process.env.GOOGLE_OAUTH_REDIRECT_URL;
 
 var auth = new googleAuth();
-var oauth2Client = new auth.OAuth2(
-  clientSecretData.web.client_id,
-  clientSecretData.web.client_secret,
-  redirectURL
-);
+
+
+function generateNewOAuth2Client(){
+  var newOAuth2Client = new auth.OAuth2(
+    clientSecretData.web.client_id,
+    clientSecretData.web.client_secret,
+    redirectURL
+  );
+  return newOAuth2Client;
+}
 
 module.exports = {
-  oauth2Client: oauth2Client,
+  oauth2Client: generateNewOAuth2Client(),
   generateOAuthUrl: function(){
-    var oauthURL = oauth2Client.generateAuthUrl({
+    var newOAuth2Client = generateNewOAuth2Client();
+    var oauthURL = newOAuth2Client.generateAuthUrl({
         access_type: "offline",
         scope: [
         "https://www.googleapis.com/auth/drive",
