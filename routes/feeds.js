@@ -4,160 +4,195 @@ var fs = require("fs");
 var googleOAuth = require("../google/googleOAuth");
 var dbconn = require("../database/connection.js");
 
-// CREATE
-router.post("/:userID", function(req, res, next){
-    console.log("POST to create new project");
-    if(req.body != null){
-        console.log(req.body.projectName);
-        dbconn.query("INSERT INTO Project(project_name) VALUES(" + dbconn.escape(req.body.projectName) + ")", function(err, result){
-            if(err){
-                console.log(err);
-            } else {
-                req.projectID = result.insertId;
-                dbconn.query("INSERT INTO User_Project(user_id, project_id, user_access_level) VALUES(" + req.params.userID + ", " + req.projectID + ", 1)", function(err, result){
-                    if(err){
-                        console.log(err);
-                    } else {
-                        fs.mkdir("./projects/" + req.projectID, function(err){
-                            if(err){
-                                console.log("Error making folder " + err);
-                            } else {
-                                fs.readFile("./projects/project_template.json", function(err, data){
-                                    if(err){
-                                        console.log("Error reading project template file " + err);
-                                    } else {
-                                        var projectTemplate = JSON.parse(data);
-                                        projectTemplate.project_id = req.projectID;
-                                        projectTemplate.project_name = req.body.projectName;
-                                        projectTemplate.date_created = projectTemplate.date_updated = Date.now();
-                                        projectTemplate.last_updated_by = req.params.userID;
+// ALL REQUESTS
+router.use(function(req, res, next){    
+    req.responseObject = {};
 
-                                        fs.writeFile("./projects/" + req.projectID + "/admin.json", JSON.stringify(projectTemplate), function(err){
-                                            if(err) {
-                                                console.log("Error making file " + err);
-                                            } else {
-                                                console.log("Project admin file created");
-                                                fs.writeFile("./projects/" + req.projectID + "/content.json", "{}", function(err){
-                                                    if(err) {
-                                                        console.log("Error making file " + err);
-                                                    } else {
-                                                        console.log("Project content file created");
-                                                        res.redirect("/feeds/" + req.params.userID);
-                                                    }
-                                                });
-                                            }
-                                        });
-                                    }
-                                });
-                            }
-                        });
-                    }
-                });
-            }
-        });
+    if(req.query.userID != null){
+        req.userID = req.query.userID;
+    }
+
+    if(req.method == "GET"){
+        next();
     } else {
-        res.send("No body provided");
+        // All other request methods are expected to have both a userID
+        // and a body included with them
+        if(req.userID != null){
+            if(req.body != null){
+                next();
+            } else {
+                res.send("No body provided");
+            }
+        } else {
+            res.send("No userID provided");
+        }
     }
 });
-router.post("/:userID/:project", function(req, res, next){
-    res.send("POST request received from userID=" + req.params.userID + " for projectID=" + req.params.project);
+
+// CREATE
+router.post("/", function(req, res, next){
+    console.log("POST to create new project");
+    dbconn.query("INSERT INTO Project(project_name) VALUES(" + dbconn.escape(req.body.projectName) + ")", function(err, result){
+        if(err){
+            console.log(err);
+        } else {
+            req.projectID = result.insertId;
+            dbconn.query("INSERT INTO User_Project(user_id, project_id, user_access_level) VALUES(" + req.userID + ", " + req.projectID + ", 1)", function(err, result){
+                if(err){
+                    console.log(err);
+                } else {
+                    fs.mkdir("./projects/" + req.projectID, function(err){
+                        if(err){
+                            console.log("Error making folder " + err);
+                        } else {
+                            fs.readFile("./projects/project_template.json", function(err, data){
+                                if(err){
+                                    console.log("Error reading project template file " + err);
+                                } else {
+                                    var projectTemplate = JSON.parse(data);
+                                    projectTemplate.project_id = req.projectID;
+                                    projectTemplate.project_name = req.body.projectName;
+                                    projectTemplate.date_created = projectTemplate.date_updated = Date.now();
+                                    projectTemplate.last_updated_by = req.userID;
+
+                                    fs.writeFile("./projects/" + req.projectID + "/admin.json", JSON.stringify(projectTemplate), function(err){
+                                        if(err) {
+                                            console.log("Error making file " + err);
+                                        } else {
+                                            console.log("Project admin file created");
+                                            fs.writeFile("./projects/" + req.projectID + "/content.json", "{}", function(err){
+                                                if(err) {
+                                                    console.log("Error making file " + err);
+                                                } else {
+                                                    console.log("Project content file created");
+                                                    res.redirect("/feeds/" + req.userID);
+                                                }
+                                            });
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+        }
+    });
 });
-router.post("/:userID/:project/:collection", function(req, res, next){
-    res.send("POST request received from userID=" + req.params.userID + " for projectID=" + req.params.project + " collection=" + req.params.collection);
+router.post("/:projectID", function(req, res, next){
+    res.send("POST request received from userID=" + req.userID + " for projectID=" + req.params.project);
 });
-router.post("/:userID/:project/:collection/:item", function(req, res, next){
-    res.send("POST request received from userID=" + req.params.userID + " for projectID=" + req.params.project + " collection=" + req.params.collection + " and item=" + req.params.item);
+router.post("/:projectID/:collection", function(req, res, next){
+    res.send("POST request received from userID=" + req.userID + " for projectID=" + req.params.project + " collection=" + req.params.collection);
+});
+router.post("/:projectID/:collection/:item", function(req, res, next){
+    res.send("POST request received from userID=" + req.userID + " for projectID=" + req.params.project + " collection=" + req.params.collection + " and item=" + req.params.item);
 });
 
 // READ
-router.get("/:userID", function(req, res, next){
-    console.log("GET request from " + req.params.userID + " to view all projects");
-    dbconn.query("SELECT up.project_id, p.project_name, up.user_access_level FROM Project p LEFT JOIN User_Project as up ON p.id = up.project_id WHERE up.user_id =" + dbconn.escape(req.params.userID), function(err, projects, fields){
-        if(err){
-            console.log(err);
-        } else {
-            res.send(projects);
-        }
-    });
-});
-router.get("/:userID/:projectID", function(req, res, next){
-    dbconn.query("SELECT up.project_id, up.user_id, up.user_access_level FROM Project p LEFT JOIN User_Project up ON p.id = up.project_id WHERE p.id = " + dbconn.escape(req.params.projectID) + " AND up.user_id = " + dbconn.escape(req.params.userID), function(err, rows, fields){
-        if(err){
-            console.log(err);
-        } else {
-            var projectRow = rows[0];
-
-            fs.readFile("./projects/" + projectRow.project_id + "/admin.json", {encoding: "utf-8"}, function(err, data){
-                if(err){
-                    console.log(err);
+router.get("/", function(req, res, next){
+    console.log("GET request from " + req.userID + " to view all projects");
+    if(req.userID != null){
+        dbconn.query("SELECT up.project_id, p.project_name, up.user_access_level FROM Project p LEFT JOIN User_Project as up ON p.id = up.project_id WHERE up.user_id =" + dbconn.escape(req.userID), function(err, rows, fields){
+            if(err){
+                console.log(err);
+            } else {
+                if(rows.length > 0){
+                    res.send(rows);
                 } else {
-                    var projectAdmin = JSON.parse(data);
-                    var projectStructure = projectAdmin.project_structure;
-
-                    fs.readFile("./projects/" + projectRow.project_id + "/content.json", {encoding: "utf-8"}, function(err, projectContent){
-                        if(err){
-                            console.log(err);
-                        } else {
-                            var responseObject;
-
-                            if(req.query.fullContext != null){
-                                responseObject = {
-                                    project_structure: projectStructure,
-                                    project_content: JSON.parse(projectContent)
-                                }
-                            } else {
-                                switch(projectRow.user_access_level){
-                                    case 1: {
-                                        responseObject = {
-                                            project_structure: projectStructure,
-                                            project_content: JSON.parse(projectContent)
-                                        }
-                                        break;
-                                    }
-                                    default: {
-                                        responseObject = JSON.parse(projectContent);
-                                        break;
-                                    }
-                                }             
-                            }
-                            res.send(responseObject);
-                        }
-                    });
-                    
+                    res.send("Unknown user");
                 }
-            });            
-        }
-    });
+            }
+        });
+    } else {
+        res.send("No userID provided");
+    }
+    
 });
-router.get("/:userID/:projectID/:collection", function(req, res, next){
-    dbconn.query("SELECT up.project_id, up.user_access_level FROM Project p LEFT JOIN User_Project up ON p.id = up.project_id WHERE p.id = " + dbconn.escape(req.params.projectID) + " AND up.user_id = " + dbconn.escape(req.params.userID), function(err, rows, fields){
+router.get("/:projectID", function(req, res, next){
+    dbconn.query("SELECT up.project_id, up.user_id, up.user_access_level FROM Project p LEFT JOIN User_Project up ON p.id = up.project_id WHERE p.id = " + dbconn.escape(req.params.projectID) + " AND up.user_id = " + dbconn.escape(req.userID), function(err, rows, fields){
         if(err){
             console.log(err);
         } else {
-            var projectRow = rows[0];
-
-            fs.readFile("./projects/" + projectRow.project_id + "/content.json", {encoding: "utf-8"}, function(err, projectContent){
-                if(err){
-                    console.log(err);
-                } else {
-                    var collectionName = req.params.collection.toLowerCase();
-                    projectContent = JSON.parse(projectContent);
-                    var collectionContent = projectContent[collectionName] != null ? projectContent[collectionName] : {};
-                    var responseObject = {};
-                    responseObject[collectionName] = collectionContent;
-                    res.send(responseObject);
-                }
-            });           
+            if(rows.length > 0){
+                fs.readFile("./projects/" + req.params.projectID + "/admin.json", {encoding: "utf-8"}, function(err, data){
+                    if(err){
+                        console.log(err);
+                    } else {
+                        var projectAdmin = JSON.parse(data);
+                        req.responseObject.structure = projectAdmin.project_structure;
+                        next();                    
+                    }
+                });
+            } else {
+                next();
+            }          
         }
     });
 });
-router.get("/:userID/:projectID/:collection/:item", function(req, res, next){
-    res.send("GET request received from userID=" + req.params.userID + " for projectID=" + req.params.project + " collection=" + req.params.collection + " and item=" + req.params.item);
+router.get("/:projectID", function(req, res, next){
+    fs.readFile("./projects/" + req.params.projectID + "/content.json", {encoding: "utf-8"}, function(err, projectContent){
+        if(err){
+            console.log(err);
+        } else {
+            if(req.responseObject.structure != null){
+                req.responseObject.content = JSON.parse(projectContent);
+            } else {
+                req.responseObject = JSON.parse(projectContent);
+            }
+           
+            res.send(req.responseObject);
+        }
+    });
+});
+router.get("/:projectID/:collection", function(req, res, next){
+    req.collectionName = req.params.collection.toLowerCase();
+    console.log("Request for the " + req.collectionName + " collection");
+    dbconn.query("SELECT up.project_id, up.user_access_level FROM Project p LEFT JOIN User_Project up ON p.id = up.project_id WHERE p.id = " + dbconn.escape(req.params.projectID) + " AND up.user_id = " + dbconn.escape(req.userID), function(err, rows, fields){
+        if(err){
+            console.log(err);
+        } else {
+            if(rows.length > 0){
+                fs.readFile("./projects/" + req.params.projectID + "/admin.json", {encoding: "utf-8"}, function(err, data){
+                    if(err){
+                        console.log(err);
+                    } else {
+                        var projectAdmin = JSON.parse(data);
+                        req.responseObject.structure = projectAdmin.project_structure[req.collectionName];
+                        next();                    
+                    }
+                });
+            } else {
+                next();
+            }    
+        }
+    });
+});
+router.get("/:projectID/:collection", function(req, res, next){
+    fs.readFile("./projects/" + req.params.projectID + "/content.json", {encoding: "utf-8"}, function(err, projectContent){
+        if(err){
+            console.log(err);
+        } else {
+            projectContent = JSON.parse(projectContent);
+            var collectionContent = projectContent[req.collectionName] != null ? projectContent[req.collectionName] : {};
+
+            if(req.responseObject.structure != null){
+                req.responseObject.content = collectionContent;
+            } else {
+                req.responseObject = collectionContent;
+            }
+            
+            res.send(req.responseObject);
+        }
+    });
+});
+router.get("/:projectID/:collection/:item", function(req, res, next){
+    res.send("GET request received from userID=" + req.userID + " for projectID=" + req.params.project + " collection=" + req.params.collection + " and item=" + req.params.item);
 });
 
 // UPDATE
-router.put("/:userID/:projectID", function(req, res, next){
-    dbconn.query("SELECT p.id as 'project_id', up.user_id as 'user_id', up.user_access_level as 'user_access_level' FROM Project p LEFT JOIN User_Project up ON p.id = up.project_id WHERE p.id = " + dbconn.escape(req.params.projectID) + " AND up.user_id = " + dbconn.escape(req.params.userID), function(err, rows, fields){
+router.put("/:projectID", function(req, res, next){
+    dbconn.query("SELECT up.project_id, up.user_id, up.user_access_level FROM Project p LEFT JOIN User_Project up ON p.id = up.project_id WHERE p.id = " + dbconn.escape(req.params.projectID) + " AND up.user_id = " + dbconn.escape(req.userID), function(err, rows, fields){
         if(err){
             console.log(err);
         } else {
@@ -175,7 +210,7 @@ router.put("/:userID/:projectID", function(req, res, next){
                             } else {
                                 var adminProjectFile = JSON.parse(data);
                                 adminProjectFile.date_updated = Date.now();
-                                adminProjectFile.last_updated_by = req.params.userID;
+                                adminProjectFile.last_updated_by = req.userID;
                                 adminProjectFile.project_structure = JSON.parse(req.body.projectStructure);
 
                                 fs.writeFile(adminFilePath, JSON.stringify(adminProjectFile), function(err){
@@ -208,7 +243,7 @@ router.put("/:userID/:projectID", function(req, res, next){
         }
     });
 });
-router.put("/:userID/:projectID/addCollaborator", function(req, res, next){
+router.put("/:projectID/addCollaborator", function(req, res, next){
     if(req.body.email != null && req.body.email.length > 0){
         dbconn.query("SELECT id FROM User WHERE email_address=" + dbconn.escape(req.body.email), function(err, rows, fields){
             if(err){
@@ -233,16 +268,29 @@ router.put("/:userID/:projectID/addCollaborator", function(req, res, next){
         });
     }
 });
-router.put("/:userID/:projectID/addCollaborator", function(req, res, next){
+router.put("/:projectID/addCollaborator", function(req, res, next){
+    var accessLevel = req.body.accessLevel == null || req.body.accessLevel < 1 ? 1 : req.body.accessLevel;
+
     dbconn.query("SELECT * FROM User_Project WHERE user_id=" + req.newCollaboratorID + " AND project_id=" + req.params.projectID, function(err, rows, fields){
         if(err){
             console.log("Error checking if user is already a contributor to project " + err);
         } else {
             if(rows.length > 0){
-                console.log("This user is already a collaborator on this project");
-                res.send();
+                if(accessLevel == rows[0].user_access_level){
+                    console.log("This user is already a collaborator on this project");
+                    res.send();
+                } else {
+                    dbconn.query("UPDATE User_Project SET user_access_level=" + dbconn.escape(accessLevel) + "WHERE user_id=" + req.newCollaboratorID, function(err, result) {
+                        if(err){
+                            console.log("Error updating user on project " + err);
+                        } else {
+                            console.log("Collaborators access level updated on project");
+                            res.send();
+                        }
+                    });
+                }
             } else {
-                var accessLevel = req.body.accessLevel == null || req.body.accessLevel < 1 ? 1 : req.body.accessLevel;
+                
                 dbconn.query("INSERT INTO User_Project(user_id, project_id, user_access_level) VALUES(" + req.newCollaboratorID + ", " + req.params.projectID + ", " + dbconn.escape(accessLevel) + ")", function(err, result) {
                     if(err){
                         console.log("Error adding user to project " + err);
@@ -255,22 +303,22 @@ router.put("/:userID/:projectID/addCollaborator", function(req, res, next){
         }
     });
 });
-router.put("/:userID/:projectID/:collection", function(req, res, next){
-    res.send("PUT request received from userID=" + req.params.userID + " for projectID=" + req.params.project + " collection=" + req.params.collection);
+router.put("/:projectID/:collection", function(req, res, next){
+    res.send("PUT request received from userID=" + req.userID + " for projectID=" + req.params.project + " collection=" + req.params.collection);
 });
-router.put("/:userID/:projectID/:collection/:item", function(req, res, next){
-    res.send("PUT request received from userID=" + req.params.userID + " for projectID=" + req.params.project + " collection=" + req.params.collection + " and item=" + req.params.item);
+router.put("/:projectID/:collection/:item", function(req, res, next){
+    res.send("PUT request received from userID=" + req.userID + " for projectID=" + req.params.project + " collection=" + req.params.collection + " and item=" + req.params.item);
 });
 
 // DELETE
-router.delete("/:userID/:projectID", function(req, res, next){
-    res.send("DELETE request received from userID=" + req.params.userID + " for projectID=" + req.params.project);
+router.delete("/:projectID", function(req, res, next){
+    res.send("DELETE request received from userID=" + req.userID + " for projectID=" + req.params.project);
 });
-router.delete("/:userID/:projectID/:collection", function(req, res, next){
-    res.send("DELETE request received from userID=" + req.params.userID + " for projectID=" + req.params.project + " collection=" + req.params.collection);
+router.delete("/:projectID/:collection", function(req, res, next){
+    res.send("DELETE request received from userID=" + req.userID + " for projectID=" + req.params.project + " collection=" + req.params.collection);
 });
-router.delete("/:userID/:projectID/:collection/:item", function(req, res, next){
-    dbconn.query("SELECT p.id as 'project_id', up.user_id as 'user_id', up.user_access_level as 'user_access_level' FROM Project p LEFT JOIN User_Project up ON p.id = up.project_id WHERE p.id = " + dbconn.escape(req.params.projectID) + " AND up.user_id = " + dbconn.escape(req.params.userID), function(err, rows, fields){
+router.delete("/:projectID/:collection/:item", function(req, res, next){
+    dbconn.query("SELECT p.id as 'project_id', up.user_id as 'user_id', up.user_access_level as 'user_access_level' FROM Project p LEFT JOIN User_Project up ON p.id = up.project_id WHERE p.id = " + dbconn.escape(req.params.projectID) + " AND up.user_id = " + dbconn.escape(req.userID), function(err, rows, fields){
         if(err){
             console.log(err);
         } else {
