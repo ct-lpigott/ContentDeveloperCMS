@@ -14,7 +14,7 @@ app.use("/feeds", require("./routes/feeds.js"));
 app.set("view engine", "pug");
 app.set("views", "./views");
 
-app.use(express.static("./www"));
+app.use(express.static("./public"));
 
 app.listen(process.env.PORT, function () {
   console.log("Listening on port: " + process.env.PORT);
