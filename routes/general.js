@@ -1,7 +1,7 @@
 // Creating a new router through the express module. This router
 // will be used within this module so set up the various requests
 // which this route will accept.
-var express = require('express').Router();
+var router = require('express').Router();
 
 // Requiring the custom google OAuth module, which exports an object with 
 // a method to generate a new oauth url.

@@ -8,13 +8,14 @@ var googleOAuth = require("../google/googleOAuth");
 router.get("/oauthRedirectURL", function(req, res, next){
     var authCode = req.query.code;
 
-    googleOAuth.oauth2Client.getToken(authCode, function(error, token) {
+    var oauth2Client = googleOAuth.generateOAuth2Client();
+    
+    oauth2Client.getToken(authCode, function(error, token) {
         if (error) {
             console.log("Error while trying to retrieve access token", error);
         } else {
             var plus = google.plus('v1');
             
-            var oauth2Client = googleOAuth.oauth2Client;
             oauth2Client.credentials = token;
 
             plus.people.get({
