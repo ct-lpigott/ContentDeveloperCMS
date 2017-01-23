@@ -20,10 +20,17 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // Setting up the routing structure of the app. Sending requests to a different
 // route in the server based on the first URL parameter of their request i.e.
 // requests that begin with "/admin" will be routed through the admin route etc. 
-app.use("/", require("./routes/general.js"));
+app.use("/", require("./routes/index.js"));
 app.use("/admin", require("./routes/admin.js"));
 app.use("/google", require("./routes/google.js"));
 app.use("/feeds", require("./routes/feeds.js"));
+
+// Setting up the error routes for the app. Errors in the admin panel and 
+// feeds API will be dealt with through individual error routes, while all
+// other errors will be dealt with through the general errors route.
+app.use("/admin", require("./routes/error-routes/admin-errors.js"));
+app.use("/feeds", require("./routes/error-routes/feeds-errors.js"));
+app.use(require("./routes/error-routes/general-errors.js"));
 
 // Setting the view engine (or tempate engine) that the app will use to be "pug"
 // (previously know as Jade). Setting the views directory (where these templates)

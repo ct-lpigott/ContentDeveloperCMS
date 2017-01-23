@@ -1,0 +1,9 @@
+extends ./../view_components/layout.pug
+
+block main-body
+    h1 Content Developer - Admin Error
+    h2 #{error.status} - #{error.message}
+        if adminErrors
+            ul
+                each err in adminErrors
+                    li #{err}

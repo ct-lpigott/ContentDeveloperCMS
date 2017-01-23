@@ -18,6 +18,18 @@ var dbconn = require("../database/connection.js");
 // a new OAuth2Client.
 var googleOAuth = require("../google/googleOAuth");
 
+// ALL REQUESTS
+router.use(function(req, res, next){
+    // Creating an empty array on the request object, to temporarily store
+    // any errors that may occur throughout this route, so that they can
+    // be rendered in the error page for the admin-errors route (should
+    // any errors occur).
+    req.adminErrors = [];
+
+    // Allowing this request to continue through this route
+    next();
+});
+
 // Request to view the list of projects available to this user 
 router.get("/:userID", function(req, res, next){
     console.log("Request recieved in admin route. ID=" + req.params.userID);
