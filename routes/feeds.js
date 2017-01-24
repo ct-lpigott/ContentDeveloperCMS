@@ -17,6 +17,8 @@ var dbconn = require("../database/connection.js");
 // a new OAuth2Client.
 var googleOAuth = require("../google/googleOAuth");
 
+var validation = require("./feeds-components/validation.js");
+
 // ALL REQUESTS ------------------------------------------------------------------------------------------------------------
 // Preforming initial checks on all request to this route
 router.use(function(req, res, next){
@@ -531,35 +533,48 @@ router.put("/:projectID", function(req, res, next){
                 // it can be updated accordingly
                 var adminProjectFile = req.fileData.admin;
 
-                // Setting the date updated to the current time, the last_updated_by property to the
-                // ID of the current user, and the project_structure to the structure passed to the 
-                // request body
-                adminProjectFile.date_updated = Date.now();
-                adminProjectFile.last_updated_by = req.userID;
-                adminProjectFile.project_structure = JSON.parse(req.body.projectStructure);
+                if(validation.jsonToObject(req.body.projectStructure)){
+                    // Setting the date updated to the current time, the last_updated_by property to the
+                    // ID of the current user, and the project_structure to the structure passed to the 
+                    // request body
+                    adminProjectFile.date_updated = Date.now();
+                    adminProjectFile.last_updated_by = req.userID;
+                    adminProjectFile.project_structure = JSON.parse(req.body.projectStructure);
 
-                // Updating the projects admin.json file, passing the adminProjectFile object created above
-                // (which contains the updated details of the project) as the content for the file as a JSON string
-                fs.writeFile("./projects/" + req.params.projectID + "/admin.json", JSON.stringify(adminProjectFile), function(err){
-                    if(err) {
-                        // Logging the error to the console
-                        console.log("Error updating admin.json file " + err);
+                    // Updating the projects admin.json file, passing the adminProjectFile object created above
+                    // (which contains the updated details of the project) as the content for the file as a JSON string
+                    fs.writeFile("./projects/" + req.params.projectID + "/admin.json", JSON.stringify(adminProjectFile), function(err){
+                        if(err) {
+                            // Logging the error to the console
+                            console.log("Error updating admin.json file " + err);
 
-                        // Unable to update the admin.json file. Adding this as an error to the 
-                        // feedsErrors array.
-                        req.feedsErrors.push("Server error - unable to update project structure");
+                            // Unable to update the admin.json file. Adding this as an error to the 
+                            // feedsErrors array.
+                            req.feedsErrors.push("Server error - unable to update project structure");
 
-                        // Since this is a significant issue, passing this request to the feeds-errors
-                        // route, by calling the next method with an empty error (as all errors will be
-                        // accessible from the feedsErrors array).
-                        next(new Error());
-                    } else {
-                        console.log("Project admin file updated");
+                            // Since this is a significant issue, passing this request to the feeds-errors
+                            // route, by calling the next method with an empty error (as all errors will be
+                            // accessible from the feedsErrors array).
+                            next(new Error());
+                        } else {
+                            console.log("Project admin file updated");
 
-                        // Sending the new project structure as the response to the request
-                        res.send(adminProjectFile.project_structure);
-                    }
-                });
+                            // Sending the new project structure as the response to the request
+                            res.send(adminProjectFile.project_structure);
+                        }
+                    });
+                } else {
+                    // This is not a valid JSON object. Adding this as an 
+                    // error to the feedsErrors array.
+                    req.feedsErrors.push("This is not valid JSON. Cannot update the project structure");
+
+                    // Since this is a significant issue, passing this request to the feeds-errors
+                    // route, by calling the next method with an empty error (as all errors will be
+                    // accessible from the feedsErrors array).
+                    next(new Error());
+                }
+
+                
             } else if(req.body.projectContent != null){
                 // Passing this request to the next stage of the router, so that the content
                 // can be updated
@@ -604,29 +619,41 @@ router.put("/:projectID", function(req, res, next){
 });
 // Continued - request to update the contents of an entire project
 router.put("/:projectID", function(req, res, next){
-    // Updating the projects content.json file to be equal to the content passed to the request
-    // body. This content is already in JSON format
-    fs.writeFile("./projects/" + req.params.projectID + "/content.json", req.body.projectContent, function(err){
-        if(err) {
-            // Logging this error to the console
-            console.log("Error updating file " + err);
+    if(validation.jsonToObject(req.body.projectContent)){
+        // Updating the projects content.json file to be equal to the content passed to the request
+        // body. This content is already in JSON format
+        fs.writeFile("./projects/" + req.params.projectID + "/content.json", req.body.projectContent, function(err){
+            if(err) {
+                // Logging this error to the console
+                console.log("Error updating file " + err);
 
-            // No content were included in the request. Adding this as an error to the 
-            // feedsErrors array.
-            req.feedsErrors.push("No project content included in the request");
+                // No content were included in the request. Adding this as an error to the 
+                // feedsErrors array.
+                req.feedsErrors.push("No project content included in the request");
 
-            // Since this is a significant issue, passing this request to the feeds-errors
-            // route, by calling the next method with an empty error (as all errors will be
-            // accessible from the feedsErrors array).
-            next(new Error());
-        } else {
-            console.log("Project content file updated");
+                // Since this is a significant issue, passing this request to the feeds-errors
+                // route, by calling the next method with an empty error (as all errors will be
+                // accessible from the feedsErrors array).
+                next(new Error());
+            } else {
+                console.log("Project content file updated");
 
-            // Sending back a response with an empty JSON string, as the content has been
-            // successfully updated
-            res.send("{}");
-        }
-    }); 
+                // Sending back a response with an empty JSON string, as the content has been
+                // successfully updated
+                res.send("{}");
+            }
+        }); 
+    } else {
+        // This is not a valid JSON object. Adding this as an 
+        // error to the feedsErrors array.
+        req.feedsErrors.push("This is not valid JSON. Cannot update the project content");
+
+        // Since this is a significant issue, passing this request to the feeds-errors
+        // route, by calling the next method with an empty error (as all errors will be
+        // accessible from the feedsErrors array).
+        next(new Error());
+    }
+    
 });
 
 // Request to add a collaborator to a project
@@ -846,6 +873,7 @@ router.delete("/:projectID/:collection/:item", function(req, res, next){
                 }
             }
 
+            
             // Checking that a change has been made to the project content i.e. that it
             // is not the same as it was when the file was first read in at the beginning of
             // this request
@@ -874,6 +902,7 @@ router.delete("/:projectID/:collection/:item", function(req, res, next){
                     }
                 });
             }
+            
             break;
         }
     }          
