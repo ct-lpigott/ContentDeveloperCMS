@@ -24,6 +24,9 @@ function clickEventHandler(e){
 }
 
 function sendAjaxRequest(url, requestData, callback, method="GET"){
+    var queryStringURL = url.indexOf("?") > -1 ? url + "&" : url + "?";
+    queryStringURL += "userID=" + userID;
+
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
@@ -38,7 +41,7 @@ function sendAjaxRequest(url, requestData, callback, method="GET"){
             callback(response);
         }
     };
-    xhttp.open(method, url + "?userID=" + userID, true);
+    xhttp.open(method, queryStringURL, true);
     xhttp.setRequestHeader("X-Requested-With", "XMLHttpRequest");
     xhttp.setRequestHeader("Content-Type", "application/json");
     xhttp.send(JSON.stringify(requestData));

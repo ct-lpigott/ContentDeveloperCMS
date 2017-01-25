@@ -50,9 +50,9 @@ function customClickEventHandler(e){
             var accessLevel = document.getElementById("accessLevel").value;
 
             if(email.length > 0 && accessLevel > 0){
-                sendAjaxRequest("/feeds/" + projectID + "/addCollaborator", {email: email, accessLevel: accessLevel}, function(responseObject){
+                sendAjaxRequest("/feeds/" + projectID + "?action=addCollaborator", {email: email, accessLevel: accessLevel}, function(responseObject){
                     
-                }, "PUT");
+                }, "POST");
             }
             break;
         }
