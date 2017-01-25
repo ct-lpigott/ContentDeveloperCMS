@@ -5,7 +5,9 @@ module.exports = function (err, req, res, next) {
     // Setting the request status to be equal to the specified status
     // of the error, or failing that (i.e. if one has not been specified)
     // setting it to 500 - Internal Server Error).
-    res.status(err.status || 500);
+    if(err.message != "notify"){
+        res.status(err.status || 500);
+    }    
 
     // Creating an errors array on the response object, and setting it to be
     // equal to any errors that occurred within the feeds route, so that they
