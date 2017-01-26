@@ -75,7 +75,7 @@ router.get("/oauthRedirectURL", function(req, res, next){
                                 
                                 // Updating this users google profile ID and auth token, based on those returned from 
                                 // the Google API request
-                                dbconn.query("UPDATE User SET display_name= " + user.displayName + ", google_profile_image_url = " + userProfileImageURL + ", google_profile_id= " + user.id + ", google_auth_token= " + dbconn.escape(jsonToken) + " WHERE id = " + dbconn.escape(rows[0].id), function(err, result){
+                                 dbconn.query("UPDATE User SET display_name= " + dbconn.escape(user.displayName) + ", google_profile_image_url= " + dbconn.escape(userProfileImageURL) + ", google_profile_id= " + dbconn.escape(user.id) + ", google_auth_token= " + dbconn.escape(jsonToken) + " WHERE id = " + dbconn.escape(rows[0].id), function(err, result){
                                     if(err) {
                                         console.log("Unable to update users Google profile ID and auth token. " + err);
                                     } else {
@@ -90,7 +90,7 @@ router.get("/oauthRedirectURL", function(req, res, next){
 
                                 // Creating a new user in the database, using the email address, Google profile ID
                                 // and auth access token provided by the request to the Google API
-                                dbconn.query("INSERT into User(display_name, email_address, google_profile_image_url, google_profile_id, google_auth_token) VALUES(" + user.displayName + ", " + dbconn.escape(user.emails[0].value) + ", " + userProfileImageURL + ", " + dbconn.escape(user.id) + ", " + dbconn.escape(jsonToken) + ")", function(err, result){
+                                bconn.query("INSERT into User(display_name, email_address, google_profile_image_url, google_profile_id, google_auth_token) VALUES(" + dbconn.escape(user.displayName) + ", " + dbconn.escape(user.emails[0].value) + ", " + dbconn.escape(userProfileImageURL) + ", " + dbconn.escape(user.id) + ", " + dbconn.escape(jsonToken) + ")", function(err, result){
                                     if(err) {
                                         console.log(err);
                                     } else {
@@ -119,7 +119,7 @@ router.get("/oauthRedirectURL", function(req, res, next){
     // Checking that a userID exists on the request object
     if(req.userID != null){
         // Redirecting this user to the admin panel, using their userID as a parameter
-        res.redirect("/admin/" + req.userID);
+        res.redirect("/admin?userID=" + req.userID);
     } else {
         console.log("No user was found");
         res.send("Unable to login");
