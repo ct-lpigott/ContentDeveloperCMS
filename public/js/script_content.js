@@ -18,9 +18,14 @@ function customClickEventHandler(e){
     switch(e.target.id){
         case "updateProjectContent": {
             var projectContent = parseProjectContentToJSON();
-            sendAjaxRequest("/feeds/" + projectID, {projectContent: projectContent}, function(responseObject){
-                
-            }, "PUT"); 
+            if(jsonToObject(projectContent)){
+                sendAjaxRequest("/feeds/" + projectID, {projectContent: projectContent}, function(responseObject){
+                    
+                }, "PUT");
+            } else {
+                console.log("There is an issue with this content");
+            }
+             
             break;
         }
         case "resetProjectContent": {
@@ -75,6 +80,5 @@ function parseProjectContentToJSON(){
         }
     }
     
-
     return JSON.stringify(projectContent);
 }

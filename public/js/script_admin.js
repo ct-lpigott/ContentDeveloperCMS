@@ -38,12 +38,15 @@ function customClickEventHandler(e){
         }
         case "updateProjectStructure": {
             parsedProjectStructure = parseProjectStructureToJSON();
-            
 
-            sendAjaxRequest("/feeds/" + projectID, {projectStructure: parsedProjectStructure}, function(responseObject){
-                updateProjectJSON(responseObject);
-                document.getElementById("previewProjectStructure").click();
-            }, "PUT");
+            if(jsonToObject(parsedProjectStructure)){
+                sendAjaxRequest("/feeds/" + projectID, {projectStructure: parsedProjectStructure}, function(responseObject){
+                    updateProjectJSON(responseObject);
+                    document.getElementById("previewProjectStructure").click();
+                }, "PUT");
+            } else {
+                console.log("This is not valid JSON");
+            }            
 
             break;
         }
