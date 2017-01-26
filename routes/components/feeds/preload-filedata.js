@@ -35,7 +35,7 @@ router.use(function(req, res, next){
     // they can be used throughout this route
     req.fileData = {};
 
-    if(req.userID != null){
+    if(req.userID != null && req.tmpParams.projectID.length > 0){
         // Querying the database, to find the projects that this user has access to, by joining
         // the user table to the user_projects table. Returning only the columns needed for the 
         // reponse to the user. 
@@ -98,7 +98,7 @@ router.use(function(req, res, next){
             }
         });
     } else {
-        // Since no userID was supplied in the request, passing this on to the next
+        // Since no userID or projectID was supplied in the request, passing this on to the next
         // stage of the router below (so that just the project content can be returned,
         // without the project structure included)
         next();
@@ -107,33 +107,41 @@ router.use(function(req, res, next){
 });
 // Continued - PRE for requests to read the contents of a project, it's collection or any items within those collections
 router.use(function(req, res, next){
-    // Reading the contents of the content.json file of the project, from the project directory
-    // (named as per the projectID), so that the contents of the project can be returned to the user
-    fs.readFile("./projects/" + req.tmpParams.projectID + "/content.json", {encoding: "utf-8"}, function(err, projectContent){
-        if(err){
-            // Logging error to the database
-            console.log(err);
+    if(req.tmpParams.projectID.length > 0){
+        // Reading the contents of the content.json file of the project, from the project directory
+        // (named as per the projectID), so that the contents of the project can be returned to the user
+        fs.readFile("./projects/" + req.tmpParams.projectID + "/content.json", {encoding: "utf-8"}, function(err, projectContent){
+            if(err){
+                // Logging error to the database
+                console.log(err);
 
-            // Unable to load this projects content.json file, to read the content of the 
-            // file. Adding this as an error to the feedsErrors array.
-            req.feedsErrors.push("Server error - unable to load this projects contents");
+                // Unable to load this projects content.json file, to read the content of the 
+                // file. Adding this as an error to the feedsErrors array.
+                req.feedsErrors.push("Server error - unable to load this projects contents");
 
-            // Since this is a significant issue, passing this request to the feeds-errors
-            // route, by calling the next method with an empty error (as all errors will be
-            // accessible from the feedsErrors array).
-            next(new Error());
-        } else {
-            // Adding the content of the project (as returned from the content.json file) as 
-            // the content property on the file data object, so that it can be used throughout
-            // the rest of this route
-            req.fileData.content = JSON.parse(projectContent);
-            
-            // Passing this request on to the next stage of the router, so that the specific
-            // portions of the project that have been requested can be traversed and returned
-            // to the user as appropriate
-            next();
-        }
-    });
+                // Since this is a significant issue, passing this request to the feeds-errors
+                // route, by calling the next method with an empty error (as all errors will be
+                // accessible from the feedsErrors array).
+                next(new Error());
+            } else {
+                // Adding the content of the project (as returned from the content.json file) as 
+                // the content property on the file data object, so that it can be used throughout
+                // the rest of this route
+                req.fileData.content = JSON.parse(projectContent);
+                
+                // Passing this request on to the next stage of the router, so that the specific
+                // portions of the project that have been requested can be traversed and returned
+                // to the user as appropriate
+                next();
+            }
+        });
+    } else {
+        // Passing this request on to the next stage of the router, although no file content
+        // has been loaded (so either this request will fail further on through the route,
+        // or this is a request to create a new project)
+        next();
+    }
+    
 });
 
 // Exporting the router that was set up in this file, so that it can be included
