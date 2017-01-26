@@ -80,7 +80,7 @@ function updateUserProjects(userProjects){
         var newLi = document.createElement("li");
 
         var newA = document.createElement("a");
-        newA.setAttribute("href", "/admin/" + userID + "/" + userProjects[i].project_id);
+        newA.setAttribute("href", "/admin/" + userProjects[i].project_id + "?userID=" + userID);
         newA.innerHTML = userProjects[i].project_name;
         newLi.appendChild(newA);
 

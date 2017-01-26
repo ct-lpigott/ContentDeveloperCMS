@@ -3,14 +3,19 @@ extends view_components/layout.pug
 block main-body
 
     h1 Content Developer Admin
-    h2 Welcome back #{userDisplayName}
-    img(src=userProfileImage title=userDisplayName class="profileImage")
+    
+    h2 Welcome back 
+        if user.displayName
+        | #{user.displayName}
+    
+    if user.google_profile_image_url
+        img(src=user.google_profile_image_url title=user.displayName class="profileImage")
 
     input(id="newProjectName" type="text")
     button(id="createNewProject") Create New Project
     
     ul#userProjects
 
-    input(id="userID" type="hidden" value=userID)
+    input(id="userID" type="hidden" value=user.id)
 
     script(src='/js/script_admin.js')

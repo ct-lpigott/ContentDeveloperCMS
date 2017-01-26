@@ -51,43 +51,11 @@ router.get("/", function(req, res, next){
         } else {
             // Checking that there was at least one result returned from the database
             if(rows.length > 0){
-                // Loading the Google Plus object from the googleapis module, so that a
-                // request can be made to this API to retrieve this user's profile
-                // information
-                var plus = google.plus('v1');
-
-                // Creating a new oauth2 client, using a method from the custom google
-                // oauth module. This client will be used to authenticate the request
-                // to the Google Plus API below.
-                var oauth2Client = googleOAuth.generateOAuth2Client();
-
-                // Adding the user's GoogleAuthToken (sourced from the row returned from the 
-                // database) as the credentials for the oauth2 client, which wil be included
-                // in the request to the Google Plus API below.
-                oauth2Client.credentials = JSON.parse(rows[0].google_auth_token);
-
-                // Making a request to the Google Plus API, to get the profile information
-                // relating to this user. Passing the oauth2Client created above as the
-                // authentication for this request.
-                plus.people.get({
-                    userId: "me",
-                    auth: oauth2Client
-                }, function (err, user) {
-                    // Checking if an error was returned from the request.
-                    if(err) {
-                        // Logging the error to the console.
-                        console.log("Error loading user profile " + err);
-                    } else {
-                        // Rendering the admin template, supplying it with the title of the
-                        // page, the user's display name, and the link to their profile image (with
-                        // the size specification removed - as by default it is set to 50px)
-                        res.render("admin", {
-                            pageTitle: "Admin Panel",
-                            userDisplayName: user.displayName,
-                            userProfileImage: user.image.url.replace("?sz=50", ""),
-                            userID: req.userID 
-                        });
-                    }
+                // Rendering the admin template, supplying it with the title of the
+                // page and the user
+                res.render("admin", {
+                    pageTitle: "Admin Panel",
+                    user: rows[0] 
                 });
             } else {
                 req.adminErrors.push("This user is not recognised");

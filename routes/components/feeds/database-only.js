@@ -16,7 +16,7 @@ router.get("/", function(req, res, next){
         // Querying the database, to find the projects that this user has access to, by joining
         // the user table to the user_projects table. Returning only the columns needed for the 
         // reponse to the user
-        dbconn.query("SELECT * FROM Project p LEFT JOIN User_Project as up ON p.id = up.project_id LEFT JOIN User ON u.id = up.user_id WHERE up.user_id =" + dbconn.escape(req.userID), function(err, rows, fields){
+        dbconn.query("SELECT up.project_id, p.project_name, up.user_access_level FROM Project p LEFT JOIN User_Project as up ON p.id = up.project_id LEFT JOIN User as u ON u.id = up.user_id WHERE up.user_id =" + dbconn.escape(req.userID), function(err, rows, fields){
             if(err){
                 // Logging this error to the console
                 console.log(err);
