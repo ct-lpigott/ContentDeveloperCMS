@@ -90,7 +90,7 @@ router.get("/oauthRedirectURL", function(req, res, next){
 
                                 // Creating a new user in the database, using the email address, Google profile ID
                                 // and auth access token provided by the request to the Google API
-                                bconn.query("INSERT into User(display_name, email_address, google_profile_image_url, google_profile_id, google_auth_token) VALUES(" + dbconn.escape(user.displayName) + ", " + dbconn.escape(user.emails[0].value) + ", " + dbconn.escape(userProfileImageURL) + ", " + dbconn.escape(user.id) + ", " + dbconn.escape(jsonToken) + ")", function(err, result){
+                                dbconn.query("INSERT into User(display_name, email_address, google_profile_image_url, google_profile_id, google_auth_token) VALUES(" + dbconn.escape(user.displayName) + ", " + dbconn.escape(user.emails[0].value) + ", " + dbconn.escape(userProfileImageURL) + ", " + dbconn.escape(user.id) + ", " + dbconn.escape(jsonToken) + ")", function(err, result){
                                     if(err) {
                                         console.log(err);
                                     } else {

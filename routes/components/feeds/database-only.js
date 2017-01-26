@@ -266,7 +266,7 @@ router.delete("/:projectID", function(req, res, next){
                 } else {
                     console.log("Collaborator " + req.body.collaboratorID + " has been removed from project " + req.params.projectID);
                     
-                    dbconn.query("SELECT email_address, display_name FROM User WHERE id=" + dbconn.escape(req.newCollaboratorID), function(err, rows, fields){
+                    dbconn.query("SELECT email_address, display_name FROM User WHERE id=" + dbconn.escape(req.body.collaboratorID), function(err, rows, fields){
                         if(err){
                             console.log(err);
                         } else {
