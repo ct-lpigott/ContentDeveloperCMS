@@ -7,9 +7,11 @@ var router = require('express').Router();
 // connection to the database can be reused throughout the application.
 var dbconn = require("../../../database/connection.js");
 
+var sendEmail = require("../../../email/send_email.js");
+
 // Request to get the list of projects accessible by this user
 router.get("/", function(req, res, next){
-    console.log("GET request from " + req.userID + " to view all projects");
+    console.log("GET request from " + req.userID + " to view all projects");  
 
     // Checking that a userID has been provided within the request
     if(req.userID != null){
@@ -169,6 +171,16 @@ router.post("/:projectID", function(req, res, next){
                                 } else {
                                     console.log("Collaborators access level updated on project");
 
+                                    dbconn.query("SELECT u.email_address, u.display_name, p.project_name FROM User_Project up LEFT JOIN User u ON u.id = up.user_id LEFT JOIN Project p ON p.id = up.project_id WHERE u.id=" + dbconn.escape(req.newCollaboratorID), function(err, rows, fields){
+                                        if(err){
+                                            console.log(err);
+                                        } else {
+                                            if(rows.length > 0){
+                                                sendEmail.accessLevelChanged(rows[0].email_address, rows[0].display_name, rows[0].project_name, req.body.accessLevel);
+                                            } 
+                                        }
+                                    }); 
+
                                     res.redirect(303, "/feeds/" + req.params.projectID + "?action=getCollaborators");
                                 }
                             });
@@ -190,7 +202,17 @@ router.post("/:projectID", function(req, res, next){
                                 // accessible from the feedsErrors array).
                                 next(new Error());
                             } else {
-                                console.log("New collaborator added to project");
+                                console.log("New collaborator added to project");        
+
+                                dbconn.query("SELECT u.email_address, u.display_name, p.project_name FROM User_Project up LEFT JOIN User u ON u.id = up.user_id LEFT JOIN Project p ON p.id = up.project_id WHERE u.id=" + dbconn.escape(req.newCollaboratorID), function(err, rows, fields){
+                                    if(err){
+                                        console.log(err);
+                                    } else {
+                                        if(rows.length > 0){
+                                            sendEmail.addedToProject(rows[0].email_address, rows[0].display_name, rows[0].project_name);
+                                        } 
+                                    }
+                                });                    
 
                                 res.redirect(303, "/feeds/" + req.params.projectID + "?action=getCollaborators");
                             }
@@ -243,6 +265,17 @@ router.delete("/:projectID", function(req, res, next){
 
                 } else {
                     console.log("Collaborator " + req.body.collaboratorID + " has been removed from project " + req.params.projectID);
+                    
+                    dbconn.query("SELECT email_address, display_name FROM User WHERE id=" + dbconn.escape(req.newCollaboratorID), function(err, rows, fields){
+                        if(err){
+                            console.log(err);
+                        } else {
+                            if(rows.length > 0){
+                                sendEmail.removedFromProject(rows[0].email_address, rows[0].display_name, req.params.projectID);
+                            } 
+                        }
+                    });   
+
                     res.redirect(303, "/feeds/" + req.params.projectID + "?action=getCollaborators");
                 }
             });
