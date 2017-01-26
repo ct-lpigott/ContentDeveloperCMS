@@ -25,6 +25,15 @@ block main-body
             option(value=2) Content Editor
     button(id="addNewCollab") Add
 
+    div
+        h2 Collaborators on this Project
+            table(id="collaborators")
+                thead
+                    tr
+                        th User
+                        th Access Level
+                        th Remove
+                tbody
     input(id="userID" type="hidden" value=userID)
     input(id="projectID" type="hidden" value=projectID)
 

@@ -149,14 +149,7 @@ router.post("/:projectID", function(req, res, next){
                             // Logging the error to the console
                             console.log("This user is already a collaborator on this project");
 
-                            // This user already has this access level to the proejct. Adding this as 
-                            // an error to the feedsErrors array.
-                            req.feedsErrors.push("This user already has the requested access level for this project");
-
-                            // Since this is a significant issue, passing this request to the feeds-errors
-                            // route, by calling the next method with an empty error (as all errors will be
-                            // accessible from the feedsErrors array).
-                            next(new Error("notify"));
+                            res.redirect(303, "/feeds/" + req.params.projectID + "?action=getCollaborators");
                         } else {
                             // As this is a different access level for this user, for this project, updating the
                             // user_project table to reflect this i.e. changing this users level for this project
@@ -176,8 +169,7 @@ router.post("/:projectID", function(req, res, next){
                                 } else {
                                     console.log("Collaborators access level updated on project");
 
-                                    // Returning an empty JSON string, as the users access level has been updated
-                                    res.send("{}");
+                                    res.redirect(303, "/feeds/" + req.params.projectID + "?action=getCollaborators");
                                 }
                             });
                         }
@@ -200,9 +192,7 @@ router.post("/:projectID", function(req, res, next){
                             } else {
                                 console.log("New collaborator added to project");
 
-                                // Sending a response with an empty JSON string, as the collaborator
-                                // has been successfully added to the project
-                                res.send("{}");
+                                res.redirect(303, "/feeds/" + req.params.projectID + "?action=getCollaborators");
                             }
                         });
                     }
@@ -221,6 +211,45 @@ router.post("/:projectID", function(req, res, next){
             // accessible from the feedsErrors array).
             next(new Error());
         }
+    } else {
+        next();
+    }
+});
+
+router.get("/:projectID", function(req, res, next){
+    if(req.query.action == "getCollaborators"){
+        // Querying the database, to get all collaborators for this project
+
+        //SELECT u.displayName, up.user_access_level FROM User_Project as up LEFT JOIN User as u WHERE up.project_id=" + dbconn.escape(req.params.projectID)
+        dbconn.query("SELECT u.display_name, up.user_id, up.user_access_level FROM User_Project up LEFT JOIN User u ON up.user_id = u.id WHERE up.project_id=" + dbconn.escape(req.params.projectID), function(err, rows, fields){
+            if(err){
+
+            } else {
+                if(rows.length > 0){
+                    res.send(rows);
+                }
+            }
+        });
+    } else {
+        next();
+    }
+});
+
+router.delete("/:projectID", function(req, res, next){
+    if(req.query.action == "removeCollaborator"){
+        if(req.body.collaboratorID != null){
+            dbconn.query("DELETE FROM User_Project WHERE project_id=" + dbconn.escape(req.params.projectID) + " AND user_id=" + dbconn.escape(req.body.collaboratorID), function(err, rows, fields){
+                if(err){
+
+                } else {
+                    console.log("Collaborator " + req.body.collaboratorID + " has been removed from project " + req.params.projectID);
+                    res.redirect(303, "/feeds/" + req.params.projectID + "?action=getCollaborators");
+                }
+            });
+        } else {
+            // Error - no collaborator specified
+        }
+        
     } else {
         next();
     }

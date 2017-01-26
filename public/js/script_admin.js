@@ -13,6 +13,7 @@ function customWindowOnload(){
     if(document.getElementById("projectID")){
         projectID = document.getElementById("projectID").value;
         resetProjectStructure();
+        getProjectCollaborators();
     }    
 }
 
@@ -23,6 +24,7 @@ function customSetupEventListeners(){
 }
 
 function customClickEventHandler(e){
+    // BY ID
     switch(e.target.id){
         case "createNewProject": {
             var newProjectName = document.getElementById("newProjectName").value;
@@ -51,7 +53,7 @@ function customClickEventHandler(e){
 
             if(email.length > 0 && accessLevel > 0){
                 sendAjaxRequest("/feeds/" + projectID + "?action=addCollaborator", {email: email, accessLevel: accessLevel}, function(responseObject){
-                    
+                    updateProjectCollaborators(responseObject);
                 }, "POST");
             }
             break;
@@ -69,6 +71,15 @@ function customClickEventHandler(e){
             resetProjectStructure();
             break;
         }
+    }
+
+    // BY CLASS
+    if(e.target.classList.contains("removeCollaborator")){
+        
+        sendAjaxRequest("/feeds/" + projectID + "?action=removeCollaborator", {collaboratorID: e.target.getAttribute("data-userID")}, function(responseObject){
+            console.log("Deleted Collab " + e.target.getAttribute("data-userID"));
+            updateProjectCollaborators(responseObject);
+        }, "DELETE");
     }
 }
 

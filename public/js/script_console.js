@@ -128,3 +128,35 @@ function createItemInputElements(collection, itemContent=null, itemIndex=-1){
 
     return itemContainerElement;
 }
+
+function getProjectCollaborators(){
+    sendAjaxRequest("/feeds/" + projectID + "?action=getCollaborators", {}, function(responseObject){
+        updateProjectCollaborators(responseObject)
+    });
+}
+
+function updateProjectCollaborators(collaborators){
+    var collaboratorsTableBody = document.getElementById("collaborators").getElementsByTagName("tbody")[0];
+    collaboratorsTableBody.innerHTML = "";
+
+    for(var i=0; i < collaborators.length; i++){
+        var newRow = document.createElement("tr");
+
+        var nameTdElement = document.createElement("td");
+        nameTdElement.innerHTML = collaborators[i].display_name;
+
+        var accessLevelTdElement = document.createElement("td");
+        accessLevelTdElement.innerHTML = collaborators[i].user_access_level;
+
+        var removeCollaboratorElement = document.createElement("td");
+        removeCollaboratorElement.innerHTML = "x";
+        removeCollaboratorElement.setAttribute("class", "removeCollaborator");
+        removeCollaboratorElement.setAttribute("data-userID", collaborators[i].user_id);
+
+        newRow.appendChild(nameTdElement);
+        newRow.appendChild(accessLevelTdElement);
+        newRow.appendChild(removeCollaboratorElement);
+
+        collaboratorsTableBody.appendChild(newRow);
+    }
+}
