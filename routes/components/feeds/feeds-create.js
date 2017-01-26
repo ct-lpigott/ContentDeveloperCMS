@@ -12,6 +12,8 @@ var fs = require("fs");
 // connection to the database can be reused throughout the application.
 var dbconn = require("../../../database/connection.js");
 
+var validation = require("./../validation.js");
+
 // Request to create a new project
 router.post("/", function(req, res, next){
     console.log("POST to create new project");
@@ -172,12 +174,254 @@ router.post("/", function(req, res, next){
 
 // Request to add a collection to a project
 router.post("/:projectID", function(req, res, next){
-    res.send("POST request received from userID=" + req.userID + " for projectID=" + req.params.project);
+    if(req.body.structure != null) {
+        if(req.fileData.admin != null){
+            if(validation.objectToJson(req.body.structure)){
+                var updatedFileDataStructure = req.fileData.admin;
+                for(var collection in req.body.structure){
+                    if(updatedFileDataStructure.project_structure[collection] == null){
+                        updatedFileDataStructure.project_structure[collection] = req.body.structure[collection];
+                    } else {
+                        // As this collection already exists, this user should be updating it,
+                        // not creating it. Adding this as an error to the feedsErrors array.
+                        req.feedsErrors.push(collection + " is already a collection in this project. Please use a PUT request to update it.");
+                    }
+                    
+                }
+
+                if(req.feedsErrors.length > 0){
+                    res.responseObject.errors = req.feedsErrors;
+                }
+
+                if(validation.objectToJson(updatedFileDataStructure)){
+                    fs.writeFile("./projects/" + req.params.projectID + "/admin.json", JSON.stringify(updatedFileDataStructure), function(err){
+                        if(err) {
+                            // Logging the error to the console
+                            console.log("Error updating project admin file " + err);
+
+                            // As it has not been possible to update the admin.json file for this 
+                            // project, adding this as an error to the feedsErrors array.
+                            req.feedsErrors.push("Server error - unable to update project structure");
+
+                            // Since this is a significant issue, passing this request to the feeds-errors
+                            // route, by calling the next method with an empty error (as all errors will be
+                            // accessible from the feedsErrors array).
+                            next(new Error());
+                        } else {
+                            console.log("Collection added to project admin file");
+
+                            res.send(updatedFileDataStructure);
+                        }
+                    });
+                } else {
+                    // As it has not been possible parse the updated object to JSON, the content
+                    // cannot be updated. Adding this as an error to the feeds errors array.
+                    req.feedsErrors.push("Server error - unable to update project content");
+
+                    // Since this is a significant issue, passing this request to the feeds-errors
+                    // route, by calling the next method with an empty error (as all errors will be
+                    // accessible from the feedsErrors array).
+                    next(new Error());
+                }
+            } else {
+                // As it has not been possible parse the updated object to JSON, the content
+                // cannot be updated. Adding this as an error to the feeds errors array.
+                req.feedsErrors.push("Server error - unable to update project content");
+
+                // Since this is a significant issue, passing this request to the feeds-errors
+                // route, by calling the next method with an empty error (as all errors will be
+                // accessible from the feedsErrors array).
+                next(new Error());
+            }        
+        } else {
+            // No project structure was included in the request. Adding this as an error 
+            // to the feeds errors array.
+            req.feedsErrors.push("This user does not have permission to edit the project structure. Unable to create collection");
+
+            // Since this is a significant issue, passing this request to the feeds-errors
+            // route, by calling the next method with an empty error (as all errors will be
+            // accessible from the feedsErrors array).
+            next(new Error());
+        }
+    } else {
+        if(req.body.content != null){
+            next();
+        } else {
+            // No project structure was included in the request. Adding this as an error 
+            // to the feeds errors array.
+            req.feedsErrors.push("No project structure included in the request. Unable to create collection");
+
+            // Since this is a significant issue, passing this request to the feeds-errors
+            // route, by calling the next method with an empty error (as all errors will be
+            // accessible from the feedsErrors array).
+            next(new Error());
+        }
+    }
+    
+});
+// Continued - Request to add a collection to a project
+router.post("/:projectID", function(req, res, next){
+    if(req.body.content != null){
+        if(req.fileData.content != null){
+            if(validation.objectToJson(req.body.content)){
+                var updatedFileDataContent = req.fileData.content;
+                for(var collection in req.body.content){
+                    updatedFileDataContent[collection] = req.body.content[collection];
+                }
+
+                if(validation.objectToJson(updatedFileDataContent)){
+                    fs.writeFile("./projects/" + req.params.projectID + "/content.json", JSON.stringify(updatedFileDataContent), function(err){
+                        if(err) {
+                            // Logging the error to the console
+                            console.log("Error updating project content file " + err);
+
+                            // As it has not been possible to update the content.json file for this 
+                            // project, adding this as an error to the feedsErrors array.
+                            req.feedsErrors.push("Server error - unable to update project content");
+
+                            // Since this is a significant issue, passing this request to the feeds-errors
+                            // route, by calling the next method with an empty error (as all errors will be
+                            // accessible from the feedsErrors array).
+                            next(new Error());
+                        } else {
+                            console.log("Collection added to project content file");
+
+                            res.send(updatedFileDataContent);
+                        }
+                    });
+                } else {
+                    // As it has not been possible parse the updated object to JSON, the content
+                    // cannot be updated. Adding this as an error to the feeds errors array.
+                    req.feedsErrors.push("The content included is not valid JSON. Cannot update collection");
+
+                    // Since this is a significant issue, passing this request to the feeds-errors
+                    // route, by calling the next method with an empty error (as all errors will be
+                    // accessible from the feedsErrors array).
+                    next(new Error());
+                }
+            } else {
+                // As it has not been possible parse the updated object to JSON, the content
+                // cannot be updated. Adding this as an error to the feeds errors array.
+                req.feedsErrors.push("The content included is not valid JSON. Cannot update collection");
+
+                // Since this is a significant issue, passing this request to the feeds-errors
+                // route, by calling the next method with an empty error (as all errors will be
+                // accessible from the feedsErrors array).
+                next(new Error());
+            }
+        } else {
+            // Adding this as an error to the feeds errors array.
+            req.feedsErrors.push("This user does not have permission to update the project content.");
+
+            // Since this is a significant issue, passing this request to the feeds-errors
+            // route, by calling the next method with an empty error (as all errors will be
+            // accessible from the feedsErrors array).
+            next(new Error());
+        }
+        
+        
+    } else {
+        // As no content has been included in the request, unable to update the
+        // collection. Adding this as an error to the feeds errors array.
+        req.feedsErrors.push("No content provied in the request. Cannot update the collection");
+
+        // Since this is a significant issue, passing this request to the feeds-errors
+        // route, by calling the next method with an empty error (as all errors will be
+        // accessible from the feedsErrors array).
+        next(new Error());
+    }
 });
 
 // Request to add an item to a collection within a project
 router.post("/:projectID/:collection", function(req, res, next){
-    res.send("POST request received from userID=" + req.userID + " for projectID=" + req.params.project + " collection=" + req.params.collection);
+    // Temporarily storing the collection name (as requested in the URL parameters) on
+    // the request object, so that it can be used throughout this route. Transforming
+    // the collection name to lowercase, for use within the route. 
+    req.collectionName = req.params.collection.toLowerCase();
+
+    if(req.body.content != null){
+        if(req.fileData.content != null){
+            if(validation.objectToJson(req.body.content)){
+                var updatedFileDataContent = req.fileData.content;
+
+                switch(updatedFileDataContent[req.collectionName].constructor){
+                    case Array: {
+                        console.log("array");
+                        for(var item in req.body.content){
+                            updatedFileDataContent[req.collectionName].push(req.body.content[item]);
+                        }
+                    }
+                    default: {
+                        console.log("Not Array");
+                        for(var item in req.body.content){
+                            updatedFileDataContent[req.collectionName][item] = req.body.content[item];
+                        }
+                        break;
+                    }
+                }
+                
+
+                if(validation.objectToJson(updatedFileDataContent)){
+                    fs.writeFile("./projects/" + req.params.projectID + "/content.json", JSON.stringify(updatedFileDataContent), function(err){
+                        if(err) {
+                            // Logging the error to the console
+                            console.log("Error updating project content file " + err);
+
+                            // As it has not been possible to update the content.json file for this 
+                            // project, adding this as an error to the feedsErrors array.
+                            req.feedsErrors.push("Server error - unable to create new item in collection");
+
+                            // Since this is a significant issue, passing this request to the feeds-errors
+                            // route, by calling the next method with an empty error (as all errors will be
+                            // accessible from the feedsErrors array).
+                            next(new Error());
+                        } else {
+                            console.log("New item added to collection");
+
+                            res.send(updatedFileDataContent[req.collectionName]);
+                        }
+                    });
+                } else {
+                    // As it has not been possible parse the updated object to JSON, the content
+                    // cannot be updated. Adding this as an error to the feeds errors array.
+                    req.feedsErrors.push("The content included is not valid JSON. Cannot add to collection");
+
+                    // Since this is a significant issue, passing this request to the feeds-errors
+                    // route, by calling the next method with an empty error (as all errors will be
+                    // accessible from the feedsErrors array).
+                    next(new Error());
+                }
+            } else {
+                // As it has not been possible parse the updated object to JSON, the content
+                // cannot be updated. Adding this as an error to the feeds errors array.
+                req.feedsErrors.push("The content included is not valid JSON. Cannot add to collection");
+
+                // Since this is a significant issue, passing this request to the feeds-errors
+                // route, by calling the next method with an empty error (as all errors will be
+                // accessible from the feedsErrors array).
+                next(new Error());
+            }
+        } else {
+            // Adding this as an error to the feeds errors array.
+            req.feedsErrors.push("This user does not have permission to add to this collection");
+
+            // Since this is a significant issue, passing this request to the feeds-errors
+            // route, by calling the next method with an empty error (as all errors will be
+            // accessible from the feedsErrors array).
+            next(new Error());
+        }
+        
+        
+    } else {
+        // As no content has been included in the request, unable to update the
+        // collection. Adding this as an error to the feeds errors array.
+        req.feedsErrors.push("No content provied in the request");
+
+        // Since this is a significant issue, passing this request to the feeds-errors
+        // route, by calling the next method with an empty error (as all errors will be
+        // accessible from the feedsErrors array).
+        next(new Error());
+    }
 });
 
 // Exporting the router that was set up in this file, so that it can be included
