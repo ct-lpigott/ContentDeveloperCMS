@@ -3,20 +3,9 @@
 // which this route will accept.
 var router = require('express').Router();
 
-// Requiring the googleapis module, so that it can be used within
-// within this module to make requests to specific Google APIs
-// i.e. to make request to the Plus API, to get the user's name and
-// profile picture from the Google account
-var google = require("googleapis");
-
 // Requiring the custom database connection module, so that the one
 // connection to the database can be reused throughout the application.
 var dbconn = require("../database/connection.js");
-
-// Requiring the custom google OAuth module, which exports an object with 
-// a method to generate a new oauth url, and a method which returns
-// a new OAuth2Client.
-var googleOAuth = require("../google/googleOAuth");
 
 // ALL REQUESTS
 router.use(function(req, res, next){
