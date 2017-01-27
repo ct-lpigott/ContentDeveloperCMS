@@ -10,20 +10,24 @@ var transporter = nodemailer.createTransport({
 });
 
 function sendEmail(to, subject, htmlBody){
-    var mailOptions = {
-        from: "'Content Developer' <" + process.env.EMAIL_ADDRESS + ">",
-        to: to,
-        subject: subject,
-        html: htmlBody
-    };
+    if(process.env.DEBUG == null){
+        var mailOptions = {
+            from: "'Content Developer' <" + process.env.EMAIL_ADDRESS + ">",
+            to: to,
+            subject: subject,
+            html: htmlBody
+        };
 
-    transporter.sendMail(mailOptions, function(error, info) {
-        if (error) {
-            console.log(error);
-        } else {
-            console.log("Email successfully sent: " + info.response);
-        }
-    });
+        transporter.sendMail(mailOptions, function(error, info) {
+            if (error) {
+                console.log(error);
+            } else {
+                console.log("Email successfully sent: " + info.response);
+            }
+        });
+    } else {
+        return true;
+    }
 }
 
 module.exports = {
