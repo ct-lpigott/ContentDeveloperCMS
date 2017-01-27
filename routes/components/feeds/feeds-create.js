@@ -14,6 +14,8 @@ var dbconn = require("../../../database/connection.js");
 
 var validation = require("./../validation.js");
 
+var defaultAccessLevels = require("../../../project_defaults/default_access_levels.js");
+
 // Request to create a new project
 router.post("/", function(req, res, next){
     console.log("POST to create new project");
@@ -22,7 +24,7 @@ router.post("/", function(req, res, next){
     if(req.body.projectName != null){
         // Creating a new project in the database, using the project name provided 
         // in the request body, escaping this value before passing it to the database
-        dbconn.query("INSERT INTO Project(project_name) VALUES(" + dbconn.escape(req.body.projectName) + ")", function(err, result){
+        dbconn.query("INSERT INTO Project(project_name, access_levels) VALUES(" + dbconn.escape(req.body.projectName) + ", " + dbconn.escape(defaultAccessLevels.allAsString()) + ")", function(err, result){
             if(err){
                 // Logging the error to the console
                 console.log(err);
@@ -44,7 +46,7 @@ router.post("/", function(req, res, next){
                 // Creating a new entry in the User_Project database, to add the current user as an
                 // administrator of this project. Defaulting this user to have the highest level
                 // of access to this project i.e. 1
-                dbconn.query("INSERT INTO User_Project(user_id, project_id, user_access_level) VALUES(" + req.userID + ", " + req.projectID + ", 1)", function(err, result){
+                dbconn.query("INSERT INTO User_Project(user_id, project_id, access_level_id) VALUES(" + req.userID + ", " + req.projectID + ", " + defaultAccessLevels.getByName("Administrator") + ")", function(err, result){
                     if(err){
                         // Logging the error to the console
                         console.log("Error - Unable to link this new project with the current user", err);
@@ -78,7 +80,7 @@ router.post("/", function(req, res, next){
                             } else {
                                 // Loading in the project template file, which will be used to instantiate the
                                 // admin.json file for this project 
-                                fs.readFile("./projects/project_template.json", function(err, data){
+                                fs.readFile("./project_defaults/project_template.json", function(err, data){
                                     // Creating a projectTemplate object. Defaulting this to be an empty
                                     // object, which will be replaced by the contents of the template file,
                                     // if this was loaded without error.
@@ -147,7 +149,7 @@ router.post("/", function(req, res, next){
                                                     // to the /feeds/userID route, so that the list of projects belonging to this
                                                     // user (which will now include this new project) will be returned in the
                                                     // response object
-                                                    res.redirect("/feeds/" + req.userID);
+                                                    res.redirect("/feeds?userID=" + req.userID);
                                                 }
                                             });
                                         }

@@ -9,6 +9,8 @@ var dbconn = require("../../../database/connection.js");
 
 var sendEmail = require("../../../email/send_email.js");
 
+var defaultAccessLevels = require("../../../project_defaults/default_access_levels.js");
+
 // Request to get the list of projects accessible by this user
 router.get("/", function(req, res, next){
     console.log("GET request from " + req.userID + " to view all projects");  
@@ -18,7 +20,7 @@ router.get("/", function(req, res, next){
         // Querying the database, to find the projects that this user has access to, by joining
         // the user table to the user_projects table. Returning only the columns needed for the 
         // reponse to the user
-        dbconn.query("SELECT up.project_id, p.project_name, up.user_access_level FROM Project p LEFT JOIN User_Project as up ON p.id = up.project_id LEFT JOIN User as u ON u.id = up.user_id WHERE up.user_id =" + dbconn.escape(req.userID), function(err, rows, fields){
+        dbconn.query("SELECT up.project_id, p.project_name, al.access_level_int, al.access_level_name FROM Project p LEFT JOIN User_Project as up ON p.id = up.project_id LEFT JOIN User as u ON u.id = up.user_id LEFT JOIN AccessLevel al ON up.access_level_id = al.id WHERE up.user_id =" + dbconn.escape(req.userID), function(err, rows, fields){
             if(err){
                 // Logging this error to the console
                 console.log(err);
@@ -35,10 +37,11 @@ router.get("/", function(req, res, next){
                 if(rows.length > 0){
                     // Sending the resulting rows from the database query, as the response
                     // to the user. These rows will only contain the columns specified in the 
-                    // query i.e. project ID, project name and user acces level
+                    // query i.e. project ID, project name and user acces level int and name
                     res.send(rows);
                 } else {
-                    res.send("This user has no projects");
+                    // This user has no projects
+                    res.send("{}");
                 }
             }
         });
@@ -126,9 +129,9 @@ router.post("/:projectID", function(req, res, next){
     if(req.query.action == "addCollaborator"){
         // Checking if an access level property was provided in the request, and that the
         // value of that property is greater than 0
-        if(req.body.accessLevel != null && req.body.accessLevel > 0){
+        if(req.body.accessLevelId != null){
             // Querying the database, to check if this user is already connected with this project
-            dbconn.query("SELECT * FROM User_Project WHERE user_id=" + req.newCollaboratorID + " AND project_id=" + req.params.projectID, function(err, rows, fields){
+            dbconn.query("SELECT * FROM User_Project up LEFT JOIN AccessLevel al ON up.access_level_id = al.id WHERE user_id=" + req.newCollaboratorID + " AND project_id=" + req.params.projectID, function(err, rows, fields){
                 if(err){
                     // Logging the error to the console
                     console.log("Error checking if user is already a contributor to project " + err);
@@ -147,7 +150,7 @@ router.post("/:projectID", function(req, res, next){
                     if(rows.length > 0){
                         // Determining if this users current access level is the same as the one
                         // included in the request i.e. to see if any change of access level is necessary
-                        if(req.body.accessLevel == rows[0].user_access_level){
+                        if(req.body.accessLevelId == rows[0].access_level_id){
                             // Logging the error to the console
                             console.log("This user is already a collaborator on this project");
 
@@ -155,7 +158,7 @@ router.post("/:projectID", function(req, res, next){
                         } else {
                             // As this is a different access level for this user, for this project, updating the
                             // user_project table to reflect this i.e. changing this users level for this project
-                            dbconn.query("UPDATE User_Project SET user_access_level=" + dbconn.escape(req.body.accessLevel) + "WHERE user_id=" + req.newCollaboratorID, function(err, result) {
+                            dbconn.query("UPDATE User_Project SET access_level_id=" + dbconn.escape(req.body.accessLevelId) + "WHERE user_id=" + req.newCollaboratorID, function(err, result) {
                                 if(err){
                                     // Logging the error to the console
                                     console.log("Error updating user on project " + err);
@@ -171,12 +174,12 @@ router.post("/:projectID", function(req, res, next){
                                 } else {
                                     console.log("Collaborators access level updated on project");
 
-                                    dbconn.query("SELECT u.email_address, u.display_name, p.project_name FROM User_Project up LEFT JOIN User u ON u.id = up.user_id LEFT JOIN Project p ON p.id = up.project_id WHERE u.id=" + dbconn.escape(req.newCollaboratorID), function(err, rows, fields){
+                                    dbconn.query("SELECT * FROM User_Project up LEFT JOIN User u ON u.id = up.user_id LEFT JOIN Project p ON p.id = up.project_id LEFT JOIN AccessLevel al ON up.access_level_id = al.id WHERE u.id=" + dbconn.escape(req.newCollaboratorID), function(err, rows, fields){
                                         if(err){
                                             console.log(err);
                                         } else {
                                             if(rows.length > 0){
-                                                sendEmail.accessLevelChanged(rows[0].email_address, rows[0].display_name, rows[0].project_name, req.body.accessLevel);
+                                                sendEmail.accessLevelChanged(rows[0].email_address, rows[0].display_name, rows[0].project_name, rows[0].access_level_name);
                                             } 
                                         }
                                     }); 
@@ -188,7 +191,7 @@ router.post("/:projectID", function(req, res, next){
                     } else {
                         // This user has not previously been a collaborator on this project, so creating a new
                         // relationship between the user and the project, using the access level provided
-                        dbconn.query("INSERT INTO User_Project(user_id, project_id, user_access_level) VALUES(" + req.newCollaboratorID + ", " + req.params.projectID + ", " + dbconn.escape(req.body.accessLevel) + ")", function(err, result) {
+                        dbconn.query("INSERT INTO User_Project(user_id, project_id, access_level_id) VALUES(" + req.newCollaboratorID + ", " + req.params.projectID + ", " + dbconn.escape(req.body.accessLevelId) + ")", function(err, result) {
                             if(err){
                                 // Logging the error to the console
                                 console.log("Error adding user to project " + err);
@@ -242,8 +245,7 @@ router.get("/:projectID", function(req, res, next){
     if(req.query.action == "getCollaborators"){
         // Querying the database, to get all collaborators for this project
 
-        //SELECT u.displayName, up.user_access_level FROM User_Project as up LEFT JOIN User as u WHERE up.project_id=" + dbconn.escape(req.params.projectID)
-        dbconn.query("SELECT u.display_name, up.user_id, up.user_access_level FROM User_Project up LEFT JOIN User u ON up.user_id = u.id WHERE up.project_id=" + dbconn.escape(req.params.projectID), function(err, rows, fields){
+        dbconn.query("SELECT u.display_name, up.user_id, al.access_level_int, al.access_level_name FROM User_Project up LEFT JOIN User u ON up.user_id = u.id LEFT JOIN AccessLevel al ON up.access_level_id = al.id WHERE up.project_id=" + dbconn.escape(req.params.projectID), function(err, rows, fields){
             if(err){
 
             } else {
@@ -256,6 +258,36 @@ router.get("/:projectID", function(req, res, next){
         next();
     }
 });
+
+router.get("/:projectID", function(req, res, next){
+    if(req.query.action == "getAccessLevels"){
+        // Querying the database, to get all access levels for this project
+        dbconn.query("SELECT access_levels FROM Project WHERE id=" + dbconn.escape(req.params.projectID) + " ", function(err, rows, fields){
+            if(err){
+                next(Error());
+            } else {
+                if(rows.length > 0){
+                    dbconn.query("SELECT id, access_level_int, access_level_name FROM AccessLevel WHERE id IN (" + rows[0].access_levels + ")", function(err, rows, fields){
+                        if(err){
+                            next(Error());
+                        } else {
+                            if(rows.length > 0){
+                                res.send(rows);
+                            } else {
+                                next(Error());
+                            }
+                        }
+                    });
+                } else {
+                    next(Error());
+                }                
+            }
+        });
+    } else {
+        next();
+    }
+});
+
 
 router.delete("/:projectID", function(req, res, next){
     if(req.query.action == "removeCollaborator"){

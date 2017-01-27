@@ -12,6 +12,8 @@ var fs = require("fs");
 // connection to the database can be reused throughout the application.
 var dbconn = require("../../../database/connection.js");
 
+var defaultAccessLevels = require("../../../project_defaults/default_access_levels.js");
+
 // PRE for requests to read/update/delete the contents of a project, it's collection or any items within those collections
 router.use(function(req, res, next){
     // Creating a temporary array of the URL parameters, as these are not accessible within
@@ -39,7 +41,7 @@ router.use(function(req, res, next){
         // Querying the database, to find the projects that this user has access to, by joining
         // the user table to the user_projects table. Returning only the columns needed for the 
         // reponse to the user. 
-        dbconn.query("SELECT * FROM Project p LEFT JOIN User_Project up ON p.id = up.project_id WHERE p.id = " + dbconn.escape(req.tmpParams.projectID) + " AND up.user_id = " + dbconn.escape(req.tmpParams.userID), function(err, rows, fields){
+        dbconn.query("SELECT * FROM Project p LEFT JOIN User_Project up ON p.id = up.project_id LEFT JOIN AccessLevel al ON up.access_level_id = al.id WHERE p.id = " + dbconn.escape(req.tmpParams.projectID) + " AND up.user_id = " + dbconn.escape(req.tmpParams.userID), function(err, rows, fields){
             if(err){
                 // Logging this error to the console
                 console.log(err);
@@ -57,7 +59,7 @@ router.use(function(req, res, next){
 
                     // Storing the users access level on the request object, to be used throughout
                     // the rest of this route
-                    req.user_access_level = rows[0].user_access_level;
+                    req.user_access_level = rows[0].access_level_int;
 
                     // Reading this projects admin.json file from the project directory (which is named
                     // as per the projects ID), so that the project structure can be returned to the user

@@ -1,15 +1,15 @@
 var defaultAccessLevels = {
     "Administrator": 1,
     "Content Editor": 2,
-    "Content Viewer": 3
+    "View Only": 3
 };
 
 module.exports = {
     getByName: function(name){
         return defaultAccessLevels[name] || null;
     },
-    allAsJson: function(){
-        return JSON.stringify(this.all());
+    allAsString: function(){
+        return this.all().join();
     },
     all: function(){
         var accessLevels = [];

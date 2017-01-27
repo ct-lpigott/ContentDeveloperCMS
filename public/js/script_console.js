@@ -145,17 +145,23 @@ function updateProjectCollaborators(collaborators){
         var nameTdElement = document.createElement("td");
         nameTdElement.innerHTML = collaborators[i].display_name;
 
-        var accessLevelTdElement = document.createElement("td");
-        accessLevelTdElement.innerHTML = collaborators[i].user_access_level;
+        var accessLevelNameTdElement = document.createElement("td");
+        accessLevelNameTdElement.innerHTML = collaborators[i].access_level_name;
 
-        var removeCollaboratorElement = document.createElement("td");
-        removeCollaboratorElement.innerHTML = "x";
-        removeCollaboratorElement.setAttribute("class", "removeCollaborator");
-        removeCollaboratorElement.setAttribute("data-userID", collaborators[i].user_id);
+        var accessLevelIntTdElement = document.createElement("td");
+        accessLevelIntTdElement.innerHTML = collaborators[i].access_level_int;
+
+        var removeCollaboratorTdElement = document.createElement("td");
+        var removeCollaboratorButtonElement = document.createElement("button");
+        removeCollaboratorButtonElement.innerHTML = "x";
+        removeCollaboratorButtonElement.setAttribute("class", "removeCollaborator");
+        removeCollaboratorButtonElement.setAttribute("data-userID", collaborators[i].user_id);
+        removeCollaboratorTdElement.appendChild(removeCollaboratorButtonElement);
 
         newRow.appendChild(nameTdElement);
-        newRow.appendChild(accessLevelTdElement);
-        newRow.appendChild(removeCollaboratorElement);
+        newRow.appendChild(accessLevelNameTdElement);
+        newRow.appendChild(accessLevelIntTdElement);
+        newRow.appendChild(removeCollaboratorTdElement);
 
         collaboratorsTableBody.appendChild(newRow);
     }
@@ -189,4 +195,17 @@ function objectToJson(jsObject){
     
     console.log("VALIDATION | Valid JSON = " + validJson);
     return validJson;
+}
+
+function getAccessLevels(){
+    sendAjaxRequest("/feeds/" + projectID + "?action=getAccessLevels", {}, function(responseObject){
+        var accessLevelSelect = document.getElementById("accessLevel");
+
+        for(var accessLevel of responseObject){
+            var newOption = document.createElement("option");
+            newOption.innerHTML = accessLevel.access_level_name;
+            newOption.setAttribute("value", accessLevel.id);
+            accessLevelSelect.appendChild(newOption);
+        }
+    });
 }

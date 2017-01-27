@@ -13,6 +13,7 @@ function customWindowOnload(){
     if(document.getElementById("projectID")){
         projectID = document.getElementById("projectID").value;
         resetProjectStructure();
+        getAccessLevels();
         getProjectCollaborators();
     }    
 }
@@ -55,7 +56,7 @@ function customClickEventHandler(e){
             var accessLevel = document.getElementById("accessLevel").value;
 
             if(email.length > 0 && accessLevel > 0){
-                sendAjaxRequest("/feeds/" + projectID + "?action=addCollaborator", {email: email, accessLevel: accessLevel}, function(responseObject){
+                sendAjaxRequest("/feeds/" + projectID + "?action=addCollaborator", {email: email, accessLevelId: accessLevel}, function(responseObject){
                     updateProjectCollaborators(responseObject);
                 }, "POST");
             }
