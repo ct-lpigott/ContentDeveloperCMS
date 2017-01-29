@@ -16,7 +16,7 @@ var clientSecretData = JSON.parse(fs.readFileSync("./google/client_secret.json")
 // request to return a user to the server following a successful login)
 // based on that specified in the environment variable i.e. this may
 // vary depending on where the server is running
-var redirectURL = process.env.GOOGLE_OAUTH_REDIRECT_URL;
+var redirectURL = process.env.SITE_URL + "/google/oauthRedirectURL";
 
 // Setting the export of this module to be equal to an object, which 
 // contains two methods - one to generate a new OAuth URL, and the other
