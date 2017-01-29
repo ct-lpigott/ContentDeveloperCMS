@@ -6,6 +6,9 @@
 var express = require("express");
 var pug = require("pug");
 var bodyParser = require('body-parser');
+var http = require("http");
+var https = require("https");
+var redirectHttps = require("redirect-https");
 
 // Generating a new app using the express module
 var app = express();
@@ -47,6 +50,34 @@ app.use(express.static("./public"));
 app.listen(process.env.PORT, function () {
   console.log("Listening on port: " + process.env.PORT);
 });
+
+/*
+var greenlockExpress = require('greenlock-express').create({ 
+  server: 'staging',
+  email: 'pigottlaura@gmail.com',
+  agreeTos: true,
+  approveDomains: [ process.env.SITE_URL ]
+});
+
+
+var redirectToSecureServer = greenlockExpress.middleware(
+  redirectHttps({port:process.env.PORT_HTTPS})
+);
+
+// Setting up a HTTP server, whose only purpose is to redirect any HTTP requests as 
+// HTTPS requests i.e. if a request is recieved at the process.env.PORT, it will be
+// redirected to the process.env.PORT_HTTPS (which will be received by the HTTPS
+// server running below).
+http.createServer(redirectToSecureServer).listen(process.env.PORT, function () {
+  console.log("Listening for HTTP requests on " + process.env.PORT);
+});
+
+// Setting up a HTTP server, to deal with all HTTPS requests i.e. to be the main
+// server of the app.
+https.createServer(greenlockExpress.httpsOptions, greenlockExpress.middleware(app)).listen(process.env.PORT_HTTPS, function () {
+  console.log("Listening for HTTPS requests, and serving app, on port " + process.env.PORT_HTTPS);
+});
+*/
 
 // Setting the app, that was set up within this file, as the export for this module
 module.exports = app;
