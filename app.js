@@ -20,6 +20,18 @@ var app = express();
 app.use(bodyParser.json()); 
 app.use(bodyParser.urlencoded({ extended: true }));
 
+// Intercepting all requests, to set the response headers for implementing
+// HSTS (HTTP Strict-Transport-Security) to ensure the site can only ever be accessed
+// through HTTPS
+app.use(function(req, res, next){
+  // Setting the Strict Transport Security header to be valid for 1 year,
+  // and to include all subdomains
+  res.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+
+  // Passing this request onto the next router, so that it can continue through the app
+  next();
+});
+
 // Setting up the routing structure of the app. Sending requests to a different
 // route in the server based on the first URL parameter of their request i.e.
 // requests that begin with "/admin" will be routed through the admin route etc. 
