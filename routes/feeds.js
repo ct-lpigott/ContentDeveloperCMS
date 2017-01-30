@@ -9,16 +9,16 @@ router.use(require("./components/feeds/database-only.js"));
 router.use(require("./components/feeds/preload-filedata.js"));
 
 // CREATE (post)
-router.use(require("./components/feeds/feeds-create.js"));
+router.post("*", require("./components/feeds/feeds-create.js"));
 
 // READ (get)
-router.use(require("./components/feeds/feeds-read.js"));
+router.get("*", require("./components/feeds/feeds-read.js"));
 
 // UPDATE (put)
-router.use(require("./components/feeds/feeds-update.js"));
+router.put("*", require("./components/feeds/feeds-update.js"));
 
 // DELETE (delete)
-router.use(require("./components/feeds/feeds-delete.js"));
+router.delete("*", require("./components/feeds/feeds-delete.js"));
 
 // Exporting the router that was set up in this file, so that it can be included
 // in the app.js file and specified as the route for all requests to the "/feeds" route
