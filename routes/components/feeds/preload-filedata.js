@@ -24,13 +24,29 @@ router.use(function(req, res, next){
     // "/" so as to create an array of name=value pairs i.e. ["1", "books"];
     var parameters = req.url.slice(1).split("?")[0].split("/");
 
+    // Creating a new array on the request object, to store these parameters, so they can be used
+    // throughout the feeds route.
+    req.allParams = [];
+
+    // Looping through all of the parameters in the temporary array created above, to insure
+    // that only the indexes that contain a value are stored i.e. if a user requested /books/ this
+    // would create an array of 2 items ["books", ""] as the last "/" would have be used to split
+    // the string and would include an empty string in the parameters.
+    for(var i=0; i< parameters.length; i++){
+        // Checking that this parameters value is not empty
+        if(parameters[i] != ""){
+            // Adding this parameter to the request object's allParams array
+            req.allParams.push(parameters[i]);
+        }
+    }
+
     // Creating a temporary parameters object on the request, to store the value of the userID
     // and projectID that should be used within this middleware to load in the relevant files
     // data, so that the contents of these can be reused throughout this route. The values stored
     // within the tmp parameters will only be used within this funciton, and the one directly below.
     req.tmpParams = {
         userID: req.userID,
-        projectID: parameters[0]
+        projectID: req.allParams[0]
     };
 
     // Creating an empty object, to store the contents and structure of the project files, so that
