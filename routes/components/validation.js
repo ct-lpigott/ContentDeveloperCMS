@@ -26,5 +26,12 @@ module.exports = {
         
         console.log("VALIDATION | Valid JSON = " + validJson);
         return validJson;
+    },
+    contentStructure: function(content, structure){
+        var response = {
+            successful: true,
+            errors: []
+        };
+        return response;
     }
 };

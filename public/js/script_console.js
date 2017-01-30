@@ -33,6 +33,21 @@ function updateProjectHTML(projectDetails, includeContent=true){
                 collectionContainer.appendChild(addButtonElement);
                 break;
             }
+            case "object":{
+                if(includeContent && projectContent[collection] != null){
+                    var itemIndex = 0;
+                    for(var item in projectContent[collection]){
+                        var itemContainerElement = createItemInputElements(collection, projectContent[collection][item], itemIndex);
+                        collectionContainer.appendChild(itemContainerElement);
+
+                        itemIndex++;
+                    }
+                } else {
+                    var itemContainerElement = createItemInputElements(collection, null, 0);
+                    collectionContainer.appendChild(itemContainerElement);
+                }
+                break;
+            }
             default: {
                 var elementValue = includeContent ? projectContent[collection] : null;
                 var itemContainerElement = createItemInputElements(collection, elementValue, 0);
@@ -64,16 +79,19 @@ function createItemInputElements(collection, itemContent=null, itemIndex=-1){
                     newElement.setAttribute("id", itemID);
                     
                     for(var inputAttribute in projectStructure[collection][itemDefinition][itemInput]["attributes"]){
-                        newElement.setAttribute(inputAttribute, projectStructure[collection][itemDefinition][itemInput]["attributes"][inputAttribute]);
+                        if(inputAttribute != "options"){
+                            newElement.setAttribute(inputAttribute, projectStructure[collection][itemDefinition][itemInput]["attributes"][inputAttribute]);
+                        }
                     }
                     
                     switch(projectStructure[collection][itemDefinition][itemInput]["input_type"]){
                         case "select": {
-                            for(var option in projectStructure[collection][itemDefinition][itemInput]["options"]){
+                            for(var option of projectStructure[collection][itemDefinition][itemInput]["attributes"]["options"]){
                                 var newOption = document.createElement("option");
-                                newOption.innerHTML = projectStructure[collection][itemDefinition][itemInput]["options"][option];
+                                newOption.innerHTML = upperCamelCaseAll(underscoreToSpace(option));
+                                newOption.setAttribute("value", option);
                                 if(itemContent != null && itemContent[itemInput] != null){
-                                    if(projectStructure[collection][itemDefinition][itemInput]["options"][option] == itemContent[itemInput]){
+                                    if(option == itemContent[itemInput]){
                                         newOption.setAttribute("selected", "selected");
                                     }
                                 }

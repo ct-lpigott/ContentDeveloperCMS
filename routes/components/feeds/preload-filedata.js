@@ -36,7 +36,7 @@ router.use(function(req, res, next){
         // Checking that this parameters value is not empty
         if(parameters[i] != ""){
             // Adding this parameter to the request object's allParams array
-            req.allParams.push(parameters[i]);
+            req.allParams.push(parameters[i].toLowerCase());
         }
     }
 
