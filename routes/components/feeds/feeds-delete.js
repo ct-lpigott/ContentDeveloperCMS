@@ -149,9 +149,9 @@ router.delete("/:projectID/*", function(req, res, next){
             // update the project content file.
             if(req.removedItemFrom != null){
                 // Checking that the fileData content is still a valid object, by attempting
-                // to parse it to JSON. Since the new item that was created will have been reflected
+                // to parse it to JSON. Since the item that was removed will have been reflected
                 // in this object (as it was passed by reference to a function) completing this recheck
-                // to ensure that creating the new item did not corrupt the existing content
+                // to ensure that deleting the new item did not corrupt the existing content
                 if(validation.objectToJson(req.fileData.content)){
                     // Updating this project's content.json file, passing the JSON stringified version
                     // of the fileData content object as the contents
@@ -162,14 +162,14 @@ router.delete("/:projectID/*", function(req, res, next){
 
                             // As it has not been possible to update the content.json file for this 
                             // project, adding this as an error to the feedsErrors array.
-                            req.feedsErrors.push("Server error - unable to create new item in collection");
+                            req.feedsErrors.push("Server error - unable to delete this item");
 
                             // Since this is a significant issue, passing this request to the feeds-errors
                             // route, by calling the next method with an empty error (as all errors will be
                             // accessible from the feedsErrors array).
                             return next(new Error());
                         } else {
-                            console.log("New item added to project");
+                            console.log("Item deleted from project");
 
                             res.send(req.removedItemFrom);
                         }
@@ -188,12 +188,9 @@ router.delete("/:projectID/*", function(req, res, next){
                 // Returning any errors set in the createItem() function to the caller
                 return next(new Error());
             }
-                
-
-
         } else {
             // Adding this as an error to the feeds errors array.
-            req.feedsErrors.push("This user does not have permission to add to this collection");
+            req.feedsErrors.push("This user does not have permission to delete this item");
 
             // Since this is a significant issue, passing this request to the feeds-errors
             // route, by calling the next method with an empty error (as all errors will be
@@ -203,7 +200,7 @@ router.delete("/:projectID/*", function(req, res, next){
 
     } else {
         // Adding this as an error to the feeds errors array.
-        req.feedsErrors.push("Not enough parameters provided to create this content");
+        req.feedsErrors.push("Not enough parameters provided to delete this content");
 
         // Since this is a significant issue, passing this request to the feeds-errors
         // route, by calling the next method with an empty error (as all errors will be
