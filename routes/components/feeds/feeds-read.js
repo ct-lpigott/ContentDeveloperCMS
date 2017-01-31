@@ -26,78 +26,71 @@ router.get("/:projectID", function(req, res, next){
 });
 
 // Request to get the content of a collection in a project
-router.get("/:projectID/:collection", function(req, res, next){
-    // Temporarily storing the collection name (as requested in the URL parameters) on
-    // the request object, so that it can be used throughout this route. Transforming
-    // the collection name to lowercase, for use within the route. 
-    req.collectionName = req.params.collection.toLowerCase();
+router.get("/:projectID/*", function(req, res, next){
+    var contentData = req.fileData.content;
+    var structureData = req.fileData.admin != null ? req.fileData.admin.project_structure : null;
 
-    console.log("Request for the " + req.collectionName + " collection");
-    
-    // Parsing the content of the requested collection, by accessing it from the project
-    // content, as stored on the content object of the fileData object. If no content
-    // is returned, then setting this value as an empty object.
-    var collectionContent = req.fileData.content[req.collectionName] != null ? req.fileData.content[req.collectionName] : {};
+    var encapsulationData = req.allParams.slice(1);
+
+    // Looping through the encapsulationData array (i.e. parameters passed to the
+    // request URL) to drill down into the fileData object, to find the property that
+    // needs to have an item created on it. 
+    for(var i=0; i<encapsulationData.length; i++){
+
+        if(contentData[encapsulationData[i]] != undefined){
+            // Setting the contentData equal to the next level of the encapsulationData array
+            // i.e. to keep drilling down into the contentData object
+            contentData = contentData[encapsulationData[i]];
+        } else {
+            req.feedsErrors.push("'" + encapsulationData.join("/") + "' does not exist.");
+            return next(new Error()); 
+        }
+
+        if(structureData != null){
+            // Ignoring index values, as these will have no relevance to the project structure
+            if(isNaN(encapsulationData[i])){
+                if(structureData.items != undefined){
+                    structureData = structureData.items;
+                }
+                
+                if(structureData.attributes != undefined){
+                    structureData = structureData.attributes;
+                }
+
+                if(structureData[encapsulationData[i]] != undefined){
+                    structureData = structureData[encapsulationData[i]];
+                }
+            } else {
+                if(structureData.items != undefined){
+                    structureData = structureData.items;
+                } else {
+                    req.feedsErrors.push(encapsulationData[i] + " is not defined to contain items. Please create this items structure first.");
+                    return next(new Error()); 
+                }
+            }
+        }
         
+    }
+
     // Checking if admin data has been read from the projects admin.json file
-    if(req.fileData.admin != null){
+    if(structureData != null){
         // Adding the value of the collections project structure property of the project admin file, 
         // as the structure property on the responseObject.
-        req.responseObject.structure = req.fileData.admin.project_structure[req.collectionName];
+        req.responseObject.structure = structureData;
 
         // Adding the content of the project (as returned from the content.json file) as 
         // a property on the response object, as the response will contain both the content
         // and the structure
-        req.responseObject.content = collectionContent;
+        req.responseObject.content = contentData;
     } else {
         // Setting the collection content of the project as the response object, as no structure 
         // will be returned alongside the content
-        req.responseObject = collectionContent;
+        req.responseObject = contentData;
     }
             
     // Sending the response object back in the response (which may contain the project structure,
     // project content and possibly some errors)
     res.send(req.responseObject);
-});
-
-// Request to get the content of an item in a collection of a project
-router.get("/:projectID/:collection/:item", function(req, res, next){
-    // Temporarily storing the collection name (as requested in the URL parameters) on
-    // the request object, so that it can be used throughout this route. Transforming
-    // the collection name to lowercase, for use within the route. 
-    req.collectionName = req.params.collection.toLowerCase();
-
-    // Temporarily storing the item name (as requested in the URL parameters) on
-    // the request object, so that it can be used throughout this route. Transforming
-    // the item name to lowercase, for use within the route. 
-    req.itemName = req.params.item.toLowerCase();
-
-    console.log("Request for the " + req.item + " item of the " + req.collectionName + " collection");
-    
-    // Parsing the content of the requested collection, by accessing it from the project
-    // content, as stored on the content object of the fileData object. If no content
-    // is returned, then setting this value as an empty object.
-    var collectionContent = req.fileData.content[req.collectionName][req.itemName] != null ? req.fileData.content[req.collectionName][req.itemName] : {};
-        
-    // Checking if admin data has been read from the projects admin.json file
-    if(req.fileData.admin != null){
-        // Adding the value of the collections project structure property of the project admin file, 
-        // as the structure property on the responseObject.
-        req.responseObject.structure = req.fileData.admin.project_structure[req.collectionName];
-
-        // Adding the content of the project (as returned from the content.json file) as 
-        // a property on the response object, as the response will contain both the content
-        // and the structure
-        req.responseObject.content = collectionContent;
-    } else {
-        // Setting the collection content of the project as the response object, as no structure 
-        // will be returned alongside the content
-        req.responseObject = collectionContent;
-    }
-            
-    // Sending the response object back in the response (which may contain the project structure,
-    // project content and possibly some errors)
-    res.send(req.responseObject);    
 });
 
 // Exporting the router that was set up in this file, so that it can be included
