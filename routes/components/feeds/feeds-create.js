@@ -224,48 +224,39 @@ router.post("/:projectID/*", function(req, res, next){
                         // the end of this loop, I should have the item into which the new item should
                         // be created.
                         for(var i=0; i<encapsulationData.length; i++){
-                            try{
-                                // Ignoring the last item of the encapsulationData, as it will be stored
-                                // as the itemName above
-                                if(i < encapsulationData.length - 1){
-                                    // Checking if the structureFileData currently contains an "items" property,
-                                    // in which case setting the structureFileData to this property (so that users
-                                    // don't have to continually type /books/items/attributes)
-                                    if(structureFileData.items != undefined){
-                                        structureFileData = structureFileData["items"];
-                                    }
+                            // Ignoring the last item of the encapsulationData, as it will be stored
+                            // as the itemName above
+                            if(i < encapsulationData.length - 1){
+                                // Checking if the structureFileData currently contains an "items" property,
+                                // in which case setting the structureFileData to this property (so that users
+                                // don't have to continually type /books/items/attributes)
+                                if(structureFileData.items != undefined){
+                                    structureFileData = structureFileData.items;
+                                }
 
-                                    // Checking if the structureFileData currently contains an "attributes" property,
-                                    // in which case setting the structureFileData to this property (so that users
-                                    // don't have to continually type /books/items/attributes)
-                                    if(structureFileData.attributes != undefined){
-                                        structureFileData = structureFileData["attrbutes"];
-                                    }
-                                    // Setting the structureFileData equal to the next level of the encapsulationData array
+                                // Checking if the structureFileData currently contains an "attributes" property,
+                                // in which case setting the structureFileData to this property (so that users
+                                // don't have to continually type /books/items/attributes)
+                                if(structureFileData.attributes != undefined){
+                                    structureFileData = structureFileData.attributes;
+                                }
+                               
+                                // Checking if the above traversal has resulting in the structureFileData becoming "undefined",
+                                // in which case a portion of the encapsulationData structure must not exist i.e. the user
+                                // is trying to create an item within an object that does not exist
+                                if(structureFileData[encapsulationData[i]] == undefined){
+                                     // Setting the structureFileData equal to the next level of the encapsulationData array
                                     // i.e. to keep drilling down into the structureFileData object
                                     structureFileData = structureFileData[encapsulationData[i]];
-
-                                    // Checking if the above traversal has resulting in the structureFileData becoming "undefined",
-                                    // in which case a portion of the encapsulationData structure must not exist i.e. the user
-                                    // is trying to create an item within an object that does not exist
-                                    if(structureFileData == undefined){
-                                        // The structure cannot be updated, since there is no file structure to define the container
-                                        // of this item. Adding this to the feedsErrors array, and then returning this function so 
-                                        // that no further attempt to create this item will be made. Since req.newItem will remain 
-                                        // null, this error will be returned to the caller, further down along this route
-                                        req.feedsErrors.push("'" + encapsulationData.slice(0, encapsulationData.length-1).join("/") + "' is not defined. Please create the container objects first");
-                                        return;
-                                    }
-                                } 
-                            } catch(e){
-                                // The structure cannot be updated, if any errors occur when traversing the structure above.
-                                // Adding this to the feedsErrors array, and then returning this function so 
-                                // that no further attempt to create this item will be made. Since req.newItem will remain 
-                                // null, this error will be returned to the caller, further down along this route
-                                req.feedsErrors.push("'" + encapsulationData.slice(0, encapsulationData.length-1).join("/") + "' is not defined. Please create the container objects first");
-                                return;
-                            }
-                            
+                                } else {
+                                    // The structure cannot be updated, since there is no file structure to define the container
+                                    // of this item. Adding this to the feedsErrors array, and then returning this function so 
+                                    // that no further attempt to create this item will be made. Since req.newItem will remain 
+                                    // null, this error will be returned to the caller, further down along this route
+                                    req.feedsErrors.push("'" + encapsulationData.slice(0, encapsulationData.length-1).join("/") + "' is not defined. Please create the container objects first");
+                                    return;
+                                }
+                            } 
                         }
 
                         // Checking whether the fileData object contains the property referred to in the parent
@@ -552,44 +543,36 @@ router.post("/:projectID/*", function(req, res, next){
                         // request URL) to drill down into the fileData object, to find the property that
                         // needs to have an item created on it. 
                         for(var i=0; i<encapsulationData.length; i++){
-                            try{
-                                //Not including the last two indexes of the
-                                // array, as these will be the parentName and itemName (as referenced above). By
-                                // the end of this loop, I should have the item into which the new item should
-                                // be created.
-                               if(i < encapsulationData.length - 2){
+                            //Not including the last two indexes of the
+                            // array, as these will be the parentName and itemName (as referenced above). By
+                            // the end of this loop, I should have the item into which the new item should
+                            // be created.
+                            if(i < encapsulationData.length - 2){
+                                if(contentFileData[encapsulationData[i]] != null){
                                     // Setting the contentFileData equal to the next level of the encapsulationData array
                                     // i.e. to keep drilling down into the contentFileData object
                                     contentFileData = contentFileData[encapsulationData[i]];
+                                } else {
+                                    req.feedsErrors.push("'" + encapsulationData.slice(0, encapsulationData.length-1)[0].join("/") + "' does not exist. Please create the container objects first");
+                                    return;
                                 }
-                            } catch(e){
-                                req.feedsErrors.push("'" + encapsulationData.slice(0, encapsulationData.length-1)[0].join("/") + "' does not exist. Please create the container objects first");
-                                return;
+                                
                             }
 
-                            try{
-                                // Ignoring index values, as these will have no relevance to the project structure
-                                if(isNaN(encapsulationData[i])){
-                                    if(structureFileData[encapsulationData[i]] != undefined){
-                                        // Setting the structureFileData equal to the next level of the encapsulationData array
-                                        // i.e. to keep drilling down into the structureFileData object
-                                        structureFileData = structureFileData[encapsulationData[i]];
-                                    } else if(structureFileData.items != undefined){
-                                        structureFileData = structureFileData.items;
-                                    }
-                                } else {
-                                    if(structureFileData.items != undefined){
-                                        structureFileData = structureFileData.items;
-                                    } else {
-                                        req.feedsErrors.push(encapsulationData[i] + " is not defined to contain items. Please update this items structure first.");
-                                        return;
-                                    }
+                            // Ignoring index values, as these will have no relevance to the project structure
+                            if(isNaN(encapsulationData[i])){
+                                if(structureFileData[encapsulationData[i]] != undefined){
+                                    // Setting the structureFileData equal to the next level of the encapsulationData array
+                                    // i.e. to keep drilling down into the structureFileData object
+                                    structureFileData = structureFileData[encapsulationData[i]];
+                                } else if(structureFileData.items != undefined){
+                                    structureFileData = structureFileData.items;
                                 }
-                            } catch(e){
+                            } else {
                                 if(structureFileData.items != undefined){
                                     structureFileData = structureFileData.items;
                                 } else {
-                                    req.feedsErrors.push("There is no structure defined for '" + encapsulationData.join("/") + "'. Please define the structure first.");
+                                    req.feedsErrors.push(encapsulationData[i] + " is not defined to contain items. Please update this items structure first.");
                                     return;
                                 }
                             }
