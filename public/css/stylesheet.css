@@ -30,3 +30,7 @@ footer {
     vertical-align: text-top;
     margin-right: 1%;
 }
+
+[draggable="true"]:before {
+    content: "...";
+}

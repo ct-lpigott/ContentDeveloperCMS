@@ -1,12 +1,15 @@
 var userID;
 var projectID;
 var projectStructure;
+var draggingElement;
+var dragStartY;
 
 function customWindowOnload(){
     userID = document.getElementById("userID").value;
     projectID = document.getElementById("projectID").value;
     sendAjaxRequest("/feeds/" + projectID, {}, function(responseObject){
         updateProjectHTML(responseObject);
+        setupDraggableContainers();
     });   
 }
 

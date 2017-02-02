@@ -4,6 +4,10 @@ function updateProjectHTML(projectDetails, includeContent=true){
     var projectContentContainer = document.getElementById("projectContent");
     projectContentContainer.innerHTML = "";
 
+    if(includeContent == false){
+        projectContentContainer.setAttribute("class", "draggableContainer");
+    }
+
     for(var collection in projectStructure){
         var collectionContainer = document.createElement("div");
         collectionContainer.setAttribute("class", "collection " + collection);
@@ -15,10 +19,14 @@ function updateProjectHTML(projectDetails, includeContent=true){
         switch(projectStructure[collection].type){
             case "array": {
                 if(includeContent){
+                    var draggableContainerElement = document.createElement("div");
+                    draggableContainerElement.setAttribute("class", "draggableContainer");
+                    collectionContainer.appendChild(draggableContainerElement);
+
                     var itemIndex = 0;
                     for(var item in projectContent[collection]){
                         var itemContainerElement = createItemInputElements(collection, projectContent[collection][item], itemIndex);
-                        collectionContainer.appendChild(itemContainerElement);
+                        draggableContainerElement.appendChild(itemContainerElement);
 
                         itemIndex++;
                     }
@@ -251,4 +259,67 @@ function hasClass(element, className){
         }
     }
     return elementHasClass;
+}
+
+function setupDraggableContainers(){
+    var draggableContainers = document.getElementsByClassName("draggableContainer");
+    
+    for(var i=0; i<draggableContainers.length; i++){
+        
+        for(var c=0; c<draggableContainers[i].children.length; c++){
+            // Setting the draggable property of each child of the draggable 
+            // container to true, so that it can be dragged
+            draggableContainers[i].children[c].setAttribute("draggable", "true");
+        }
+
+        draggableContainers[i].addEventListener("dragstart", function(e){
+            if(hasClass(e.target.parentNode, "draggableContainer")){
+                draggingElement = e.target;
+                dragStartY = e.screenY;
+                addClass(draggingElement, "dragging");
+                //console.log("start drag");
+            }
+        });
+        
+        draggableContainers[i].addEventListener("dragend", function(e){
+            if(hasClass(e.target.parentNode, "draggableContainer")){
+                removeClass(e.target, "dragging");
+                //console.log("stop drag");
+            }
+        });
+        
+        draggableContainers[i].addEventListener("dragover", function(e) {
+            // The default action of this event is to reset the drag operation
+            // to none. Preventing this from happening, so that the "drop" event
+            // will occur, so the item can be moved within the DOM
+            e.preventDefault();
+        });
+        
+        draggableContainers[i].addEventListener("drop", function(e){
+            if(e.target.parentNode == draggingElement.parentNode){
+                e.target.parentNode.removeChild(draggingElement);
+                if(e.screenY < dragStartY){
+                    e.target.parentNode.insertBefore(draggingElement, e.target);
+                } else {
+                    e.target.parentNode.insertBefore(draggingElement, e.target.nextSibling);
+                }
+                draggingElement = null;
+                dragStartY = null;
+                //console.log("drop");
+            }	
+            removeClass(e.target, "dragging");					
+        });
+        
+        draggableContainers[i].addEventListener("dragenter", function(e) {
+            if(e.target.parentNode == draggingElement.parentNode){
+                addClass(e.target, "dragging");
+            }
+        });
+        
+        draggableContainers[i].addEventListener("dragleave", function(e) {
+            if(hasClass(e.target.parentNode, "draggableContainer")){
+                removeClass(e.target, "dragging");
+            }
+        });
+    } 
 }
