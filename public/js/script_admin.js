@@ -78,7 +78,7 @@ function customClickEventHandler(e){
     }
 
     // BY CLASS
-    if(e.target.classList.contains("removeCollaborator")){
+    if(hasClass(e.target, "removeCollaborator")){
         
         sendAjaxRequest("/feeds/" + projectID + "?action=removeCollaborator", {collaboratorID: e.target.getAttribute("data-userID")}, function(responseObject){
             console.log("Deleted Collab " + e.target.getAttribute("data-userID"));

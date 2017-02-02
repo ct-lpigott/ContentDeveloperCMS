@@ -227,3 +227,28 @@ function getAccessLevels(){
         }
     });
 }
+
+function addClass(element, className){
+    element.className += " " + className;
+}
+
+function removeClass(element, className){
+    var elementClasses = element.className.split(" ");
+    for(var i=0; i<elementClasses.length; i++){
+        if(elementClasses[i] == className){
+            elementClasses.splice(i, 1);
+        }
+    }
+    element.className = elementClasses.join(" ");
+}
+
+function hasClass(element, className){
+    var elementHasClass = false;
+    var elementClasses = element.className.split(" ");
+    for(var i=0; i<elementClasses.length; i++){
+        if(elementClasses[i] == className){
+            elementHasClass = true;
+        }
+    }
+    return elementHasClass;
+}

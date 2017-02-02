@@ -35,13 +35,13 @@ function customClickEventHandler(e){
         }
     }
 
-    if(e.target.classList.contains("add")){
+    if(hasClass(e.target, "add")){
         var collection = e.target.parentNode.getAttribute("data-collection");
         var collectionContainer = document.querySelector(".collection." + collection);
         var newItemIndex = document.querySelectorAll(".item-container." + collection + "-item").length;
         var newItemContainerElement = createItemInputElements(collection, null, newItemIndex);
         collectionContainer.insertBefore(newItemContainerElement, e.target);
-    } else if(e.target.classList.contains("delete")){
+    } else if(hasClass(e.target, "delete")){
         var collection = e.target.parentNode.querySelector("[data-collection]").getAttribute("data-collection");
         var itemIndex = e.target.parentNode.querySelector("[data-index]").getAttribute("data-index");
         sendAjaxRequest("/feeds/" + projectID + "/" + collection + "/" + itemIndex, {}, function(responseObject){
