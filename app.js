@@ -59,8 +59,8 @@ app.use(express.static("./public"));
 
 if(process.env.DEBUG == null){
   var greenlockExpress = require('greenlock-express').create({ 
-    server: 'staging',
-    email: 'pigottlaura@gmail.com',
+    server: process.env.CERT_SERVER,
+    email: process.env.EMAIL_ADDRESS,
     agreeTos: true,
     approveDomains: [ process.env.SITE_URL ]
   });
