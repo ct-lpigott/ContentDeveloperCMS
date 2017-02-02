@@ -175,3 +175,23 @@ function reformatJSON(){
 function updateSelectionRange(insertionPoint){
     var projectStructureContainer = document.getElementById("projectStructure").setSelectionRange(insertionPoint, insertionPoint);
 }
+
+function adminDropEvent(collectionName, newIndexPosition){
+    var originalStructure = JSON.parse(parseProjectStructureToJSON());
+    var newStructure = {};
+
+    var index = 0;
+    for(var collection in originalStructure){
+        if(index == newIndexPosition){
+            newStructure[collectionName] = originalStructure[collectionName];
+        }
+
+        if(collectionName != collection){
+            newStructure[collection] = originalStructure[collection];
+        }
+
+        index++;
+    }
+    updateProjectJSON(newStructure);
+    console.log(collectionName + " is now at " + newIndexPosition);
+}

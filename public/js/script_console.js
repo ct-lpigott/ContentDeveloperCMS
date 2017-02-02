@@ -303,6 +303,12 @@ function setupDraggableContainers(){
                 } else {
                     e.target.parentNode.insertBefore(draggingElement, e.target.nextSibling);
                 }
+
+                if(typeof adminDropEvent == "function"){
+                    var draggingElementNewIndex = getChildIndex(e.target.parentNode, draggingElement);
+                    adminDropEvent(draggingElement.getAttribute("data-collection"), draggingElementNewIndex);
+                }
+
                 draggingElement = null;
                 dragStartY = null;
                 //console.log("drop");
@@ -322,4 +328,14 @@ function setupDraggableContainers(){
             }
         });
     } 
+}
+
+function getChildIndex(parent, child){
+    var childIndex = -1;
+    for(var i=0; i<parent.children.length; i++){
+        if(parent.children[i] == child){
+            childIndex = i;
+        }
+    }
+    return childIndex;
 }
