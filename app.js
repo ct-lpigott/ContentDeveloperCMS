@@ -9,6 +9,7 @@ var bodyParser = require('body-parser');
 var http = require("http");
 var https = require("https");
 var redirectHttps = require("redirect-https");
+var fs = require("fs");
 
 // Generating a new app using the express module
 var app = express();
@@ -58,8 +59,18 @@ app.set("views", "./views");
 app.use(express.static("./public"));
 
 if(process.env.DEBUG == null || process.env.DEBUG == "false"){
+  fs.exists("./letsencrypt", function(exists){
+    if(!exists){
+      fs.mkdir("./letsencrypt", function(err){
+        console.log("letsencrypt directory created");
+      });
+    } else {
+      console.log("letsencrypt directory already exists");
+    }
+  });
 
   var greenlockExpress = require('greenlock-express').create({
+    configDir: "./letsencrypt",
     server: process.env.CERT_SERVER,
     email: process.env.EMAIL_ADDRESS,
     agreeTos: true,
