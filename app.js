@@ -86,6 +86,7 @@ if(process.env.DEBUG == null){
     redirectHttps({port:process.env.PORT_HTTPS})
   );
 
+  /*
   // Setting up a HTTP server, whose only purpose is to redirect any HTTP requests as 
   // HTTPS requests i.e. if a request is recieved at the process.env.PORT, it will be
   // redirected to the process.env.PORT_HTTPS (which will be received by the HTTPS
@@ -93,11 +94,12 @@ if(process.env.DEBUG == null){
   http.createServer(redirectToSecureServer).listen(process.env.PORT, function () {
     console.log("Listening for HTTP requests on " + process.env.PORT);
   });
+  */
 
   // Setting up a HTTP server, to deal with all HTTPS requests i.e. to be the main
   // server of the app.
-  https.createServer(greenlockExpress.httpsOptions, greenlockExpress.middleware(app)).listen(process.env.PORT_HTTPS, function () {
-    console.log("Listening for HTTPS requests, and serving app, on port " + process.env.PORT_HTTPS);
+  https.createServer(greenlockExpress.httpsOptions, greenlockExpress.middleware(app)).listen(process.env.PORT, function () {
+    console.log("Listening for HTTPS requests, and serving app, on port " + process.env.PORT);
   });
 } else {
   // Setting the app to run on the port specified in the environment variables. This 
