@@ -1,6 +1,6 @@
 node_modules
 .vscode
-~/letsencrypt
+letsencrypt
 *.sql
 projects/*
 !projects/project_template.json

@@ -15,7 +15,8 @@ router.delete("/:projectID", function(req, res, next){
     res.send("DELETE request received from userID=" + req.userID + " for projectID=" + req.params.project);
 });
 
-// Request to create a new item or collections CONTENT in a project
+// Request to delete an item or collections CONTENT in a project
+// Note project structure cannot be deleted
 router.delete("/:projectID/*", function(req, res, next){
     // Checking that the request contains more than just the project ID
     if(req.allParams.length > 1){
