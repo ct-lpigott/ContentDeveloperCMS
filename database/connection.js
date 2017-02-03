@@ -19,10 +19,8 @@ function connectToDatabase(){
 }
 
 connection.on("error", function(err){
-    if(err == "PROTOCOL_CONNECTION_LOST"){
+    if(err.code == "PROTOCOL_CONNECTION_LOST"){
         connectToDatabase();
-    } else {
-        console.log("SQL Database connection error " + err);
     }
 });
 
