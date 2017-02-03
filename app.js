@@ -68,6 +68,7 @@ if(process.env.DEBUG == null){
     configDir: "./letsencrypt",
     store: require('le-store-certbot').create({ webrootPath: '/tmp/acme-challenges' }),
     approveDomains: function(opts, certs, cb) {
+      console.log(certs);
       if (certs) {
         opts.domains = certs.altnames;
       }
