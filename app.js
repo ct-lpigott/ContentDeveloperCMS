@@ -57,7 +57,7 @@ app.set("views", "./views");
 // with all requests for static elements of the site, such as JavaScript, CSS etc.
 app.use(express.static("./public"));
 
-if(process.env.DEBUG == null || process.env.DEBUG == false){
+if(process.env.DEBUG == null || process.env.DEBUG == "false"){
   'use strict';
 
   var greenlockExpress = require('greenlock-express').create({
