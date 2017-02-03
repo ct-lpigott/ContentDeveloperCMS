@@ -5,6 +5,10 @@ var connectionString = process.env.DB_CONNECTION_STRING;
 var connection = mysql.createConnection(connectionString);
 
 if (connection.threadId == null) {
+    connectToDatabase();
+}
+
+function connectToDatabase(){
     connection.connect(function (err) {
         if (err) {
             console.error("Unable to connect to server " + err.stack + "\n");
@@ -13,5 +17,13 @@ if (connection.threadId == null) {
         }
     });
 }
+
+connection.on("error", function(err){
+    if(err == "PROTOCOL_CONNECTION_LOST"){
+        connectToDatabase();
+    } else {
+        console.log("SQL Database connection error " + err);
+    }
+});
 
 module.exports = connection;
