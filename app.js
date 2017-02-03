@@ -58,28 +58,12 @@ app.set("views", "./views");
 app.use(express.static("./public"));
 
 if(process.env.DEBUG == null || process.env.DEBUG == "false"){
-  'use strict';
 
   var greenlockExpress = require('greenlock-express').create({
     server: process.env.CERT_SERVER,
-    challenges: {
-      'http-01': require('le-challenge-fs').create({ webrootPath: '/tmp/acme-challenges' }) 
-    },
-    configDir: "./letsencrypt",
-    store: require('le-store-certbot').create({ webrootPath: '/tmp/acme-challenges' }),
-    approveDomains: function(opts, certs, cb) {
-      console.log(certs);
-      if (certs) {
-        opts.domains = certs.altnames;
-      }
-      else {
-        opts.domains = [ process.env.HOST_NAME ],
-        opts.email = process.env.EMAIL_ADDRESS;
-        opts.agreeTos = true;
-      }
-    
-      cb(null, { options: opts, certs: certs });
-    }
+    email: process.env.EMAIL_ADDRESS,
+    agreeTos: true,
+    approveDomains: [ process.env.SITE_URL ]
   });
 
 
@@ -87,25 +71,23 @@ if(process.env.DEBUG == null || process.env.DEBUG == "false"){
     redirectHttps({port:process.env.PORT_HTTPS})
   );
 
-  /*
   // Setting up a HTTP server, whose only purpose is to redirect any HTTP requests as 
   // HTTPS requests i.e. if a request is recieved at the process.env.PORT, it will be
   // redirected to the process.env.PORT_HTTPS (which will be received by the HTTPS
   // server running below).
-  http.createServer(redirectToSecureServer).listen(process.env.PORT, function () {
+  http.createServer(redirectToSecureServer).listen(process.env.PORT, process.env.HOST_NAME, function () {
     console.log("Listening for HTTP requests on " + process.env.PORT);
   });
-  */
 
   // Setting up a HTTP server, to deal with all HTTPS requests i.e. to be the main
   // server of the app.
-  https.createServer(greenlockExpress.httpsOptions, greenlockExpress.middleware(app)).listen(process.env.PORT, function () {
-    console.log("Listening for HTTPS requests, and serving app, on port " + process.env.PORT);
+  https.createServer(greenlockExpress.httpsOptions, greenlockExpress.middleware(app)).listen(process.env.PORT_HTTPS, process.env.HOST_NAME, function () {
+    console.log("Listening for HTTPS requests, and serving app, on port " + process.env.PORT_HTTPS);
   });
 } else {
   // Setting the app to run on the port specified in the environment variables. This 
   // will set up the server to be available to receive requests on this route.
-  app.listen(process.env.PORT, function () {
+  app.listen(process.env.PORT, process.env.HOST_NAME, function () {
     console.log("Listening for all requests on port: " + process.env.PORT);
   });
 }
