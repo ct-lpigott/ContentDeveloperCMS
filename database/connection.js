@@ -5,7 +5,7 @@ var connectionString = process.env.DB_CONNECTION_STRING;
 var connection = mysql.createConnection(connectionString);
 
 if (connection.threadId == null) {
-    connectToDatabase();
+    //connectToDatabase();
 }
 
 function connectToDatabase(){
