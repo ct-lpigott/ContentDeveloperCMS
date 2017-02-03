@@ -2,12 +2,15 @@ extends view_components/layout.pug
 
 block main-body
 
-    h1 #{projectName}
-
-    div(id="projectContent")
-
-    button(id="updateProjectContent") Save
-    button(id="resetProjectContent") Reset
+    div.row
+        div.col-2-12
+            div(id="projectCollections")
+        div.col-8-12
+            //div(id="projectContent")
+            div(id="projectCollectionsContent").row
+        div.col-2-12.right
+            button(id="updateProjectContent") Save All
+            button(id="resetProjectContent") Reset All
 
     input(id="userID" type="hidden" value=userID)
     input(id="projectID" type="hidden" value=projectID)

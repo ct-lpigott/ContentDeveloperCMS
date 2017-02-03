@@ -1,20 +1,28 @@
 extends view_components/layout.pug
 
 block main-body
-
-    h1 Content Developer Admin
-    
-    h2 Welcome back 
-        if user.displayName
-        | #{user.displayName}
-    
-    if user.google_profile_image_url
-        img(src=user.google_profile_image_url title=user.displayName class="profileImage")
-
-    input(id="newProjectName" type="text")
-    button(id="createNewProject") Create New Project
-    
-    ul#userProjects
+    div.row
+        div.col-6-12
+            div.row
+                h2 My Projects
+            div.row
+                table#userProjects
+                    thead
+                        tr
+                            th Project Name
+                            th Access Level
+                            th Options
+                    tbody
+        div.col-6-12
+            div.row
+                h2 Create a New Project
+            div.row
+                h3 Project Name:
+            div.row
+                input(id="newProjectName" type="text")
+            div(id="templates").row
+                h3 Templates
+                button(id="createNewProject") No Template
 
     input(id="userID" type="hidden" value=user.id)
 

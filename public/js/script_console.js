@@ -1,11 +1,14 @@
 function updateProjectHTML(projectDetails, includeContent=true){
     projectStructure = projectDetails.structure;
     var projectContent = projectDetails.content;
-    var projectContentContainer = document.getElementById("projectContent");
-    projectContentContainer.innerHTML = "";
 
-    if(includeContent == false){
-        projectContentContainer.setAttribute("class", "draggableContainer");
+    if(includeContent){
+        var projectCollections = document.getElementById("projectCollections");
+        projectCollections.innerHTML = "";
+        document.getElementById("projectCollectionsContent").innerHTML = "";
+    } else {
+        document.getElementById("projectContent").innerHTML = "";
+        document.getElementById("projectContent").setAttribute("class", "draggableContainer");
     }
 
     for(var collection in projectStructure){
@@ -14,8 +17,15 @@ function updateProjectHTML(projectDetails, includeContent=true){
         collectionContainer.setAttribute("data-collection", collection);
 
         var collectionHeading = document.createElement("h3");
-        collectionHeading.innerHTML = upperCamelCaseAll(underscoreToSpace(collection));
+        var collectionNavButton = document.createElement("button");
+        collectionNavButton.setAttribute("for-collection", collection);
+        collectionHeading.innerHTML = collectionNavButton.innerHTML = upperCamelCaseAll(underscoreToSpace(collection));
+        
         collectionContainer.appendChild(collectionHeading);
+        if(includeContent){
+            projectCollections.appendChild(collectionNavButton);
+        }
+        
         switch(projectStructure[collection].type){
             case "array": {
                 if(includeContent){
@@ -63,8 +73,19 @@ function updateProjectHTML(projectDetails, includeContent=true){
                 break;
             }
         }
-        projectContentContainer.appendChild(collectionContainer);
+        if(includeContent){
+            document.getElementById("projectCollectionsContent").appendChild(collectionContainer);
+        } else {
+            document.getElementById("projectContent").appendChild(collectionContainer);
+        }
     }
+
+    if(includeContent){
+        addClass(projectCollections.children[0], "active");
+        addClass(document.getElementById("projectCollectionsContent").children[0], "visible");
+    }
+
+    refreshDraggableContainers();    
 }
 
 function createItemInputElements(collection, itemContent=null, itemIndex=-1){
@@ -237,7 +258,9 @@ function getAccessLevels(){
 }
 
 function addClass(element, className){
-    element.className += " " + className;
+    if(hasClass(element, className) == false){
+        element.className += " " + className;
+    } 
 }
 
 function removeClass(element, className){
@@ -261,16 +284,19 @@ function hasClass(element, className){
     return elementHasClass;
 }
 
-function setupDraggableContainers(){
+function refreshDraggableContainerChildren(draggableContainer){
+    for(var c=0; c<draggableContainer.children.length; c++){
+        // Setting the draggable property of each child of the draggable 
+        // container to true, so that it can be dragged
+        draggableContainer.children[c].setAttribute("draggable", "true");
+    }    
+}
+
+function refreshDraggableContainers(){
     var draggableContainers = document.getElementsByClassName("draggableContainer");
     
     for(var i=0; i<draggableContainers.length; i++){
-        
-        for(var c=0; c<draggableContainers[i].children.length; c++){
-            // Setting the draggable property of each child of the draggable 
-            // container to true, so that it can be dragged
-            draggableContainers[i].children[c].setAttribute("draggable", "true");
-        }
+        refreshDraggableContainerChildren(draggableContainers[i]);
 
         draggableContainers[i].addEventListener("dragstart", function(e){
             if(hasClass(e.target.parentNode, "draggableContainer")){
@@ -296,7 +322,7 @@ function setupDraggableContainers(){
         });
         
         draggableContainers[i].addEventListener("drop", function(e){
-            if(e.target.parentNode == draggingElement.parentNode){
+            if(draggingElement != null && e.target.parentNode == draggingElement.parentNode){
                 e.target.parentNode.removeChild(draggingElement);
                 if(e.screenY < dragStartY){
                     e.target.parentNode.insertBefore(draggingElement, e.target);
@@ -327,7 +353,7 @@ function setupDraggableContainers(){
                 removeClass(e.target, "dragging");
             }
         });
-    } 
+    }
 }
 
 function getChildIndex(parent, child){

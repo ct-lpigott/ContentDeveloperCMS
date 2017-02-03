@@ -9,7 +9,7 @@ function customWindowOnload(){
     projectID = document.getElementById("projectID").value;
     sendAjaxRequest("/feeds/" + projectID, {}, function(responseObject){
         updateProjectHTML(responseObject);
-        setupDraggableContainers();
+        refreshDraggableContainers();
     });   
 }
 
@@ -40,32 +40,42 @@ function customClickEventHandler(e){
 
     if(hasClass(e.target, "add")){
         var collection = e.target.parentNode.getAttribute("data-collection");
-        var collectionContainer = document.querySelector(".collection." + collection);
+        var collectionContainer = document.getElementsByClassName("collection " + collection)[0];
+        var draggableContainer = collectionContainer.getElementsByClassName("draggableContainer")[0];
         var newItemIndex = document.querySelectorAll(".item-container." + collection + "-item").length;
         var newItemContainerElement = createItemInputElements(collection, null, newItemIndex);
-        collectionContainer.insertBefore(newItemContainerElement, e.target);
+        draggableContainer.append(newItemContainerElement);
+        refreshDraggableContainerChildren(draggableContainer);
     } else if(hasClass(e.target, "delete")){
         var collection = e.target.parentNode.querySelector("[data-collection]").getAttribute("data-collection");
         var itemIndex = e.target.parentNode.querySelector("[data-index]").getAttribute("data-index");
         sendAjaxRequest("/feeds/" + projectID + "/" + collection + "/" + itemIndex, {}, function(responseObject){
             e.target.parentNode.remove();
         }, "DELETE");
+    } else if(e.target.parentNode.id == "projectCollections"){
+        var collectionToActivate = e.target.getAttribute("for-collection");
+        console.log(collectionToActivate);
+        removeClass(e.target.parentNode.getElementsByClassName("active")[0], "active");
+        addClass(e.target, "active");
+
+        removeClass(document.getElementById("projectCollectionsContent").getElementsByClassName("visible")[0], "visible");
+        addClass(document.getElementById("projectCollectionsContent").getElementsByClassName(collectionToActivate)[0], "visible");
     }
 }
 
 function parseProjectContentToJSON(){
     var projectContent = {};
 
-    var projectContentContainer = document.getElementById("projectContent");
+    var projectContentContainer = document.getElementById("projectCollectionsContent");
 
     for(var collection in projectStructure){
         switch(projectStructure[collection].type){
             case "array": {
                 projectContent[collection] = [];
-                var numCollectionItems = document.getElementsByClassName(collection + "-item").length;
+                var collectionItems = document.getElementsByClassName(collection + "-item");
 
-                for(var i=0; i < numCollectionItems; i++){
-                    var itemElements = projectContentContainer.querySelectorAll("[data-collection='" + collection +"'][data-index='" + i + "']");
+                for(var i=0; i < collectionItems.length; i++){
+                    var itemElements = collectionItems[i].querySelectorAll("[data-key]");
                     var itemDetails = {};
                     
                     for(var e=0; e < itemElements.length; e++){

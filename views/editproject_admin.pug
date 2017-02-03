@@ -2,37 +2,37 @@ extends view_components/layout.pug
 
 block main-body
 
-    h1 #{projectName}
+    div.row
+        div.col-6-12
+            h2 Project Structure Editor
+            textarea(id="projectStructure")
 
-    div.col-2
-        h2 Project Structure Editor
-        textarea(id="projectStructure")
+            button(id="previewProjectStructure") Preview
+            button(id="updateProjectStructure") Save
+            button(id="resetProjectStructure") Reset
+            
+        div.col-6-12
+            h2 Project Structure Preview
+            div(id="projectContent")
+    div.row
+        div.col-6-12
+            h2 Add Collaborator
+            label Email Address:
+                input(id="newCollabEmail" type="email")
+            label Access Level
+                select(id="accessLevel")
+            button(id="addNewCollab") Add
 
-        button(id="previewProjectStructure") Preview
-        button(id="updateProjectStructure") Save
-        button(id="resetProjectStructure") Reset
-        
-    div.col-2
-        h2 Project Structure Preview
-        div(id="projectContent")
+        div.col-6-12
+            h2 Collaborators on this Project
+                table(id="collaborators")
+                    thead
+                        tr
+                            th User
+                            th Access Level
+                            th Remove
+                    tbody
 
-    div.col-2
-        h2 Add Collaborator
-        label Email Address:
-            input(id="newCollabEmail" type="email")
-        label Access Level
-            select(id="accessLevel")
-        button(id="addNewCollab") Add
-
-    div.col-2
-        h2 Collaborators on this Project
-            table(id="collaborators")
-                thead
-                    tr
-                        th User
-                        th Access Level
-                        th Remove
-                tbody
     input(id="userID" type="hidden" value=userID)
     input(id="projectID" type="hidden" value=projectID)
 

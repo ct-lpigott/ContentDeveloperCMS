@@ -90,19 +90,39 @@ function customClickEventHandler(e){
 }
 
 function updateUserProjects(userProjects){
-    var userProjectsUL = document.getElementById("userProjects");
-    userProjectsUL.innerHTML = "";
+    var userProjectsTableBody = document.getElementById("userProjects").getElementsByTagName("tbody")[0];
+    userProjectsTableBody.innerHTML = "";
 
-    for(var i=0; i<userProjects.length; i++){
-        var newLi = document.createElement("li");
+    if(userProjects.length == 0){
+        var newTr = document.createElement("tr");
+        var newTd = document.createElement("td");
+        newTd.innerHTML = "You have no projects. Please create one!";
+        newTd.setAttribute("colspan", "3");
+        newTr.appendChild(newTd);
+        userProjectsTableBody.appendChild(newTd);
+    } else {
+        for(var i=0; i<userProjects.length; i++){
+            var newTr = document.createElement("tr");
+            var newTd_projectName = document.createElement("td");
+            var newTd_accessLevel = document.createElement("td");
+            var newTd_view = document.createElement("td");
 
-        var newA = document.createElement("a");
-        newA.setAttribute("href", "/admin/" + userProjects[i].project_id + "?userID=" + userID);
-        newA.innerHTML = userProjects[i].project_name;
-        newLi.appendChild(newA);
+            newTd_projectName.innerHTML = userProjects[i].project_name
 
-        userProjectsUL.appendChild(newLi);
+            newTd_accessLevel.innerHTML = userProjects[i].access_level_name;
+
+            var newA = document.createElement("a");
+            newA.setAttribute("href", "/admin/" + userProjects[i].project_id + "?userID=" + userID);
+            newA.innerHTML = "Edit";
+            newTd_view.appendChild(newA);
+
+            newTr.appendChild(newTd_projectName);
+            newTr.appendChild(newTd_accessLevel);
+            newTr.appendChild(newTd_view);
+            userProjectsTableBody.appendChild(newTr);
+        }
     }
+    
 }
 
 function updateProjectJSON(projectStructureOBJ){
@@ -160,7 +180,7 @@ function resetProjectStructure(){
     sendAjaxRequest("/feeds/" + projectID, {}, function(responseObject){
         updateProjectJSON(responseObject.structure);
         updateProjectHTML(responseObject, false);
-        setupDraggableContainers();
+        refreshDraggableContainers();
     }); 
 }
 

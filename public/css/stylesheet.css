@@ -1,10 +1,24 @@
 .profileImage {
-    width: 70px;
+    width: 50px;
+    vertical-align: bottom;
     height: auto;
 }
-
+header {
+    background-color: black;
+    color: white;
+}
+body {
+    margin: 0;
+    padding: 0;
+}
+h1 {
+    margin: 1% 0;
+}
 textarea {
     display: block;
+}
+table {
+    width: 100%;
 }
 
 #projectStructure {
@@ -17,20 +31,88 @@ th {
 button {
     cursor: pointer;
 }
+#projectCollections {
+    position: absolute;
+    left: -6%;
+    padding-top: 11%;
+    width: 100%;
+}
+#projectCollections button, #templates button {
+    border: 1px solid white;
+    display: block;
+    width: 100%;
+    color: white;
+}
+#projectCollections button {
+    padding: 7% 1%;
+    background-color: grey;
+}
+#templates button {
+    padding: 3%;
+    background-color: black;
+    text-align: left;
+}
+#projectCollectionsContent .collection {
+    min-height: 400px;
+    display: none;
+}
+.item-container {
+    padding: 1% 0;
+}
+
+/* Visible */
+.hidden {
+    display: none !important;
+}
+.visible {
+    display: block !important;
+}
+.active {
+    background-color: black !important;
+    color: white;
+    outline-color: transparent;
+}
 
 /* FOOTER */
 footer {
     text-align: center;
 }
 
-.col-2 {
-    display: inline-block;
-    width: 48%;
-    box-sizing: border-box;
-    vertical-align: text-top;
-    margin-right: 1%;
-}
-
+/* Dragging */
 [draggable="true"]:before {
     content: "...";
 }
+
+/* ALIGN */
+.right {
+    text-align: right;
+}
+.left {
+    text-align: left;
+}
+
+/* GRID */
+.row {
+    display: block;
+    margin: 0 0 1% 0;
+    padding: 0.5% 1%;
+}
+[class*="col-"]{
+    position: relative;
+    display: inline-block;
+    box-sizing: border-box;
+    vertical-align: text-top;
+    padding: 0 1%;
+}
+.col-1-12 {width: 8%;}
+.col-2-12 {width: 16%;}
+.col-3-12 {width: 25%;}
+.col-4-12 {width: 33%;}
+.col-5-12 {width: 42%;}
+.col-6-12 {width: 50%;}
+.col-7-12 {width: 58%;}
+.col-8-12 {width: 67%;}
+.col-9-12 {width: 75%;}
+.col-10-12 {width: 83%;}
+.col-11-12 {width: 88%;}
+.col-12-12 {width: 100%;}
