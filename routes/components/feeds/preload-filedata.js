@@ -53,7 +53,7 @@ router.use(function(req, res, next){
     // they can be used throughout this route
     req.fileData = {};
 
-    if(req.userID != null && req.tmpParams.projectID.length > 0){
+    if(req.userID != null && req.tmpParams.projectID != null){
         // Querying the database, to find the projects that this user has access to, by joining
         // the user table to the user_projects table. Returning only the columns needed for the 
         // reponse to the user. 
@@ -125,7 +125,7 @@ router.use(function(req, res, next){
 });
 // Continued - PRE for requests to read the contents of a project, it's collection or any items within those collections
 router.use(function(req, res, next){
-    if(req.tmpParams.projectID.length > 0){
+    if(req.tmpParams.projectID != null){
         // Reading the contents of the content.json file of the project, from the project directory
         // (named as per the projectID), so that the contents of the project can be returned to the user
         fs.readFile("./projects/" + req.tmpParams.projectID + "/content.json", {encoding: "utf-8"}, function(err, projectContent){

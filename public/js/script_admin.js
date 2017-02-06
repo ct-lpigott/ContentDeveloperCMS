@@ -33,6 +33,7 @@ function customClickEventHandler(e){
             var newProjectName = document.getElementById("newProjectName").value;
             if(newProjectName != null && newProjectName.length > 0){
                 sendAjaxRequest("/feeds/", {projectName: newProjectName}, function(responseObject){
+                    document.getElementById("newProjectName").value = "";
                     updateUserProjects(responseObject);
                 }, "POST");
             }

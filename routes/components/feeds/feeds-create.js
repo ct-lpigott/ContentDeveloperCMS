@@ -8,6 +8,8 @@ var router = require('express').Router();
 // and save project files to the /projects directory
 var fs = require("fs");
 
+var simpleGit = require("simple-git");
+
 // Requiring the custom database connection module, so that the one
 // connection to the database can be reused throughout the application.
 var dbconn = require("../../../database/connection.js");
@@ -144,6 +146,42 @@ router.post("/", function(req, res, next){
                                                     next(new Error());
                                                 } else {
                                                     console.log("Project content file created");
+
+                                                    // Setting defaults to be used as the Git Credentials, incase there
+                                                    // is any issue with the query to the database, or the user's details
+                                                    // are not available
+                                                    var gitDisplayName = "Content Developer";
+                                                    var gitEmailAddress = process.env.EMAIL_ADDRESS;
+                                                
+                                                    // Creating a new Git repository for this project, and initialising it
+                                                    var newGitRepo = simpleGit("./projects/" + req.projectID);
+                                                    newGitRepo.init();
+
+                                                    var userDetails = dbconn.query("SELECT * FROM User WHERE id=" + req.userID, function(err, rows, fields){
+                                                        
+                                                        if(err){
+                                                            console.log("Issue when querying the database for the users details - git - " + err);
+                                                            // Not dealing with the error any further, as a response will already have been sent
+                                                            // to the client
+                                                        } else {
+                                                            if(rows.length > 0){
+                                                                // Accessing the user's name and email address from the database
+                                                                gitDisplayName = rows[0].display_name;
+                                                                gitEmailAddress = rows[0].email_address;
+                                                            }
+                                                        }
+
+                                                        // Setting up the configuration for this user, and then committing
+                                                        // all files in the project folder i.e. as the first commit to the
+                                                        // project
+                                                        newGitRepo
+                                                            .addConfig("user.name", gitDisplayName)
+                                                            .addConfig("user.email", gitEmailAddress)
+                                                            .add("./*")
+                                                            .commit("'" + req.body.projectName + "' project files created");
+                                                    });
+
+                                                    
 
                                                     // As this project has now successfully been created, redirecting this request
                                                     // to the /feeds/userID route, so that the list of projects belonging to this
