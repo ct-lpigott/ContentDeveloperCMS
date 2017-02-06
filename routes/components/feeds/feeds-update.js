@@ -3,11 +3,6 @@
 // which this route will accept.
 var router = require('express').Router();
 
-// Requiring the file system module, so that this route can have access
-// to the file system of the server i.e. to be able to create, open, edit 
-// and save project files to the /projects directory
-var fs = require("fs");
-
 var validation = require("./../validation.js");
 
 // Request to update the entire contents of a project
@@ -15,45 +10,19 @@ router.put("/:projectID", function(req, res, next){
     // Determining the level of access this user has to this project
     switch(req.user_access_level){
         case 1: {
-            if(req.body.projectStructure != null){
+            if(req.body.structure != null){
                 // Transforming the project structure within the request body to lowercase,
                 // as the project structure should not contain uppercase characters
-                req.body.projectStructure = req.body.projectStructure.toLowerCase();                   
+                req.body.structure = req.body.structure.toLowerCase();                   
 
-                // Temporarily storing the file data from the admin.json file, so that
-                // it can be updated accordingly
-                var adminProjectFile = req.fileData.admin;
-
-                if(validation.jsonToObject(req.body.projectStructure)){
-                    // Setting the date updated to the current time, the last_updated_by property to the
-                    // ID of the current user, and the project_structure to the structure passed to the 
+                if(validation.jsonToObject(req.body.structure)){
+                    // Setting the project_structure to the structure passed to the 
                     // request body
-                    adminProjectFile.date_updated = Date.now();
-                    adminProjectFile.last_updated_by = req.userID;
-                    adminProjectFile.project_structure = JSON.parse(req.body.projectStructure);
+                    req.fileData.admin.project_structure = JSON.parse(req.body.structure);
 
-                    // Updating the projects admin.json file, passing the adminProjectFile object created above
-                    // (which contains the updated details of the project) as the content for the file as a JSON string
-                    fs.writeFile("./projects/" + req.params.projectID + "/admin.json", JSON.stringify(adminProjectFile), function(err){
-                        if(err) {
-                            // Logging the error to the console
-                            console.log("Error updating admin.json file " + err);
-
-                            // Unable to update the admin.json file. Adding this as an error to the 
-                            // feedsErrors array.
-                            req.feedsErrors.push("Server error - unable to update project structure");
-
-                            // Since this is a significant issue, passing this request to the feeds-errors
-                            // route, by calling the next method with an empty error (as all errors will be
-                            // accessible from the feedsErrors array).
-                            next(new Error());
-                        } else {
-                            console.log("Project admin file updated");
-
-                            // Sending the new project structure as the response to the request
-                            res.send(adminProjectFile.project_structure);
-                        }
-                    });
+                    console.log("Entire contents of project structure updated");
+                    req.updateFile = "structure";
+                    next();
                 } else {
                     // This is not a valid JSON object. Adding this as an 
                     // error to the feedsErrors array.
@@ -111,29 +80,11 @@ router.put("/:projectID", function(req, res, next){
 // Continued - request to update the contents of an entire project
 router.put("/:projectID", function(req, res, next){
     if(validation.jsonToObject(req.body.projectContent)){
-        // Updating the projects content.json file to be equal to the content passed to the request
-        // body. This content is already in JSON format
-        fs.writeFile("./projects/" + req.params.projectID + "/content.json", req.body.projectContent, function(err){
-            if(err) {
-                // Logging this error to the console
-                console.log("Error updating file " + err);
-
-                // No content were included in the request. Adding this as an error to the 
-                // feedsErrors array.
-                req.feedsErrors.push("No project content included in the request");
-
-                // Since this is a significant issue, passing this request to the feeds-errors
-                // route, by calling the next method with an empty error (as all errors will be
-                // accessible from the feedsErrors array).
-                next(new Error());
-            } else {
-                console.log("Project content file updated");
-
-                // Sending back a response with an empty JSON string, as the content has been
-                // successfully updated
-                res.send("{}");
-            }
-        }); 
+        console.log("Entire contents of project content updated");
+        req.gitCommitMessage = "Update to entire contents of project";
+        req.updateFile = "content";
+        req.resultData = req.body.projectContent;
+        next();
     } else {
         // This is not a valid JSON object. Adding this as an 
         // error to the feedsErrors array.
@@ -294,6 +245,7 @@ router.put("/:projectID/*", function(req, res, next){
                                                 // item (with the item name supplied in the parameters), and setting its 
                                                 // value to the updated item value 
                                                 contentFileData[parentName][itemName] = updatedItemContent;
+                                                req.gitCommitMessage = "Update to content of " + parentName + ": " + itemName;
                                             } else {
                                                 // Looping through any errors that were returned from the content validation,
                                                 // and adding them to the req.feedsErrors array, before returning the function,
@@ -347,6 +299,7 @@ router.put("/:projectID/*", function(req, res, next){
                                     if(validateContent.successful){
                                         // Updating the value of this top level item to the updated item value
                                         contentFileData[itemName] = updatedItemContent; 
+                                        req.gitCommitMessage = "Update to content: " + itemName;
                                     } else {
                                         // Looping through any errors that were returned from the content validation,
                                         // and adding them to the req.feedsErrors array, before returning the function,
@@ -408,28 +361,10 @@ router.put("/:projectID/*", function(req, res, next){
                         // in this object (as it was passed by reference to a function) completing this recheck
                         // to ensure that updating the new item did not corrupt the existing content
                         if(validation.objectToJson(req.fileData.content)){
-
-                            // Updating this project's content.json file, passing the JSON stringified version
-                            // of the fileData content object as the contents
-                            fs.writeFile("./projects/" + req.params.projectID + "/content.json", JSON.stringify(req.fileData.content), function(err){
-                                if(err) {
-                                    // Logging the error to the console
-                                    console.log("Error updating project content file " + err);
-
-                                    // As it has not been possible to update the content.json file for this 
-                                    // project, adding this as an error to the feedsErrors array.
-                                    req.feedsErrors.push("Server error - unable to update item");
-
-                                    // Since this is a significant issue, passing this request to the feeds-errors
-                                    // route, by calling the next method with an empty error (as all errors will be
-                                    // accessible from the feedsErrors array).
-                                    return next(new Error());
-                                } else {
-                                    console.log("Item was updated in the project");
-
-                                    res.send(req.updatedItem);
-                                }
-                            });
+                            console.log("Project contents updated");
+                            req.updateFile = "content";
+                            req.resultData = req.updatedItem;
+                            next();
                         } else {
                             // As it has not been possible parse the updated object to JSON, the content
                             // cannot be updated. Adding this as an error to the feeds errors array.

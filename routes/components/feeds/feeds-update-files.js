@@ -46,7 +46,9 @@ router.use(function(req, res, next){
                                 .add("./content.json")
                                 .commit(req.gitCommitMessage);
 
-                            console.log("Project content file successfully updated")
+                            console.log("Project content file successfully updated");
+
+                            req.resultData = req.resultData != null ? req.resultData : req.fileData.content;
                             res.send(req.resultData);
                         }
                     });
@@ -73,59 +75,56 @@ router.use(function(req, res, next){
 
 router.use(function(req, res, next){
     if(req.updateFile == "structure"){
-        if(req.body.stucture != req.fileData.admin.project_structure){
-            // Updating the meta data of the admin.json file
-            req.fileData.admin.date_updated = Date.now();
-            req.fileData.admin.last_updated_by = req.userID;
+        // Updating the meta data of the admin.json file
+        req.fileData.admin.date_updated = Date.now();
+        req.fileData.admin.last_updated_by = req.userID;
 
-            // Checking that the fileData admin is still a valid object, by attempting
-            // to parse it to JSON. Since the new item that was created will have been reflected
-            // in this object (as it was passed by reference to a function) completing this recheck
-            // to ensure that creating the new item did not corrupt the existing project_structure
-            if(validation.objectToJson(req.fileData.admin)){
-                // Updating this project's admin.json file, passing the JSON stringified version
-                // of the fileData object as the contents
-                fs.writeFile("./projects/" + req.projectID + "/admin.json", JSON.stringify(req.fileData.admin), function(err){
-                    if(err) {
-                        // Logging the error to the console
-                        console.log("Error updating project admin file " + err);
+        // Checking that the fileData admin is still a valid object, by attempting
+        // to parse it to JSON. Since the new item that was created will have been reflected
+        // in this object (as it was passed by reference to a function) completing this recheck
+        // to ensure that creating the new item did not corrupt the existing project_structure
+        if(validation.objectToJson(req.fileData.admin)){
+            // Updating this project's admin.json file, passing the JSON stringified version
+            // of the fileData object as the contents
+            fs.writeFile("./projects/" + req.projectID + "/admin.json", JSON.stringify(req.fileData.admin), function(err){
+                if(err) {
+                    // Logging the error to the console
+                    console.log("Error updating project admin file " + err);
 
-                        // As it has not been possible to update the admin.json file for this 
-                        // project, adding this as an error to the feedsErrors array.
-                        req.feedsErrors.push("Server error - unable to update project structure data file");
+                    // As it has not been possible to update the admin.json file for this 
+                    // project, adding this as an error to the feedsErrors array.
+                    req.feedsErrors.push("Server error - unable to update project structure data file");
 
-                        // Since this is a significant issue, passing this request to the feeds-errors
-                        // route, by calling the next method with an empty error (as all errors will be
-                        // accessible from the feedsErrors array).
-                        return next(new Error());
-                    } else {
-                        console.log("Project admin file updated");
+                    // Since this is a significant issue, passing this request to the feeds-errors
+                    // route, by calling the next method with an empty error (as all errors will be
+                    // accessible from the feedsErrors array).
+                    return next(new Error());
+                } else {
+                    console.log("Project admin file updated");
 
-                        req.gitCommitMessage = req.gitCommitMessage != null ? req.gitCommitMessage : "New structure added to project";
-                        var projectGitRepo = simpleGit("./projects/" + req.projectID);
-                        projectGitRepo
-                            .addConfig("user.name", req.user_display_name)
-                            .addConfig("user.email", req.user_email_address)
-                            .add("./admin.json")
-                            .commit(req.gitCommitMessage);
+                    req.gitCommitMessage = req.gitCommitMessage != null ? req.gitCommitMessage : "New structure added to project";
+                    var projectGitRepo = simpleGit("./projects/" + req.projectID);
+                    projectGitRepo
+                        .addConfig("user.name", req.user_display_name)
+                        .addConfig("user.email", req.user_email_address)
+                        .add("./admin.json")
+                        .commit(req.gitCommitMessage);
 
-                        // Sending the new item as the response to the caller, so that they can
-                        // see the result of their request
-                        res.send(req.resultData);
-                    }
-                });
-            } else {
-                // As it has not been possible parse the updated object to JSON, the project structure
-                // cannot be updated. Adding this as an error to the feeds errors array.
-                req.feedsErrors.push("The content included is not valid JSON");
-
-                // Since this is a significant issue, passing this request to the feeds-errors
-                // route, by calling the next method with an empty error (as all errors will be
-                // accessible from the feedsErrors array).
-                return next(new Error());
-            }
+                    // Sending the new item as the response to the caller, so that they can
+                    // see the result of their request
+                    req.resultData = req.resultData != null ? req.resultData : req.fileData.admin.project_structure;
+                    res.send(req.resultData);
+                }
+            });
         } else {
-            next();
+            // As it has not been possible parse the updated object to JSON, the project structure
+            // cannot be updated. Adding this as an error to the feeds errors array.
+            req.feedsErrors.push("The content included is not valid JSON");
+
+            // Since this is a significant issue, passing this request to the feeds-errors
+            // route, by calling the next method with an empty error (as all errors will be
+            // accessible from the feedsErrors array).
+            return next(new Error());
         }
     } else {
         next();

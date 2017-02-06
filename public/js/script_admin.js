@@ -44,7 +44,7 @@ function customClickEventHandler(e){
             parsedProjectStructure = parseProjectStructureToJSON();
 
             if(jsonToObject(parsedProjectStructure)){
-                sendAjaxRequest("/feeds/" + projectID, {projectStructure: parsedProjectStructure}, function(responseObject){
+                sendAjaxRequest("/feeds/" + projectID, {structure: parsedProjectStructure}, function(responseObject){
                     updateProjectJSON(responseObject);
                     document.getElementById("previewProjectStructure").click();
                 }, "PUT");
