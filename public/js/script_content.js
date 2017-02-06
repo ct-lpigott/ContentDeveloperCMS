@@ -22,7 +22,7 @@ function customClickEventHandler(e){
         case "updateProjectContent": {
             var projectContent = parseProjectContentToJSON();
             if(jsonToObject(projectContent)){
-                sendAjaxRequest("/feeds/" + projectID, {projectContent: projectContent}, function(responseObject){
+                sendAjaxRequest("/feeds/" + projectID, {content: projectContent}, function(responseObject){
                     
                 }, "PUT");
             } else {

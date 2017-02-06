@@ -15,56 +15,51 @@ var validation = require("./../validation.js");
 router.use(function(req, res, next){
     if(req.updateFile != null) {
         if(req.updateFile == "content") {
-            if(req.body.content != req.fileData.content){
-                // Checking that the fileData content is still a valid object, by attempting
-                // to parse it to JSON. Since the new item that was created will have been reflected
-                // in this object (as it was passed by reference to a function) completing this recheck
-                // to ensure that creating the new item did not corrupt the existing content
-                if(validation.objectToJson(req.fileData.content)){
-                    // Updating this project's content.json file, passing the JSON stringified version
-                    // of the fileData content object as the contents
-                    fs.writeFile("./projects/" + req.projectID + "/content.json", JSON.stringify(req.fileData.content), function(err){
-                        if(err) {
-                            // Logging the error to the console
-                            console.log("Error updating project content file " + err);
+            // Checking that the fileData content is still a valid object, by attempting
+            // to parse it to JSON. Since the new item that was created will have been reflected
+            // in this object (as it was passed by reference to a function) completing this recheck
+            // to ensure that creating the new item did not corrupt the existing content
+            if(validation.objectToJson(req.fileData.content)){
+                // Updating this project's content.json file, passing the JSON stringified version
+                // of the fileData content object as the contents
+                fs.writeFile("./projects/" + req.projectID + "/content.json", JSON.stringify(req.fileData.content), function(err){
+                    if(err) {
+                        // Logging the error to the console
+                        console.log("Error updating project content file " + err);
 
-                            // As it has not been possible to update the content.json file for this 
-                            // project, adding this as an error to the feedsErrors array.
-                            req.feedsErrors.push("Server error - unable to update project content data file");
+                        // As it has not been possible to update the content.json file for this 
+                        // project, adding this as an error to the feedsErrors array.
+                        req.feedsErrors.push("Server error - unable to update project content data file");
 
-                            // Since this is a significant issue, passing this request to the feeds-errors
-                            // route, by calling the next method with an empty error (as all errors will be
-                            // accessible from the feedsErrors array).
-                            return next(new Error());
-                        } else {
-                            req.gitCommitMessage = req.gitCommitMessage != null ? req.gitCommitMessage : "New content added to project";
+                        // Since this is a significant issue, passing this request to the feeds-errors
+                        // route, by calling the next method with an empty error (as all errors will be
+                        // accessible from the feedsErrors array).
+                        return next(new Error());
+                    } else {
+                        req.gitCommitMessage = req.gitCommitMessage != null ? req.gitCommitMessage : "Project content updated";
+                        req.resultData = req.resultData != null ? req.resultData : req.fileData.content;
 
-                            var projectGitRepo = simpleGit("./projects/" + req.projectID);
-                            projectGitRepo
-                                .addConfig("user.name", req.user_display_name)
-                                .addConfig("user.email", req.user_email_address)
-                                .add("./content.json")
-                                .commit(req.gitCommitMessage);
+                        var projectGitRepo = simpleGit("./projects/" + req.projectID);
+                        projectGitRepo
+                            .addConfig("user.name", req.user_display_name)
+                            .addConfig("user.email", req.user_email_address)
+                            .add("./content.json")
+                            .commit(req.gitCommitMessage);
 
-                            console.log("Project content file successfully updated");
-
-                            req.resultData = req.resultData != null ? req.resultData : req.fileData.content;
-                            res.send(req.resultData);
-                        }
-                    });
-                } else {
-                    // As it has not been possible parse the updated object to JSON, the content
-                    // cannot be updated. Adding this as an error to the feeds errors array.
-                    req.feedsErrors.push("The content included is not valid JSON.");
-
-                    // Since this is a significant issue, passing this request to the feeds-errors
-                    // route, by calling the next method with an empty error (as all errors will be
-                    // accessible from the feedsErrors array).
-                    return next(new Error());
-                }
+                        console.log("Project content file successfully updated");
+                        res.send(req.resultData);
+                    }
+                });
             } else {
-                next();
-            }
+                // As it has not been possible parse the updated object to JSON, the content
+                // cannot be updated. Adding this as an error to the feeds errors array.
+                req.feedsErrors.push("The content included is not valid JSON.");
+
+                // Since this is a significant issue, passing this request to the feeds-errors
+                // route, by calling the next method with an empty error (as all errors will be
+                // accessible from the feedsErrors array).
+                return next(new Error());
+            }            
         } else {
             next();
         }
@@ -102,7 +97,9 @@ router.use(function(req, res, next){
                 } else {
                     console.log("Project admin file updated");
 
-                    req.gitCommitMessage = req.gitCommitMessage != null ? req.gitCommitMessage : "New structure added to project";
+                    req.gitCommitMessage = req.gitCommitMessage != null ? req.gitCommitMessage : "Project structure updated";
+                    req.resultData = req.resultData != null ? req.resultData : req.fileData.admin.project_structure;
+                    
                     var projectGitRepo = simpleGit("./projects/" + req.projectID);
                     projectGitRepo
                         .addConfig("user.name", req.user_display_name)
@@ -112,7 +109,6 @@ router.use(function(req, res, next){
 
                     // Sending the new item as the response to the caller, so that they can
                     // see the result of their request
-                    req.resultData = req.resultData != null ? req.resultData : req.fileData.admin.project_structure;
                     res.send(req.resultData);
                 }
             });

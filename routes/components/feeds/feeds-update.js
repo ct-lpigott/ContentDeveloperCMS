@@ -21,6 +21,7 @@ router.put("/:projectID", function(req, res, next){
                     req.fileData.admin.project_structure = JSON.parse(req.body.structure);
 
                     console.log("Entire contents of project structure updated");
+                    req.gitCommitMessage = "Update to entire structure of project";
                     req.updateFile = "structure";
                     next();
                 } else {
@@ -79,23 +80,25 @@ router.put("/:projectID", function(req, res, next){
 });
 // Continued - request to update the contents of an entire project
 router.put("/:projectID", function(req, res, next){
-    if(validation.jsonToObject(req.body.projectContent)){
-        console.log("Entire contents of project content updated");
-        req.gitCommitMessage = "Update to entire contents of project";
-        req.updateFile = "content";
-        req.resultData = req.body.projectContent;
-        next();
-    } else {
-        // This is not a valid JSON object. Adding this as an 
-        // error to the feedsErrors array.
-        req.feedsErrors.push("This is not valid JSON. Cannot update the project content");
+    if(req.body.content != null){
+        if(validation.jsonToObject(req.body.content)){
+            console.log("Entire contents of project content updated");
+            req.gitCommitMessage = "Update to entire contents of project";
+            req.updateFile = "content";
+            next();
+        } else {
+            // This is not a valid JSON object. Adding this as an 
+            // error to the feedsErrors array.
+            req.feedsErrors.push("This is not valid JSON. Cannot update the project content");
 
-        // Since this is a significant issue, passing this request to the feeds-errors
-        // route, by calling the next method with an empty error (as all errors will be
-        // accessible from the feedsErrors array).
-        next(new Error());
+            // Since this is a significant issue, passing this request to the feeds-errors
+            // route, by calling the next method with an empty error (as all errors will be
+            // accessible from the feedsErrors array).
+            next(new Error());
+        }
+    } else {
+        next();
     }
-    
 });
 
 // Request to update an item or collections CONTENT in a project
