@@ -3,11 +3,6 @@
 // which this route will accept.
 var router = require('express').Router();
 
-// Requiring the file system module, so that this route can have access
-// to the file system of the server i.e. to be able to create, open, edit 
-// and save project files to the /projects directory
-var fs = require("fs");
-
 var validation = require("./../validation.js");
 
 // Request to delete a project
@@ -22,7 +17,7 @@ router.delete("/:projectID/*", function(req, res, next){
     if(req.allParams.length > 1){
         // Checking that the fileData (i.e. the current content of the project) has
         // been loaded in the preload-filedata route
-        if(req.fileData.content){                
+        if(req.fileData.content){           
             // Calling the deleteItem method (which is defined directly below this)
             // to delete the requested item. Passing it the current content file data, and the
             // encapsulationData (i.e. all the parameters of the request, excluding the
@@ -149,42 +144,11 @@ router.delete("/:projectID/*", function(req, res, next){
             // i.e. has an item been removed? If not, then there will be no need to
             // update the project content file.
             if(req.removedItemFrom != null){
-                // Checking that the fileData content is still a valid object, by attempting
-                // to parse it to JSON. Since the item that was removed will have been reflected
-                // in this object (as it was passed by reference to a function) completing this recheck
-                // to ensure that deleting the new item did not corrupt the existing content
-                if(validation.objectToJson(req.fileData.content)){
-                    // Updating this project's content.json file, passing the JSON stringified version
-                    // of the fileData content object as the contents
-                    fs.writeFile("./projects/" + req.params.projectID + "/content.json", JSON.stringify(req.fileData.content), function(err){
-                        if(err) {
-                            // Logging the error to the console
-                            console.log("Error updating project content file " + err);
-
-                            // As it has not been possible to update the content.json file for this 
-                            // project, adding this as an error to the feedsErrors array.
-                            req.feedsErrors.push("Server error - unable to delete this item");
-
-                            // Since this is a significant issue, passing this request to the feeds-errors
-                            // route, by calling the next method with an empty error (as all errors will be
-                            // accessible from the feedsErrors array).
-                            return next(new Error());
-                        } else {
-                            console.log("Item deleted from project");
-
-                            res.send(req.removedItemFrom);
-                        }
-                    });
-                } else {
-                    // As it has not been possible parse the updated object to JSON, the content
-                    // cannot be updated. Adding this as an error to the feeds errors array.
-                    req.feedsErrors.push("The content included is not valid JSON. Cannot add to collection");
-
-                    // Since this is a significant issue, passing this request to the feeds-errors
-                    // route, by calling the next method with an empty error (as all errors will be
-                    // accessible from the feedsErrors array).
-                    return next(new Error());
-                }
+                console.log("Item deleted from project content");
+                req.gitCommitMessage = itemName + " removed from project content";
+                req.updateFile = "content";
+                req.resultData = req.removedItemFrom;
+                next();
             } else {
                 // Returning any errors set in the createItem() function to the caller
                 return next(new Error());

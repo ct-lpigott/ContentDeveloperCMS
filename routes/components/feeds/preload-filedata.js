@@ -40,24 +40,17 @@ router.use(function(req, res, next){
         }
     }
 
-    // Creating a temporary parameters object on the request, to store the value of the userID
-    // and projectID that should be used within this middleware to load in the relevant files
-    // data, so that the contents of these can be reused throughout this route. The values stored
-    // within the tmp parameters will only be used within this funciton, and the one directly below.
-    req.tmpParams = {
-        userID: req.userID,
-        projectID: req.allParams[0]
-    };
+    req.projectID = req.allParams[0];
 
     // Creating an empty object, to store the contents and structure of the project files, so that
     // they can be used throughout this route
     req.fileData = {};
 
-    if(req.userID != null && req.tmpParams.projectID != null){
+    if(req.userID != null && req.projectID != null){
         // Querying the database, to find the projects that this user has access to, by joining
         // the user table to the user_projects table. Returning only the columns needed for the 
         // reponse to the user. 
-        dbconn.query("SELECT * FROM Project p LEFT JOIN User_Project up ON p.id = up.project_id LEFT JOIN AccessLevel al ON up.access_level_id = al.id WHERE p.id = " + dbconn.escape(req.tmpParams.projectID) + " AND up.user_id = " + dbconn.escape(req.tmpParams.userID), function(err, rows, fields){
+        dbconn.query("SELECT * FROM Project p LEFT JOIN User_Project up ON p.id = up.project_id LEFT JOIN AccessLevel al ON up.access_level_id = al.id LEFT JOIN User u ON up.user_id = u.id WHERE p.id = " + dbconn.escape(req.projectID) + " AND up.user_id = " + dbconn.escape(req.userID), function(err, rows, fields){
             if(err){
                 // Logging this error to the console
                 console.log(err);
@@ -76,10 +69,12 @@ router.use(function(req, res, next){
                     // Storing the users access level on the request object, to be used throughout
                     // the rest of this route
                     req.user_access_level = rows[0].access_level_int;
+                    req.user_display_name = rows[0].display_name;
+                    req.user_email_address = rows[0].email_address;
 
                     // Reading this projects admin.json file from the project directory (which is named
                     // as per the projects ID), so that the project structure can be returned to the user
-                    fs.readFile("./projects/" + req.tmpParams.projectID + "/admin.json", {encoding: "utf-8"}, function(err, data){
+                    fs.readFile("./projects/" + req.projectID + "/admin.json", {encoding: "utf-8"}, function(err, data){
                         if(err){
                             // Logging this error to the console
                             console.log(err);
@@ -125,10 +120,10 @@ router.use(function(req, res, next){
 });
 // Continued - PRE for requests to read the contents of a project, it's collection or any items within those collections
 router.use(function(req, res, next){
-    if(req.tmpParams.projectID != null){
+    if(req.projectID != null){
         // Reading the contents of the content.json file of the project, from the project directory
         // (named as per the projectID), so that the contents of the project can be returned to the user
-        fs.readFile("./projects/" + req.tmpParams.projectID + "/content.json", {encoding: "utf-8"}, function(err, projectContent){
+        fs.readFile("./projects/" + req.projectID + "/content.json", {encoding: "utf-8"}, function(err, projectContent){
             if(err){
                 // Logging error to the database
                 console.log(err);

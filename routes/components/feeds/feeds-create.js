@@ -227,8 +227,7 @@ router.post("/:projectID/*", function(req, res, next){
                 // it should never be able to reach this point if it is not, as it would
                 // have thrown an error when passing through the body parser middleware
                 // in app.js, so this is just to ensure that no invalid data gets through
-                if(validation.objectToJson(req.body.structure)){
-                    
+                if(validation.objectToJson(req.body.structure)){                    
                     // Calling the createItem method (which is defined directly below this)
                     // to create the new item. Passing it the current structure file data, the
                     // encapsulationData (i.e. all the parameters of the request, excluding the
@@ -262,40 +261,30 @@ router.post("/:projectID/*", function(req, res, next){
                         // the end of this loop, I should have the item into which the new item should
                         // be created.
                         for(var i=0; i<encapsulationData.length; i++){
-                            // Ignoring the last item of the encapsulationData, as it will be stored
-                            // as the itemName above
-                            if(i < encapsulationData.length - 1){
-                                // Checking if the structureFileData currently contains an "items" property,
-                                // in which case setting the structureFileData to this property (so that users
-                                // don't have to continually type /books/items/attributes)
-                                if(structureFileData.items != undefined){
-                                    structureFileData = structureFileData.items;
-                                }
-
-                                // Checking if the structureFileData currently contains an "attributes" property,
-                                // in which case setting the structureFileData to this property (so that users
-                                // don't have to continually type /books/items/attributes)
-                                if(structureFileData.attributes != undefined){
-                                    structureFileData = structureFileData.attributes;
-                                }
-                               
-                                // Checking if the above traversal has resulting in the structureFileData becoming "undefined",
-                                // in which case a portion of the encapsulationData structure must not exist i.e. the user
-                                // is trying to create an item within an object that does not exist
-                                if(structureFileData[encapsulationData[i]] == undefined){
-                                     // Setting the structureFileData equal to the next level of the encapsulationData array
-                                    // i.e. to keep drilling down into the structureFileData object
-                                    structureFileData = structureFileData[encapsulationData[i]];
-                                } else {
-                                    // The structure cannot be updated, since there is no file structure to define the container
-                                    // of this item. Adding this to the feedsErrors array, and then returning this function so 
-                                    // that no further attempt to create this item will be made. Since req.newItem will remain 
-                                    // null, this error will be returned to the caller, further down along this route
-                                    req.feedsErrors.push("'" + encapsulationData.slice(0, encapsulationData.length-1).join("/") + "' is not defined. Please create the container objects first");
-                                    return;
-                                }
-                            } 
+                            // Checking if the structureFileData currently contains an "items" property,
+                            // in which case setting the structureFileData to this property (so that users
+                            // don't have to continually type /books/items/attributes)
+                            if(structureFileData.items != undefined){
+                                structureFileData = structureFileData.items;
+                            }
+                            
+                            // Checking if the above traversal has resulting in the structureFileData becoming "undefined",
+                            // in which case a portion of the encapsulationData structure must not exist i.e. the user
+                            // is trying to create an item within an object that does not exist
+                            if(structureFileData[encapsulationData[i]] != undefined){
+                                    // Setting the structureFileData equal to the next level of the encapsulationData array
+                                // i.e. to keep drilling down into the structureFileData object
+                                structureFileData = structureFileData[encapsulationData[i]];
+                            }
+    
+                            // Checking if the structureFileData currently contains an "attributes" property,
+                            // in which case setting the structureFileData to this property (so that users
+                            // don't have to continually type /books/items/attributes)
+                            if(structureFileData.attributes != undefined){
+                                structureFileData = structureFileData.attributes;
+                            }
                         }
+                        
 
                         // Checking whether the fileData object contains the property referred to in the parent
                         // name variable i.e. does the request new item have a parent, or is it at the top-most
@@ -315,6 +304,7 @@ router.post("/:projectID/*", function(req, res, next){
                                 } else {
                                     // Adding this as a new property on the parents attributes object
                                     structureFileData[parentName]["attributes"][itemName] = newItem;
+                                    req.gitCommitMessage = "New attribute structure added to " + parentName + ": '" + itemName + "'";
                                 }
                             } else if(structureFileData[parentName]["items"] != undefined){
                                 // Checking if this item name is already a property on the parent items object
@@ -328,6 +318,7 @@ router.post("/:projectID/*", function(req, res, next){
                                 } else {
                                     // Adding this as a new property on the parents items object
                                     structureFileData[parentName]["items"][itemName] = newItem;
+                                    req.gitCommitMessage = "New item structure added to " + parentName + ": '" + itemName + "'";
                                 }
                             } else {
                                 // Checking if this item name is already a property on the parent object
@@ -341,6 +332,7 @@ router.post("/:projectID/*", function(req, res, next){
                                 } else {
                                     // Adding this as a new property on the parents object
                                     structureFileData[parentName][itemName] = newItem;
+                                    req.gitCommitMessage = "New structure added to " + parentName + ": '" + itemName + "'";
                                 }
                             }
 
@@ -371,6 +363,7 @@ router.post("/:projectID/*", function(req, res, next){
                                 } else {
                                     // Adding this as a new property on the global attributes object
                                     structureFileData["attributes"][itemName] = newItem;
+                                    req.gitCommitMessage = "New structure attribute added: '" + itemName + "'";
                                 } 
                                 // If the function has reached this point, then an item must have been created (as
                                 // if this proved not to be possible, then the function would have returned by now).
@@ -395,6 +388,7 @@ router.post("/:projectID/*", function(req, res, next){
                                 } else {
                                     // Adding this as a new property on the global items object
                                     structureFileData["items"][itemName] = newItem;
+                                    req.gitCommitMessage = "New structure item added: '" + itemName + "'";
                                 } 
                                 // If the function has reached this point, then an item must have been created (as
                                 // if this proved not to be possible, then the function would have returned by now).
@@ -422,6 +416,7 @@ router.post("/:projectID/*", function(req, res, next){
                                 } else {
                                     // Adding this as a new property on the global object
                                     structureFileData[itemName] = newItem;
+                                    req.gitCommitMessage = "New structure added: '" + itemName + "'";
                                 }
                                 // If the function has reached this point, then an item must have been created (as
                                 // if this proved not to be possible, then the function would have returned by now).
@@ -442,48 +437,10 @@ router.post("/:projectID/*", function(req, res, next){
                     // i.e. has a new item been created? If not, then there will be no need to
                     // update the project admin file.
                     if(req.newItem != null){
-                        // Updating the meta data of the admin.json file
-                        req.fileData.admin.date_updated = Date.now();
-                        req.fileData.admin.last_updated_by = req.userID;
-
-                        // Checking that the fileData admin is still a valid object, by attempting
-                        // to parse it to JSON. Since the new item that was created will have been reflected
-                        // in this object (as it was passed by reference to a function) completing this recheck
-                        // to ensure that creating the new item did not corrupt the existing project_structure
-                        if(validation.objectToJson(req.fileData.admin)){
-                            // Updating this project's admin.json file, passing the JSON stringified version
-                            // of the fileData object as the contents
-                            fs.writeFile("./projects/" + req.params.projectID + "/admin.json", JSON.stringify(req.fileData.admin), function(err){
-                                if(err) {
-                                    // Logging the error to the console
-                                    console.log("Error updating project admin file " + err);
-
-                                    // As it has not been possible to update the admin.json file for this 
-                                    // project, adding this as an error to the feedsErrors array.
-                                    req.feedsErrors.push("Server error - unable to create new item in the project");
-
-                                    // Since this is a significant issue, passing this request to the feeds-errors
-                                    // route, by calling the next method with an empty error (as all errors will be
-                                    // accessible from the feedsErrors array).
-                                    return next(new Error());
-                                } else {
-                                    console.log("New item added to project structure");
-
-                                    // Sending the new item as the response to the caller, so that they can
-                                    // see the result of their request
-                                    res.send(req.newItem);
-                                }
-                            });
-                        } else {
-                            // As it has not been possible parse the updated object to JSON, the project structure
-                            // cannot be updated. Adding this as an error to the feeds errors array.
-                            req.feedsErrors.push("The content included is not valid JSON. Cannot add to collection");
-
-                            // Since this is a significant issue, passing this request to the feeds-errors
-                            // route, by calling the next method with an empty error (as all errors will be
-                            // accessible from the feedsErrors array).
-                            return next(new Error());
-                        }
+                        req.updateFile = "structure";
+                        req.resultData = req.newItem;
+                        console.log("New item added to project structure");
+                        next();
                     } else {
                         // Returning any errors set in the createItem() function to the caller
                         return next(new Error());
@@ -645,6 +602,7 @@ router.post("/:projectID/*", function(req, res, next){
                                                 // this item at, this will be ignored as the item can only ever be created
                                                 // at the end of an array (PUT requests are used to update exisiting items)
                                                 contentFileData[parentName].push(newItem);
+                                                req.gitCommitMessage = "New content pushed to array: '" + parentName + "'";
                                             } else {
                                                 // Looping through any errors that were returned from the content validation,
                                                 // and adding them to the req.feedsErrors array, before returning the function,
@@ -675,6 +633,7 @@ router.post("/:projectID/*", function(req, res, next){
                                                 // Since this is an object, creating a new property on the parent item (with the item name
                                                 // supplied in the parameters), and setting its value to the new item value 
                                                 contentFileData[parentName][itemName] = newItem;
+                                                req.gitCommitMessage = "New content created in object:  '" + parentName + "." + itemName;
                                             } else {
                                                 // Looping through any errors that were returned from the content validation,
                                                 // and adding them to the req.feedsErrors array, before returning the function,
@@ -728,6 +687,7 @@ router.post("/:projectID/*", function(req, res, next){
                                             if(validateContent.successful){
                                                 // Since this is any array, pushing to the new item into it
                                                 contentFileData[itemName].push(newItem); 
+                                                req.gitCommitMessage = "New content added to array: " + itemName;
                                             } else {
                                                 // Looping through any errors that were returned from the content validation,
                                                 // and adding them to the req.feedsErrors array, before returning the function,
@@ -739,25 +699,6 @@ router.post("/:projectID/*", function(req, res, next){
                                                 return;
                                             }
                                             break;                   
-                                        }
-                                        case "object": {
-                                            // PLACEHOLDER - For validating content against structure
-                                            var validateContent = validation.contentStructure(newItem, structureFileData[itemName].attributes);   
-                                            if(validateContent.successful){
-                                                // Since this is an object, creating a new property with the name
-                                                // of the item, and setting it to be equal to the new items value
-                                                contentFileData[itemName] = newItem;
-                                            } else {
-                                                // Looping through any errors that were returned from the content validation,
-                                                // and adding them to the req.feedsErrors array, before returning the function,
-                                                // as this content cannot be added to the project as it does not match with the
-                                                // project structure (details of which will be inclued in the errors)
-                                                for(var i=0; i<validateContent.errors.length; i++){
-                                                    req.feedsErrors.push(validateContent.errors[i]);
-                                                }
-                                                return;
-                                            }
-                                            break;
                                         }
                                         default: {
                                             // Since this item is neither an Array or an Object, it is just a 
@@ -780,6 +721,7 @@ router.post("/:projectID/*", function(req, res, next){
                                         // creating a new property (with the item name supplied in the parameters), 
                                         // and setting its value to the new item value 
                                         contentFileData[itemName] = newItem;
+                                        req.gitCommitMessage = "New content created: '" + itemName + "'";
                                     } else {
                                         // Looping through any errors that were returned from the content validation,
                                         // and adding them to the req.feedsErrors array, before returning the function,
@@ -827,42 +769,9 @@ router.post("/:projectID/*", function(req, res, next){
                     // i.e. has a new item been created? If not, then there will be no need to
                     // update the project content file.
                     if(req.newItem != null){
-                        // Checking that the fileData content is still a valid object, by attempting
-                        // to parse it to JSON. Since the new item that was created will have been reflected
-                        // in this object (as it was passed by reference to a function) completing this recheck
-                        // to ensure that creating the new item did not corrupt the existing content
-                        if(validation.objectToJson(req.fileData.content)){
-                            // Updating this project's content.json file, passing the JSON stringified version
-                            // of the fileData content object as the contents
-                            fs.writeFile("./projects/" + req.params.projectID + "/content.json", JSON.stringify(req.fileData.content), function(err){
-                                if(err) {
-                                    // Logging the error to the console
-                                    console.log("Error updating project content file " + err);
-
-                                    // As it has not been possible to update the content.json file for this 
-                                    // project, adding this as an error to the feedsErrors array.
-                                    req.feedsErrors.push("Server error - unable to create new item in collection");
-
-                                    // Since this is a significant issue, passing this request to the feeds-errors
-                                    // route, by calling the next method with an empty error (as all errors will be
-                                    // accessible from the feedsErrors array).
-                                    return next(new Error());
-                                } else {
-                                    console.log("New item added to project");
-
-                                    res.send(req.newItem);
-                                }
-                            });
-                        } else {
-                            // As it has not been possible parse the updated object to JSON, the content
-                            // cannot be updated. Adding this as an error to the feeds errors array.
-                            req.feedsErrors.push("The content included is not valid JSON. Cannot add to collection");
-
-                            // Since this is a significant issue, passing this request to the feeds-errors
-                            // route, by calling the next method with an empty error (as all errors will be
-                            // accessible from the feedsErrors array).
-                            return next(new Error());
-                        }
+                        req.updateFile = "content";
+                        req.resultData = req.newItem;
+                        next();
                     } else {
                         // Returning any errors set in the createItem() function to the caller
                         return next(new Error());
@@ -891,11 +800,7 @@ router.post("/:projectID/*", function(req, res, next){
             // As no content has been included in the request, unable to update the
             // collection. Adding this as an error to the feeds errors array.
             req.feedsErrors.push("No content provied in the request");
-
-            // Since this is a significant issue, passing this request to the feeds-errors
-            // route, by calling the next method with an empty error (as all errors will be
-            // accessible from the feedsErrors array).
-            next(new Error());
+            next();
         }
     } else {
         // Adding this as an error to the feeds errors array.
