@@ -244,8 +244,7 @@ router.post("/:projectID/*", function(req, res, next){
                         // Determining the itemName and parentItem name, based on the last
                         // two values of the encapsulationData data (parameters of the request URL).
                         // Parent name may not always have a value, as the item may be at the top
-                        // level of the project_structure object, so defaulting this to null if no 
-                        // value exits
+                        // level of the content object, so defaulting this to null if no value exits
                         var itemName = encapsulationData[encapsulationData.length-1];
                         var parentName = encapsulationData[encapsulationData.length-2] || null;
 
@@ -272,7 +271,7 @@ router.post("/:projectID/*", function(req, res, next){
                             // in which case a portion of the encapsulationData structure must not exist i.e. the user
                             // is trying to create an item within an object that does not exist
                             if(structureFileData[encapsulationData[i]] != undefined){
-                                    // Setting the structureFileData equal to the next level of the encapsulationData array
+                                // Setting the structureFileData equal to the next level of the encapsulationData array
                                 // i.e. to keep drilling down into the structureFileData object
                                 structureFileData = structureFileData[encapsulationData[i]];
                             }
@@ -363,7 +362,7 @@ router.post("/:projectID/*", function(req, res, next){
                                 } else {
                                     // Adding this as a new property on the global attributes object
                                     structureFileData["attributes"][itemName] = newItem;
-                                    req.gitCommitMessage = "New structure attribute added: '" + itemName + "'";
+                                    req.gitCommitMessage = parentName != null ? "New structure attribute added to " + parentName + ": " + itemName : "New structure attribute added to global object: '" + itemName + "'";
                                 } 
                                 // If the function has reached this point, then an item must have been created (as
                                 // if this proved not to be possible, then the function would have returned by now).
@@ -388,7 +387,7 @@ router.post("/:projectID/*", function(req, res, next){
                                 } else {
                                     // Adding this as a new property on the global items object
                                     structureFileData["items"][itemName] = newItem;
-                                    req.gitCommitMessage = "New structure item added: '" + itemName + "'";
+                                    req.gitCommitMessage = parentName != null ? "New structure item added to " + parentName + ": " + itemName :"New structure item added to global object: '" + itemName + "'";
                                 } 
                                 // If the function has reached this point, then an item must have been created (as
                                 // if this proved not to be possible, then the function would have returned by now).
@@ -416,7 +415,7 @@ router.post("/:projectID/*", function(req, res, next){
                                 } else {
                                     // Adding this as a new property on the global object
                                     structureFileData[itemName] = newItem;
-                                    req.gitCommitMessage = "New structure added: '" + itemName + "'";
+                                    req.gitCommitMessage = parentName != null ? "New structure added to " + parentName + ": " + itemName : "New structure added to global object: '" + itemName + "'";
                                 }
                                 // If the function has reached this point, then an item must have been created (as
                                 // if this proved not to be possible, then the function would have returned by now).

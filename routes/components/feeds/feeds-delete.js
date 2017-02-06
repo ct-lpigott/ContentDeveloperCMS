@@ -76,6 +76,7 @@ router.delete("/:projectID/*", function(req, res, next){
                             // with the same value as the itemName
                             if(contentFileData[parentName][itemName] != undefined){
                                 contentFileData[parentName].splice(itemName, 1);
+                                req.gitCommitMessage = "Content removed from " + parentName + ": " + itemName;
                             } else {
                                 // Since this index does not exist within this array, adding this to the feedsErrors
                                 // array, and then returning this function so that no further attempt to create this
@@ -91,6 +92,7 @@ router.delete("/:projectID/*", function(req, res, next){
                             // with the same value as the itemName
                             if(contentFileData[parentName][itemName] != undefined){
                                 delete contentFileData[parentName][itemName];
+                                req.gitCommitMessage = "Content removed from " + parentName + ": " + itemName;
                             } else {
                                 // Since this property does not exist within this object, adding this to the feedsErrors
                                 // array, and then returning this function so that no further attempt to create this
@@ -123,6 +125,7 @@ router.delete("/:projectID/*", function(req, res, next){
                     // name already defined
                     if(contentFileData[itemName] != undefined){
                         delete contentFileData[itemName];
+                        req.gitCommitMessage = "Content removed: " + itemName;
                     } else {
                         // Since this property does not exist on the global object, adding this to the feedsErrors
                         // array, and then returning this function so that no further attempt to create this
@@ -145,7 +148,6 @@ router.delete("/:projectID/*", function(req, res, next){
             // update the project content file.
             if(req.removedItemFrom != null){
                 console.log("Item deleted from project content");
-                req.gitCommitMessage = itemName + " removed from project content";
                 req.updateFile = "content";
                 req.resultData = req.removedItemFrom;
                 next();
