@@ -3,6 +3,7 @@ var projectID;
 var draggingElement;
 var dragStartY;
 var projectStructureHistoryPreviewTextarea;
+var projectContentHistoryPreviewTextarea;
 
 function customWindowOnload(){
     userID = document.getElementById("userID").value;
@@ -16,6 +17,7 @@ function customWindowOnload(){
     if(document.getElementById("projectID")){
         projectID = document.getElementById("projectID").value;
         projectStructureHistoryPreviewTextarea = document.getElementById("projectStructureHistoryPreview");
+        projectContentHistoryPreviewTextarea = document.getElementById("projectContentHistoryPreview");
         resetProjectStructure();
         getAccessLevels();
         getProjectCollaborators();
@@ -82,7 +84,7 @@ function customClickEventHandler(e){
         }
         case "revertContent": {
             if(jsonToObject(projectContentHistoryPreviewTextarea.value)){
-                sendAjaxRequest("/feeds/" + projectID, {structure: projectContentHistoryPreviewTextarea.value, short_commit_id: projectContentHistoryPreviewTextarea.getAttribute("data-short_commit_id")}, function(responseObject){
+                sendAjaxRequest("/feeds/" + projectID, {content: projectContentHistoryPreviewTextarea.value, short_commit_id: projectContentHistoryPreviewTextarea.getAttribute("data-short_commit_id")}, function(responseObject){
                     console.log("Content updated");
                 }, "PUT");
             } else {

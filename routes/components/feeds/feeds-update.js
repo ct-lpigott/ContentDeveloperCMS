@@ -88,7 +88,11 @@ router.put("/:projectID", function(req, res, next){
         if(validation.jsonToObject(req.body.content)){
             req.fileData.content = JSON.parse(req.body.content);
             console.log("Entire contents of project content updated");
-            req.gitCommitMessage = "Update to entire contents of project";
+            if(req.body.short_commit_id != null){
+                req.gitCommitMessage = "Project content rolled back to commit id: " + req.body.short_commit_id;
+            } else {
+                req.gitCommitMessage = "Update to entire contents of project";
+            }
             req.updateFile = "content";
             next();
         } else {
