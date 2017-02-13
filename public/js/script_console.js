@@ -81,16 +81,18 @@ function updateProjectHTML(projectDetails, includeContent=true){
     }
 
     if(includeContent){
-        addClass(projectCollections.children[0], "active");
-        addClass(document.getElementById("projectCollectionsContent").children[0], "visible");
+        if(projectCollections.children.length > 0){
+            addClass(projectCollections.children[0], "active");
+            addClass(document.getElementById("projectCollectionsContent").children[0], "visible");
+        }
     }
 
     refreshDraggableContainers();    
     if(projectDetails.content_history != null){
-        if(projectDetails.structure_history != null){
-            updateProjectHistory(projectDetails.content_history, projectDetails.structure_history);
-        } else {
+        if(includeContent){
             updateProjectHistory(projectDetails.content_history);
+        } else {
+            updateProjectHistory(projectDetails.content_history, projectDetails.structure_history);
         }
     }
 }
@@ -339,32 +341,39 @@ function refreshDraggableContainers(){
 function updateProjectHistory(contentCommitHistory, structureCommitHistory=null){
     var projectContentHistoryTableBody = document.getElementById("projectContentHistory");
 
-    generateHistoryTable(contentCommitHistory.all, projectContentHistoryTableBody);
+    generateHistoryTable(contentCommitHistory.all, projectContentHistoryTableBody, "content");
 
     if(structureCommitHistory != null){
         var projectStructureHistoryTableBody = document.getElementById("projectStructureHistory");
         
-        generateHistoryTable(structureCommitHistory.all, projectStructureHistoryTableBody);
+        generateHistoryTable(structureCommitHistory.all, projectStructureHistoryTableBody, "structure");
     }
 }
 
-function generateHistoryTable(arrayOfCommits, tableBody){
+function generateHistoryTable(arrayOfCommits, tableBody, historyOf){
     for(var i=0; i< arrayOfCommits.length; i++){
+        var dateOfCommit = new Date(arrayOfCommits[i].date);
+        var shortCommitId = arrayOfCommits[i].hash.slice(0, 6);
+
         var newCommitRow = document.createElement("tr");
 
+        var commitTd = document.createElement("td");
+        commitTd.innerHTML = shortCommitId;
+
         var dateTd = document.createElement("td");
-        dateTd.innerHTML = arrayOfCommits[i].date;
+        dateTd.innerHTML = customDateFormat(dateOfCommit, false, true);
 
         var changesTd = document.createElement("td");
-        changesTd.innerHTML = arrayOfCommits[i].message;
+        changesTd.innerHTML = arrayOfCommits[i].message.indexOf("(HEAD ->") > -1 ? arrayOfCommits[i].message.split("(HEAD ->")[0] : arrayOfCommits[i].message;
 
         var byTd = document.createElement("td");
         byTd.innerHTML = arrayOfCommits[i].author_name;
 
         var optionsTd = document.createElement("td");
-        optionsTd.innerHTML = "<button data-hash=" + arrayOfCommits[i].hash + ">View</button>";
+        optionsTd.innerHTML = "<button data-hash=" + arrayOfCommits[i].hash + " data-historyof=" + historyOf + " data-short_commit_id=" + shortCommitId + " class='previewHistory'>Preview</button>";
 
 
+        newCommitRow.appendChild(commitTd);
         newCommitRow.appendChild(dateTd);
         newCommitRow.appendChild(changesTd);
         newCommitRow.appendChild(byTd);
@@ -372,4 +381,40 @@ function generateHistoryTable(arrayOfCommits, tableBody){
 
         tableBody.appendChild(newCommitRow);
     }
+}
+
+function previewCommitHistory(targetButton){
+    console.log("Previewing " + targetButton.getAttribute("data-hash") + " for " + targetButton.getAttribute("data-historyof"));
+        var historyOf = targetButton.getAttribute("data-historyof");
+        var commitHash = targetButton.getAttribute("data-hash");
+        var shortCommitId = commitHash.slice(0, 6);
+        sendAjaxRequest("/feeds/" + projectID + "?action=previewCommit&commit_hash=" + commitHash + "&historyof=" + historyOf, {}, function(responseObject){
+            if(historyOf == "content"){
+                if(document.getElementById("projectContentHistoryPreview") != undefined){
+                    updateProjectJSON(responseObject.commit_content, "projectContentHistoryPreview");
+                } else {
+                    var tempProjectDetails = {
+                        content: responseObject.commit_content,
+                        structure: responseObject.structure
+                    };
+                    updateProjectHTML(tempProjectDetails);
+                }
+                
+                var previouslySelected = document.getElementById("projectContentHistory").getElementsByClassName("selected")[0];
+                if(previouslySelected != null){
+                    removeClass(previouslySelected, "selected");
+                }
+
+            } else if(historyOf == "structure"){
+                updateProjectJSON(responseObject.commit_structure, "projectStructureHistoryPreview");
+                document.getElementById("projectStructureHistoryPreview").setAttribute("data-short_commit_id", shortCommitId);
+                var previouslySelected = document.getElementById("projectStructureHistory").getElementsByClassName("selected")[0];
+                if(previouslySelected != null){
+                    removeClass(previouslySelected, "selected");
+                }
+                
+            } 
+
+            addClass(targetButton.parentNode.parentNode, "selected");           
+        });
 }

@@ -33,27 +33,49 @@ block main-body
                             th Remove
                     tbody
     div.row
-        div.col-12-12
+        div.col-8-12
             h2 Project Structure History
             table
+                colgroup
+                    col(width="10%")
+                    col(width="20%")
+                    col(width="40%")
+                    col(width="20%")
+                    col(width="10%")
                 thead
                     tr
+                        th Commit ID
                         th Date
                         th Changes
                         th Made By
                         th Options
                 tbody(id="projectStructureHistory")
+        div.col-4-12
+            h2 Preview
+                textarea(id="projectStructureHistoryPreview" disabled)
+                button(id="revertStructure") Revert to this Structure
     div.row
-        div.col-12-12
+        div.col-8-12
             h2 Project Content History
             table
+                colgroup
+                    col(width="10%")
+                    col(width="20%")
+                    col(width="40%")
+                    col(width="20%")
+                    col(width="10%")
                 thead
                     tr
+                        th Commit ID
                         th Date
                         th Changes
                         th Made By
                         th Options
                 tbody(id="projectContentHistory")
+        div.col-4-12
+            h2 Preview
+                textarea(id="projectContentHistoryPreview" disabled)
+                button(id="revertContent") Revert to this Content
 
     input(id="userID" type="hidden" value=userID)
     input(id="projectID" type="hidden" value=projectID)

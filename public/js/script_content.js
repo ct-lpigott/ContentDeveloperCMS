@@ -60,6 +60,8 @@ function customClickEventHandler(e){
 
         removeClass(document.getElementById("projectCollectionsContent").getElementsByClassName("visible")[0], "visible");
         addClass(document.getElementById("projectCollectionsContent").getElementsByClassName(collectionToActivate)[0], "visible");
+    } else if(hasClass(e.target, "previewHistory")){
+        previewCommitHistory(e.target);
     }
 }
 

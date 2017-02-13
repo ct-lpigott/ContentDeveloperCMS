@@ -5,6 +5,35 @@ var router = require('express').Router();
 
 var simpleGit = require("simple-git");
 
+// Request to get the contents of a specific commit
+router.get("/:projectID", function(req, res, next){
+    if(req.query.action == "previewCommit"){
+        if(req.query.commit_hash != null && req.query.historyof != null){
+            var projectGit = simpleGit("./projects/" + req.params.projectID);
+            var filePath = req.query.historyof == "content" ? "content.json" : "admin.json";
+            projectGit.show([req.query.commit_hash + ":" + filePath], function(err, commitData){
+                if(err){
+
+                } else {
+                    var commitDataObject = JSON.parse(commitData);
+                    req.responseObject.hash = req.query.commit_hash;
+                    if(req.query.historyof == "content"){
+                        req.responseObject.commit_content = commitDataObject;
+                        req.responseObject.structure = req.fileData.admin.project_structure;
+                    } else if(req.query.historyof == "structure"){
+                        req.responseObject.commit_structure = commitDataObject.project_structure;
+                    }
+                    res.send(req.responseObject);
+                }
+            });
+        } else {
+
+        }
+    } else {
+        next();
+    }
+});
+
 // Request to get the entire content of a project
 router.get("/:projectID", function(req, res, next){
     if(req.fileData.admin != null){

@@ -2,6 +2,7 @@ var userID;
 var projectID;
 var draggingElement;
 var dragStartY;
+var projectStructureHistoryPreviewTextarea;
 
 function customWindowOnload(){
     userID = document.getElementById("userID").value;
@@ -14,6 +15,7 @@ function customWindowOnload(){
 
     if(document.getElementById("projectID")){
         projectID = document.getElementById("projectID").value;
+        projectStructureHistoryPreviewTextarea = document.getElementById("projectStructureHistoryPreview");
         resetProjectStructure();
         getAccessLevels();
         getProjectCollaborators();
@@ -78,6 +80,28 @@ function customClickEventHandler(e){
             resetProjectStructure();
             break;
         }
+        case "revertContent": {
+            if(jsonToObject(projectContentHistoryPreviewTextarea.value)){
+                sendAjaxRequest("/feeds/" + projectID, {structure: projectContentHistoryPreviewTextarea.value, short_commit_id: projectContentHistoryPreviewTextarea.getAttribute("data-short_commit_id")}, function(responseObject){
+                    console.log("Content updated");
+                }, "PUT");
+            } else {
+                console.log("This is not valid JSON");
+            }  
+            break;
+        }
+        case "revertStructure": {
+            if(jsonToObject(projectStructureHistoryPreviewTextarea.value)){
+                sendAjaxRequest("/feeds/" + projectID, {structure: projectStructureHistoryPreviewTextarea.value, short_commit_id: projectStructureHistoryPreviewTextarea.getAttribute("data-short_commit_id")}, function(responseObject){
+                    updateProjectJSON(responseObject);
+                    document.getElementById("previewProjectStructure").click();
+                }, "PUT");
+            } else {
+                console.log("This is not valid JSON");
+            }  
+
+            break;
+        }
     }
 
     // BY CLASS
@@ -87,6 +111,8 @@ function customClickEventHandler(e){
             console.log("Deleted Collab " + e.target.getAttribute("data-userID"));
             updateProjectCollaborators(responseObject);
         }, "DELETE");
+    } else if(hasClass(e.target, "previewHistory")){
+        previewCommitHistory(e.target);
     }
 }
 
@@ -126,9 +152,9 @@ function updateUserProjects(userProjects){
     
 }
 
-function updateProjectJSON(projectStructureOBJ){
+function updateProjectJSON(projectStructureOBJ, textareaContainer="projectStructure"){
     var formattedJSON = JSON.stringify(projectStructureOBJ, null, 4);
-    document.getElementById("projectStructure").value = formattedJSON;
+    document.getElementById(textareaContainer).value = formattedJSON;
 }
 
 function projectStructureKeyDownHandler(e){

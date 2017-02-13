@@ -9,6 +9,8 @@ var dbconn = require("../../../database/connection.js");
 
 var sendEmail = require("../../../email/send_email.js");
 
+var simpleGit = require("simple-git");
+
 var defaultAccessLevels = require("../../../project_defaults/default_access_levels.js");
 
 // Request to get the list of projects accessible by this user
@@ -56,6 +58,14 @@ router.get("/", function(req, res, next){
         next(new Error());
     }
     
+});
+
+router.post("/:projectID", function(req, res, next){
+    if(req.query.action != null){
+        next();
+    } else {
+        next("route");
+    }
 });
 
 // Request to add a collaborator to a project
@@ -241,6 +251,7 @@ router.post("/:projectID", function(req, res, next){
     }
 });
 
+// Request to get all collaborators for a project
 router.get("/:projectID", function(req, res, next){
     if(req.query.action == "getCollaborators"){
         // Querying the database, to get all collaborators for this project
@@ -259,6 +270,7 @@ router.get("/:projectID", function(req, res, next){
     }
 });
 
+// Continued - Continuation of route for request to get all collaborators for a project
 router.get("/:projectID", function(req, res, next){
     if(req.query.action == "getAccessLevels"){
         // Querying the database, to get all access levels for this project
@@ -288,7 +300,7 @@ router.get("/:projectID", function(req, res, next){
     }
 });
 
-
+// Request to delete a collaborator from a project
 router.delete("/:projectID", function(req, res, next){
     if(req.query.action == "removeCollaborator"){
         if(req.body.collaboratorID != null){

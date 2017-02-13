@@ -21,7 +21,11 @@ router.put("/:projectID", function(req, res, next){
                     req.fileData.admin.project_structure = JSON.parse(req.body.structure);
 
                     console.log("Entire contents of project structure updated");
-                    req.gitCommitMessage = "Update to entire structure of project";
+                    if(req.body.short_commit_id != null){
+                        req.gitCommitMessage = "Project structure rolled back to commit id: " + req.body.short_commit_id;
+                    } else {
+                        req.gitCommitMessage = "Update to entire structure of project";
+                    }
                     req.updateFile = "structure";
                     next();
                 } else {
@@ -36,7 +40,7 @@ router.put("/:projectID", function(req, res, next){
                 }
 
                 
-            } else if(req.body.projectContent != null){
+            } else if(req.body.content != null){
                 // Passing this request to the next stage of the router, so that the content
                 // can be updated
                 next();
@@ -57,7 +61,7 @@ router.put("/:projectID", function(req, res, next){
         }
         default: {
             // Checking if the user has included content in the request body
-            if(req.body.projectContent != null){
+            if(req.body.content != null){
                 // Passing this request to the next stage of the router, so that the content
                 // can be updated
                 next();
@@ -82,6 +86,7 @@ router.put("/:projectID", function(req, res, next){
 router.put("/:projectID", function(req, res, next){
     if(req.body.content != null){
         if(validation.jsonToObject(req.body.content)){
+            req.fileData.content = JSON.parse(req.body.content);
             console.log("Entire contents of project content updated");
             req.gitCommitMessage = "Update to entire contents of project";
             req.updateFile = "content";
