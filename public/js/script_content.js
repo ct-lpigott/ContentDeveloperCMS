@@ -10,6 +10,7 @@ function customWindowOnload(){
     sendAjaxRequest("/feeds/" + projectID, {}, function(responseObject){
         updateProjectHTML(responseObject);
         refreshDraggableContainers();
+        getProjectHistory(true);
     });   
 }
 
@@ -22,8 +23,17 @@ function customClickEventHandler(e){
         case "updateProjectContent": {
             var projectContent = parseProjectContentToJSON();
             if(jsonToObject(projectContent)){
-                sendAjaxRequest("/feeds/" + projectID, {content: projectContent}, function(responseObject){
-                    
+                var requestBodyParams = {content: projectContent};
+                
+                if(e.target.getAttribute("data-short_commit_id") != null){
+                    requestBodyParams.short_commit_id = e.target.getAttribute("data-short_commit_id");
+                }
+
+                sendAjaxRequest("/feeds/" + projectID, requestBodyParams, function(responseObject){
+                    getProjectHistory(true);
+                    if(e.target.getAttribute("data-short_commit_id") != null){
+                        e.target.removeAttribute("data-short_commit_id");
+                    }
                 }, "PUT");
             } else {
                 console.log("There is an issue with this content");
@@ -34,6 +44,7 @@ function customClickEventHandler(e){
         case "resetProjectContent": {
            sendAjaxRequest("/feeds/" + projectID, {}, function(responseObject){
                updateProjectHTML(responseObject);
+               document.getElementById("updateProjectContent").removeAttribute("data-short_commit_id");
             });  
         }
     }

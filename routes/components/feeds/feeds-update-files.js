@@ -44,10 +44,10 @@ router.use(function(req, res, next){
                             .addConfig("user.name", req.user_display_name)
                             .addConfig("user.email", req.user_email_address)
                             .add("./content.json")
-                            .commit(req.gitCommitMessage);
-
-                        console.log("Project content file successfully updated");
-                        res.send(req.resultData);
+                            .commit(req.gitCommitMessage, function(){
+                                console.log("Project content file successfully updated");
+                                res.send(req.resultData);
+                            });
                     }
                 });
             } else {
@@ -105,11 +105,11 @@ router.use(function(req, res, next){
                         .addConfig("user.name", req.user_display_name)
                         .addConfig("user.email", req.user_email_address)
                         .add("./admin.json")
-                        .commit(req.gitCommitMessage);
-
-                    // Sending the new item as the response to the caller, so that they can
-                    // see the result of their request
-                    res.send(req.resultData);
+                        .commit(req.gitCommitMessage, function(){
+                            // Sending the new item as the response to the caller, so that they can
+                            // see the result of their request
+                            res.send(req.resultData);
+                        });                    
                 }
             });
         } else {

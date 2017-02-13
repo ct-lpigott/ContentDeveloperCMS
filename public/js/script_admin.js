@@ -21,6 +21,7 @@ function customWindowOnload(){
         resetProjectStructure();
         getAccessLevels();
         getProjectCollaborators();
+        getProjectHistory(false);
     }    
 }
 
@@ -50,6 +51,7 @@ function customClickEventHandler(e){
             if(jsonToObject(parsedProjectStructure)){
                 sendAjaxRequest("/feeds/" + projectID, {structure: parsedProjectStructure}, function(responseObject){
                     updateProjectJSON(responseObject);
+                    getProjectHistory(false);
                     document.getElementById("previewProjectStructure").click();
                 }, "PUT");
             } else {
@@ -86,6 +88,7 @@ function customClickEventHandler(e){
             if(jsonToObject(projectContentHistoryPreviewTextarea.value)){
                 sendAjaxRequest("/feeds/" + projectID, {content: projectContentHistoryPreviewTextarea.value, short_commit_id: projectContentHistoryPreviewTextarea.getAttribute("data-short_commit_id")}, function(responseObject){
                     console.log("Content updated");
+                    getProjectHistory(false);
                 }, "PUT");
             } else {
                 console.log("This is not valid JSON");
@@ -96,6 +99,7 @@ function customClickEventHandler(e){
             if(jsonToObject(projectStructureHistoryPreviewTextarea.value)){
                 sendAjaxRequest("/feeds/" + projectID, {structure: projectStructureHistoryPreviewTextarea.value, short_commit_id: projectStructureHistoryPreviewTextarea.getAttribute("data-short_commit_id")}, function(responseObject){
                     updateProjectJSON(responseObject);
+                    getProjectHistory(false);
                     document.getElementById("previewProjectStructure").click();
                 }, "PUT");
             } else {

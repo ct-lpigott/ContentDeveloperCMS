@@ -88,13 +88,6 @@ function updateProjectHTML(projectDetails, includeContent=true){
     }
 
     refreshDraggableContainers();    
-    if(projectDetails.content_history != null){
-        if(includeContent){
-            updateProjectHistory(projectDetails.content_history);
-        } else {
-            updateProjectHistory(projectDetails.content_history, projectDetails.structure_history);
-        }
-    }
 }
 
 function createItemInputElements(collection, itemContent=null, itemIndex=-1){
@@ -351,6 +344,7 @@ function updateProjectHistory(contentCommitHistory, structureCommitHistory=null)
 }
 
 function generateHistoryTable(arrayOfCommits, tableBody, historyOf){
+    tableBody.innerHTML = "";
     for(var i=0; i< arrayOfCommits.length; i++){
         var dateOfCommit = new Date(arrayOfCommits[i].date);
         var shortCommitId = arrayOfCommits[i].hash.slice(0, 6);
@@ -392,12 +386,14 @@ function previewCommitHistory(targetButton){
             if(historyOf == "content"){
                 if(document.getElementById("projectContentHistoryPreview") != undefined){
                     updateProjectJSON(responseObject.commit_content, "projectContentHistoryPreview");
+                    document.getElementById("projectContentHistoryPreview").setAttribute("data-short_commit_id", shortCommitId);
                 } else {
                     var tempProjectDetails = {
                         content: responseObject.commit_content,
                         structure: responseObject.structure
                     };
                     updateProjectHTML(tempProjectDetails);
+                    document.getElementById("updateProjectContent").setAttribute("data-short_commit_id", shortCommitId);
                 }
                 
                 var previouslySelected = document.getElementById("projectContentHistory").getElementsByClassName("selected")[0];
@@ -417,4 +413,14 @@ function previewCommitHistory(targetButton){
 
             addClass(targetButton.parentNode.parentNode, "selected");           
         });
+}
+
+function getProjectHistory(includeContent) {
+    sendAjaxRequest("/feeds/" + projectID, {}, function(responseObject){
+        if(includeContent){
+            updateProjectHistory(responseObject.content_history);
+        } else {
+            updateProjectHistory(responseObject.content_history, responseObject.structure_history);
+        }
+    });
 }
