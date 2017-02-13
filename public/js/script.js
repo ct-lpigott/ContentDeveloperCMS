@@ -102,3 +102,29 @@ function getChildIndex(parent, child){
     }
     return childIndex;
 }
+function customDateFormat(dateObj, shortDate=false, includeTime=true){
+    var dateString = "";
+
+    var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "July", "Aug", "Sept", "Oct", "Nov", "Dec"];
+
+    var doubleDigitDay = doubleDigitNum(dateObj.getDate());
+
+    if(shortDate){
+        var doubleDigitMonth = doubleDigitNum(dateObj.getMonth() + 1);
+        dateString = doubleDigitDay + "/" + doubleDigitMonth + "/" + dateObj.getFullYear();
+    } else {
+        dateString = doubleDigitDay + " " + months[dateObj.getMonth()] + " " + dateObj.getFullYear();
+    }
+    
+
+    if(includeTime){
+        var amPm = dateObj.getHours() < 12 ? "am" : "pm";
+        dateString += " " + doubleDigitNum(dateObj.getHours()) + ":" + doubleDigitNum(dateObj.getMinutes()) + amPm;
+    }
+    
+    return dateString;
+}
+
+function doubleDigitNum(num){
+    return num < 10 ? "0" + num : num;
+}
