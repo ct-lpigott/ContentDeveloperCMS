@@ -3,6 +3,8 @@
 // which this route will accept.
 var router = require('express').Router();
 
+var simpleGit = require("simple-git");
+
 // Request to get the entire content of a project
 router.get("/:projectID", function(req, res, next){
     if(req.fileData.admin != null){
@@ -14,15 +16,50 @@ router.get("/:projectID", function(req, res, next){
         // a property on the response object, as the response will contain both the content
         // and the structure
         req.responseObject.content = req.fileData.content;
+
+        // Accessing the git repository for this project
+        var projectGit = simpleGit("./projects/" + req.params.projectID);
+
+        // Preforming a git log on the content.json file, to get all commits relating
+        // to changes to the content only
+        projectGit.log(["content.json"], function(err, contentHistoryData){
+            if(err){
+                console.log(err);
+            } else {
+                // Checking that there are commits to return to the caller
+                if(contentHistoryData.total > 0){
+                    // Appending the content history returned to the response object
+                    req.responseObject.content_history = contentHistoryData;
+                }
+                
+                // Preforming a git log on the admin.json file, to get all commits relating
+                // to changes to the structure only
+                projectGit.log(["admin.json"], function(err, adminHistoryData){
+                    if(err){
+                        console.log(err);
+                    } else {
+                        // Checking that there are commits to return to the caller
+                        if(adminHistoryData.total > 0){
+                            // Appending the structure history returned to the response object
+                            req.responseObject.structure_history = adminHistoryData;
+                        }
+                        
+                        // Returning the response object to the caller, which should now contain
+                        // the project structure, content and commit history for each of these seperatley
+                        res.send(req.responseObject);
+                    }
+                });
+            }
+        });
+        
     } else {
         // Setting the content of the project (as stored on the request object) as 
         // the response object, as no structure will be returned alongside the content
         req.responseObject = req.fileData.content;
+
+        // Returning the response object to the caller, containing just the content for the project
+        res.send(req.responseObject);
     }
-            
-    // Sending the response object back in the response (which may contain the project structure,
-    // project content and possibly some errors)
-    res.send(req.responseObject);
 });
 
 // Request to get the content of a collection in a project

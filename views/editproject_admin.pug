@@ -32,6 +32,28 @@ block main-body
                             th Access Level
                             th Remove
                     tbody
+    div.row
+        div.col-12-12
+            h2 Project Structure History
+            table
+                thead
+                    tr
+                        th Date
+                        th Changes
+                        th Made By
+                        th Options
+                tbody(id="projectStructureHistory")
+    div.row
+        div.col-12-12
+            h2 Project Content History
+            table
+                thead
+                    tr
+                        th Date
+                        th Changes
+                        th Made By
+                        th Options
+                tbody(id="projectContentHistory")
 
     input(id="userID" type="hidden" value=userID)
     input(id="projectID" type="hidden" value=projectID)

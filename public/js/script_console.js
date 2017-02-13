@@ -86,6 +86,13 @@ function updateProjectHTML(projectDetails, includeContent=true){
     }
 
     refreshDraggableContainers();    
+    if(projectDetails.content_history != null){
+        if(projectDetails.structure_history != null){
+            updateProjectHistory(projectDetails.content_history, projectDetails.structure_history);
+        } else {
+            updateProjectHistory(projectDetails.content_history);
+        }
+    }
 }
 
 function createItemInputElements(collection, itemContent=null, itemIndex=-1){
@@ -326,5 +333,43 @@ function refreshDraggableContainers(){
                 removeClass(e.target, "dragging");
             }
         });
+    }
+}
+
+function updateProjectHistory(contentCommitHistory, structureCommitHistory=null){
+    var projectContentHistoryTableBody = document.getElementById("projectContentHistory");
+
+    generateHistoryTable(contentCommitHistory.all, projectContentHistoryTableBody);
+
+    if(structureCommitHistory != null){
+        var projectStructureHistoryTableBody = document.getElementById("projectStructureHistory");
+        
+        generateHistoryTable(structureCommitHistory.all, projectStructureHistoryTableBody);
+    }
+}
+
+function generateHistoryTable(arrayOfCommits, tableBody){
+    for(var i=0; i< arrayOfCommits.length; i++){
+        var newCommitRow = document.createElement("tr");
+
+        var dateTd = document.createElement("td");
+        dateTd.innerHTML = arrayOfCommits[i].date;
+
+        var changesTd = document.createElement("td");
+        changesTd.innerHTML = arrayOfCommits[i].message;
+
+        var byTd = document.createElement("td");
+        byTd.innerHTML = arrayOfCommits[i].author_name;
+
+        var optionsTd = document.createElement("td");
+        optionsTd.innerHTML = "<button data-hash=" + arrayOfCommits[i].hash + ">View</button>";
+
+
+        newCommitRow.appendChild(dateTd);
+        newCommitRow.appendChild(changesTd);
+        newCommitRow.appendChild(byTd);
+        newCommitRow.appendChild(optionsTd);
+
+        tableBody.appendChild(newCommitRow);
     }
 }
