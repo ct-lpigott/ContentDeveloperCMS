@@ -56,7 +56,7 @@ button {
     text-align: left;
 }
 #projectCollectionsContent .collection {
-    min-height: 400px;
+    min-height: 200px;
     display: none;
 }
 .item-container {

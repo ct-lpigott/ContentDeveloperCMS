@@ -1,4 +1,7 @@
 function updateProjectHTML(projectDetails, includeContent=true){
+    // Every time the project HTML is updated, updating the global projectStructure
+    // variable, as it will be used for pulling the content from the content admin
+    // page, and rebuilding it back into a JSON object 
     projectStructure = projectDetails.structure;
     var projectContent = projectDetails.content;
 
@@ -11,29 +14,45 @@ function updateProjectHTML(projectDetails, includeContent=true){
         document.getElementById("projectContent").setAttribute("class", "draggableContainer");
     }
 
+    // Looping through every collection contained in the project structure
     for(var collection in projectStructure){
+
+        // Creating a container for this collection
         var collectionContainer = document.createElement("div");
         collectionContainer.setAttribute("class", "collection " + collection);
         collectionContainer.setAttribute("data-collection", collection);
 
-        var collectionHeading = document.createElement("h3");
-        var collectionNavButton = document.createElement("button");
-        collectionNavButton.setAttribute("for-collection", collection);
-        collectionHeading.innerHTML = collectionNavButton.innerHTML = upperCamelCaseAll(underscoreToSpace(collection));
-        
-        collectionContainer.appendChild(collectionHeading);
+        // Checking whether or not content is being displayed
         if(includeContent){
+            // Creating the side bar nav button for this collection
+            var collectionNavButton = document.createElement("button");
+            collectionNavButton.setAttribute("for-collection", collection);
+            collectionNavButton.innerHTML = upperCamelCaseAll(underscoreToSpace(collection));
             projectCollections.appendChild(collectionNavButton);
         }
+
+        // Creating the heading for this collection
+        var collectionHeading = document.createElement("h3");
+        collectionHeading.innerHTML = upperCamelCaseAll(underscoreToSpace(collection));
+        collectionContainer.appendChild(collectionHeading);
         
-        switch(projectStructure[collection].type){
+        // Determining what type of object this will be stored as i.e. array, object or other
+        switch(projectStructure[collection]["type"]){
             case "array": {
+                // Checking whether content will be displayed or not
                 if(includeContent){
+                    // Creating an item index, which will be increased with each itteration of the Looping
+                    // below, to define the item index of each item in the array (so that it can be used to
+                    // delete the item individually later on)
+                    var itemIndex = 0;
+
+                    // Creating individual draggable containers for each of the items in the array
                     var draggableContainerElement = document.createElement("div");
                     draggableContainerElement.setAttribute("class", "draggableContainer");
                     collectionContainer.appendChild(draggableContainerElement);
 
-                    var itemIndex = 0;
+                    // Looping through each of the items that current exist in the content file of the 
+                    // project, creating a new container and elements for each one 
                     for(var item in projectContent[collection]){
                         var itemContainerElement = createItemInputElements(collection, projectContent[collection][item], itemIndex);
                         draggableContainerElement.appendChild(itemContainerElement);
@@ -41,10 +60,13 @@ function updateProjectHTML(projectDetails, includeContent=true){
                         itemIndex++;
                     }
                 } else {
+                    // Since no content is to be displayed, creating empty inputs for this collection
+                    // i.e. to be displayed as a preview in the admin JSON preview panel
                     var itemContainerElement = createItemInputElements(collection, null, 0);
                     collectionContainer.appendChild(itemContainerElement);
                 }
                 
+                // Creating an "add" button, so that new elements can be added to this array
                 var addButtonElement = document.createElement("button");
                 addButtonElement.innerHTML = "Add " + collection;
                 addButtonElement.setAttribute("class", "add");
@@ -52,6 +74,8 @@ function updateProjectHTML(projectDetails, includeContent=true){
                 break;
             }
             case "object":{
+                // Checking whether content is to be displayed, and if content currently exists
+                // for this collection
                 if(includeContent && projectContent[collection] != null){
                     var itemIndex = 0;
                     for(var item in projectContent[collection]){
@@ -61,113 +85,201 @@ function updateProjectHTML(projectDetails, includeContent=true){
                         itemIndex++;
                     }
                 } else {
+                    // Since the content is not to be displayed, or no content currently exists for this
+                    // collection, creating empty input elmenets for this collection
                     var itemContainerElement = createItemInputElements(collection, null, 0);
                     collectionContainer.appendChild(itemContainerElement);
                 }
                 break;
             }
             default: {
+                // Since this is neither an array or an object, this content will be stored as a property
+                // which will contain no items within it
                 var elementValue = includeContent ? projectContent[collection] : null;
                 var itemContainerElement = createItemInputElements(collection, elementValue, 0);
                 collectionContainer.appendChild(itemContainerElement);
                 break;
             }
         }
+
+        // Determining where to append the collection to, depending on whether the content
+        // is being displayed within it or not
         if(includeContent){
             document.getElementById("projectCollectionsContent").appendChild(collectionContainer);
         } else {
             document.getElementById("projectContent").appendChild(collectionContainer);
         }
     }
-
+    
+    // Determining whether to highlight an active category, depending on whether or not the content
+    // is being included or not
     if(includeContent){
+        // Checking that there is at least one collection defined within this project
         if(projectCollections.children.length > 0){
+            // Setting the first collection of the project to be active in the sidebar navigation, as
+            // well as making the content visible in the project content panel
             addClass(projectCollections.children[0], "active");
             addClass(document.getElementById("projectCollectionsContent").children[0], "visible");
         }
     }
 
+    // Refreshing the draggable containers, so that each element in a draggable container will
+    // have the "draggable" attribute, and each container will have the appropriate event listeners
+    // set up on it 
     refreshDraggableContainers();    
 }
 
 function createItemInputElements(collection, itemContent=null, itemIndex=-1){
+    // Creaing a container to hold all the elements for this item
     var itemContainerElement = document.createElement("div");
-    for(var itemDefinition in projectStructure[collection]){  
-        itemContainerElement.setAttribute("class", "item-container " + collection + "-item");
-        if(projectStructure[collection]["items"] != null){
-            for(var itemInput in projectStructure[collection][itemDefinition]){
-                if(projectStructure[collection][itemDefinition][itemInput]["input_type"] != null){
-                    var itemID = collection + "-" + itemIndex + "-" + itemInput;
+    itemContainerElement.setAttribute("class", "item-container " + collection + "-item");
 
-                    var newLabel = document.createElement("label");
-                    newLabel.innerHTML = upperCamelCaseAll(underscoreToSpace(itemInput));
-                    newLabel.setAttribute("for", itemID);
+    // Checking if this structure has "attributes", "items" or itself is the definition
+    // for the content
+    if(projectStructure[collection]["attributes"] != null){ 
+        // Determining the element which will be used to request input for this
+        // collection i.e. either the one defined in the project structure, 
+        // or <input> as a default 
+        var elementType = projectStructure[collection]["input_type"] || "input";
 
-                    var newElement = document.createElement(projectStructure[collection][itemDefinition][itemInput]["input_type"]);
-                    newElement.setAttribute("data-collection", collection);
-                    newElement.setAttribute("data-index", itemIndex);
-                    newElement.setAttribute("data-key", itemInput);
-                    newElement.setAttribute("id", itemID);
-                    
-                    for(var inputAttribute in projectStructure[collection][itemDefinition][itemInput]["attributes"]){
-                        if(inputAttribute != "options"){
-                            newElement.setAttribute(inputAttribute, projectStructure[collection][itemDefinition][itemInput]["attributes"][inputAttribute]);
+        // Defaulting the item id of this input to be the collection name with "0" appended
+        // as a collection that has attributes will only ever have itself i.e. it will
+        // no contain multiple items, in the way that an array would
+        var itemID = collection + "-0";
+        
+        // Creating a label for this input
+        var newLabel = document.createElement("label");
+        newLabel.innerHTML = upperCamelCaseAll(underscoreToSpace(collection));
+        newLabel.setAttribute("for", itemID);
+
+        // Creating a new input element, based ont he element type defined above
+        var newInputElement = document.createElement(elementType);
+        newInputElement.setAttribute("data-collection", collection);
+        newInputElement.setAttribute("id", itemID);
+        
+        // Looping through all of the attributes specified for this collection
+        for(var inputAttribute in projectStructure[collection]["attributes"]){
+            // Checking whether this attribute is for "options" 
+            if(inputAttribute == "options"){
+                // Looping through all of the options defined in the project structure
+                for(var option of projectStructure[collection]["attributes"]["options"]){
+                    // Creating a new <option> element for each one
+                    var newOption = document.createElement("option");
+                    newOption.innerHTML = upperCamelCaseAll(underscoreToSpace(option));
+                    newOption.setAttribute("value", option);
+
+                    // Checking that content exists for this collection
+                    if(itemContent != null){
+                        // Checking if the current option is equal to the value of the collection,
+                        // And if so, then setting this as the selected value
+                        if(option == itemContent){
+                            newOption.setAttribute("selected", "selected");
                         }
                     }
-                    
-                    switch(projectStructure[collection][itemDefinition][itemInput]["input_type"]){
-                        case "select": {
-                            for(var option of projectStructure[collection][itemDefinition][itemInput]["attributes"]["options"]){
-                                var newOption = document.createElement("option");
-                                newOption.innerHTML = upperCamelCaseAll(underscoreToSpace(option));
-                                newOption.setAttribute("value", option);
-                                if(itemContent != null && itemContent[itemInput] != null){
-                                    if(option == itemContent[itemInput]){
-                                        newOption.setAttribute("selected", "selected");
-                                    }
-                                }
-                                newElement.appendChild(newOption);
-                            }
-                            break;
-                        }
-                        default: {
-                            if(itemContent != null && itemContent[itemInput] != null){
-                                newElement.setAttribute("value", itemContent[itemInput]);
-                            }
-                            break;
-                        }
-                    }
-                    
-                    itemContainerElement.appendChild(newLabel);
-                    itemContainerElement.appendChild(newElement);
-                }                            
-            }
-        } else if(projectStructure[collection]["attributes"] != null){
-            var inputType = projectStructure[collection]["attributes"]["type"];
-            var itemID = collection + "-0";
 
-            var newLabel = document.createElement("label");
-            newLabel.innerHTML = upperCamelCaseAll(underscoreToSpace(collection));
-            newLabel.setAttribute("for", itemID);
-
-            var newInputElement = document.createElement("input");
-            newInputElement.setAttribute("data-collection", collection);
-            newInputElement.setAttribute("id", itemID);
-            newInputElement.setAttribute("type", inputType);
-            
-            for(var inputAttribute in projectStructure[collection]["attributes"]){
+                    // Checking that the parent for this options element is infact a <select> element
+                    // before appending it
+                    if(elementType == "select") {
+                        newInputElement.appendChild(newOption);
+                    }   
+                }
+            } else {
+                // For all other attributes defined in the project structure (excluding "options", which
+                // are dealt with above) setting them as attributes on the new element
                 newInputElement.setAttribute(inputAttribute, projectStructure[collection]["attributes"][inputAttribute]);
             }
-            if(itemContent != null){
-                newInputElement.setAttribute("value", itemContent);
+        }
+
+        // If item content exists, setting the value of this element to be equal to the content provided
+        if(itemContent != null){
+            newInputElement.setAttribute("value", itemContent);
+        }
+
+        // If this is an <input> element, and no type has been defined, defaulting
+        // it to "text"
+        if(elementType == "input" && newInputElement.getAttribute("type") == null){
+            newInputElement.setAttribute("type", "text");
+        }
+
+        // Appending the new label and input element to the items container
+        itemContainerElement.appendChild(newLabel);
+        itemContainerElement.appendChild(newInputElement);
+    } else if(projectStructure[collection]["items"] != null){
+        for(var itemInput in projectStructure[collection]["items"]){
+            // Determining the element which will be used to request input for this
+            // collections items i.e. either the one defined in the project structure, 
+            // or <input> as a default 
+            var elementType = projectStructure[collection]["items"][itemInput]["input_type"] || "input";
+            var itemID = collection + "-" + itemIndex + "-" + itemInput;
+
+            // Creating a new label for this input
+            var newLabel = document.createElement("label");
+            newLabel.innerHTML = upperCamelCaseAll(underscoreToSpace(itemInput));
+            newLabel.setAttribute("for", itemID);
+
+            // Creating a new element, based on the type defined above
+            var newElement = document.createElement(elementType);
+            newElement.setAttribute("data-collection", collection);
+            newElement.setAttribute("data-index", itemIndex);
+            newElement.setAttribute("data-key", itemInput);
+            newElement.setAttribute("id", itemID);
+            
+            // Looping throuh all the attributes for each of the items properties, as defined
+            // in the project structure
+            for(var inputAttribute in projectStructure[collection]["items"][itemInput]["attributes"]){
+                // Checking whether this attribute is for "options"
+                if(inputAttribute == "options"){
+                    // Looping through all of the options defined in the project structure
+                    for(var option of projectStructure[collection]["items"][itemInput]["attributes"]["options"]){
+                        // Creating a new <option> element for each one
+                        var newOption = document.createElement("option");
+                        newOption.innerHTML = upperCamelCaseAll(underscoreToSpace(option));
+                        newOption.setAttribute("value", option);
+
+                        // Checking that content exists for this collections item
+                        if(itemContent != null && itemContent[itemInput] != null){
+                            // Checking if the current option is equal to the value of the collections item,
+                            // And if so, then setting this as the selected value
+                            if(option == itemContent[itemInput]){
+                                newOption.setAttribute("selected", "selected");
+                            }
+                        }
+
+                        // Checking that the parent for this options element is infact a <select> element
+                        // before appending it
+                        if(elementType == "select"){
+                            newElement.appendChild(newOption); 
+                        }
+                    }
+                } else {
+                    // For all other attributes defined in the project structure (excluding "options", which
+                    // are dealt with above) setting them as attributes on the new element
+                    newElement.setAttribute(inputAttribute, projectStructure[collection]["items"][itemInput]["attributes"][inputAttribute]);
+                    
+                    // Checking whether content has been provided for this item, and if it has, setting 
+                    // the value of this element to be equal to it
+                    if(itemContent != null && itemContent[itemInput] != null){
+                        newElement.setAttribute("value", itemContent[itemInput]);
+                    }
+                }
             }
 
+
+            // If this is an <input> element, and no type has been defined, defaulting
+            // it to "text"
+            if(elementType == "input" && newElement.getAttribute("type") == null){
+                newElement.setAttribute("type", "text");
+            }
+            
+            // Appending the new label and input element to the items container
             itemContainerElement.appendChild(newLabel);
-            itemContainerElement.appendChild(newInputElement);
-        }              
-                                
+            itemContainerElement.appendChild(newElement);                      
+        }
     }
 
+    // Checking whether content is being displayed for this structure, and that
+    // there are items to display within it, before adding a delete button beside
+    // each item
     if(itemContent != null && projectStructure[collection]["items"] != null){
         var deleteButtonElement = document.createElement("button");
         deleteButtonElement.innerHTML = "Delete";
@@ -175,6 +287,8 @@ function createItemInputElements(collection, itemContent=null, itemIndex=-1){
         itemContainerElement.appendChild(deleteButtonElement);
     }
 
+    // Returning the item container, which will contain all of the input elements, labels
+    // and buttons required for this item
     return itemContainerElement;
 }
 
@@ -214,36 +328,6 @@ function updateProjectCollaborators(collaborators){
 
         collaboratorsTableBody.appendChild(newRow);
     }
-}
-
-function jsonToObject(jsonString){
-    var validJsObject = false;
-    var jsObj = {};
-
-    try {
-        jsObj = JSON.parse(jsonString);
-        validJsObject = true;
-    } catch(e) {
-        validJsObject = false;
-    }
-    
-    console.log("VALIDATION | Valid object = " + validJsObject);
-    return validJsObject;
-}
-
-function objectToJson(jsObject){
-    var validJson = false;
-    var jsonString = "";
-
-    try {
-        jsonString = JSON.stringify(jsObject);
-        validJson = true;
-    } catch(e) {
-        validJson = false;
-    }
-    
-    console.log("VALIDATION | Valid JSON = " + validJson);
-    return validJson;
 }
 
 function getAccessLevels(){

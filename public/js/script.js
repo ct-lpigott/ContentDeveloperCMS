@@ -48,14 +48,17 @@ function sendAjaxRequest(url, requestData, callback, method="GET"){
 }
 
 function upperCamelCase(stringVal){
+    stringVal += "";
     return stringVal[0].toUpperCase() + stringVal.slice(1);
 }
 
 function underscoreToSpace(stringVal){
+    stringVal += "";
     return stringVal.replace(/_/g, " ");
 }
 
 function upperCamelCaseAll(stringVal){
+    stringVal += "";
     var words = stringVal.split(" ");
     var result = "";
 
@@ -127,4 +130,34 @@ function customDateFormat(dateObj, shortDate=false, includeTime=true){
 
 function doubleDigitNum(num){
     return num < 10 ? "0" + num : num;
+}
+
+function jsonToObject(jsonString){
+    var validJsObject = false;
+    var jsObj = {};
+
+    try {
+        jsObj = JSON.parse(jsonString);
+        validJsObject = true;
+    } catch(e) {
+        validJsObject = false;
+    }
+    
+    console.log("VALIDATION | Valid object = " + validJsObject);
+    return validJsObject;
+}
+
+function objectToJson(jsObject){
+    var validJson = false;
+    var jsonString = "";
+
+    try {
+        jsonString = JSON.stringify(jsObject);
+        validJson = true;
+    } catch(e) {
+        validJson = false;
+    }
+    
+    console.log("VALIDATION | Valid JSON = " + validJson);
+    return validJson;
 }

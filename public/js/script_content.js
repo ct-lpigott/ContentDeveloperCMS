@@ -44,6 +44,9 @@ function customClickEventHandler(e){
         case "resetProjectContent": {
            sendAjaxRequest("/feeds/" + projectID, {}, function(responseObject){
                updateProjectHTML(responseObject);
+               if(document.getElementById("projectContentHistory").getElementsByClassName("selected")[0] != undefined){
+                    removeClass(document.getElementById("projectContentHistory").getElementsByClassName("selected")[0], "selected");
+               }
                document.getElementById("updateProjectContent").removeAttribute("data-short_commit_id");
             });  
         }
@@ -62,6 +65,7 @@ function customClickEventHandler(e){
         var itemIndex = e.target.parentNode.querySelector("[data-index]").getAttribute("data-index");
         sendAjaxRequest("/feeds/" + projectID + "/" + collection + "/" + itemIndex, {}, function(responseObject){
             e.target.parentNode.remove();
+            getProjectHistory(true);
         }, "DELETE");
     } else if(e.target.parentNode.id == "projectCollections"){
         var collectionToActivate = e.target.getAttribute("for-collection");
