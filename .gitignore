@@ -3,4 +3,5 @@ node_modules
 letsencrypt
 *.sql
 projects/*
+public/uploads
 !projects/project_template.json

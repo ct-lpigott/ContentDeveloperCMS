@@ -193,6 +193,9 @@ function createItemInputElements(collection, itemContent=null, itemIndex=-1){
         // If item content exists, setting the value of this element to be equal to the content provided
         if(itemContent != null){
             newInputElement.setAttribute("value", itemContent);
+            if(newInputElement.getAttribute("type") == "file"){
+                newInputElement.setAttribute("data-file_url", itemContent);
+            }
         }
 
         // If this is an <input> element, and no type has been defined, defaulting
@@ -204,6 +207,12 @@ function createItemInputElements(collection, itemContent=null, itemIndex=-1){
         // Appending the new label and input element to the items container
         itemContainerElement.appendChild(newLabel);
         itemContainerElement.appendChild(newInputElement);
+
+        if(itemContent != null && newInputElement.getAttribute("type") == "file"){
+            var thumbnailImage = document.createElement("img");
+            thumbnailImage.src = itemContent;
+            itemContainerElement.appendChild(thumbnailImage);
+        }
     } else if(projectStructure[collection]["items"] != null){
         for(var itemInput in projectStructure[collection]["items"]){
             // Determining the element which will be used to request input for this
@@ -260,6 +269,9 @@ function createItemInputElements(collection, itemContent=null, itemIndex=-1){
                     // the value of this element to be equal to it
                     if(itemContent != null && itemContent[itemInput] != null){
                         newElement.setAttribute("value", itemContent[itemInput]);
+                        if(newElement.getAttribute("type") == "file"){
+                            newElement.setAttribute("data-file_url", itemContent);
+                        }
                     }
                 }
             }
@@ -273,7 +285,13 @@ function createItemInputElements(collection, itemContent=null, itemIndex=-1){
             
             // Appending the new label and input element to the items container
             itemContainerElement.appendChild(newLabel);
-            itemContainerElement.appendChild(newElement);                      
+            itemContainerElement.appendChild(newElement);  
+
+            if(itemContent != null && newElement.getAttribute("type") == "file"){
+                var thumbnailImage = document.createElement("img");
+                thumbnailImage.src = itemContent;
+                itemContainerElement.appendChild(thumbnailImage);
+            }                    
         }
     }
 

@@ -1,25 +1,16 @@
 // Including the modules which make up the basis of the application.
 // Using express to manage the routing of requests to the server.
 // Using pug to create the templates for the various pages on the site.
-// Using the body parser to parse the HTML request body and store is
-// on the "body" property of each request.
 var express = require("express");
 var pug = require("pug");
-var bodyParser = require('body-parser');
 var http = require("http");
 var https = require("https");
 var redirectHttps = require("redirect-https");
 var fs = require("fs");
+var multer = require("multer");
 
 // Generating a new app using the express module
 var app = express();
-
-// Setting the app to use the body parser for all requests to the server.
-// Using the json() method for parsing requests with a content type of
-// "application/json". Using the urlencoded() method for parsing requests
-// with a content type of "application/x-www-form-urlencoded".
-app.use(bodyParser.json()); 
-app.use(bodyParser.urlencoded({ extended: true }));
 
 // Intercepting all requests, to set the response headers for implementing
 // HSTS (HTTP Strict-Transport-Security) to ensure the site can only ever be accessed
@@ -32,6 +23,19 @@ app.use(function(req, res, next){
   // Passing this request onto the next router, so that it can continue through the app
   next();
 });
+
+var multerUpload = multer({
+  storage: multer.diskStorage({
+    destination: function (req, file, cb) {
+      cb(null, "./public/uploads");
+    },
+    filename: function (req, file, cb) {
+      cb(null, Date.now() + "_" + file.originalname);
+    }
+  })
+});
+
+app.use("/feeds", multerUpload.single("file"));
 
 // Setting up the routing structure of the app. Sending requests to a different
 // route in the server based on the first URL parameter of their request i.e.

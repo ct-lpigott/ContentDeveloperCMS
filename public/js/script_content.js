@@ -21,24 +21,25 @@ function customSetupEventListeners(){
 function customClickEventHandler(e){
     switch(e.target.id){
         case "updateProjectContent": {
-            var projectContent = parseProjectContentToJSON();
-            if(jsonToObject(projectContent)){
-                var requestBodyParams = {content: projectContent};
-                
-                if(e.target.getAttribute("data-short_commit_id") != null){
-                    requestBodyParams.short_commit_id = e.target.getAttribute("data-short_commit_id");
-                }
-
-                sendAjaxRequest("/feeds/" + projectID, requestBodyParams, function(responseObject){
-                    getProjectHistory(true);
+            uploadFiles(function(){
+                var projectContent = parseProjectContentToJSON();
+                if(jsonToObject(projectContent)){
+                    var requestBodyParams = {content: projectContent};
+                    
                     if(e.target.getAttribute("data-short_commit_id") != null){
-                        e.target.removeAttribute("data-short_commit_id");
+                        requestBodyParams.short_commit_id = e.target.getAttribute("data-short_commit_id");
                     }
-                }, "PUT");
-            } else {
-                console.log("There is an issue with this content");
-            }
-             
+
+                    sendAjaxRequest("/feeds/" + projectID, requestBodyParams, function(responseObject){
+                        getProjectHistory(true);
+                        if(e.target.getAttribute("data-short_commit_id") != null){
+                            e.target.removeAttribute("data-short_commit_id");
+                        }
+                    }, "PUT");
+                } else {
+                    console.log("There is an issue with this content");
+                }
+            });             
             break;
         }
         case "resetProjectContent": {
@@ -80,6 +81,43 @@ function customClickEventHandler(e){
     }
 }
 
+function uploadFiles(cb){
+    var projectContentContainer = document.getElementById("projectCollectionsContent");
+    var fileInputs = projectContentContainer.querySelectorAll("input[type='file']");
+    var totalUploaded = 0;
+
+    for(var i=0; i<fileInputs.length; i++){
+        if(fileInputs[i].files.length > 0){
+            uploadFile(fileInputs[i], function(){
+                totalUploaded++;
+                
+                if(totalUploaded == fileInputs.length){
+                    cb();
+                }
+            });
+        } else {
+            totalUploaded++;
+        }
+        if(totalUploaded == fileInputs.length){
+            cb();
+        }        
+    }
+}
+
+function uploadFile(fileInput, cb){
+    console.log(fileInput.files[0]);
+    sendAjaxRequest("/feeds/" + projectID + "?action=uploadFile", {file: fileInput.files[0]}, function(responseObject){
+        fileInput.setAttribute("data-file_url", responseObject.fileUrl);
+        var thumbnailImg = fileInput.parentNode.getElementsByTagName("img")[0];
+        if(thumbnailImg == null){
+            thumbnailImg = document.createElement("img");
+            fileInput.parentNode.appendChild(thumbnailImg);
+        }
+        thumbnailImg.setAttribute("src", responseObject.fileUrl);
+        cb();
+    }, "POST");
+}
+
 function parseProjectContentToJSON(){
     var projectContent = {};
 
@@ -103,7 +141,11 @@ function parseProjectContentToJSON(){
                 break;
             }
             default: {
-                projectContent[collection] = document.getElementById(collection + "-0").value;
+                if(document.getElementById(collection + "-0").getAttribute("type") == "file"){
+                    projectContent[collection] = document.getElementById(collection + "-0").getAttribute("data-file_url");
+                } else {
+                    projectContent[collection] = document.getElementById(collection + "-0").value;
+                }
                 break;
 
             }

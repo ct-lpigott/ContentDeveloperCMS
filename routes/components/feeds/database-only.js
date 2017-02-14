@@ -332,6 +332,17 @@ router.delete("/:projectID", function(req, res, next){
     }
 });
 
+// Request to upload a media item to a project
+router.post("/:projectID", function(req, res, next){
+    if(req.query.action == "uploadFile"){
+        if(req.file != null){
+            console.log("FILE UPLOAD");
+            req.responseObject.fileUrl = "../uploads/" + req.file.filename;
+            res.send(req.responseObject);
+        }
+    }
+});
+
 // Exporting the router that was set up in this file, so that it can be included
 // in the app.js file and specified as the route for all requests to the "/feeds" route
 module.exports = router;
