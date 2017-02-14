@@ -8,6 +8,8 @@ var fs = require("fs");
 // make requests of the Google APIs throughout the server)
 var googleAuth = require("google-auth-library");
 
+var google = require("googleapis");
+
 // Storing the client secret data for the servers Google projects
 // so that they can be used when setting up new OAuth2Clients
 var clientSecretData = JSON.parse(fs.readFileSync("./google/client_secret.json"));
@@ -58,5 +60,51 @@ module.exports = {
 
     // Returning the new OAuth2Client to the caller
     return newOAuth2Client;
+  },
+  createNewProjectFolder: function(projectName, userAccessToken, cb){
+    console.log("About to create new folder");
+    var oauth2Client = this.generateOAuth2Client();
+    oauth2Client.credentials = JSON.parse(userAccessToken);
+    var drive = google.drive("v3");
+
+    var folderMeta = {
+      "name" : "ContentDeveloper_" + projectName,
+      "mimeType" : "application/vnd.google-apps.folder"
+    };
+
+    drive.files.create({
+      auth: oauth2Client,
+      resource: folderMeta,
+      fields: "id"
+    }, function(error, file) {
+      if(error) {
+        console.log(error);
+      } else {
+        console.log("Successfully created folder. Id: = " + file.id);
+        makeFolderPublic(file.id, oauth2Client, function(){
+          cb(file.id);
+        });
+      }
+    });
   }
 };
+
+function makeFolderPublic(fileId, oauth2Client, cb) {
+  var drive = google.drive("v3");
+  drive.permissions.create({
+    auth: oauth2Client,
+    resource: {
+      "type": "anyone",
+      "role": "reader"
+    },
+    fileId: fileId,
+    fields: 'id',
+  }, function(error, res) {
+    if (error) {
+      console.log(error);
+    } else {
+      console.log("Successfully updated permission for: " +  res.id);
+      cb();
+    }
+  }); 
+}
