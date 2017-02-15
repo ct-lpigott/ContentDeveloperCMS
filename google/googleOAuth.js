@@ -115,6 +115,11 @@ module.exports = {
           console.log(err);
         } else {
           console.log("File successfully uploaded", uploadedFile.id);
+          fs.unlink(fileInfo.path, function(err){
+            if(err){
+              console.log(err);
+            }
+          });
           cb(uploadedFile.id);
         }
       });
