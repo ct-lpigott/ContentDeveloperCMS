@@ -9,6 +9,8 @@ var dbconn = require("../../../database/connection.js");
 
 var sendEmail = require("../../../email/send_email.js");
 
+var googleOAuth = require("../../../google/googleOAuth.js");
+
 var simpleGit = require("simple-git");
 
 var defaultAccessLevels = require("../../../project_defaults/default_access_levels.js");
@@ -335,10 +337,25 @@ router.delete("/:projectID", function(req, res, next){
 // Request to upload a media item to a project
 router.post("/:projectID", function(req, res, next){
     if(req.query.action == "uploadFile"){
+        console.log("Uploading file");
         if(req.file != null){
-            console.log("FILE UPLOAD");
-            req.responseObject.fileUrl = "../uploads/" + req.file.filename;
-            res.send(req.responseObject);
+            dbconn.query("SELECT google_auth_token, media_folder_id FROM Project p LEFT JOIN User_Project up on p.id = up.project_id LEFT JOIN User u ON u.id = up.user_id WHERE p.id = " + req.params.projectID + " AND up.user_id = " + req.userID, function(err, rows, fields){
+                if(err){
+                    console.log(err);
+                } else {
+                    if(rows.length > 0){
+                        googleOAuth.uploadMediaItem(req.file, rows[0].media_folder_id, rows[0].google_auth_token, function(fileUrl){
+                            console.log("FILE UPLOAD");
+                            req.responseObject.fileUrl = "https://drive.google.com/uc?id=" + fileUrl;
+                            //req.responseObject.fileUrl = "../uploads/" + req.file.filename;
+                            res.send(req.responseObject);
+                        });
+                    }
+                }
+            });
+        } else {
+            console.log("No file");
+            res.send();
         }
     }
 });

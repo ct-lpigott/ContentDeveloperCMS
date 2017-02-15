@@ -10,6 +10,10 @@ var googleAuth = require("google-auth-library");
 
 var google = require("googleapis");
 
+var drive = google.drive("v3");
+
+var fs = require("fs");
+
 // Storing the client secret data for the servers Google projects
 // so that they can be used when setting up new OAuth2Clients
 var clientSecretData = JSON.parse(fs.readFileSync("./google/client_secret.json"));
@@ -65,7 +69,6 @@ module.exports = {
     console.log("About to create new folder");
     var oauth2Client = this.generateOAuth2Client();
     oauth2Client.credentials = JSON.parse(userAccessToken);
-    var drive = google.drive("v3");
 
     var folderMeta = {
       "name" : "ContentDeveloper_" + projectName,
@@ -86,11 +89,40 @@ module.exports = {
         });
       }
     });
+  },
+  uploadMediaItem: function(fileInfo, mediaFolderId, userAccessToken, cb){  
+    var oauth2Client = this.generateOAuth2Client();
+    oauth2Client.credentials = JSON.parse(userAccessToken);
+    
+    if(mediaFolderId != null){
+      var fileMetadata = {
+        "name": fileInfo.originalname,
+        parents: [ mediaFolderId ]
+      };
+      
+      var mediaItem = {
+        mimeType: fileInfo.mimetype,
+        body: fs.createReadStream(fileInfo.path)
+      };
+      
+      drive.files.create({
+         auth: oauth2Client,
+         resource: fileMetadata,
+         media: mediaItem,
+         fields: "id"
+      }, function(err, uploadedFile) {
+        if(err) {
+          console.log(err);
+        } else {
+          console.log("File successfully uploaded", uploadedFile.id);
+          cb(uploadedFile.id);
+        }
+      });
+    }    
   }
 };
 
 function makeFolderPublic(fileId, oauth2Client, cb) {
-  var drive = google.drive("v3");
   drive.permissions.create({
     auth: oauth2Client,
     resource: {

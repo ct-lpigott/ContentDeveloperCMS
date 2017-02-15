@@ -114,6 +114,7 @@ function uploadFile(fileInput, cb){
             fileInput.parentNode.appendChild(thumbnailImg);
         }
         thumbnailImg.setAttribute("src", responseObject.fileUrl);
+        thumbnailImg.setAttribute("value", responseObject.fileUrl);
         cb();
     }, "POST");
 }
