@@ -143,7 +143,24 @@ module.exports = {
         console.log(err);
       } else {
         console.log("User successfully added to media folder: " + res.id);
-        cb(res.id);
+        cb(String(res.id));
+      }
+    });
+  },
+  removeUserFromMediaFolder: function(mediaFolderId, userPermissionId, userAccessToken, cb){
+    var oauth2Client = this.generateOAuth2Client();
+    oauth2Client.credentials = JSON.parse(userAccessToken);
+    
+    drive.permissions.delete({
+      auth: oauth2Client,
+      fileId: mediaFolderId,
+      permissionId: userPermissionId
+    }, function(err, res) {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log("User successfully removed from media folder");
+        cb();
       }
     });
   }
