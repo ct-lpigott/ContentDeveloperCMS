@@ -6,8 +6,10 @@ var pug = require("pug");
 var http = require("http");
 var https = require("https");
 var redirectHttps = require("redirect-https");
-var fs = require("fs");
 var multer = require("multer");
+var checkDirectories = require("./custom_modules/check_directories.js");
+
+checkDirectories();
 
 // Generating a new app using the express module
 var app = express();
@@ -27,7 +29,9 @@ app.use(function(req, res, next){
 var multerUpload = multer({
   storage: multer.diskStorage({
     destination: function (req, file, cb) {
-      cb(null, "./public/uploads");
+      var uploadDirectory = process.env.HOST_NAME == "localhost" ? "./public/uploads" : "./uploads";
+
+      cb(null, uploadDirectory);
     },
     filename: function (req, file, cb) {
       cb(null, Date.now() + "_" + file.originalname);
@@ -63,15 +67,6 @@ app.set("views", "./views");
 app.use(express.static("./public"));
 
 if(process.env.DEBUG == null || process.env.DEBUG == "false"){
-  fs.exists("./letsencrypt", function(exists){
-    if(!exists){
-      fs.mkdir("./letsencrypt", function(err){
-        console.log("letsencrypt directory created");
-      });
-    } else {
-      console.log("letsencrypt directory already exists");
-    }
-  });
 
   var greenlockExpress = require('greenlock-express').create({
     configDir: "./letsencrypt",
