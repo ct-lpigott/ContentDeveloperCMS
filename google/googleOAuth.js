@@ -119,6 +119,28 @@ module.exports = {
         }
       });
     }    
+  },
+  addUserToMediaFolder: function(mediaFolderId, userEmailAddress, userAccessToken, role, cb){
+    var oauth2Client = this.generateOAuth2Client();
+    oauth2Client.credentials = JSON.parse(userAccessToken);
+    
+    drive.permissions.create({
+      auth: oauth2Client,
+      resource: {
+        "type": "user",
+        "role": role,
+        "emailAddress": userEmailAddress
+      },
+      fileId: mediaFolderId,
+      fields: "id",
+    }, function(err, res) {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log("User successfully added to media folder: " + res.id);
+        cb(res.id);
+      }
+    });
   }
 };
 

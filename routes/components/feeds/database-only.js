@@ -201,35 +201,50 @@ router.post("/:projectID", function(req, res, next){
                             });
                         }
                     } else {
-                        // This user has not previously been a collaborator on this project, so creating a new
-                        // relationship between the user and the project, using the access level provided
-                        dbconn.query("INSERT INTO User_Project(user_id, project_id, access_level_id) VALUES(" + req.newCollaboratorID + ", " + req.params.projectID + ", " + dbconn.escape(req.body.accessLevelId) + ")", function(err, result) {
+                        
+                        dbconn.query("SELECT * FROM User_Project up LEFT JOIN User u ON up.user_id = u.id LEFT JOIN Project p ON up.project_id = p.id WHERE up.project_id = " + req.params.projectID + " AND up.user_id = " + req.userID, function(err, rows, fields){
                             if(err){
-                                // Logging the error to the console
-                                console.log("Error adding user to project " + err);
-
-                                // Unable to create new entry in the user_project table. Adding this as 
-                                // an error to the feedsErrors array.
-                                req.feedsErrors.push("Server error - unable to add collaborator to project");
-
-                                // Since this is a significant issue, passing this request to the feeds-errors
-                                // route, by calling the next method with an empty error (as all errors will be
-                                // accessible from the feedsErrors array).
-                                next(new Error());
+                                console.log(err);
                             } else {
-                                console.log("New collaborator added to project");        
-
-                                dbconn.query("SELECT u.email_address, u.display_name, p.project_name FROM User_Project up LEFT JOIN User u ON u.id = up.user_id LEFT JOIN Project p ON p.id = up.project_id WHERE u.id=" + dbconn.escape(req.newCollaboratorID), function(err, rows, fields){
-                                    if(err){
-                                        console.log(err);
-                                    } else {
-                                        if(rows.length > 0){
-                                            sendEmail.addedToProject(rows[0].email_address, rows[0].display_name, rows[0].project_name);
-                                        } 
-                                    }
-                                });                    
-
-                                res.redirect(303, "/feeds/" + req.params.projectID + "?action=getCollaborators");
+                                if(rows.length > 0){
+                                    googleOAuth.addUserToMediaFolder(rows[0].media_folder_id, req.body.email, rows[0].google_auth_token, "writer", function(newPermissionId){
+                                        if(newPermissionId != null){
+                                            // This user has not previously been a collaborator on this project, so creating a new
+                                            // relationship between the user and the project, using the access level provided
+                                            dbconn.query("INSERT INTO User_Project(user_id, project_id, access_level_id, media_folder_permission_id) VALUES(" + req.newCollaboratorID + ", " + req.params.projectID + ", " + dbconn.escape(req.body.accessLevelId) + ", " + newPermissionId + ")", function(err, result) {
+                                                if(err){
+                                                    // Logging the error to the console
+                                                    console.log("Error adding user to project " + err);
+                    
+                                                    // Unable to create new entry in the user_project table. Adding this as 
+                                                    // an error to the feedsErrors array.
+                                                    req.feedsErrors.push("Server error - unable to add collaborator to project");
+                    
+                                                    // Since this is a significant issue, passing this request to the feeds-errors
+                                                    // route, by calling the next method with an empty error (as all errors will be
+                                                    // accessible from the feedsErrors array).
+                                                    next(new Error());
+                                                } else {
+                                                    console.log("New collaborator added to project");        
+                    
+                                                    dbconn.query("SELECT u.email_address, u.display_name, p.project_name FROM User_Project up LEFT JOIN User u ON u.id = up.user_id LEFT JOIN Project p ON p.id = up.project_id WHERE u.id=" + dbconn.escape(req.newCollaboratorID), function(err, rows, fields){
+                                                        if(err){
+                                                            console.log(err);
+                                                        } else {
+                                                            if(rows.length > 0){
+                                                                sendEmail.addedToProject(rows[0].email_address, rows[0].display_name, rows[0].project_name);
+                                                            } 
+                                                        }
+                                                    });                    
+                    
+                                                    res.redirect(303, "/feeds/" + req.params.projectID + "?action=getCollaborators");
+                                                }
+                                            });
+                                        }
+                                    });
+                                } else {
+                                    console.log("No user could be found");
+                                }
                             }
                         });
                     }
