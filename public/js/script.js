@@ -21,6 +21,10 @@ function clickEventHandler(e){
     if(typeof customClickEventHandler == "function"){
         customClickEventHandler(e);
     }
+    
+    if(hasClass(e.target, "cancelRow")){
+        e.target.parentNode.parentNode.parentNode.removeChild(e.target.parentNode.parentNode);
+    }
 }
 
 function sendAjaxRequest(url, requestData, callback, method="GET"){

@@ -14,11 +14,11 @@ var simpleGit = require("simple-git");
 // connection to the database can be reused throughout the application.
 var dbconn = require("../../../database/connection.js");
 
+var accessLevels = require("../../../custom_modules/access_levels.js");
+
 var validation = require("./../validation.js");
 
 var googleOAuth = require("../../../google/googleOAuth.js");
-
-var defaultAccessLevels = require("../../../project_defaults/default_access_levels.js");
 
 // Request to create a new project
 router.post("/", function(req, res, next){
@@ -35,7 +35,7 @@ router.post("/", function(req, res, next){
                         console.log(newGoogleFolderId);
                         // Creating a new project in the database, using the project name provided 
                         // in the request body, escaping this value before passing it to the database
-                        dbconn.query("INSERT INTO Project(project_name, access_levels, media_folder_id) VALUES(" + dbconn.escape(req.body.projectName) + ", " + dbconn.escape(defaultAccessLevels.allAsString()) + ", " + dbconn.escape(newGoogleFolderId) + ")", function(err, result){
+                        dbconn.query("INSERT INTO Project(project_name, access_levels, media_folder_id) VALUES(" + dbconn.escape(req.body.projectName) + ", " + dbconn.escape(JSON.stringify(accessLevels.getDefaultAccessLevels())) + ", " + dbconn.escape(newGoogleFolderId) + ")", function(err, result){
                             if(err){
                                 // Logging the error to the console
                                 console.log(err);
@@ -57,7 +57,7 @@ router.post("/", function(req, res, next){
                                 // Creating a new entry in the User_Project database, to add the current user as an
                                 // administrator of this project. Defaulting this user to have the highest level
                                 // of access to this project i.e. 1
-                                dbconn.query("INSERT INTO User_Project(user_id, project_id, access_level_id) VALUES(" + req.userID + ", " + req.projectID + ", " + defaultAccessLevels.getByName("Administrator") + ")", function(err, result){
+                                dbconn.query("INSERT INTO User_Project(user_id, project_id, access_level_int) VALUES(" + req.userID + ", " + req.projectID + ", 1)", function(err, result){
                                     if(err){
                                         // Logging the error to the console
                                         console.log("Error - Unable to link this new project with the current user", err);

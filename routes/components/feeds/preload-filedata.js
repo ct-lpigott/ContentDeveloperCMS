@@ -12,8 +12,6 @@ var fs = require("fs");
 // connection to the database can be reused throughout the application.
 var dbconn = require("../../../database/connection.js");
 
-var defaultAccessLevels = require("../../../project_defaults/default_access_levels.js");
-
 // PRE for requests to read/update/delete the contents of a project, it's collection or any items within those collections
 router.use(function(req, res, next){
     // Creating a temporary array of the URL parameters, as these are not accessible within
@@ -50,7 +48,7 @@ router.use(function(req, res, next){
         // Querying the database, to find the projects that this user has access to, by joining
         // the user table to the user_projects table. Returning only the columns needed for the 
         // reponse to the user. 
-        dbconn.query("SELECT * FROM Project p LEFT JOIN User_Project up ON p.id = up.project_id LEFT JOIN AccessLevel al ON up.access_level_id = al.id LEFT JOIN User u ON up.user_id = u.id WHERE p.id = " + dbconn.escape(req.projectID) + " AND up.user_id = " + dbconn.escape(req.userID), function(err, rows, fields){
+        dbconn.query("SELECT * FROM Project p LEFT JOIN User_Project up ON p.id = up.project_id LEFT JOIN User u ON up.user_id = u.id WHERE p.id = " + dbconn.escape(req.projectID) + " AND up.user_id = " + dbconn.escape(req.userID), function(err, rows, fields){
             if(err){
                 // Logging this error to the console
                 console.log(err);

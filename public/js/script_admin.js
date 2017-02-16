@@ -65,7 +65,7 @@ function customClickEventHandler(e){
             var accessLevel = document.getElementById("accessLevel").value;
 
             if(email.length > 0 && accessLevel > 0){
-                sendAjaxRequest("/feeds/" + projectID + "?action=addCollaborator", {email: email, accessLevelId: accessLevel}, function(responseObject){
+                sendAjaxRequest("/feeds/" + projectID + "?action=addCollaborator", {email: email, accessLevelInt: accessLevel}, function(responseObject){
                     updateProjectCollaborators(responseObject);
                 }, "POST");
             }
@@ -108,6 +108,10 @@ function customClickEventHandler(e){
 
             break;
         }
+        case "addNewAccessLevel": {
+            newCustomAccessLevelRow();
+            break;
+        }
     }
 
     // BY CLASS
@@ -119,6 +123,29 @@ function customClickEventHandler(e){
         }, "DELETE");
     } else if(hasClass(e.target, "previewHistory")){
         previewCommitHistory(e.target);
+    } else if(hasClass(e.target, "addAccessLevel")){
+        var parentRow = e.target.parentNode.parentNode;
+        var newAccessLevelName = parentRow.getElementsByClassName("access_level_name")[0].textContent;
+        var newAccessLevelInt = parentRow.getElementsByClassName("access_level_int")[0].textContent;
+        sendAjaxRequest("/feeds/" + projectID + "?action=accessLevels", {access_level_name: newAccessLevelName, access_level_int: newAccessLevelInt}, function(responseObject){
+            console.log("New access level added");
+            getAccessLevels();
+        }, "POST");
+    } else if(hasClass(e.target, "deleteAccessLevel")){
+        var parentRow = e.target.parentNode.parentNode;
+        var newAccessLevelInt = parentRow.getElementsByClassName("access_level_int")[0].getAttribute("data-access_level_int");
+        sendAjaxRequest("/feeds/" + projectID + "?action=accessLevels", {access_level_int: newAccessLevelInt}, function(responseObject){
+            console.log("Access level deleted");
+            getAccessLevels();
+        }, "DELETE");
+    } else if(hasClass(e.target, "updateAccessLevel")){
+        var parentRow = e.target.parentNode.parentNode;
+        var newAccessLevelName = parentRow.getElementsByClassName("access_level_name")[0].textContent;
+        var newAccessLevelInt = parentRow.getElementsByClassName("access_level_int")[0].getAttribute("data-access_level_int");
+        sendAjaxRequest("/feeds/" + projectID + "?action=accessLevels", {access_level_name: newAccessLevelName, access_level_int: newAccessLevelInt}, function(responseObject){
+            console.log("Access level updated");
+            getAccessLevels();
+        }, "PUT");
     }
 }
 

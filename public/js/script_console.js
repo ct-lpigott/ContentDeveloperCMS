@@ -329,9 +329,6 @@ function updateProjectCollaborators(collaborators){
         var accessLevelNameTdElement = document.createElement("td");
         accessLevelNameTdElement.innerHTML = collaborators[i].access_level_name;
 
-        var accessLevelIntTdElement = document.createElement("td");
-        accessLevelIntTdElement.innerHTML = collaborators[i].access_level_int;
-
         var removeCollaboratorTdElement = document.createElement("td");
         var removeCollaboratorButtonElement = document.createElement("button");
         removeCollaboratorButtonElement.innerHTML = "x";
@@ -341,7 +338,6 @@ function updateProjectCollaborators(collaborators){
 
         newRow.appendChild(nameTdElement);
         newRow.appendChild(accessLevelNameTdElement);
-        newRow.appendChild(accessLevelIntTdElement);
         newRow.appendChild(removeCollaboratorTdElement);
 
         collaboratorsTableBody.appendChild(newRow);
@@ -349,16 +345,56 @@ function updateProjectCollaborators(collaborators){
 }
 
 function getAccessLevels(){
-    sendAjaxRequest("/feeds/" + projectID + "?action=getAccessLevels", {}, function(responseObject){
+    sendAjaxRequest("/feeds/" + projectID + "?action=accessLevels", {}, function(responseObject){
         var accessLevelSelect = document.getElementById("accessLevel");
+        accessLevelSelect.innerHTML = "";
+        document.getElementById("customiseAccessLevels").innerHTML = "";
 
         for(var accessLevel of responseObject){
             var newOption = document.createElement("option");
             newOption.innerHTML = accessLevel.access_level_name;
-            newOption.setAttribute("value", accessLevel.id);
+            newOption.setAttribute("value", accessLevel.access_level_int);
             accessLevelSelect.appendChild(newOption);
+
+            if(document.getElementById("customiseAccessLevels") != null){
+                newCustomAccessLevelRow(accessLevel);
+            }
         }
     });
+}
+
+function newCustomAccessLevelRow(accessLevel=null){
+    var customiseAccessLevelsTableBody = document.getElementById("customiseAccessLevels");
+
+    var newRow = document.createElement("tr");
+
+    var accessLevelNameTd = document.createElement("td");
+    var accessLevelIntTd = document.createElement("td");
+    var accessLevelInUseTd = document.createElement("td");
+    var accessLevelOptionsTd = document.createElement("td");
+
+    accessLevelNameTd.setAttribute("contentEditable", true);
+    accessLevelNameTd.setAttribute("class", "access_level_name");
+    accessLevelIntTd.setAttribute("class", "access_level_int");
+
+    if(accessLevel != null){
+        accessLevelNameTd.innerHTML = accessLevel.access_level_name;
+        accessLevelIntTd.innerHTML = accessLevel.access_level_int;
+        accessLevelIntTd.setAttribute("data-access_level_int", accessLevel.access_level_int);
+        accessLevelInUseTd.innerHTML = accessLevel.in_use ? "Yes" : "No";
+        accessLevelOptionsTd.innerHTML = "<button class='updateAccessLevel'>Update</button>";
+        accessLevelOptionsTd.innerHTML += accessLevel.in_use || accessLevel.access_level_int <= 3? "" : "<button class='deleteAccessLevel'>Delete</button>";
+    } else {
+        accessLevelIntTd.setAttribute("contentEditable", true);
+        accessLevelOptionsTd.innerHTML = "<button class='addAccessLevel'>Save</button><button class='cancelRow'>Cancel</button>";
+    }
+    
+    newRow.appendChild(accessLevelNameTd);
+    newRow.appendChild(accessLevelIntTd);
+    newRow.appendChild(accessLevelInUseTd);
+    newRow.appendChild(accessLevelOptionsTd);
+
+    customiseAccessLevelsTableBody.appendChild(newRow);
 }
 
 function refreshDraggableContainerChildren(draggableContainer){

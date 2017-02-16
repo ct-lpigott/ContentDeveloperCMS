@@ -33,6 +33,24 @@ block main-body
                             th Remove
                     tbody
     div.row
+        div.col-6-12
+            h2 Customise Access Levels
+            table
+                colgroup
+                    col(width="40%")
+                    col(width="20%")
+                    col(width="10%")
+                    col(width="30%")
+                thead
+                    tr
+                        th Access Level Name
+                        th Access Level Int
+                        th In Use
+                        th Options
+                tbody(id="customiseAccessLevels")
+            button(id="addNewAccessLevel") Add New Access Level
+            
+    div.row
         div.col-8-12
             h2 Project Structure History
             table
