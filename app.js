@@ -7,12 +7,18 @@ var http = require("http");
 var https = require("https");
 var redirectHttps = require("redirect-https");
 var multer = require("multer");
+var bodyParser = require('body-parser');
 var checkDirectories = require("./custom_modules/check_directories.js");
 
 checkDirectories();
 
 // Generating a new app using the express module
 var app = express();
+
+// Setting the app to use the body parser for all requests to the server.
+// Using the json() method for parsing requests with a content type of
+// "application/json"
+app.use(bodyParser.json()); 
 
 // Intercepting all requests, to set the response headers for implementing
 // HSTS (HTTP Strict-Transport-Security) to ensure the site can only ever be accessed

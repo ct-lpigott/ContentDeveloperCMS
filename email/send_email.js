@@ -39,7 +39,7 @@ module.exports = {
             projectName: projectName,
             siteUrl: process.env.SITE_URL
         });
-        console.log(emailContent);
+        //console.log(emailContent);
         sendEmail(userEmail, "Added as Collaborator", emailContent);
     },
     accessLevelChanged: function(userEmail, userDisplayName, projectName, accessLevel){
@@ -51,7 +51,7 @@ module.exports = {
             accessLevel: accessLevel,
             siteUrl: process.env.SITE_URL
         });
-        console.log(emailContent);
+        //console.log(emailContent);
         sendEmail(userEmail, "Access Level Changed", emailContent);
     },
     removedFromProject: function(userEmail, userDisplayName, projectName){
@@ -62,7 +62,7 @@ module.exports = {
             projectName: projectName,
             siteUrl: process.env.SITE_URL
         });
-        console.log(emailContent);
+        //console.log(emailContent);
         sendEmail(userEmail, "Removed as Collaborator", emailContent);
     }
 };
