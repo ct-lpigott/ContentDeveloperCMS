@@ -151,6 +151,7 @@ router.put("/:projectID/*", function(req, res, next){
                         // level of the content object, so defaulting this to null if no value exits
                         var itemName = encapsulationData[encapsulationData.length-1];
                         var parentName = encapsulationData[encapsulationData.length-2] || null;
+                        var arrayIndex = null;
 
                         // Creating an updatedItem property on the request object, to track if and
                         // when an item is updated within this funciton (so as to determine if the 
@@ -162,12 +163,13 @@ router.put("/:projectID/*", function(req, res, next){
                         // needs to have an item updated within it. 
                         for(var i=0; i<encapsulationData.length; i++){
 
-                            // CONTENT
+                            
+
                             // Not including the last two indexes of the
                             // array, as these will be the parentName and itemName (as referenced above). By
                             // the end of this loop, I should have the parent which contains the item that
                             // should be updated.
-                            if(i < encapsulationData.length - 2){
+                            if((isNaN(parentName) && i < encapsulationData.length -2) || (isNaN(parentName) == false && i < encapsulationData.length -3)){
                                 // Checking that the next level of encapsulation data exists within the current
                                 // level of the content
                                 if(contentFileData[encapsulationData[i]] != null){
@@ -187,36 +189,28 @@ router.put("/:projectID/*", function(req, res, next){
                                 }
                             }
 
-                            // STRUCTURE
                             // Checking if the next item in the encapsulatedData array in not a number, as
                             // I am ignoring index values for now, as these will not exist within the project 
                             // structure
                             if(isNaN(encapsulationData[i])){
                                 // Checking that the next level of encapsulation data exists within the current
                                 // level of the structure
-                                if(structureFileData[encapsulationData[i]] != undefined){
-                                    // Setting the structureFileData equal to the next level of the encapsulationData array
-                                    // i.e. to keep drilling down into the structureFileData object
-                                    structureFileData = structureFileData[encapsulationData[i]];
-                                }                                
-
-                                // Checking if the structureFileData object currently contains an attributes
-                                // property, in which case we will step down another level (as the user will never
-                                // be required to specifically request the attributes property)
-                                if(structureFileData.attributes != undefined){
-                                    // Setting the structureFileData equal to the attributes property of its current value
-                                    // i.e. to keep drilling down into the structureFileData object
-                                    structureFileData = structureFileData.attributes;
-                                }                              
+                                if((isNaN(parentName) && i < encapsulationData.length -2) || (isNaN(parentName) == false && i < encapsulationData.length -3)){
+                                    if(structureFileData[encapsulationData[i]] != undefined){
+                                        // Setting the structureFileData equal to the next level of the encapsulationData array
+                                        // i.e. to keep drilling down into the structureFileData object
+                                        structureFileData = structureFileData[encapsulationData[i]];
+                                    }
+                                }                           
                             } else {
+                                if(parentName == encapsulationData[i]){
+                                    parentName = encapsulationData[i-1];
+                                    arrayIndex = encapsulationData[i];
+                                }
                                 // Since the next item in the encapsulatedData array is a number, then checking
                                 // to see if the current level of the structureFileData is set up to contain 
                                 // items
-                                if(structureFileData.items != undefined){
-                                    // Setting the structureFileData equal to the items property of its current value
-                                    // i.e. to keep drilling down into the structureFileData object
-                                    structureFileData = structureFileData.items;
-                                } else {
+                                if(structureFileData[parentName].items == undefined){
                                     // Since the next item in the encapsulatedData array was a number, but the project
                                     // structure at this point does not contain an items property, then this object
                                     // is not structured to accept items. Adding this as an error to the req.feedsErrors 
@@ -229,64 +223,71 @@ router.put("/:projectID/*", function(req, res, next){
                             }
                         }
 
-
-                        // Checking that there is structure provided for this item
-                        if(structureFileData != null){
-                            
-                            // Checking whether the fileData object contains the property referred to in the parent
-                            // name variable i.e. does the request new item have a parent, or is it at the top-most
-                            // level of the project_structure object
-                            if(contentFileData[parentName] != null){
-
-                                // Determing what type of parent we are trying to update the item in i.e.
-                                // an Array, Object or other. Items can only ever be inserted to arrays or objects,
-                                // and so if the result is other, an error will be thrown i.e. you cannot insert
-                                // an object into a string, and so it cannot be possible to update an object
-                                // within one either
-                                switch(contentFileData[parentName].constructor.name.toLowerCase()){
-
-                                    case "array": case "object": {
-                                        // Checking if the parent object/array we are trying to update already 
-                                        // contains a property/index with the same value as the itemName
-                                        if(contentFileData[parentName][itemName] != undefined){
-
-                                            // PLACEHOLDER - For validating content against structure
-                                            var validateContent = validation.contentStructure(updatedItemContent, structureFileData);   
-                                            if(validateContent.successful){
-                                                // Since this is an object/array, updating the property/index on the parent 
-                                                // item (with the item name supplied in the parameters), and setting its 
-                                                // value to the updated item value 
-                                                contentFileData[parentName][itemName] = updatedItemContent;
-                                                req.gitCommitMessage = "Update to content of " + parentName + ": " + itemName;
-                                            } else {
-                                                // Looping through any errors that were returned from the content validation,
-                                                // and adding them to the req.feedsErrors array, before returning the function,
-                                                // as this content cannot be updated in the project as it does not match with the
-                                                // project structure (details of which will be inclued in the errors)
-                                                for(var i=0; i<validateContent.errors.length; i++){
-                                                    req.feedsErrors.push(validateContent.errors[i]);
+                        // Checking if a parent was specified in the request
+                        if(parentName != null){
+                            // Checking if a structure is defined for the parent
+                            if(structureFileData[parentName] != null){
+                                // Checking if content already exists for the parent
+                                if(contentFileData[parentName] != null){
+                                    // Determing what type of parent we are trying to update the item in i.e.
+                                    // an Array, Object or other. Items can only ever be inserted to arrays or objects,
+                                    // and so if the result is other, an error will be thrown i.e. you cannot insert
+                                    // an object into a string, and so it cannot be possible to update an object
+                                    // within one either
+                                    switch(structureFileData[parentName]["type"]){
+                                        case "array": case "object": {
+                                            // Checking if the parent object/array we are trying to update already 
+                                            // contains a property/index with the same value as the itemName
+                                            if(contentFileData[parentName][itemName] != undefined || (arrayIndex != null && contentFileData[parentName][arrayIndex][itemName] != undefined)){
+                                                var validateWith = structureFileData[parentName]["items"][itemName] || structureFileData[parentName]["items"];
+                                                var validateContent = validation.contentStructure(updatedItemContent, validateWith);   
+                                                if(validateContent.successful){
+                                                    if(arrayIndex != null){
+                                                        contentFileData = contentFileData[parentName];
+                                                        parentName = arrayIndex;
+                                                    }
+                                                    // Since this is an object/array, updating the property/index on the parent 
+                                                    // item (with the item name supplied in the parameters), and setting its 
+                                                    // value to the updated item value 
+                                                    contentFileData[parentName][itemName] = updatedItemContent;
+                                                    req.gitCommitMessage = "Update to content of " + parentName + ": " + itemName;
+                                                } else {
+                                                    // Looping through any errors that were returned from the content validation,
+                                                    // and adding them to the req.feedsErrors array, before returning the function,
+                                                    // as this content cannot be updated in the project as it does not match with the
+                                                    // project structure (details of which will be inclued in the errors)
+                                                    for(var i=0; i<validateContent.errors.length; i++){
+                                                        req.feedsErrors.push(validateContent.errors[i]);
+                                                    }
+                                                    return;
                                                 }
+                                            } else {
+                                                // Since this property/index does not currently exist within this object/array, adding this to the 
+                                                // feedsErrors array, and then returning this function so that no further attempt to update 
+                                                // this item will be made. Since req.updatedItem will remain null, this error will be returned
+                                                // to the caller, further down along this route
+                                                req.feedsErrors.push(itemName + " does not exist in " + parentName + ". Use a POST request to create it.");
                                                 return;
                                             }
-                                        } else {
-                                            // Since this property/index does not currently exist within this object/array, adding this to the 
-                                            // feedsErrors array, and then returning this function so that no further attempt to update 
-                                            // this item will be made. Since req.updatedItem will remain null, this error will be returned
-                                            // to the caller, further down along this route
-                                            req.feedsErrors.push(itemName + " does not exist in " + parentName + ". Use a POST request to create it.");
-                                            return;
+                                            break;
                                         }
-                                        break;
+                                        default: {
+                                            // Since this items parent is neither an Array or an Object, this item cannot be updated inside 
+                                            // it. Adding this to the feedsErrors array, and then returning this function so that no further 
+                                            // attempt to create this item will be made. Since req.updatedItem will remain null, this error will 
+                                            // be returned to the caller, further down along this route
+                                            req.feedsErrors.push(parentName + " cannot not contain items, such as " + itemName);
+                                            return;
+                                            break;
+                                        }
                                     }
-                                    default: {
-                                        // Since this items parent is neither an Array or an Object, this item cannot be updated inside 
-                                        // it. Adding this to the feedsErrors array, and then returning this function so that no further 
-                                        // attempt to create this item will be made. Since req.updatedItem will remain null, this error will 
-                                        // be returned to the caller, further down along this route
-                                        req.feedsErrors.push(parentName + " cannot not contain items, such as " + itemName);
-                                        return;
-                                        break;
-                                    }
+                                } else {
+                                    // Since the parent does not yet exist, the content within it cannot be updated, adding this to the 
+                                    // feedsErrors array, and then returning this function so that no further attempt to update 
+                                    // this item will be made. Since req.updatedItem will remain null, this error will be returned
+                                    // to the caller, further down along this route
+                                    req.feedsErrors.push(parentName + " does not exist. Use a POST request to create it.");
+                                    return;
                                 }
 
                                 // If the function has reached this point, then an item must have been updated (as
@@ -301,13 +302,12 @@ router.put("/:projectID/*", function(req, res, next){
                                 req.updatedItem = {};
                                 req.updatedItem[parentName] = contentFileData[parentName];
                             } else {
-                                // Since this item does not appear to have a parent, checking whether it exists
-                                // at the top level of the file data project_structure i.e. is there a property by this 
-                                // name already defined
-                                if(contentFileData[itemName] != undefined){
-
-                                    // PLACEHOLDER - For validating content against structure
-                                    var validateContent = validation.contentStructure(updatedItemContent, structureFileData);   
+                                
+                            }
+                        } else {
+                            if(structureFileData[itemName] != null){
+                                if(contentFileData[itemName] != null){
+                                    var validateContent = validation.contentStructure(updatedItemContent, structureFileData[itemName]);   
                                     if(validateContent.successful){
                                         // Updating the value of this top level item to the updated item value
                                         contentFileData[itemName] = updatedItemContent; 
@@ -330,7 +330,6 @@ router.put("/:projectID/*", function(req, res, next){
                                     req.feedsErrors.push(itemName + " does not exist. Please use a POST request to create it.");
                                     return;
                                 }
-
                                 // If the function has reached this point, then an item must have been updated (as
                                 // if this proved not to be possible, then the function would have returned by now).
                                 // Setting this updatedItem property of the request object to be an empty object. Then
@@ -341,24 +340,24 @@ router.put("/:projectID/*", function(req, res, next){
                                 // be sufficient.
                                 req.updatedItem = {};
                                 req.updatedItem[itemName] = contentFileData[itemName];
-                            }
-                        } else {
-                            // Since there is no structure available for this item, it will not be possible to update
-                            // it. Determing the error to return based on whether a parent name was present
-                            if(parentName != null){
-                                // Adding this to the feedsErrors array, and then returning this function so
-                                // that no further attempt to update this item will be made. Since req.updatedItem
-                                // will remain null, this error will be returned to the caller, further down 
-                                // along this route
-                                req.feedsErrors.push("There is no structure defined for " + itemName + " within " + parentItem + " , so this content cannot be updated.");
-                                return;
                             } else {
-                                // Adding this to the feedsErrors array, and then returning this function so
-                                // that no further attempt to update this item will be made. Since req.updatedItem
-                                // will remain null, this error will be returned to the caller, further down 
-                                // along this route
-                                req.feedsErrors.push("There is no structure defined for " + itemName + ", so this content cannot be updated.");
-                                return;
+                                // Since there is no structure available for this item, it will not be possible to update
+                                // it. Determing the error to return based on whether a parent name was present
+                                if(parentName != null){
+                                    // Adding this to the feedsErrors array, and then returning this function so
+                                    // that no further attempt to update this item will be made. Since req.updatedItem
+                                    // will remain null, this error will be returned to the caller, further down 
+                                    // along this route
+                                    req.feedsErrors.push("There is no structure defined for " + itemName + " within " + parentItem + " , so this content cannot be updated.");
+                                    return;
+                                } else {
+                                    // Adding this to the feedsErrors array, and then returning this function so
+                                    // that no further attempt to update this item will be made. Since req.updatedItem
+                                    // will remain null, this error will be returned to the caller, further down 
+                                    // along this route
+                                    req.feedsErrors.push("There is no structure defined for " + itemName + ", so this content cannot be updated.");
+                                    return;
+                                }
                             }
                         }
                     }

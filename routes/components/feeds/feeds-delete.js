@@ -3,8 +3,6 @@
 // which this route will accept.
 var router = require('express').Router();
 
-var validation = require("../../../custom_modules/validation.js");
-
 // Request to delete a project
 router.delete("/:projectID", function(req, res, next){
     res.send("DELETE request received from userID=" + req.userID + " for projectID=" + req.params.project);

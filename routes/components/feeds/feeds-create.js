@@ -609,7 +609,6 @@ router.post("/:projectID/*", function(req, res, next){
                                                 req.feedsErrors.push("Position " + itemName + " in " + parentName + " is already taken. Use a PUT request to update it.");
                                                 return;
                                             } else {
-                                                // PLACEHOLDER - For validating content against structure
                                                 var validateContent = validation.contentStructure(newItem, structureFileData[parentName]["items"]);   
                                                 if(validateContent.successful){
                                                     // Since this is an array, pushing the new item into the parent
@@ -642,8 +641,7 @@ router.post("/:projectID/*", function(req, res, next){
                                                 req.feedsErrors.push(itemName + " already exists in " + parentName + ". Use a PUT request to update it.");
                                                 return;
                                             } else {
-                                                // PLACEHOLDER - For validating content against structure
-                                                var validateContent = validation.contentStructure(newItem, structureFileData[parentName].items);   
+                                                var validateContent = validation.contentStructure(newItem, structureFileData[parentName]["items"]);   
                                                 if(validateContent.successful){
                                                     // Since this is an object, creating a new property on the parent item (with the item name
                                                     // supplied in the parameters), and setting its value to the new item value 
@@ -699,7 +697,6 @@ router.post("/:projectID/*", function(req, res, next){
                                     // an object into a string
                                     switch(structureFileData[itemName]["type"].toLowerCase()){
                                         case "array": {
-                                            // PLACEHOLDER - For validating content against structure
                                             var validateContent = validation.contentStructure(newItem, structureFileData[itemName]["items"]);   
                                             if(validateContent.successful){
                                                 // Since this is any array, pushing to the new item into it
@@ -730,7 +727,6 @@ router.post("/:projectID/*", function(req, res, next){
                                         }
                                     }
                                 } else {
-                                    // PLACEHOLDER - For validating content against structure
                                     var validateContent = validation.contentStructure(newItem, structureFileData[itemName]);   
                                     if(validateContent.successful){
                                         // Since this is a new collection (top level property) on the file data object, 
