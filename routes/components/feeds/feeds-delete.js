@@ -3,7 +3,7 @@
 // which this route will accept.
 var router = require('express').Router();
 
-var validation = require("./../validation.js");
+var validation = require("../../../custom_modules/validation.js");
 
 // Request to delete a project
 router.delete("/:projectID", function(req, res, next){

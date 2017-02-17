@@ -16,7 +16,7 @@ var dbconn = require("../../../database/connection.js");
 
 var accessLevels = require("../../../custom_modules/access_levels.js");
 
-var validation = require("./../validation.js");
+var validation = require("../../../custom_modules/validation.js");
 
 var googleOAuth = require("../../../google/googleOAuth.js");
 
@@ -550,7 +550,7 @@ router.post("/:projectID/*", function(req, res, next){
                         // request URL) to drill down into the fileData object, to find the property that
                         // needs to have an item created on it. 
                         for(var i=0; i<encapsulationData.length; i++){
-                            //Not including the last two indexes of the
+                            // Not including the last two indexes of the
                             // array, as these will be the parentName and itemName (as referenced above). By
                             // the end of this loop, I should have the item into which the new item should
                             // be created.
@@ -568,7 +568,11 @@ router.post("/:projectID/*", function(req, res, next){
 
                             // Ignoring index values, as these will have no relevance to the project structure
                             if(isNaN(encapsulationData[i])){
-                                if(structureFileData[encapsulationData[i]] != undefined){
+                                // Not including the last two indexes of the
+                                // array, as these will be the parentName and itemName (as referenced above). By
+                                // the end of this loop, I should have the item into which the new item should
+                                // be created.
+                                if(i < encapsulationData.length - 2 && structureFileData[encapsulationData[i]] != undefined){
                                     // Setting the structureFileData equal to the next level of the encapsulationData array
                                     // i.e. to keep drilling down into the structureFileData object
                                     structureFileData = structureFileData[encapsulationData[i]];
@@ -585,117 +589,118 @@ router.post("/:projectID/*", function(req, res, next){
                             }
                         }
 
-                        if(structureFileData[parentName] != null || structureFileData[itemName] != null || structureFileData.items != null || structureFileData.attributes != null){
-                            // Checking whether the fileData object contains the property referred to in the parent
-                            // name variable i.e. does the request new item have a parent, or is it at the top-most
-                            // level of the project_structure object
-                            if(contentFileData[parentName] != null){
-                                // Determing what type of item we are trying to insert the new item into i.e.
-                                // an Array, Object or other. Items can only ever be inserted to arrays or objects,
-                                // and so if the result is other, an error will be thrown i.e. you cannot insert
-                                // an object into a string
-                                switch(contentFileData[parentName].constructor.name.toLowerCase()){
-                                    case "array": {
-                                        // Checking if the array we are trying to insert into already contains an index
-                                        // with the same value as the itemName
-                                        if(contentFileData[parentName][itemName] != undefined){
-                                            // Since this index already exists within this array, adding this to the feedsErrors
-                                            // array, and then returning this function so that no further attempt to create this
-                                            // item will be made. Since req.newItem will remain null, this error will be returned
-                                            // to the caller, further down along this route
-                                            req.feedsErrors.push("Position " + itemName + " in " + parentName + " is already taken. Use a PUT request to update it.");
-                                            return;
-                                        } else {
-                                            // PLACEHOLDER - For validating content against structure
-                                            var validateContent = validation.contentStructure(newItem, structureFileData.items);   
-                                            if(validateContent.successful){
-                                                // Since this is an array, pushing the new item into the parent
-                                                // Note that even if the user has specified an index position to insert
-                                                // this item at, this will be ignored as the item can only ever be created
-                                                // at the end of an array (PUT requests are used to update exisiting items)
-                                                contentFileData[parentName].push(newItem);
-                                                req.gitCommitMessage = "New content pushed to array: '" + parentName + "'";
-                                            } else {
-                                                // Looping through any errors that were returned from the content validation,
-                                                // and adding them to the req.feedsErrors array, before returning the function,
-                                                // as this content cannot be added to the project as it does not match with the
-                                                // project structure (details of which will be inclued in the errors)
-                                                for(var i=0; i<validateContent.errors.length; i++){
-                                                    req.feedsErrors.push(validateContent.errors[i]);
-                                                }
+                        // Checking if a parent was specified in the request
+                        if(parentName != null){
+                            // Checking if a structure is defined for the parent
+                            if(structureFileData[parentName] != null){
+                                // Checking if content already exists for the parent
+                                if(contentFileData[parentName] != null){
+                                    // Checking if the parent is defined to contain items i.e. is it an
+                                    // array or an object
+                                    switch(structureFileData[parentName]["type"]){
+                                        case "array": {
+                                            // Checking if the array we are trying to insert into already contains an index
+                                            // with the same value as the itemName
+                                            if(contentFileData[parentName][itemName] != undefined){
+                                                // Since this index already exists within this array, adding this to the feedsErrors
+                                                // array, and then returning this function so that no further attempt to create this
+                                                // item will be made. Since req.newItem will remain null, this error will be returned
+                                                // to the caller, further down along this route
+                                                req.feedsErrors.push("Position " + itemName + " in " + parentName + " is already taken. Use a PUT request to update it.");
                                                 return;
-                                            }
-                                        } 
-                                        break;                   
-                                    }
-                                    case "object": {
-                                        // Checking if the object we are trying to insert into already contains a property
-                                        // with the same value as the itemName
-                                        if(contentFileData[parentName][itemName] != undefined){
-                                            // Since this property already exists within this object, adding this to the feedsErrors
-                                            // array, and then returning this function so that no further attempt to create this
-                                            // item will be made. Since req.newItem will remain null, this error will be returned
-                                            // to the caller, further down along this route
-                                            req.feedsErrors.push(itemName + " already exists in " + parentName + ". Use a PUT request to update it.");
-                                            return;
-                                        } else {
-                                            // PLACEHOLDER - For validating content against structure
-                                            var validateContent = validation.contentStructure(newItem, structureFileData[itemName].attributes);   
-                                            if(validateContent.successful){
-                                                // Since this is an object, creating a new property on the parent item (with the item name
-                                                // supplied in the parameters), and setting its value to the new item value 
-                                                contentFileData[parentName][itemName] = newItem;
-                                                req.gitCommitMessage = "New content created in object:  '" + parentName + "." + itemName;
                                             } else {
-                                                // Looping through any errors that were returned from the content validation,
-                                                // and adding them to the req.feedsErrors array, before returning the function,
-                                                // as this content cannot be added to the project as it does not match with the
-                                                // project structure (details of which will be inclued in the errors)
-                                                for(var i=0; i<validateContent.errors.length; i++){
-                                                    req.feedsErrors.push(validateContent.errors[i]);
+                                                // PLACEHOLDER - For validating content against structure
+                                                var validateContent = validation.contentStructure(newItem, structureFileData[parentName]["items"]);   
+                                                if(validateContent.successful){
+                                                    // Since this is an array, pushing the new item into the parent
+                                                    // Note that even if the user has specified an index position to insert
+                                                    // this item at, this will be ignored as the item can only ever be created
+                                                    // at the end of an array (PUT requests are used to update exisiting items)
+                                                    contentFileData[parentName].push(newItem);
+                                                    req.gitCommitMessage = "New content pushed to array: '" + parentName + "'";
+                                                } else {
+                                                    // Looping through any errors that were returned from the content validation,
+                                                    // and adding them to the req.feedsErrors array, before returning the function,
+                                                    // as this content cannot be added to the project as it does not match with the
+                                                    // project structure (details of which will be inclued in the errors)
+                                                    for(var i=0; i<validateContent.errors.length; i++){
+                                                        req.feedsErrors.push(validateContent.errors[i]);
+                                                    }
+                                                    return;
                                                 }
-                                                return;
-                                            }
+                                            } 
+                                            break;
                                         }
-                                        break;
+                                        case "object": {
+                                            // Checking if the object we are trying to insert into already contains a property
+                                            // with the same value as the itemName
+                                            if(contentFileData[parentName][itemName] != undefined){
+                                                // Since this property already exists within this object, adding this to the feedsErrors
+                                                // array, and then returning this function so that no further attempt to create this
+                                                // item will be made. Since req.newItem will remain null, this error will be returned
+                                                // to the caller, further down along this route
+                                                req.feedsErrors.push(itemName + " already exists in " + parentName + ". Use a PUT request to update it.");
+                                                return;
+                                            } else {
+                                                // PLACEHOLDER - For validating content against structure
+                                                var validateContent = validation.contentStructure(newItem, structureFileData[parentName].items);   
+                                                if(validateContent.successful){
+                                                    // Since this is an object, creating a new property on the parent item (with the item name
+                                                    // supplied in the parameters), and setting its value to the new item value 
+                                                    contentFileData[parentName][itemName] = newItem;
+                                                    req.gitCommitMessage = "New content created in object:  '" + parentName + "." + itemName;
+                                                } else {
+                                                    // Looping through any errors that were returned from the content validation,
+                                                    // and adding them to the req.feedsErrors array, before returning the function,
+                                                    // as this content cannot be added to the project as it does not match with the
+                                                    // project structure (details of which will be inclued in the errors)
+                                                    for(var i=0; i<validateContent.errors.length; i++){
+                                                        req.feedsErrors.push(validateContent.errors[i]);
+                                                    }
+                                                    return;
+                                                }
+                                            }
+                                            break;
+                                        }
+                                        default: {
+                                            req.feedsErrors.push(parentName + " is not defined to contain items.");
+                                            return;
+                                            break;
+                                        }
                                     }
-                                    default: {
-                                        // Since this items parent is neither an Array or an Object, this item cannot be created inside 
-                                        // it. Adding this to the feedsErrors array, and then returning this function so that no further 
-                                        // attempt to create this item will be made. Since req.newItem will remain null, this error will 
-                                        // be returned to the caller, further down along this route
-                                        req.feedsErrors.push("Cannot create " + itemName + " inside of " + parentName);
-                                        return;
-                                        break;
-                                    }
+                                } else {
+                                    req.feedsErrors.push(parentName + " does not exist. Please create the parent first.");
+                                    return;
                                 }
-
-                                // If the function has reached this point, then an item must have been created (as
-                                // if this proved not to be possible, then the function would have returned by now).
-                                // Setting this newItem property of the request object to be an empty object. Then
-                                // creating a new property on this object, using the name of the parent (as this 
-                                // will be the item into which the new item was inserted). Setting the value of this
-                                // new property to be equal to the parent item we just added the new item to i.e. so
-                                // that it now contains all of it's existing properties/indexes, plus the new item
-                                // we created. Doing this in two seperate steps, as the parentName is being generated
-                                // dynamically, so req.newItem.parentName would not be sufficient.
-                                req.newItem = {};
-                                req.newItem[parentName] = contentFileData[parentName];
                             } else {
-                                // Since this item does not appear to have a parent, checking whether it exists
-                                // at the top level of the file data project_structure i.e. is there a property by this 
-                                // name already defined
-                                if(contentFileData[itemName] != undefined){
+                                req.feedsErrors.push(parentName + " does not have a structure defined, so " + itemName + " cannot be added to it.");
+                                return;
+                            }
+
+                            // If the function has reached this point, then an item must have been created (as
+                            // if this proved not to be possible, then the function would have returned by now).
+                            // Setting this newItem property of the request object to be an empty object. Then
+                            // creating a new property on this object, using the name of the parent (as this 
+                            // will be the item into which the new item was inserted). Setting the value of this
+                            // new property to be equal to the parent item we just added the new item to i.e. so
+                            // that it now contains all of it's existing properties/indexes, plus the new item
+                            // we created. Doing this in two seperate steps, as the parentName is being generated
+                            // dynamically, so req.newItem.parentName would not be sufficient.
+                            req.newItem = {};
+                            req.newItem[parentName] = contentFileData[parentName];
+                        } else {
+                            if(structureFileData[itemName] != null){
+                                if(contentFileData[itemName] != null){
                                     // Since this property is already defined, checking whether it is an item
                                     // that can have other items added to it i.e. an Array or an Object.
                                     // Determing what type of item we are trying to insert the new item into i.e.
                                     // an Array, Object or other. Items can only ever be inserted to arrays or objects,
                                     // and so if the result is other, an error will be thrown i.e. you cannot insert
                                     // an object into a string
-                                    switch(contentFileData[itemName].constructor.name.toLowerCase()){
+                                    switch(structureFileData[itemName]["type"].toLowerCase()){
                                         case "array": {
                                             // PLACEHOLDER - For validating content against structure
-                                            var validateContent = validation.contentStructure(newItem, structureFileData.items);   
+                                            var validateContent = validation.contentStructure(newItem, structureFileData[itemName]["items"]);   
                                             if(validateContent.successful){
                                                 // Since this is any array, pushing to the new item into it
                                                 contentFileData[itemName].push(newItem); 
@@ -713,7 +718,7 @@ router.post("/:projectID/*", function(req, res, next){
                                             break;                   
                                         }
                                         default: {
-                                            // Since this item is neither an Array or an Object, it is just a 
+                                            // Since this item is not an Array it is just an object or a
                                             // property that already exists. If this property needs to be updated,
                                             // it should be done via a PUT request. Adding this to the feedsErrors 
                                             // array, and then returning this function so that no further attempt to 
@@ -724,10 +729,9 @@ router.post("/:projectID/*", function(req, res, next){
                                             break;
                                         }
                                     }
-
                                 } else {
                                     // PLACEHOLDER - For validating content against structure
-                                    var validateContent = validation.contentStructure(newItem, structureFileData.attributes);   
+                                    var validateContent = validation.contentStructure(newItem, structureFileData[itemName]);   
                                     if(validateContent.successful){
                                         // Since this is a new collection (top level property) on the file data object, 
                                         // creating a new property (with the item name supplied in the parameters), 
@@ -755,26 +759,12 @@ router.post("/:projectID/*", function(req, res, next){
                                 // dynamically, so req.newItem.itemName would not be sufficient.
                                 req.newItem = {};
                                 req.newItem[itemName] = contentFileData[itemName];
-                            }
-                        } else {
-                            if(isNaN(itemName)){
-                                // Since there is no structure defined for this item, it cannot be created
-                                // Adding this to the feedsErrors array, and then returning this function so
-                                // that no further attempt to create this item will be made. Since req.newItem
-                                // will remain null, this error will be returned to the caller, further down 
-                                //valong this route
-                                req.feedsErrors.push("There is no structure defined for " + itemName + ", so this content cannot be added");
-                                return;
                             } else {
-                                // Since this item appears to be an index value, returning a different error, as it 
-                                // is not possible to create a new item at a specific index. Adding this to the 
-                                // feedsErrors array, and then returning this function so that no further attempt 
-                                // to create this item will be made. Since req.newItem will remain null, this error
-                                // will be returned to the caller, further down along this route
-                                req.feedsErrors.push("Cannot create an item based on a specific index. If you want to update this item, use a PUT request");
+                                req.feedsErrors.push(itemName + " does not have a structure defined.");
                                 return;
                             }
                         }
+
                     }
                     
                     // Checking if the newItem property on the request object is still null

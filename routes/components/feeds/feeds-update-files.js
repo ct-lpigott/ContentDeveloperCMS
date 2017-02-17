@@ -10,7 +10,7 @@ var fs = require("fs");
 
 var simpleGit = require("simple-git");
 
-var validation = require("./../validation.js");
+var validation = require("../../../custom_modules/validation.js");
 
 router.use(function(req, res, next){
     if(req.updateFile != null) {
