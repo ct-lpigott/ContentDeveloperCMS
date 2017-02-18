@@ -163,6 +163,31 @@ module.exports = {
         cb();
       }
     });
+  },
+  getAllProjectImages: function(projectID, mediaFolderId, userAccessToken, nextPageToken, cb){
+    var oauth2Client = this.generateOAuth2Client();
+    oauth2Client.credentials = JSON.parse(userAccessToken);
+
+    var numFiles = 9;
+    var getFields = "id, name, mimeType";
+    var queryString = "'" + mediaFolderId + "' in parents";
+    
+    drive.files.list({
+      auth: oauth2Client,
+      q: queryString,
+      pageSize: numFiles,
+      pageToken: nextPageToken,
+      fields: "nextPageToken, files(" + getFields + ")"
+    }, function(err, results){      
+      if(results != null) {
+        for(var file of results.files){
+          file.url = "https://drive.google.com/uc?id=" + file.id;
+        }
+        cb(results);
+      } else {
+        cb(null);
+      }
+    });
   }
 };
 

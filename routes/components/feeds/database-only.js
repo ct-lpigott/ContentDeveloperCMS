@@ -431,6 +431,27 @@ router.put("/:projectID", function(req, res, next){
     }
 });
 
+// Request to update an access level
+router.get("/:projectID", function(req, res, next){
+    if(req.query.action == "mediaFiles"){
+        dbconn.query("SELECT * FROM User_Project up LEFT JOIN User u ON up.user_id = u.id LEFT JOIN Project p ON up.project_id = p.id WHERE up.project_id=" + req.params.projectID, function(err, rows, fields){
+            if(err){
+                console.log(err);
+            } else {
+                if(rows.length > 0){
+                    googleOAuth.getAllProjectImages(req.params.projectID, rows[0].media_folder_id, rows[0].google_auth_token, req.query.nextPageToken, function(results){
+                        res.send(results);
+                    });
+                } else {
+                    console.log("Could not find user");
+                }
+            }
+        });
+    } else {
+        next();
+    }
+});
+
 // Exporting the router that was set up in this file, so that it can be included
 // in the app.js file and specified as the route for all requests to the "/feeds" route
 module.exports = router;
