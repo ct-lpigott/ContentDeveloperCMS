@@ -6,6 +6,8 @@ function updateProjectHTML(projectDetails, includeContent=true){
     var projectContent = projectDetails.content;
 
     if(includeContent){
+        imagePreviewContainer = document.getElementById("imagePreviewContainer");
+        imagePreviewContainerNext = document.getElementById("next");
         var projectCollections = document.getElementById("projectCollections");
         projectCollections.innerHTML = "";
         document.getElementById("projectCollectionsContent").innerHTML = "";
@@ -208,11 +210,13 @@ function createItemInputElements(collection, itemContent=null, itemIndex=-1){
         itemContainerElement.appendChild(newLabel);
         itemContainerElement.appendChild(newInputElement);
 
-        if(itemContent != null && newInputElement.getAttribute("type") == "file"){
-            var thumbnailImage = document.createElement("img");
-            thumbnailImage.src = itemContent;
-            itemContainerElement.appendChild(thumbnailImage);
-        }
+        if(newInputElement.getAttribute("type") == "file"){
+            if(itemContent != null){
+                appendFileUploadElements(itemContainerElement, itemContent);
+            } else {
+                appendFileUploadElements(itemContainerElement);
+            }  
+        }  
     } else if(projectStructure[collection]["items"] != null){
         for(var itemInput in projectStructure[collection]["items"]){
             // Determining the element which will be used to request input for this
@@ -287,11 +291,13 @@ function createItemInputElements(collection, itemContent=null, itemIndex=-1){
             itemContainerElement.appendChild(newLabel);
             itemContainerElement.appendChild(newElement);  
 
-            if(itemContent != null && newElement.getAttribute("type") == "file"){
-                var thumbnailImage = document.createElement("img");
-                thumbnailImage.src = itemContent;
-                itemContainerElement.appendChild(thumbnailImage);
-            }                    
+            if(newElement.getAttribute("type") == "file"){
+                if(itemContent != null){
+                    appendFileUploadElements(itemContainerElement, itemContent);
+                } else {
+                    appendFileUploadElements(itemContainerElement);
+                }  
+            }              
         }
     }
 
@@ -561,4 +567,43 @@ function getProjectHistory(includeContent) {
             updateProjectHistory(responseObject.content_history, responseObject.structure_history);
         }
     });
+}
+
+function appendFileUploadElements(itemContainerElement, fileUrl=null){
+    var viewImagesButton = document.createElement("button");
+    viewImagesButton.innerHTML = "View Images";
+    viewImagesButton.setAttribute("class", "viewImages");
+    itemContainerElement.appendChild(viewImagesButton);
+
+    if(fileUrl != null){
+        var thumbnailImage = document.createElement("img");
+        thumbnailImage.src = fileUrl;
+        itemContainerElement.appendChild(thumbnailImage);
+    }
+}
+
+function generateAvailableImagesPreview(inputId, files){
+    var imageContainer = imagePreviewContainer.getElementsByClassName("images")[0];
+    imageContainer.innerHTML = "";
+    imagePreviewContainer.setAttribute("data-input_for", inputId);
+    for(var i=0; i<files.length; i++){
+        var imageElement = document.createElement("img");
+        imageElement.setAttribute("src", files[i].url);
+        imageElement.setAttribute("class", "previewImage");
+        imageElement.setAttribute("width", "100px");
+        imageElement.setAttribute("height", "100px");
+        imageContainer.appendChild(imageElement);
+    }
+    addClass(imagePreviewContainer, "visible");
+}
+
+function updateThumbnailImage(fileInput, fileUrl){
+    var thumbnailImg = fileInput.parentNode.getElementsByTagName("img")[0];
+    if(thumbnailImg == null){
+        thumbnailImg = document.createElement("img");
+        thumbnailImg.setAttribute("width", "100px");
+        fileInput.parentNode.appendChild(thumbnailImg);
+    }
+    thumbnailImg.setAttribute("src", fileUrl);
+    thumbnailImg.setAttribute("value", fileUrl);
 }

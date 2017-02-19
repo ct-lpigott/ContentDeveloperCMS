@@ -164,11 +164,13 @@ module.exports = {
       }
     });
   },
-  getAllProjectImages: function(projectID, mediaFolderId, userAccessToken, nextPageToken, cb){
+  getAllProjectImages: function(projectID, mediaFolderId, userAccessToken, numFiles=10, nextPageToken=null, cb){
     var oauth2Client = this.generateOAuth2Client();
     oauth2Client.credentials = JSON.parse(userAccessToken);
 
-    var numFiles = 9;
+    nextPageToken = nextPageToken == "null" ? null : nextPageToken;
+    numFiles = isNaN(numFiles) ? null : numFiles;
+
     var getFields = "id, name, mimeType";
     var queryString = "'" + mediaFolderId + "' in parents";
     

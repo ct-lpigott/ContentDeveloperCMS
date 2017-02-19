@@ -16,14 +16,49 @@ function setupEventListeners(){
     }
 }
 
-function clickEventHandler(e){
+function clickEventHandler(e){  
+
+    if(e.target.id == "next"){
+        var inputName = imagePreviewContainer.getAttribute("data-input_for");
+        var currentInput =  document.getElementById(inputName);
+        var inputViewImagesButton = currentInput.parentNode.getElementsByClassName("viewImages")[0];
+        inputViewImagesButton.click();
+        document.getElementsByClassName("viewImages");
+    } else if(hasClass(e.target, "viewImages") == false){
+        removeClass(imagePreviewContainer, "visible");
+    }
+
+    if(hasClass(e.target, "cancelRow")){
+        e.target.parentNode.parentNode.parentNode.removeChild(e.target.parentNode.parentNode);
+    } else if(hasClass(e.target, "viewImages")){
+            var imageInput = e.target.parentNode.getElementsByTagName("input")[0];
+            var nextPageToken = imageInput.getAttribute("data-next_page_token");
+            sendAjaxRequest("/feeds/" + projectID + "?action=mediaFiles&numFiles=9&nextPageToken=" + nextPageToken, {}, function(responseObject){
+                if(responseObject != null){
+                    if(responseObject.nextPageToken != null){
+                        imageInput.setAttribute("data-next_page_token", responseObject.nextPageToken);
+                        addClass(imagePreviewContainerNext, "visible");
+                    } else {
+                        imageInput.removeAttribute("data-next_page_token");
+                    }
+                    if(responseObject.files != null) {
+                        generateAvailableImagesPreview(imageInput.getAttribute("id"), responseObject.files);
+                    }
+                }
+                
+                console.log(responseObject);
+            });
+    } else if(hasClass(e.target, "previewImage")){
+        var imageURL = e.target.getAttribute("src");
+        var inputName = imagePreviewContainer.getAttribute("data-input_for");
+        var inputElement = document.getElementById(inputName);
+        inputElement.setAttribute("data-file_url", imageURL);
+        updateThumbnailImage(inputElement, imageURL);
+        removeClass(imagePreviewContainer, "visible");
+    }
 
     if(typeof customClickEventHandler == "function"){
         customClickEventHandler(e);
-    }
-    
-    if(hasClass(e.target, "cancelRow")){
-        e.target.parentNode.parentNode.parentNode.removeChild(e.target.parentNode.parentNode);
     }
 }
 

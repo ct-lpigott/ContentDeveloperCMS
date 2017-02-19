@@ -439,7 +439,7 @@ router.get("/:projectID", function(req, res, next){
                 console.log(err);
             } else {
                 if(rows.length > 0){
-                    googleOAuth.getAllProjectImages(req.params.projectID, rows[0].media_folder_id, rows[0].google_auth_token, req.query.nextPageToken, function(results){
+                    googleOAuth.getAllProjectImages(req.params.projectID, rows[0].media_folder_id, rows[0].google_auth_token, req.query.numFiles, req.query.nextPageToken, function(results){
                         res.send(results);
                     });
                 } else {

@@ -3,6 +3,8 @@ var projectID;
 var projectStructure;
 var draggingElement;
 var dragStartY;
+var imagePreviewContainer;
+var imagePreviewContainerNext;
 
 function customWindowOnload(){
     userID = document.getElementById("userID").value;
@@ -108,13 +110,7 @@ function uploadFile(fileInput, cb){
     console.log(fileInput.files[0]);
     sendAjaxRequest("/feeds/" + projectID + "?action=uploadFile", {file: fileInput.files[0]}, function(responseObject){
         fileInput.setAttribute("data-file_url", responseObject.fileUrl);
-        var thumbnailImg = fileInput.parentNode.getElementsByTagName("img")[0];
-        if(thumbnailImg == null){
-            thumbnailImg = document.createElement("img");
-            fileInput.parentNode.appendChild(thumbnailImg);
-        }
-        thumbnailImg.setAttribute("src", responseObject.fileUrl);
-        thumbnailImg.setAttribute("value", responseObject.fileUrl);
+        updateThumbnailImage(fileInput, fileUrl);
         cb();
     }, "POST");
 }
@@ -142,11 +138,15 @@ function parseProjectContentToJSON(){
                 break;
             }
             default: {
-                if(document.getElementById(collection + "-0").getAttribute("type") == "file"){
-                    projectContent[collection] = document.getElementById(collection + "-0").getAttribute("data-file_url");
-                } else {
-                    projectContent[collection] = document.getElementById(collection + "-0").value;
+                var inputElement = document.getElementById(collection + "-0");
+                if(inputElement != null){
+                    if(inputElement.getAttribute("type") == "file"){
+                        projectContent[collection] = inputElement.getAttribute("data-file_url");
+                    } else {
+                        projectContent[collection] = inputElement.value;
+                    }
                 }
+                
                 break;
 
             }

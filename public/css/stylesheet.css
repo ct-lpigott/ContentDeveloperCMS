@@ -62,10 +62,33 @@ button {
 .item-container {
     padding: 1% 0;
 }
-input[type="file"] ~ img {
+input[type="file"] ~ img, #imagePreviewContainer img {
     width: 100px;
     height: auto;
     vertical-align: top;
+}
+#imagePreviewContainer {
+    display: none;
+    position: absolute;
+    right: 50px;
+    top: 120px;
+    width: 30%;
+    max-height: 300px;
+    border: 2px solid #000;
+    background-color: #FFF;
+    overflow-y: scroll;
+}
+#imagePreviewContainer .images {
+    padding: 2%;
+}
+#next {
+    display: none;
+}
+
+#closeImagePreviewContainer {
+    position: absolute;
+    top: 5px;
+    right: 5px;
 }
 
 /* Visible */
