@@ -173,6 +173,7 @@ module.exports = {
 
     var getFields = "id, name, mimeType";
     var queryString = "'" + mediaFolderId + "' in parents";
+    queryString += " and trashed = false";
     
     drive.files.list({
       auth: oauth2Client,
