@@ -21,6 +21,16 @@ function customSetupEventListeners(){
 }
 
 function customClickEventHandler(e){
+    if(e.target.id == "next"){
+        var inputName = imagePreviewContainer.getAttribute("data-for_input");
+        var currentInput =  document.getElementById(inputName);
+        var inputViewImagesButton = currentInput.parentNode.getElementsByClassName("viewImages")[0];
+        inputViewImagesButton.click();
+        document.getElementsByClassName("viewImages");
+    } else if(hasClass(e.target, "viewImages") == false){
+        hide(imagePreviewContainer);
+    }
+    
     switch(e.target.id){
         case "updateProjectContent": {
             uploadFiles(function(){
@@ -76,8 +86,8 @@ function customClickEventHandler(e){
         removeClass(e.target.parentNode.getElementsByClassName("active")[0], "active");
         addClass(e.target, "active");
 
-        removeClass(document.getElementById("projectCollectionsContent").getElementsByClassName("visible")[0], "visible");
-        addClass(document.getElementById("projectCollectionsContent").getElementsByClassName(collectionToActivate)[0], "visible");
+        hide(document.getElementById("projectCollectionsContent").getElementsByClassName("visible")[0]);
+        show(document.getElementById("projectCollectionsContent").getElementsByClassName(collectionToActivate)[0]);
     } else if(hasClass(e.target, "previewHistory")){
         previewCommitHistory(e.target);
     }
@@ -135,6 +145,11 @@ function parseProjectContentToJSON(){
                     }
                     projectContent[collection].push(itemDetails);
                 }
+                break;
+            }
+            case "html":{
+                var collectionItem = document.getElementById(collection + "-0");
+                projectContent[collection] = collectionItem.innerHTML.toString().replace(/\"/g, "'");
                 break;
             }
             default: {

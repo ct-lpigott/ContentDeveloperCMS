@@ -2,42 +2,36 @@ extends view_components/layout.pug
 
 block main-body
 
-    div.row
-        div.col-2-12
-            div(id="projectCollections")
-        div.col-8-12
-            //div(id="projectContent")
-            div(id="projectCollectionsContent").row
-        div.col-2-12.right
-            button(id="updateProjectContent") Save All
-            button(id="resetProjectContent") Reset All
-    div.row
-        div.col-12-12
-            h2 Project Content History
-            table
-                colgroup
-                    col(width="10%")
-                    col(width="20%")
-                    col(width="40%")
-                    col(width="20%")
-                    col(width="10%")
-                thead
-                    tr
-                        th Commit ID
-                        th Date
-                        th Changes
-                        th Made By
-                        th Options
-                tbody(id="projectContentHistory")
-    div(id="imagePreviewContainer")
+    div(class="content")
         div.row
-            button(id="closeImagePreviewContainer") Close
-            h2 Available Images
-            div(class="images") 
-            button(id="next") Next >>>
+            div.col-2-12
+                div(id="projectCollections")
+            div.col-8-12
+                //div(id="projectContent")
+                div(id="projectCollectionsContent").row
+            div.col-2-12.right
+                button(id="updateProjectContent") Save All
+                button(id="resetProjectContent") Reset All
+        div.row
+            div.col-12-12
+                h2 Project Content History
+                table
+                    colgroup
+                        col(width="10%")
+                        col(width="20%")
+                        col(width="40%")
+                        col(width="20%")
+                        col(width="10%")
+                    thead
+                        tr
+                            th Commit ID
+                            th Date
+                            th Changes
+                            th Made By
+                            th Options
+                    tbody(id="projectContentHistory")
 
-    input(id="userID" type="hidden" value=userID)
-    input(id="projectID" type="hidden" value=projectID)
+        include view_components/editproject_all.pug
 
-    script(src='/js/script_content.js')
-    script(src='/js/script_console.js')
+        script(src='/js/script_content.js')
+        script(src='/js/script_console.js')

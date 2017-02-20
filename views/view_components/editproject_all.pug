@@ -1,0 +1,45 @@
+div(id="modalElements")
+    div(id="imagePreviewContainer" class="hidden")
+        div.row
+            button(id="closeImagePreviewContainer") Close
+        div.row
+            h2 Available Images
+        div.row
+            div(class="images") 
+        div.row
+            button(id="next" class="hidden") Next >>>
+
+    div(id="wysiwygHeadings" class="hidden")
+        div.row
+            strong Heading
+        div.row
+            span Text:
+            input(type="text" class="headingText")
+        div.row
+            button(class="insertElement") Insert
+    div(id="wysiwygImages" class="hidden" data-insert_type="img")
+        div.row
+            strong Image
+        div.row
+            span Image:
+            button(class="viewImages") View Images
+            input(type="file" class="fileUrl" id="modalFile")
+        div.row
+            span Alt Text:
+            input(type="text" class="altText")
+        div.row
+            button(class="insertElement") Insert
+    div(id="wysiwygLinks" class="hidden" data-insert_type="a")
+        div.row
+            strong Hyperlink
+        div.row
+            span Link
+            input(type="text" class="linkUrl")
+        div.row
+            span Link text
+            input(type="text" class="linkText")
+        div.row
+            button(class="insertElement") Insert
+
+input(id="userID" type="hidden" value=userID)
+input(id="projectID" type="hidden" value=projectID)

@@ -35,8 +35,7 @@ button {
     cursor: pointer;
 }
 #projectCollections {
-    position: absolute;
-    left: -6%;
+    margin-left: -15%;
     padding-top: 11%;
     width: 100%;
 }
@@ -56,8 +55,11 @@ button {
     text-align: left;
 }
 #projectCollectionsContent .collection {
+    width: 100%;
     min-height: 200px;
-    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
 }
 .item-container {
     padding: 1% 0;
@@ -68,21 +70,33 @@ input[type="file"] ~ img, #imagePreviewContainer img {
     vertical-align: top;
 }
 #imagePreviewContainer {
-    display: none;
     position: absolute;
-    right: 50px;
-    top: 120px;
     width: 30%;
     max-height: 300px;
     border: 2px solid #000;
-    background-color: #FFF;
     overflow-y: scroll;
+    z-index: 100 !important;
 }
 #imagePreviewContainer .images {
     padding: 2%;
 }
-#next {
-    display: none;
+
+#modalElements > div {
+    background-color: #FFF;
+    position: absolute;
+    right: 50px;
+    top: 120px;
+    z-index: 10;
+}
+
+.wysiwygInput {
+    border: 1px solid #000;
+    height: 200px;
+    overflow-y: scroll;
+}
+
+.admin .wysiwygInput {
+    height: 100px;
 }
 
 #closeImagePreviewContainer {
@@ -93,10 +107,10 @@ input[type="file"] ~ img, #imagePreviewContainer img {
 
 /* Visible */
 .hidden {
-    display: none !important;
+    visibility: hidden !important;
 }
 .visible {
-    display: block !important;
+    visibility: visible !important;
 }
 .active {
     background-color: black !important;

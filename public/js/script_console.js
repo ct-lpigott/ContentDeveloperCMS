@@ -1,9 +1,18 @@
+var wysiwygHeadings;
+var wysiwygImages;
+var wysiwygLinks;
+var wysiwygInsertionPoint;
+
 function updateProjectHTML(projectDetails, includeContent=true){
     // Every time the project HTML is updated, updating the global projectStructure
     // variable, as it will be used for pulling the content from the content admin
     // page, and rebuilding it back into a JSON object 
     projectStructure = projectDetails.structure;
     var projectContent = projectDetails.content;
+
+    wysiwygHeadings = document.getElementById("wysiwygHeadings");
+    wysiwygImages = document.getElementById("wysiwygImages");
+    wysiwygLinks = document.getElementById("wysiwygLinks");
 
     if(includeContent){
         imagePreviewContainer = document.getElementById("imagePreviewContainer");
@@ -26,6 +35,8 @@ function updateProjectHTML(projectDetails, includeContent=true){
 
         // Checking whether or not content is being displayed
         if(includeContent){
+            addClass(collectionContainer, "hidden");
+
             // Creating the side bar nav button for this collection
             var collectionNavButton = document.createElement("button");
             collectionNavButton.setAttribute("for-collection", collection);
@@ -94,6 +105,23 @@ function updateProjectHTML(projectDetails, includeContent=true){
                 }
                 break;
             }
+            case "html":{
+                var itemID = collection + "-0";
+                var contentContainer = document.createElement("div");
+                contentContainer.setAttribute("data-collection", collection);
+                contentContainer.setAttribute("id", itemID);
+                contentContainer.setAttribute("class", "wysiwygInput");
+                contentContainer.setAttribute("contentEditable", "true");
+
+                if(includeContent){
+                    contentContainer.innerHTML = projectContent[collection];
+                }
+                
+                var wysiwygEditor = createWysiwygEditor(itemID);
+                collectionContainer.appendChild(wysiwygEditor);
+                collectionContainer.appendChild(contentContainer);
+                break;
+            }
             default: {
                 // Since this is neither an array or an object, this content will be stored as a property
                 // which will contain no items within it
@@ -121,7 +149,7 @@ function updateProjectHTML(projectDetails, includeContent=true){
             // Setting the first collection of the project to be active in the sidebar navigation, as
             // well as making the content visible in the project content panel
             addClass(projectCollections.children[0], "active");
-            addClass(document.getElementById("projectCollectionsContent").children[0], "visible");
+            show(document.getElementById("projectCollectionsContent").children[0]);
         }
     }
 
@@ -585,7 +613,7 @@ function appendFileUploadElements(itemContainerElement, fileUrl=null){
 function generateAvailableImagesPreview(inputId, files){
     var imageContainer = imagePreviewContainer.getElementsByClassName("images")[0];
     imageContainer.innerHTML = "";
-    imagePreviewContainer.setAttribute("data-input_for", inputId);
+    imagePreviewContainer.setAttribute("data-for_input", inputId);
     for(var i=0; i<files.length; i++){
         var imageElement = document.createElement("img");
         imageElement.setAttribute("src", files[i].url);
@@ -594,7 +622,7 @@ function generateAvailableImagesPreview(inputId, files){
         imageElement.setAttribute("height", "100px");
         imageContainer.appendChild(imageElement);
     }
-    addClass(imagePreviewContainer, "visible");
+    show(imagePreviewContainer);
 }
 
 function updateThumbnailImage(fileInput, fileUrl){
@@ -606,4 +634,25 @@ function updateThumbnailImage(fileInput, fileUrl){
     }
     thumbnailImg.setAttribute("src", fileUrl);
     thumbnailImg.setAttribute("value", fileUrl);
+}
+
+function createWysiwygEditor(inputId){
+    var containerDiv = document.createElement("div");
+    containerDiv.setAttribute("data-for_input", inputId);
+    var buttons = [
+        {text: "Insert Image", type: "img", class: "wysiwygImagess"},
+        {text: "h1", type: "h1", class: "wysiwygHeadings"},
+        {text: "h2", type: "h2", class: "wysiwygHeadings"},
+        {text: "h3", type: "h3", class: "wysiwygHeadings"},
+        {text: "hyperlink", type:"a", class: "wysiwygLinks"}
+    ];
+
+    for(var button of buttons){
+        var newButton = document.createElement("button");
+        newButton.setAttribute("data-insert_type", button.type)
+        addClass(newButton, "wysiwygButton " + button.class);
+        newButton.innerHTML = button.text;
+        containerDiv.appendChild(newButton);
+    }
+    return containerDiv;
 }

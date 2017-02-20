@@ -2,101 +2,102 @@ extends view_components/layout.pug
 
 block main-body
 
-    div.row
-        div.col-6-12
-            h2 Project Structure Editor
-            textarea(id="projectStructure")
+    div(class="admin")
 
-            button(id="previewProjectStructure") Preview
-            button(id="updateProjectStructure") Save
-            button(id="resetProjectStructure") Reset
-            
-        div.col-6-12
-            h2 Project Structure Preview
-            div(id="projectContent")
-    div.row
-        div.col-6-12
-            h2 Add Collaborator
-            label Email Address:
-                input(id="newCollabEmail" type="email")
-            label Access Level
-                select(id="accessLevel")
-            button(id="addNewCollab") Add
+        div.row
+            div.col-6-12
+                h2 Project Structure Editor
+                textarea(id="projectStructure")
 
-        div.col-6-12
-            h2 Collaborators on this Project
-                table(id="collaborators")
+                button(id="previewProjectStructure") Preview
+                button(id="updateProjectStructure") Save
+                button(id="resetProjectStructure") Reset
+                
+            div.col-6-12
+                h2 Project Structure Preview
+                div(id="projectContent")
+        div.row
+            div.col-6-12
+                h2 Add Collaborator
+                label Email Address:
+                    input(id="newCollabEmail" type="email")
+                label Access Level
+                    select(id="accessLevel")
+                button(id="addNewCollab") Add
+
+            div.col-6-12
+                h2 Collaborators on this Project
+                    table(id="collaborators")
+                        thead
+                            tr
+                                th User
+                                th Access Level
+                                th Remove
+                        tbody
+        div.row
+            div.col-6-12
+                h2 Customise Access Levels
+                table
+                    colgroup
+                        col(width="40%")
+                        col(width="20%")
+                        col(width="10%")
+                        col(width="30%")
                     thead
                         tr
-                            th User
-                            th Access Level
-                            th Remove
-                    tbody
-    div.row
-        div.col-6-12
-            h2 Customise Access Levels
-            table
-                colgroup
-                    col(width="40%")
-                    col(width="20%")
-                    col(width="10%")
-                    col(width="30%")
-                thead
-                    tr
-                        th Access Level Name
-                        th Access Level Int
-                        th In Use
-                        th Options
-                tbody(id="customiseAccessLevels")
-            button(id="addNewAccessLevel") Add New Access Level
-            
-    div.row
-        div.col-8-12
-            h2 Project Structure History
-            table
-                colgroup
-                    col(width="10%")
-                    col(width="20%")
-                    col(width="40%")
-                    col(width="20%")
-                    col(width="10%")
-                thead
-                    tr
-                        th Commit ID
-                        th Date
-                        th Changes
-                        th Made By
-                        th Options
-                tbody(id="projectStructureHistory")
-        div.col-4-12
-            h2 Preview
-                textarea(id="projectStructureHistoryPreview" disabled)
-                button(id="revertStructure") Revert to this Structure
-    div.row
-        div.col-8-12
-            h2 Project Content History
-            table
-                colgroup
-                    col(width="10%")
-                    col(width="20%")
-                    col(width="40%")
-                    col(width="20%")
-                    col(width="10%")
-                thead
-                    tr
-                        th Commit ID
-                        th Date
-                        th Changes
-                        th Made By
-                        th Options
-                tbody(id="projectContentHistory")
-        div.col-4-12
-            h2 Preview
-                textarea(id="projectContentHistoryPreview" disabled)
-                button(id="revertContent") Revert to this Content
+                            th Access Level Name
+                            th Access Level Int
+                            th In Use
+                            th Options
+                    tbody(id="customiseAccessLevels")
+                button(id="addNewAccessLevel") Add New Access Level
+                
+        div.row
+            div.col-8-12
+                h2 Project Structure History
+                table
+                    colgroup
+                        col(width="10%")
+                        col(width="20%")
+                        col(width="40%")
+                        col(width="20%")
+                        col(width="10%")
+                    thead
+                        tr
+                            th Commit ID
+                            th Date
+                            th Changes
+                            th Made By
+                            th Options
+                    tbody(id="projectStructureHistory")
+            div.col-4-12
+                h2 Preview
+                    textarea(id="projectStructureHistoryPreview" disabled)
+                    button(id="revertStructure") Revert to this Structure
+        div.row
+            div.col-8-12
+                h2 Project Content History
+                table
+                    colgroup
+                        col(width="10%")
+                        col(width="20%")
+                        col(width="40%")
+                        col(width="20%")
+                        col(width="10%")
+                    thead
+                        tr
+                            th Commit ID
+                            th Date
+                            th Changes
+                            th Made By
+                            th Options
+                    tbody(id="projectContentHistory")
+            div.col-4-12
+                h2 Preview
+                    textarea(id="projectContentHistoryPreview" disabled)
+                    button(id="revertContent") Revert to this Content
 
-    input(id="userID" type="hidden" value=userID)
-    input(id="projectID" type="hidden" value=projectID)
+        include view_components/editproject_all.pug
 
-    script(src='/js/script_admin.js')
-    script(src='/js/script_console.js')
+        script(src='/js/script_admin.js')
+        script(src='/js/script_console.js')
