@@ -90,13 +90,10 @@ function updateProjectHTML(projectDetails, includeContent=true){
                 // Checking whether content is to be displayed, and if content currently exists
                 // for this collection
                 if(includeContent && projectContent[collection] != null){
-                    var itemIndex = 0;
-                    for(var item in projectContent[collection]){
-                        var itemContainerElement = createItemInputElements(collection, projectContent[collection][item], itemIndex);
-                        collectionContainer.appendChild(itemContainerElement);
-
-                        itemIndex++;
-                    }
+                    // Looping through each of the items that current exist in the content file of the 
+                    // project, creating a new container and elements for each one 
+                    var itemContainerElement = createItemInputElements(collection, projectContent[collection], 0);
+                    collectionContainer.appendChild(itemContainerElement);
                 } else {
                     // Since the content is not to be displayed, or no content currently exists for this
                     // collection, creating empty input elmenets for this collection
@@ -296,18 +293,17 @@ function createItemInputElements(collection, itemContent=null, itemIndex=-1){
                     // For all other attributes defined in the project structure (excluding "options", which
                     // are dealt with above) setting them as attributes on the new element
                     newElement.setAttribute(inputAttribute, projectStructure[collection]["items"][itemInput]["attributes"][inputAttribute]);
-                    
-                    // Checking whether content has been provided for this item, and if it has, setting 
-                    // the value of this element to be equal to it
-                    if(itemContent != null && itemContent[itemInput] != null){
-                        newElement.setAttribute("value", itemContent[itemInput]);
-                        if(newElement.getAttribute("type") == "file"){
-                            newElement.setAttribute("data-file_url", itemContent);
-                        }
-                    }
                 }
             }
 
+            // Checking whether content has been provided for this item, and if it has, setting 
+            // the value of this element to be equal to it
+            if(itemContent != null && itemContent[itemInput] != null){
+                newElement.setAttribute("value", itemContent[itemInput]);
+                if(newElement.getAttribute("type") == "file"){
+                    newElement.setAttribute("data-file_url", itemContent);
+                }
+            }
 
             // If this is an <input> element, and no type has been defined, defaulting
             // it to "text"
@@ -332,7 +328,7 @@ function createItemInputElements(collection, itemContent=null, itemIndex=-1){
     // Checking whether content is being displayed for this structure, and that
     // there are items to display within it, before adding a delete button beside
     // each item
-    if(itemContent != null && projectStructure[collection]["items"] != null){
+    if(itemContent != null && projectStructure[collection].type == "array"){
         var deleteButtonElement = document.createElement("button");
         deleteButtonElement.innerHTML = "Delete";
         deleteButtonElement.setAttribute("class", "delete");

@@ -132,8 +132,9 @@ function parseProjectContentToJSON(){
 
     for(var collection in projectStructure){
         switch(projectStructure[collection].type){
+            case "object":
             case "array": {
-                projectContent[collection] = [];
+                projectContent[collection] = projectStructure[collection].type == "object" ? {} : [];
                 var collectionItems = document.getElementsByClassName(collection + "-item");
 
                 for(var i=0; i < collectionItems.length; i++){
@@ -141,9 +142,17 @@ function parseProjectContentToJSON(){
                     var itemDetails = {};
                     
                     for(var e=0; e < itemElements.length; e++){
-                        itemDetails[itemElements[e].getAttribute("data-key")] = itemElements[e].value;
+                        if(projectStructure[collection].type == "object"){
+                            projectContent[collection][itemElements[e].getAttribute("data-key")] = itemElements[e].value;
+                        } else {
+                            itemDetails[itemElements[e].getAttribute("data-key")] = itemElements[e].value;
+                        }
+                        
                     }
-                    projectContent[collection].push(itemDetails);
+
+                    if(projectStructure[collection].type == "array"){
+                        projectContent[collection].push(itemDetails);
+                    }
                 }
                 break;
             }
