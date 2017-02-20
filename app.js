@@ -74,36 +74,28 @@ app.use(express.static("./public"));
 
 if(process.env.DEBUG == null || process.env.DEBUG == "false"){
 
-  var greenlockExpress = require('greenlock-express').create({
-    configDir: "./letsencrypt",
-    server: process.env.CERT_SERVER,
-    email: process.env.EMAIL_ADDRESS,
-    agreeTos: true,
-    approveDomains: [ process.env.SITE_URL ]
-  });
-
-
-  var redirectToSecureServer = greenlockExpress.middleware(
-    redirectHttps({port:process.env.PORT_HTTPS})
-  );
+  var httpsOptions = {
+    key: fs.readFileSync("./../../etc/letsencrypt/live/contentdevelopercms.eu/privatekey.pem"),
+    cert: fs.readFileSync("./../../etc/letsencrypt/live/contentdevelopercms.eu/fullchain.pem")
+  };
 
   // Setting up a HTTP server, whose only purpose is to redirect any HTTP requests as 
   // HTTPS requests i.e. if a request is recieved at the process.env.PORT, it will be
   // redirected to the process.env.PORT_HTTPS (which will be received by the HTTPS
   // server running below).
-  http.createServer(redirectToSecureServer).listen(process.env.PORT, process.env.HOST_NAME, function () {
+  http.createServer(redirectHttps({port:process.env.PORT_HTTPS})).listen(process.env.PORT, function () {
     console.log("Listening for HTTP requests on " + process.env.PORT);
   });
 
   // Setting up a HTTP server, to deal with all HTTPS requests i.e. to be the main
   // server of the app.
-  https.createServer(greenlockExpress.httpsOptions, greenlockExpress.middleware(app)).listen(process.env.PORT_HTTPS, process.env.HOST_NAME, function () {
+  https.createServer(httpsOptions, app).listen(process.env.PORT_HTTPS, function () {
     console.log("Listening for HTTPS requests, and serving app, on port " + process.env.PORT_HTTPS);
   });
 } else {
   // Setting the app to run on the port specified in the environment variables. This 
   // will set up the server to be available to receive requests on this route.
-  app.listen(process.env.PORT, process.env.HOST_NAME, function () {
+  app.listen(process.env.PORT, function () {
     console.log("Listening for all requests on port: " + process.env.PORT);
   });
 }

@@ -2,8 +2,7 @@ var fs = require("fs");
 
 var requiredDirectories = [
     "./uploads",
-    "./projects",
-    "./letsencrypt"
+    "./projects"
 ];
 
 if(process.env.HOST_NAME == "localhost"){
