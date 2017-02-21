@@ -242,6 +242,7 @@ router.put("/:projectID/*", function(req, res, next){
                                                 var validateWith = structureFileData[parentName]["items"][itemName] || structureFileData[parentName]["items"];
                                                 var validateContent = validation.contentStructure(updatedItemContent, validateWith);   
                                                 if(validateContent.successful){
+                                                    req.gitCommitMessage = "Update to content of " + parentName + ": " + itemName;
                                                     if(arrayIndex != null){
                                                         contentFileData = contentFileData[parentName];
                                                         parentName = arrayIndex;
@@ -250,7 +251,6 @@ router.put("/:projectID/*", function(req, res, next){
                                                     // item (with the item name supplied in the parameters), and setting its 
                                                     // value to the updated item value 
                                                     contentFileData[parentName][itemName] = updatedItemContent;
-                                                    req.gitCommitMessage = "Update to content of " + parentName + ": " + itemName;
                                                 } else {
                                                     // Looping through any errors that were returned from the content validation,
                                                     // and adding them to the req.feedsErrors array, before returning the function,
