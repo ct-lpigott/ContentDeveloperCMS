@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/pigottlaura/ContentDeveloperCMS#readme",
   "dependencies": {
+    "body-parser": "^1.16.1",
     "express": "^4.14.0",
     "google-auth-library": "^0.9.10",
     "googleapis": "^15.0.0",
