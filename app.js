@@ -2,6 +2,7 @@
 // Using express to manage the routing of requests to the server.
 // Using pug to create the templates for the various pages on the site.
 var express = require("express");
+var fs = require("fs");
 var pug = require("pug");
 var http = require("http");
 var https = require("https");
