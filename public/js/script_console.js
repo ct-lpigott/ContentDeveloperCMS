@@ -2,6 +2,7 @@ var wysiwygHeadings;
 var wysiwygImages;
 var wysiwygLinks;
 var wysiwygInsertionPoint;
+var currentProjectContent;
 
 function updateProjectHTML(projectDetails, includeContent=true){
     // Every time the project HTML is updated, updating the global projectStructure
@@ -9,6 +10,10 @@ function updateProjectHTML(projectDetails, includeContent=true){
     // page, and rebuilding it back into a JSON object 
     projectStructure = projectDetails.structure;
     var projectContent = projectDetails.content;
+
+    if(projectContent != null){
+        currentProjectContent = projectContent;
+    }
 
     wysiwygHeadings = document.getElementById("wysiwygHeadings");
     wysiwygImages = document.getElementById("wysiwygImages");
@@ -361,7 +366,7 @@ function updateProjectCollaborators(collaborators){
 
         var removeCollaboratorTdElement = document.createElement("td");
         var removeCollaboratorButtonElement = document.createElement("button");
-        removeCollaboratorButtonElement.innerHTML = "x";
+        removeCollaboratorButtonElement.innerHTML = "Delete";
         removeCollaboratorButtonElement.setAttribute("class", "removeCollaborator");
         removeCollaboratorButtonElement.setAttribute("data-userID", collaborators[i].user_id);
         removeCollaboratorTdElement.appendChild(removeCollaboratorButtonElement);

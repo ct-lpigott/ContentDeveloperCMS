@@ -9,7 +9,7 @@ html
             div.row
                 div.col-8-12
                     if projectName != undefined
-                        h1 #{projectName}
+                        h1(id="pageTitle") #{projectName}
                     else if user != undefined
                         h1 Content Developer Admin Panel
                     else

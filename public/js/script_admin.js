@@ -5,7 +5,7 @@ var dragStartY;
 var projectStructureHistoryPreviewTextarea;
 var projectContentHistoryPreviewTextarea;
 
-function customWindowOnload(){
+function customAdminWindowOnload(){
     userID = document.getElementById("userID").value;
 
     if(document.getElementById("userProjects")){
@@ -22,16 +22,16 @@ function customWindowOnload(){
         getAccessLevels();
         getProjectCollaborators();
         getProjectHistory(false);
-    }    
+    }  
 }
 
-function customSetupEventListeners(){
+function customAdminSetupEventListeners(){
     if(document.getElementById("projectStructure")){
         document.getElementById("projectStructure").addEventListener("keydown", projectStructureKeyDownHandler);
     }
 }
 
-function customClickEventHandler(e){
+function customAdminClickEventHandler(e){
     // BY ID
     switch(e.target.id){
         case "createNewProject": {
@@ -53,6 +53,7 @@ function customClickEventHandler(e){
                     updateProjectJSON(responseObject);
                     getProjectHistory(false);
                     document.getElementById("previewProjectStructure").click();
+                    updateProjectHTML({structure: responseObject, content: currentProjectContent}, true);
                 }, "PUT");
             } else {
                 console.log("This is not valid JSON");
@@ -89,6 +90,7 @@ function customClickEventHandler(e){
                 sendAjaxRequest("/feeds/" + projectID, {content: projectContentHistoryPreviewTextarea.value, short_commit_id: projectContentHistoryPreviewTextarea.getAttribute("data-short_commit_id")}, function(responseObject){
                     console.log("Content updated");
                     getProjectHistory(false);
+                    projectContentHistoryPreviewTextarea.value = "";
                 }, "PUT");
             } else {
                 console.log("This is not valid JSON");
@@ -100,6 +102,7 @@ function customClickEventHandler(e){
                 sendAjaxRequest("/feeds/" + projectID, {structure: projectStructureHistoryPreviewTextarea.value, short_commit_id: projectStructureHistoryPreviewTextarea.getAttribute("data-short_commit_id")}, function(responseObject){
                     updateProjectJSON(responseObject);
                     getProjectHistory(false);
+                    projectStructureHistoryPreviewTextarea.value = "";
                     document.getElementById("previewProjectStructure").click();
                 }, "PUT");
             } else {
@@ -111,6 +114,15 @@ function customClickEventHandler(e){
         case "addNewAccessLevel": {
             newCustomAccessLevelRow();
             break;
+        }
+        case "updateProjectName":{
+            var newProjectName = document.getElementById("newProjectName").value;
+            if(newProjectName != null && newProjectName.length > 0){
+                sendAjaxRequest("/feeds/" + projectID + "?action=projectName", {projectName: newProjectName}, function(responseObject){
+                    console.log("Project name updated");
+                    document.getElementById("pageTitle").innerHTML = newProjectName;
+                }, "PUT");
+            }
         }
     }
 
@@ -146,6 +158,11 @@ function customClickEventHandler(e){
             console.log("Access level updated");
             getAccessLevels();
         }, "PUT");
+    } else if(hasClass(e.target, "view")){
+        hide(document.querySelector("#adminPanel > .visible"));
+        show(document.getElementById(e.target.getAttribute("data-view") + "_view"));
+        removeClass(e.target.parentNode.getElementsByClassName("active")[0], "active");
+        addClass(e.target, "active");
     }
 }
 
@@ -165,7 +182,9 @@ function updateUserProjects(userProjects){
             var newTr = document.createElement("tr");
             var newTd_projectName = document.createElement("td");
             var newTd_accessLevel = document.createElement("td");
-            var newTd_view = document.createElement("td");
+            var newTd_lastModified = document.createElement("td");
+            var newTd_modifiedBy = document.createElement("td");
+            var newTd_options = document.createElement("td");
 
             newTd_projectName.innerHTML = userProjects[i].project_name
 
@@ -174,11 +193,13 @@ function updateUserProjects(userProjects){
             var newA = document.createElement("a");
             newA.setAttribute("href", "/admin/" + userProjects[i].project_id + "?userID=" + userID);
             newA.innerHTML = "Edit";
-            newTd_view.appendChild(newA);
+            newTd_options.appendChild(newA);
 
             newTr.appendChild(newTd_projectName);
             newTr.appendChild(newTd_accessLevel);
-            newTr.appendChild(newTd_view);
+            newTr.appendChild(newTd_lastModified);
+            newTr.appendChild(newTd_modifiedBy);
+            newTr.appendChild(newTd_options);
             userProjectsTableBody.appendChild(newTr);
         }
     }

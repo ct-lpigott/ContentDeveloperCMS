@@ -6,16 +6,22 @@ window.onload = function(){
 
     setupEventListeners();
 
-    if(typeof customWindowOnload == "function"){
-        customWindowOnload();
+    if(typeof customAdminWindowOnload == "function"){
+        customAdminWindowOnload();
+    }
+    if(typeof customContentWindowOnload == "function"){
+        customContentWindowOnload();
     }
 };
 
 function setupEventListeners(){
     document.addEventListener("click", clickEventHandler);
 
-    if(typeof customSetupEventListeners == "function"){
-        customSetupEventListeners();
+    if(typeof customAdminSetupEventListeners == "function"){
+        customAdminSetupEventListeners();
+    }
+    if(typeof customContentSetupEventListeners == "function"){
+        customContentSetupEventListeners();
     }
 }
 
@@ -126,8 +132,11 @@ function clickEventHandler(e){
         contentInput.innerHTML = content.slice(0, insertionPoint) + newElement + content.slice(insertionPoint);
     }
 
-    if(typeof customClickEventHandler == "function"){
-        customClickEventHandler(e);
+    if(typeof customAdminClickEventHandler == "function"){
+        customAdminClickEventHandler(e);
+    }
+    if(typeof customContentClickEventHandler == "function"){
+        customContentClickEventHandler(e);
     }
 }
 

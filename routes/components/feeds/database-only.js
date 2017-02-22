@@ -452,6 +452,26 @@ router.get("/:projectID", function(req, res, next){
     }
 });
 
+// Request to update a projects name
+router.put("/:projectID", function(req, res, next){
+    if(req.query.action == "projectName"){
+        if(req.body.projectName != null){
+            dbconn.query("UPDATE Project SET project_name = " + dbconn.escape(req.body.projectName) + " WHERE id=" + req.params.projectID, function(err, rows, fields){
+                if(err){
+                    console.log(err);
+                } else {
+                    res.send("{}");
+                }
+            });
+        } else {
+            req.responseObject.errors.push("No project name provided in the request");
+            next(new Error());
+        }        
+    } else {
+        next();
+    }
+});
+
 // Exporting the router that was set up in this file, so that it can be included
 // in the app.js file and specified as the route for all requests to the "/feeds" route
 module.exports = router;

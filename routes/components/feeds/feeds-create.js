@@ -113,7 +113,6 @@ router.post("/", function(req, res, next){
                                                     // as this is a new project). Finally, setting the last_updated_by
                                                     // property to the current users ID
                                                     projectTemplate.project_id = req.projectID;
-                                                    projectTemplate.project_name = req.body.projectName;
                                                     projectTemplate.date_created = projectTemplate.date_updated = Date.now();
                                                     projectTemplate.last_updated_by = req.userID;
 

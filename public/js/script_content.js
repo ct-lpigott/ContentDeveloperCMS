@@ -5,10 +5,13 @@ var draggingElement;
 var dragStartY;
 var imagePreviewContainer;
 var imagePreviewContainerNext;
+var content;
+var projectContentContainer;
 
-function customWindowOnload(){
+function customContentWindowOnload(){
     userID = document.getElementById("userID").value;
     projectID = document.getElementById("projectID").value;
+    projectContentContainer = document.getElementById("projectCollectionsContent");
     sendAjaxRequest("/feeds/" + projectID, {}, function(responseObject){
         updateProjectHTML(responseObject);
         refreshDraggableContainers();
@@ -16,11 +19,11 @@ function customWindowOnload(){
     });   
 }
 
-function customSetupEventListeners(){
+function customContentSetupEventListeners(){
     
 }
 
-function customClickEventHandler(e){
+function customContentClickEventHandler(e){
     if(e.target.id == "next"){
         var inputName = imagePreviewContainer.getAttribute("data-for_input");
         var currentInput =  document.getElementById(inputName);
@@ -67,9 +70,9 @@ function customClickEventHandler(e){
 
     if(hasClass(e.target, "add")){
         var collection = e.target.parentNode.getAttribute("data-collection");
-        var collectionContainer = document.getElementsByClassName("collection " + collection)[0];
+        var collectionContainer = projectContentContainer.getElementsByClassName("collection " + collection)[0];
         var draggableContainer = collectionContainer.getElementsByClassName("draggableContainer")[0];
-        var newItemIndex = document.querySelectorAll(".item-container." + collection + "-item").length;
+        var newItemIndex = projectContentContainer.querySelectorAll(".item-container." + collection + "-item").length;
         var newItemContainerElement = createItemInputElements(collection, null, newItemIndex);
         draggableContainer.append(newItemContainerElement);
         refreshDraggableContainerChildren(draggableContainer);
@@ -86,33 +89,36 @@ function customClickEventHandler(e){
         removeClass(e.target.parentNode.getElementsByClassName("active")[0], "active");
         addClass(e.target, "active");
 
-        hide(document.getElementById("projectCollectionsContent").getElementsByClassName("visible")[0]);
-        show(document.getElementById("projectCollectionsContent").getElementsByClassName(collectionToActivate)[0]);
+        hide(projectContentContainer.getElementsByClassName("visible")[0]);
+        show(projectContentContainer.getElementsByClassName(collectionToActivate)[0]);
     } else if(hasClass(e.target, "previewHistory")){
         previewCommitHistory(e.target);
     }
 }
 
 function uploadFiles(cb){
-    var projectContentContainer = document.getElementById("projectCollectionsContent");
     var fileInputs = projectContentContainer.querySelectorAll("input[type='file']");
     var totalUploaded = 0;
 
-    for(var i=0; i<fileInputs.length; i++){
-        if(fileInputs[i].files.length > 0){
-            uploadFile(fileInputs[i], function(){
+    if(fileInputs.length > 0){
+        for(var i=0; i<fileInputs.length; i++){
+            if(fileInputs[i].files.length > 0){
+                uploadFile(fileInputs[i], function(){
+                    totalUploaded++;
+                    
+                    if(totalUploaded == fileInputs.length){
+                        cb();
+                    }
+                });
+            } else {
                 totalUploaded++;
-                
-                if(totalUploaded == fileInputs.length){
-                    cb();
-                }
-            });
-        } else {
-            totalUploaded++;
+            }
+            if(totalUploaded == fileInputs.length){
+                cb();
+            }        
         }
-        if(totalUploaded == fileInputs.length){
-            cb();
-        }        
+    } else {
+        cb();
     }
 }
 
@@ -128,14 +134,12 @@ function uploadFile(fileInput, cb){
 function parseProjectContentToJSON(){
     var projectContent = {};
 
-    var projectContentContainer = document.getElementById("projectCollectionsContent");
-
     for(var collection in projectStructure){
         switch(projectStructure[collection].type){
             case "object":
             case "array": {
                 projectContent[collection] = projectStructure[collection].type == "object" ? {} : [];
-                var collectionItems = document.getElementsByClassName(collection + "-item");
+                var collectionItems = projectContentContainer.getElementsByClassName(collection + "-item");
 
                 for(var i=0; i < collectionItems.length; i++){
                     var itemElements = collectionItems[i].querySelectorAll("[data-key]");
@@ -157,12 +161,12 @@ function parseProjectContentToJSON(){
                 break;
             }
             case "html":{
-                var collectionItem = document.getElementById(collection + "-0");
+                var collectionItem = projectContentContainer.querySelector("#" + collection + "-0");
                 projectContent[collection] = collectionItem.innerHTML.toString().replace(/\"/g, "'");
                 break;
             }
             default: {
-                var inputElement = document.getElementById(collection + "-0");
+                var inputElement = projectContentContainer.querySelector("#" + collection + "-0");
                 if(inputElement != null){
                     if(inputElement.getAttribute("type") == "file"){
                         projectContent[collection] = inputElement.getAttribute("data-file_url");

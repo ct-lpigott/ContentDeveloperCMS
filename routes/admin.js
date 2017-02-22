@@ -59,7 +59,7 @@ router.get("/:projectID", function(req, res, next){
     // Querying the database, to check if this user has permissions to access this project, using
     // the project id and user id supplied in the URL parameters (ecscaping both before they are passed
     // to the query).
-     dbconn.query("SELECT * FROM Project p LEFT JOIN User_Project up ON p.id = up.project_id WHERE p.id = " + dbconn.escape(req.params.projectID) + " AND up.user_id = " + dbconn.escape(req.userID), function(err, rows, fields){
+     dbconn.query("SELECT * FROM Project p LEFT JOIN User_Project up ON p.id = up.project_id LEFT JOIN User u ON u.id = up.user_id WHERE p.id = " + dbconn.escape(req.params.projectID) + " AND up.user_id = " + dbconn.escape(req.userID), function(err, rows, fields){
         // Checking if any errors were returned from the database
         if(err){
             // Logging these errors to the console
@@ -93,6 +93,7 @@ router.get("/:projectID", function(req, res, next){
                 res.render(templateToRender, {
                     pageTitle: rows[0].project_name,
                     userID: req.userID,
+                    user: rows[0],
                     projectID: req.params.projectID,
                     projectName: rows[0].project_name 
                 });

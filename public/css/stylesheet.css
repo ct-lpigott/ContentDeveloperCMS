@@ -1,3 +1,9 @@
+html {
+    overflow-y: scroll;
+}
+body, #adminPanel > div, #modalElements > div {
+    background-color: #FFF;
+}
 .profileImage {
     width: 50px;
     vertical-align: bottom;
@@ -6,6 +12,13 @@
 header {
     background-color: black;
     color: white;
+}
+nav button {
+    width: 25%;
+    padding: 1%;
+}
+#collaborator_view.hidden * {
+    visibility: hidden !important;
 }
 body {
     margin: 0;
@@ -25,8 +38,9 @@ table {
     width: 100%;
     border-collapse: collapse;
 }
-#projectStructure {
+#projectStructure, #projectContent {
     min-height: 50vh;
+    overflow-y: scroll;
 }
 th {
     text-align: left;
@@ -54,12 +68,20 @@ button {
     background-color: black;
     text-align: left;
 }
-#projectCollectionsContent .collection {
+#adminPanel {
+    position: relative;
+}
+#projectCollectionsContent .collection, #adminPanel > div{
     width: 100%;
-    min-height: 200px;
     position: absolute;
     top: 0;
     left: 0;
+}
+#projectContent, table, td, th {
+    border: 1px solid #aaa;
+}
+#projectCollectionsContent {
+    min-height: 40vh;
 }
 .item-container {
     padding: 1% 0;
@@ -137,6 +159,9 @@ footer {
 }
 .left {
     text-align: left;
+}
+.alignRight {
+    float: right;
 }
 
 /* GRID */
