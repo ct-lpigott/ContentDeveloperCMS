@@ -73,7 +73,7 @@ function clickEventHandler(e){
     } else if(hasClass(e.target, "previewImage")){
         var imageURL = e.target.getAttribute("src");
         var inputName = imagePreviewContainer.getAttribute("data-for_input");
-        var inputElement = document.getElementById(inputName);
+        var inputElement = document.querySelector("#projectCollectionsContent " + inputName);
         inputElement.setAttribute("data-file_url", imageURL);
         updateThumbnailImage(inputElement, imageURL);
         hide(imagePreviewContainer);
