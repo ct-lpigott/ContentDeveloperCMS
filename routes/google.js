@@ -33,7 +33,7 @@ router.get("/oauthRedirectURL", function(req, res, next){
     // from the users login to their Google account
     oauth2Client.getToken(authCode, function(err, token) {
         if(err) {
-            console.log("Error while trying to retrieve access token", error);
+            console.log("Error while trying to retrieve access token " + err);
         } else {
             // Accessing the Google Plus API, through the google apis module
             var plus = google.plus('v1');
