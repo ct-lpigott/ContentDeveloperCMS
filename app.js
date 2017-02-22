@@ -76,8 +76,8 @@ app.use(express.static("./public"));
 if(process.env.DEBUG == null || process.env.DEBUG == "false"){
 
   var httpsOptions = {
-    key: fs.readFileSync("./../../../etc/letsencrypt/live/contentdevelopercms.eu/privkey.pem"),
-    cert: fs.readFileSync("./../../../etc/letsencrypt/live/contentdevelopercms.eu/fullchain.pem")
+    key: fs.readFileSync("./../../../../etc/letsencrypt/live/contentdevelopercms.eu/privkey.pem"),
+    cert: fs.readFileSync("./../../../../etc/letsencrypt/live/contentdevelopercms.eu/fullchain.pem")
   };
 
   // Setting up a HTTP server, whose only purpose is to redirect any HTTP requests as 
