@@ -27,7 +27,7 @@ app.use(bodyParser.json());
 app.use(function(req, res, next){
   // Setting the Strict Transport Security header to be valid for 1 year,
   // and to include all subdomains
-  res.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+  res.setHeader("Strict-Transport-Security", "max-age=31536000");
 
   // Passing this request onto the next router, so that it can continue through the app
   next();
