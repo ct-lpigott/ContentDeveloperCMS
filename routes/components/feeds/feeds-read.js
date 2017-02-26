@@ -82,6 +82,12 @@ router.get("/:projectID", function(req, res, next){
         });
         
     } else {
+        if(req.max_cache_age != null){
+            res.setHeader("Cache-control", "public; max-age=" + req.max_cache_age);
+        } else {
+            res.setHeader("Cache-control", "no-cache");
+        }
+
         // Setting the content of the project (as stored on the request object) as 
         // the response object, as no structure will be returned alongside the content
         req.responseObject = req.fileData.content;
@@ -94,7 +100,7 @@ router.get("/:projectID", function(req, res, next){
 // Request to get the content of a collection in a project
 router.get("/:projectID/*", function(req, res, next){
     var contentData = req.fileData.content;
-    var structureData = req.fileData.admin != null ? req.fileData.admin.project_structure : null;
+    var structureData = req.fileData.admin != null ? req.fileData.admin.project_structure : req.projectStructure;
 
     var encapsulationData = req.allParams.slice(1);
 
@@ -139,7 +145,7 @@ router.get("/:projectID/*", function(req, res, next){
     }
 
     // Checking if admin data has been read from the projects admin.json file
-    if(structureData != null){
+    if(req.fileData.admin != null){
         // Adding the value of the collections project structure property of the project admin file, 
         // as the structure property on the responseObject.
         req.responseObject.structure = structureData;
@@ -152,6 +158,14 @@ router.get("/:projectID/*", function(req, res, next){
         // Setting the collection content of the project as the response object, as no structure 
         // will be returned alongside the content
         req.responseObject = contentData;
+    }
+
+    if(structureData.max_cache_age != null){
+        res.setHeader("Cache-control", "public; max-age=" + structureData.max_cache_age);
+    } else if(req.max_cache_age != null){
+        res.setHeader("Cache-control", "public; max-age=" + req.max_cache_age);
+    } else {
+        res.setHeader("Cache-control", "no-cache");
     }
             
     // Sending the response object back in the response (which may contain the project structure,

@@ -398,6 +398,8 @@ router.post("/:projectID", function(req, res, next){
         } else {
             console.log("Not enough info supplied");
         }
+    } else {
+        next();
     }
 });
 
@@ -464,7 +466,26 @@ router.put("/:projectID", function(req, res, next){
                 }
             });
         } else {
-            req.responseObject.errors.push("No project name provided in the request");
+            req.feedsErrors.push("No project name provided in the request");
+            next(new Error());
+        }        
+    } else {
+        next();
+    }
+});
+
+router.post("/:projectID", function(req, res, next){
+    if(req.query.action == "cache"){
+        if(req.body.max_cache_age != null){
+            dbconn.query("UPDATE Project SET max_cache_age=" + dbconn.escape(req.body.max_cache_age) + " WHERE id=" + req.params.projectID, function(err, result){
+                if(err){
+                    console.log(err);
+                } else {
+                    res.send("{}");
+                }
+            });
+        } else {
+            req.feedsErrors.push("No maximum cache age included in the request");
             next(new Error());
         }        
     } else {

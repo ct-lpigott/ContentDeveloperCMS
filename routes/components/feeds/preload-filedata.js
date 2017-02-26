@@ -70,32 +70,7 @@ router.use(function(req, res, next){
                     req.user_display_name = rows[0].display_name;
                     req.user_email_address = rows[0].email_address;
 
-                    // Reading this projects admin.json file from the project directory (which is named
-                    // as per the projects ID), so that the project structure can be returned to the user
-                    fs.readFile("./projects/" + req.projectID + "/admin.json", {encoding: "utf-8"}, function(err, data){
-                        if(err){
-                            // Logging this error to the console
-                            console.log(err);
-
-                            // Unable to load this projects admin.json file, to read the structure of the 
-                            // project. Adding this as an error to the feedsErrors array.
-                            req.feedsErrors.push("Server error - unable to load this projects structure");
-
-                            // Since this is a significant issue, passing this request to the feeds-errors
-                            // route, by calling the next method with an empty error (as all errors will be
-                            // accessible from the feedsErrors array).
-                            next(new Error());
-                        } else {
-                            // Adding the data returned from the admin file, and storing it as the 
-                            // admin property of the fileData object, so that it can be used 
-                            // throughout this route
-                            req.fileData.admin = JSON.parse(data);
-
-                            // Passing this request on to the next stage of this route, so that
-                            // the admin data of the project can be used throughout this route
-                            next();                    
-                        }
-                    });
+                    next();
                 } else {
                     // Since no rows were returned from the database, this user does not have access
                     // to this project structure. Adding this as an error to the feedsErrors array.
@@ -108,6 +83,21 @@ router.use(function(req, res, next){
                 }          
             }
         });
+    } else if(req.projectID != null){
+        dbconn.query("SELECT * FROM Project WHERE id=" + req.projectID, function(err, rows, fields){
+            if(err){
+                console.log(err);
+            } else {
+                if(rows.length > 0){
+                    if(rows[0].max_cache_age != null){
+                        req.max_cache_age = rows[0].max_cache_age;
+                    }
+                } else {    
+                    console.log("This project does not exist");
+                }
+                next();
+            }
+        });
     } else {
         // Since no userID or projectID was supplied in the request, passing this on to the next
         // stage of the router below (so that just the project content can be returned,
@@ -116,6 +106,41 @@ router.use(function(req, res, next){
     }
     
 });
+// Continued - PRE for requests to read the contents of a project, it's collection or any items within those collections
+router.use(function(req, res, next){
+    // Reading this projects admin.json file from the project directory (which is named
+    // as per the projects ID), so that the project structure can be returned to the user
+    fs.readFile("./projects/" + req.projectID + "/admin.json", {encoding: "utf-8"}, function(err, data){
+        if(err){
+            // Logging this error to the console
+            console.log(err);
+
+            // Unable to load this projects admin.json file, to read the structure of the 
+            // project. Adding this as an error to the feedsErrors array.
+            req.feedsErrors.push("Server error - unable to load this projects structure");
+
+            // Since this is a significant issue, passing this request to the feeds-errors
+            // route, by calling the next method with an empty error (as all errors will be
+            // accessible from the feedsErrors array).
+            next(new Error());
+        } else {
+            var projectAdminFile = JSON.parse(data);
+            if(req.user_access_level == null){
+                req.projectStructure = projectAdminFile.project_structure;
+            } else {
+                // Adding the data returned from the admin file, and storing it as the 
+                // admin property of the fileData object, so that it can be used 
+                // throughout this route
+                req.fileData.admin = projectAdminFile;
+            }            
+
+            // Passing this request on to the next stage of this route, so that
+            // the admin data of the project can be used throughout this route
+            next();                    
+        }
+    });
+});
+
 // Continued - PRE for requests to read the contents of a project, it's collection or any items within those collections
 router.use(function(req, res, next){
     if(req.projectID != null){
@@ -139,7 +164,7 @@ router.use(function(req, res, next){
                 // the content property on the file data object, so that it can be used throughout
                 // the rest of this route
                 req.fileData.content = JSON.parse(projectContent);
-                
+
                 // Passing this request on to the next stage of the router, so that the specific
                 // portions of the project that have been requested can be traversed and returned
                 // to the user as appropriate
