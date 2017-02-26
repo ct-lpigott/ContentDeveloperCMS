@@ -82,7 +82,7 @@ router.get("/:projectID", function(req, res, next){
         });
         
     } else {
-        if(req.max_cache_age != null){
+        if(req.max_cache_age != null && req.max_cache_age > 0){
             res.setHeader("Cache-control", "public; max-age=" + req.max_cache_age);
         } else {
             res.setHeader("Cache-control", "no-cache");
@@ -160,9 +160,9 @@ router.get("/:projectID/*", function(req, res, next){
         req.responseObject = contentData;
     }
 
-    if(structureData.max_cache_age != null){
+    if(structureData.max_cache_age != null && structureData.max_cache_age > 0){
         res.setHeader("Cache-control", "public; max-age=" + structureData.max_cache_age);
-    } else if(req.max_cache_age != null){
+    } else if(req.max_cache_age != null && req.max_cache_age > 0){
         res.setHeader("Cache-control", "public; max-age=" + req.max_cache_age);
     } else {
         res.setHeader("Cache-control", "no-cache");

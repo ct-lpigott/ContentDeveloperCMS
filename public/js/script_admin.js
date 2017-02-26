@@ -123,6 +123,15 @@ function customAdminClickEventHandler(e){
                     document.getElementById("pageTitle").innerHTML = newProjectName;
                 }, "PUT");
             }
+            break;
+        }
+        case "updateMaxCacheAge":{
+            var maxCacheAge = document.getElementById("maxCacheAge").value;
+            if(maxCacheAge != null && isNaN(maxCacheAge) == false){
+                sendAjaxRequest("/feeds/" + projectID + "?action=cache", {max_cache_age: maxCacheAge}, function(responseObject){
+                }, "POST");
+            }
+            break;
         }
     }
 

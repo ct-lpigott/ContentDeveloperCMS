@@ -113,9 +113,14 @@ block main-body
                 div.row
                     div.col-12-12
                         h2 Project
-                        label Project Name:
-                            input(id="newProjectName" type="email" value=projectName)
-                        button(id="updateProjectName") Update
+                        div.row
+                            label Project Name:
+                                input(id="newProjectName" type="email" value=projectName)
+                            button(id="updateProjectName") Update
+                        div.row
+                            label Project Content Cachable
+                                input(id="maxCacheAge" type="number" value=maxCacheAge)
+                            button(id="updateMaxCacheAge") Update
                     
                     
 

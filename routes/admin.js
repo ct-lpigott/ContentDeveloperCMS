@@ -95,7 +95,8 @@ router.get("/:projectID", function(req, res, next){
                     userID: req.userID,
                     user: rows[0],
                     projectID: req.params.projectID,
-                    projectName: rows[0].project_name 
+                    projectName: rows[0].project_name,
+                    maxCacheAge: rows[0].max_cache_age
                 });
             } else {
                 req.adminErrors.push("This user does not have permission to access this project");

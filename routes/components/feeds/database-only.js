@@ -481,7 +481,7 @@ router.post("/:projectID", function(req, res, next){
                 if(err){
                     console.log(err);
                 } else {
-                    res.send("{}");
+                    res.send({max_cache_age: req.body.max_cache_age});
                 }
             });
         } else {
