@@ -15,7 +15,11 @@ var simpleGit = require("simple-git");
 
 var accessLevels = require("../../../custom_modules/access_levels.js");
 
-// Request to get the list of projects accessible by this user
+/**
+ * @api {get} /feeds/ Get user's projects
+ * @apiName GetUserProjects
+ * @apiGroup User
+ */
 router.get("/", function(req, res, next){
     console.log("GET request from " + req.userID + " to view all projects");  
 
@@ -474,6 +478,13 @@ router.put("/:projectID", function(req, res, next){
     }
 });
 
+/**
+ * @api {put} /feeds/:projectID?action=cache Update maximum cache age
+ * @apiParam {Number} :projectID Projects unique ID
+ * @apiParam {Number} max_cache_age Time in milliseconds
+ * @apiName UpdateCache
+ * @apiGroup Cache
+ */
 router.put("/:projectID", function(req, res, next){
     if(req.query.action == "cache"){
         if(req.body.max_cache_age != null){
@@ -493,6 +504,12 @@ router.put("/:projectID", function(req, res, next){
     }
 });
 
+/**
+ * @api {get} /feeds/:projectID?action=css Get custom css
+ * @apiParam {Number} projectID Projects unique ID
+ * @apiName ReadCustomCss
+ * @apiGroup CustomCSS
+ */
 router.get("/:projectID", function(req, res, next){
     if(req.query.action == "css"){
         dbconn.query("SELECT * FROM Project WHERE id=" + req.params.projectID, function(err, rows, fields){
@@ -511,6 +528,13 @@ router.get("/:projectID", function(req, res, next){
     }
 });
 
+/**
+ * @api {post} /feeds/:projectID?action=css Create/append to custom css
+ * @apiParam {Number} projectID Projects unique ID
+ * @apiParam {string} custom_css Custom css rules to be added
+ * @apiName CreateAppendCustomCss
+ * @apiGroup CustomCSS
+ */
 router.post("/:projectID", function(req, res, next){
     if(req.query.action == "css"){
         if(req.body.custom_css != null){
@@ -536,6 +560,13 @@ router.post("/:projectID", function(req, res, next){
     }
 });
 
+/**
+ * @api {put} /feeds/:projectID?action=css Update custom content css
+ * @apiParam {Number} projectID Projects unique ID
+ * @apiParam {string} custom_css Custom css rules to be added
+ * @apiName UpdateCustomCss
+ * @apiGroup CustomCSS
+ */
 router.put("/:projectID", function(req, res, next){
     if(req.query.action == "css"){
         if(req.body.custom_css != null){
