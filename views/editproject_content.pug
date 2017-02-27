@@ -1,6 +1,8 @@
 extends view_components/layout.pug
 
 block main-body
+    if customCss
+        style(type="text/css") #{customCss}
 
     div(class="content")
         include view_components/editcontent.pug

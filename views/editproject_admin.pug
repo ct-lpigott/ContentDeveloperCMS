@@ -111,7 +111,7 @@ block main-body
                             tbody(id="customiseAccessLevels")
                         button(id="addNewAccessLevel") Add New Access Level
                 div.row
-                    div.col-12-12
+                    div.col-6-12
                         h2 Project
                         div.row
                             label Project Name:
@@ -121,6 +121,10 @@ block main-body
                             label Project Content Cachable
                                 input(id="maxCacheAge" type="number" value=maxCacheAge)
                             button(id="updateMaxCacheAge") Update
+                        div.row
+                            label Custom Content Editor CSS
+                                textarea(id="customCss") #{customCss}
+                                button(id="updateCustomCss") Update
                     
                     
 

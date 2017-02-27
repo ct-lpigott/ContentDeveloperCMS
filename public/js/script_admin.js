@@ -129,8 +129,18 @@ function customAdminClickEventHandler(e){
             var maxCacheAge = document.getElementById("maxCacheAge").value;
             if(maxCacheAge != null && isNaN(maxCacheAge) == false){
                 sendAjaxRequest("/feeds/" + projectID + "?action=cache", {max_cache_age: maxCacheAge}, function(responseObject){
-                }, "POST");
+                }, "PUT");
             }
+            break;
+        }
+        case "updateCustomCss":{
+            var customCssTextarea = document.getElementById("customCss");
+            sendAjaxRequest("/feeds/" + projectID + "?action=css", {custom_css: customCssTextarea.value}, function(responseObject){
+                console.log("css updated");
+                if(responseObject.custom_css != undefined){
+                    customCssTextarea.value = responseObject.custom_css;
+                }
+            }, "PUT");
             break;
         }
     }

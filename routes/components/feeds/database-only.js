@@ -474,7 +474,7 @@ router.put("/:projectID", function(req, res, next){
     }
 });
 
-router.post("/:projectID", function(req, res, next){
+router.put("/:projectID", function(req, res, next){
     if(req.query.action == "cache"){
         if(req.body.max_cache_age != null){
             dbconn.query("UPDATE Project SET max_cache_age=" + dbconn.escape(req.body.max_cache_age) + " WHERE id=" + req.params.projectID, function(err, result){
@@ -493,6 +493,81 @@ router.post("/:projectID", function(req, res, next){
     }
 });
 
+router.get("/:projectID", function(req, res, next){
+    if(req.query.action == "css"){
+        dbconn.query("SELECT * FROM Project WHERE id=" + req.params.projectID, function(err, rows, fields){
+            if(err){
+                console.log(err);
+            } else {
+                if(rows.length > 0){
+                    res.send({custom_css: rows[0].custom_css})
+                } else {
+                    console.log("Cannot find project");
+                }
+            }
+        });
+    } else {
+        next();
+    }
+});
+
+router.post("/:projectID", function(req, res, next){
+    if(req.query.action == "css"){
+        if(req.body.custom_css != null){
+            dbconn.query("SELECT custom_css FROM Project WHERE id=" + req.params.projectID, function(err, rows, fields){
+                if(err){
+                    console.log(err);
+                } else {
+                    if(rows.length > 0){
+                        req.custom_css = rows[0].custom_css + " " + req.body.custom_css;
+                        next();
+                    } else {
+                        req.custom_css = req.body.custom_css;
+                        next();
+                    }
+                }
+            });
+        } else {
+            req.feedsErrors.push("No custom css included in the request");
+            next(new Error());
+        }
+    } else {
+        next();
+    }
+});
+
+router.put("/:projectID", function(req, res, next){
+    if(req.query.action == "css"){
+        if(req.body.custom_css != null){
+            req.custom_css = req.body.custom_css;
+            next();
+        } else {
+            req.feedsErrors.push("No custom css included in the request");
+            next(new Error());
+        }
+    } else {
+        next();
+    }
+});
+
+router.all("/:projectID", function(req, res, next){
+    if(req.query.action == "css"){
+        if(req.custom_css != null){
+            dbconn.query("UPDATE Project SET custom_css=" + dbconn.escape(req.custom_css) + " WHERE id=" + req.params.projectID, function(err, result){
+                if(err){
+                    console.log(err);
+                } else {
+                    res.redirect(303, "/feeds/" + req.params.projectID + "?action=css");
+                }
+            });
+        } else {
+            req.feedsErrors.push("No custom css included in the request");
+            next(new Error());
+        }
+    } else {
+        next();
+    }
+});
 // Exporting the router that was set up in this file, so that it can be included
 // in the app.js file and specified as the route for all requests to the "/feeds" route
 module.exports = router;
