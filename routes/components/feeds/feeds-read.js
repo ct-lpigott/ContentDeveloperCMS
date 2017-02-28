@@ -144,6 +144,15 @@ router.get("/:projectID/*", function(req, res, next){
         
     }
 
+    if(contentData.constructor.name.toLowerCase() == "array" && (req.query.startAt != null || req.query.numItems != null)){
+        var startAt = req.query.startAt != null ? req.query.startAt : 0;
+        var endAt = req.query.numItems != null ? parseInt(req.query.numItems) + parseInt(startAt) : contentData.length;
+
+        if(contentData.length > startAt){
+            contentData = contentData.slice(startAt, endAt);
+        }            
+    }
+
     // Checking if admin data has been read from the projects admin.json file
     if(req.fileData.admin != null){
         // Adding the value of the collections project structure property of the project admin file, 
