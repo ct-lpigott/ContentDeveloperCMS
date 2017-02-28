@@ -52,8 +52,9 @@ app.use("/feeds", multerUpload.single("file"));
 // route in the server based on the first URL parameter of their request i.e.
 // requests that begin with "/admin" will be routed through the admin route etc. 
 app.use("/", require("./routes/index.js"));
-app.use("/admin", require("./routes/admin.js"));
 app.use("/google", require("./routes/google.js"));
+app.use("/admin", require("./routes/admin.js"));
+app.use("/*", require("./routes/components/authentication.js"));
 app.use("/feeds", require("./routes/feeds.js"));
 
 // Setting up the error routes for the app. Errors in the admin panel and 

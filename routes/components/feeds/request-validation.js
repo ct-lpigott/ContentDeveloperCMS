@@ -17,16 +17,6 @@ router.use(function(req, res, next){
     // this to be an empty object. 
     req.responseObject = {};
 
-    // Checking if a userID was included in the query string
-    if(req.query.userID != null){
-        // Setting a userID property on the request object, and passing it the
-        // value of the userID from the query string. Using this approach so that
-        // if the method of passing the userID should need to change, this will
-        // be the only instance that will need to be updated (as req.userID is used
-        // throughout this route).
-        req.userID = req.query.userID;
-    }
-
     // Checking the type of HTTP method used for this request, as all non-GET request 
     // methods are expected to have both a userID and a body included with them
     if(req.method == "GET") {

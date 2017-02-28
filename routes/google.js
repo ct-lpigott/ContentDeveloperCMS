@@ -12,6 +12,8 @@ var google = require("googleapis");
 // connection to the database can be reused throughout the application.
 var dbconn = require("../database/connection.js");
 
+var crypto = require('crypto');
+
 // Requiring the custom google OAuth module, which exports an object with 
 // a method to generate a new oauth url, and a method which returns
 // a new OAuth2Client.
@@ -69,9 +71,7 @@ router.get("/oauthRedirectURL", function(req, res, next){
                             if(rows.length > 0){
                                 console.log("This is an existing user");
 
-                                // Storing the userID of this user on the request object, so that it can
-                                // be used throughout this route
-                                req.userID = rows[0].id;
+                                req.userAuthToken = rows[0].cd_user_auth_token;
                                 
                                 // Updating this users google profile ID and auth token, based on those returned from 
                                 // the Google API request
@@ -87,23 +87,29 @@ router.get("/oauthRedirectURL", function(req, res, next){
                                 });
                             } else {
                                 console.log("This is a new user");
-
-                                // Creating a new user in the database, using the email address, Google profile ID
-                                // and auth access token provided by the request to the Google API
-                                dbconn.query("INSERT into User(display_name, email_address, google_profile_image_url, google_profile_id, google_auth_token) VALUES(" + dbconn.escape(user.displayName) + ", " + dbconn.escape(user.emails[0].value) + ", " + dbconn.escape(userProfileImageURL) + ", " + dbconn.escape(user.id) + ", " + dbconn.escape(jsonToken) + ")", function(err, result){
-                                    if(err) {
-                                        console.log(err);
-                                    } else {
-                                        console.log("New user created in DB");
-
-                                        // Storing the userID of this user on the request object, so that it can
-                                        // be used throughout this route
-                                        req.userID = result.insertId;
-                                        
-                                        // Passing this request on to the next stage of this route
-                                        next();
-                                    }
-                                });
+                                
+                                crypto.randomBytes(256, (err, buf) => {
+                                  if (err){
+                                      throw err;
+                                  } else {
+                                      var randomAuthToken = buf.toString("hex") + Date.now();
+                                      console.log(randomAuthToken);
+                                      // Creating a new user in the database, using the email address, Google profile ID
+                                        // and auth access token provided by the request to the Google API
+                                        dbconn.query("INSERT into User(display_name, email_address, google_profile_image_url, google_profile_id, google_auth_token, cd_user_auth_token) VALUES(" + dbconn.escape(user.displayName) + ", " + dbconn.escape(user.emails[0].value) + ", " + dbconn.escape(userProfileImageURL) + ", " + dbconn.escape(user.id) + ", " + dbconn.escape(jsonToken) + ", " + dbconn.escape(randomAuthToken) + ")", function(err, result){
+                                            if(err) {
+                                                console.log(err);
+                                            } else {
+                                                console.log("New user created in DB");
+        
+                                                req.userAuthToken = randomAuthToken;
+                                                
+                                                // Passing this request on to the next stage of this route
+                                                next();
+                                            }
+                                        });
+                                  }
+                                });                                
                             }
                         }
                     });
@@ -117,9 +123,9 @@ router.get("/oauthRedirectURL", function(req, res, next){
 // their Google account
 router.get("/oauthRedirectURL", function(req, res, next){
     // Checking that a userID exists on the request object
-    if(req.userID != null){
+    if(req.userAuthToken != null){
         // Redirecting this user to the admin panel, using their userID as a parameter
-        res.redirect("/admin?userID=" + req.userID);
+        res.redirect("/admin");
     } else {
         console.log("No user was found");
         res.send("Unable to login");

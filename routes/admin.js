@@ -15,13 +15,6 @@ router.use(function(req, res, next){
     // any errors occur).
     req.adminErrors = [];
 
-    if(req.query.userID != null){
-        req.userID = req.query.userID;
-    } else {
-        req.adminErrors.push("No user ID provided. Cannot access admin panel");
-        next(new Error);
-    }
-
     // Allowing this request to continue through this route
     next();
 });

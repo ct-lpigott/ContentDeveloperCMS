@@ -22,123 +22,129 @@ router.use(function(req, res, next){
     // "/" so as to create an array of name=value pairs i.e. ["1", "books"];
     var parameters = req.url.slice(1).split("?")[0].split("/");
 
-    // Creating a new array on the request object, to store these parameters, so they can be used
-    // throughout the feeds route.
-    req.allParams = [];
-
-    // Looping through all of the parameters in the temporary array created above, to insure
-    // that only the indexes that contain a value are stored i.e. if a user requested /books/ this
-    // would create an array of 2 items ["books", ""] as the last "/" would have be used to split
-    // the string and would include an empty string in the parameters.
-    for(var i=0; i< parameters.length; i++){
-        // Checking that this parameters value is not empty
-        if(parameters[i] != ""){
-            // Adding this parameter to the request object's allParams array
-            req.allParams.push(parameters[i].toLowerCase());
+    if(parameters.length > 0 && parameters[0] != ""){
+        // Creating a new array on the request object, to store these parameters, so they can be used
+        // throughout the feeds route.
+        req.allParams = [];
+    
+        // Looping through all of the parameters in the temporary array created above, to insure
+        // that only the indexes that contain a value are stored i.e. if a user requested /books/ this
+        // would create an array of 2 items ["books", ""] as the last "/" would have be used to split
+        // the string and would include an empty string in the parameters.
+        for(var i=0; i< parameters.length; i++){
+            // Checking that this parameters value is not empty
+            if(parameters[i] != ""){
+                // Adding this parameter to the request object's allParams array
+                req.allParams.push(parameters[i].toLowerCase());
+            }
         }
-    }
-
-    req.projectID = req.allParams[0];
-
-    // Creating an empty object, to store the contents and structure of the project files, so that
-    // they can be used throughout this route
-    req.fileData = {};
-
-    if(req.userID != null && req.projectID != null){
-        // Querying the database, to find the projects that this user has access to, by joining
-        // the user table to the user_projects table. Returning only the columns needed for the 
-        // reponse to the user. 
-        dbconn.query("SELECT * FROM Project p LEFT JOIN User_Project up ON p.id = up.project_id LEFT JOIN User u ON up.user_id = u.id WHERE p.id = " + dbconn.escape(req.projectID) + " AND up.user_id = " + dbconn.escape(req.userID), function(err, rows, fields){
-            if(err){
-                // Logging this error to the console
-                console.log(err);
-
-                // Unable to query the database to check if this user has access to the structure
-                // of this project. Adding this as an error to the feedsErrors array.
-                req.feedsErrors.push("Unable to confirm user access to this project so no project structure has been returned");
-
-                // Passing this request on to the next stage of this route
-                next();
-            } else {
-                // Checking that a row has been returned from the database i.e. that this user has
-                // been matched with this project.
-                if(rows.length > 0){
-
-                    // Storing the users access level on the request object, to be used throughout
-                    // the rest of this route
-                    req.user_access_level = rows[0].access_level_int;
-                    req.user_display_name = rows[0].display_name;
-                    req.user_email_address = rows[0].email_address;
-
+    
+        req.projectID = req.allParams[0];
+    
+        // Creating an empty object, to store the contents and structure of the project files, so that
+        // they can be used throughout this route
+        req.fileData = {};
+        if(req.userID != null && req.projectID != null){
+            // Querying the database, to find the projects that this user has access to, by joining
+            // the user table to the user_projects table. Returning only the columns needed for the 
+            // reponse to the user. 
+            dbconn.query("SELECT * FROM Project p LEFT JOIN User_Project up ON p.id = up.project_id LEFT JOIN User u ON up.user_id = u.id WHERE p.id = " + dbconn.escape(req.projectID) + " AND up.user_id = " + dbconn.escape(req.userID), function(err, rows, fields){
+                if(err){
+                    // Logging this error to the console
+                    console.log(err);
+    
+                    // Unable to query the database to check if this user has access to the structure
+                    // of this project. Adding this as an error to the feedsErrors array.
+                    req.feedsErrors.push("Unable to confirm user access to this project so no project structure has been returned");
+    
+                    // Passing this request on to the next stage of this route
                     next();
                 } else {
-                    // Since no rows were returned from the database, this user does not have access
-                    // to this project structure. Adding this as an error to the feedsErrors array.
-                    req.feedsErrors.push("Server error - this user does not have admin access to this project");
-
-                    // Since this is a significant issue, passing this request to the feeds-errors
-                    // route, by calling the next method with an empty error (as all errors will be
-                    // accessible from the feedsErrors array).
-                    next(new Error());
-                }          
-            }
-        });
-    } else if(req.projectID != null){
-        dbconn.query("SELECT * FROM Project WHERE id=" + req.projectID, function(err, rows, fields){
-            if(err){
-                console.log(err);
-            } else {
-                if(rows.length > 0){
-                    if(rows[0].max_cache_age != null){
-                        req.max_cache_age = rows[0].max_cache_age;
-                    }
-                } else {    
-                    console.log("This project does not exist");
-                }
-                next();
-            }
-        });
-    } else {
-        // Since no userID or projectID was supplied in the request, passing this on to the next
-        // stage of the router below (so that just the project content can be returned,
-        // without the project structure included)
-        next();
-    }
+                    // Checking that a row has been returned from the database i.e. that this user has
+                    // been matched with this project.
+                    if(rows.length > 0){
     
+                        // Storing the users access level on the request object, to be used throughout
+                        // the rest of this route
+                        req.user_access_level = rows[0].access_level_int;
+                        req.user_display_name = rows[0].display_name;
+                        req.user_email_address = rows[0].email_address;
+    
+                        next();
+                    } else {
+                        // Since no rows were returned from the database, this user does not have access
+                        // to this project structure. Adding this as an error to the feedsErrors array.
+                        req.feedsErrors.push("Server error - this user does not have admin access to this project");
+    
+                        // Since this is a significant issue, passing this request to the feeds-errors
+                        // route, by calling the next method with an empty error (as all errors will be
+                        // accessible from the feedsErrors array).
+                        next(new Error());
+                    }          
+                }
+            });
+        } else if(req.projectID != null){
+            dbconn.query("SELECT * FROM Project WHERE id=" + req.projectID, function(err, rows, fields){
+                if(err){
+                    console.log(err);
+                } else {
+                    if(rows.length > 0){
+                        if(rows[0].max_cache_age != null){
+                            req.max_cache_age = rows[0].max_cache_age;
+                        }
+                    } else {    
+                        console.log("This project does not exist");
+                    }
+                    next();
+                }
+            });
+        } else {
+            // Since no userID or projectID was supplied in the request, passing this on to the next
+            // stage of the router below (so that just the project content can be returned,
+            // without the project structure included)
+            next();
+        }
+    } else {
+        next();
+    }    
 });
 // Continued - PRE for requests to read the contents of a project, it's collection or any items within those collections
 router.use(function(req, res, next){
-    // Reading this projects admin.json file from the project directory (which is named
-    // as per the projects ID), so that the project structure can be returned to the user
-    fs.readFile("./projects/" + req.projectID + "/admin.json", {encoding: "utf-8"}, function(err, data){
-        if(err){
-            // Logging this error to the console
-            console.log(err);
-
-            // Unable to load this projects admin.json file, to read the structure of the 
-            // project. Adding this as an error to the feedsErrors array.
-            req.feedsErrors.push("Server error - unable to load this projects structure");
-
-            // Since this is a significant issue, passing this request to the feeds-errors
-            // route, by calling the next method with an empty error (as all errors will be
-            // accessible from the feedsErrors array).
-            next(new Error());
-        } else {
-            var projectAdminFile = JSON.parse(data);
-            if(req.user_access_level == null){
-                req.projectStructure = projectAdminFile.project_structure;
+    if(req.projectID != null){
+        // Reading this projects admin.json file from the project directory (which is named
+        // as per the projects ID), so that the project structure can be returned to the user
+        fs.readFile("./projects/" + req.projectID + "/admin.json", {encoding: "utf-8"}, function(err, data){
+            if(err){
+                // Logging this error to the console
+                console.log(err);
+    
+                // Unable to load this projects admin.json file, to read the structure of the 
+                // project. Adding this as an error to the feedsErrors array.
+                req.feedsErrors.push("Server error - unable to load this projects structure");
+    
+                // Since this is a significant issue, passing this request to the feeds-errors
+                // route, by calling the next method with an empty error (as all errors will be
+                // accessible from the feedsErrors array).
+                next(new Error());
             } else {
-                // Adding the data returned from the admin file, and storing it as the 
-                // admin property of the fileData object, so that it can be used 
-                // throughout this route
-                req.fileData.admin = projectAdminFile;
-            }            
-
-            // Passing this request on to the next stage of this route, so that
-            // the admin data of the project can be used throughout this route
-            next();                    
-        }
-    });
+                var projectAdminFile = JSON.parse(data);
+                if(req.user_access_level == null){
+                    req.projectStructure = projectAdminFile.project_structure;
+                } else {
+                    // Adding the data returned from the admin file, and storing it as the 
+                    // admin property of the fileData object, so that it can be used 
+                    // throughout this route
+                    req.fileData.admin = projectAdminFile;
+                }            
+    
+                // Passing this request on to the next stage of this route, so that
+                // the admin data of the project can be used throughout this route
+                next();                    
+            }
+        });
+    } else {
+        next();
+    }
 });
 
 // Continued - PRE for requests to read the contents of a project, it's collection or any items within those collections
