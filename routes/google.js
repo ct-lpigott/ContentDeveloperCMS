@@ -93,6 +93,9 @@ router.get("/oauthRedirectURL", function(req, res, next){
                                       throw err;
                                   } else {
                                       var randomAuthToken = buf.toString("hex") + Date.now();
+                                      while(randomAuthToken.length > 525){
+                                          randomAuthToken = randomAuthToken.substring(1);
+                                      }
                                       console.log(randomAuthToken);
                                       // Creating a new user in the database, using the email address, Google profile ID
                                         // and auth access token provided by the request to the Google API
