@@ -187,11 +187,11 @@ function updateUserProjects(userProjects){
     var userProjectsTableBody = document.getElementById("userProjects").getElementsByTagName("tbody")[0];
     userProjectsTableBody.innerHTML = "";
 
-    if(userProjects.length == 0){
+    if(userProjects.length == undefined || userProjects.length == 0){
         var newTr = document.createElement("tr");
         var newTd = document.createElement("td");
         newTd.innerHTML = "You have no projects. Please create one!";
-        newTd.setAttribute("colspan", "3");
+        newTd.setAttribute("colspan", "5");
         newTr.appendChild(newTd);
         userProjectsTableBody.appendChild(newTd);
     } else {
