@@ -142,7 +142,6 @@ function clickEventHandler(e){
 
 function sendAjaxRequest(url, requestData, callback, method="GET"){
     var queryStringURL = url.indexOf("?") > -1 ? url + "&" : url + "?";
-    queryStringURL += "userID=" + userID;
 
     var formData = new FormData();
 

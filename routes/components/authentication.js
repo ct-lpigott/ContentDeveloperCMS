@@ -9,8 +9,16 @@ var dbconn = require("../../database/connection.js");
 
 router.use(function(req, res, next){
 	console.log("Authentication");
+	var userAuthToken;
+	
 	if(req.headers.user_auth_token != null){
-		dbconn.query("SELECT * FROM User WHERE cd_user_auth_token=" + dbconn.escape(req.headers.user_auth_token) + "", function(err, rows, fields){
+		userAuthToken = req.headers.user_auth_token;
+	} else if(req.session != null && req.session.user_auth_token != null){
+		userAuthToken = req.session.user_auth_token;
+	}
+	
+	if(userAuthToken != null){
+		dbconn.query("SELECT * FROM User WHERE cd_user_auth_token=" + dbconn.escape(userAuthToken) + "", function(err, rows, fields){
 			if(err){
 				console.log(err);
 				next(new Error("Unable to find user", null));			

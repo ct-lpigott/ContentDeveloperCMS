@@ -1,4 +1,3 @@
-var userID;
 var projectID;
 var draggingElement;
 var dragStartY;
@@ -6,7 +5,6 @@ var projectStructureHistoryPreviewTextarea;
 var projectContentHistoryPreviewTextarea;
 
 function customAdminWindowOnload(){
-    userID = document.getElementById("userID").value;
 
     if(document.getElementById("userProjects")){
         sendAjaxRequest("/feeds/", {}, function(responseObject){
@@ -210,7 +208,7 @@ function updateUserProjects(userProjects){
             newTd_accessLevel.innerHTML = userProjects[i].access_level_name;
 
             var newA = document.createElement("a");
-            newA.setAttribute("href", "/admin/" + userProjects[i].project_id + "?userID=" + userID);
+            newA.setAttribute("href", "/admin/" + userProjects[i].project_id);
             newA.innerHTML = "Edit";
             newTd_options.appendChild(newA);
 

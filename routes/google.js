@@ -124,7 +124,8 @@ router.get("/oauthRedirectURL", function(req, res, next){
 router.get("/oauthRedirectURL", function(req, res, next){
     // Checking that a userID exists on the request object
     if(req.userAuthToken != null){
-        // Redirecting this user to the admin panel, using their userID as a parameter
+        // Redirecting this user to the admin panel, using their userID as a 
+        req.session.user_auth_token = req.userAuthToken;
         res.redirect("/admin");
     } else {
         console.log("No user was found");

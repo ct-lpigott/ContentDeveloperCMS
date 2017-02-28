@@ -14,9 +14,12 @@ router.use(function(req, res, next){
     // be rendered in the error page for the admin-errors route (should
     // any errors occur).
     req.adminErrors = [];
-
-    // Allowing this request to continue through this route
-    next();
+    
+    if(req.userID != null){
+        next();
+    } else {
+        res.redirect("/");
+    }
 });
 
 // Request to view the list of projects available to this user 
@@ -37,7 +40,7 @@ router.get("/", function(req, res, next){
                 // page and the user
                 res.render("admin", {
                     pageTitle: "Admin Panel",
-                    user: rows[0] 
+                    user: rows[0], 
                 });
             } else {
                 req.adminErrors.push("This user is not recognised");

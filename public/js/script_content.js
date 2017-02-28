@@ -1,4 +1,3 @@
-var userID;
 var projectID;
 var projectStructure;
 var draggingElement;
@@ -9,7 +8,6 @@ var content;
 var projectContentContainer;
 
 function customContentWindowOnload(){
-    userID = document.getElementById("userID").value;
     projectID = document.getElementById("projectID").value;
     projectContentContainer = document.getElementById("projectCollectionsContent");
     sendAjaxRequest("/feeds/" + projectID, {}, function(responseObject){

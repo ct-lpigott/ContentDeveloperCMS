@@ -10,6 +10,7 @@ var redirectHttps = require("redirect-https");
 var multer = require("multer");
 var bodyParser = require('body-parser');
 var checkDirectories = require("./custom_modules/check_directories.js");
+var session = require("express-session");
 
 checkDirectories();
 
@@ -46,6 +47,13 @@ var multerUpload = multer({
   })
 });
 
+app.use("/", session({
+    secret: process.env.SESSION_KEY,
+    resave: false,
+    saveUninitialized: false
+    //,cookie: { secure: true } << Cant enable while running locally
+}));
+
 app.use("/feeds", multerUpload.single("file"));
 
 // Setting up the routing structure of the app. Sending requests to a different
@@ -53,8 +61,8 @@ app.use("/feeds", multerUpload.single("file"));
 // requests that begin with "/admin" will be routed through the admin route etc. 
 app.use("/", require("./routes/index.js"));
 app.use("/google", require("./routes/google.js"));
-app.use("/admin", require("./routes/admin.js"));
 app.use("/*", require("./routes/components/authentication.js"));
+app.use("/admin", require("./routes/admin.js"));
 app.use("/feeds", require("./routes/feeds.js"));
 
 // Setting up the error routes for the app. Errors in the admin panel and 
