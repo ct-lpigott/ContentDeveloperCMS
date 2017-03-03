@@ -17,30 +17,13 @@ checkDirectories();
 // Generating a new app using the express module
 var app = express();
 
+// Intercepting all requests
+app.use("/*", require("./routes/components/authentication.js"));
+
 // Setting the app to use the body parser for all requests to the server.
 // Using the json() method for parsing requests with a content type of
 // "application/json"
 app.use(bodyParser.json()); 
-
-// Intercepting all requests, to set the response headers for implementing
-// HSTS (HTTP Strict-Transport-Security) to ensure the site can only ever be accessed
-// through HTTPS
-app.use(function(req, res, next){
-  // Setting the Strict Transport Security header to be valid for 1 year,
-  // and to include all subdomains
-  res.setHeader("Strict-Transport-Security", "max-age=31536000");
-
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, user_auth_token");
-
-  if(req.method == "OPTIONS"){
-    // Responding to preflight requests
-    res.send();
-  } else {
-    // Passing this request onto the next router, so that it can continue through the app
-    next();
-  }  
-});
 
 var multerUpload = multer({
   storage: multer.diskStorage({
@@ -69,7 +52,6 @@ app.use("/feeds", multerUpload.single("file"));
 // requests that begin with "/admin" will be routed through the admin route etc. 
 app.use("/", require("./routes/index.js"));
 app.use("/google", require("./routes/google.js"));
-app.use("/*", require("./routes/components/authentication.js"));
 app.use("/admin", require("./routes/admin.js"));
 app.use("/feeds", require("./routes/feeds.js"));
 
