@@ -30,8 +30,16 @@ app.use(function(req, res, next){
   // and to include all subdomains
   res.setHeader("Strict-Transport-Security", "max-age=31536000");
 
-  // Passing this request onto the next router, so that it can continue through the app
-  next();
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, user_auth_token");
+
+  if(req.method == "OPTIONS"){
+    // Responding to preflight requests
+    res.send();
+  } else {
+    // Passing this request onto the next router, so that it can continue through the app
+    next();
+  }  
 });
 
 var multerUpload = multer({

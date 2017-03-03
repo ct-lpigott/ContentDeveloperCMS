@@ -13,6 +13,13 @@ router.put("/:projectID", function(req, res, next){
             if(req.body.structure != null){
                 // Transforming the project structure within the request body to lowercase,
                 // as the project structure should not contain uppercase characters
+                if(typeof req.body.structure != "string"){
+                    if(validation.objectToJson(req.body.structure)){
+                        req.body.structure = JSON.stringify(req.body.structure);
+                    } else {
+                        next(new Error("Invalid structure"));
+                    }
+                }
                 req.body.structure = req.body.structure.toLowerCase();                   
 
                 if(validation.jsonToObject(req.body.structure)){

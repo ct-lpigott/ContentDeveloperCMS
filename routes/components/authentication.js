@@ -25,17 +25,26 @@ router.use(function(req, res, next){
 			} else {
 				if(rows.length > 0){
 					req.userID = rows[0].id;
+					res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
 					console.log("Successful Auth");
 					next();
 				} else {
+					// Since this does not appear to be a recognised user, only allowing
+					// the origins of this request to preform GET requests on the server
+					res.setHeader("Access-Control-Allow-Methods", "GET");
 					next(new Error("Invalid user authentication token", null));
 				}
 			}
 		});
-	} else if(req.method == "GET"){
-		next();
 	} else {
-		next(new Error("No user authentication token supplied in the request"));
+		// Since there was no user auth token provided in the request, only allowing
+		// the origins of this request to preform GET requests on the server
+		res.setHeader("Access-Control-Allow-Methods", "GET");
+		if(req.method == "GET"){
+			next();
+		} else {
+			next(new Error("No user authentication token supplied in the request"));
+		}
 	}
 });
 
