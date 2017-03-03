@@ -5,7 +5,7 @@ var router = require('express').Router();
 
 // All
 router.use(require("./components/feeds/request-validation.js"));
-router.use(require("./components/feeds/database-only.js"));
+router.use(require("./components/feeds/feeds-actions.js"));
 router.use(require("./components/feeds/preload-filedata.js"));
 
 // CREATE (post)
