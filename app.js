@@ -17,6 +17,13 @@ checkDirectories();
 // Generating a new app using the express module
 var app = express();
 
+app.use("/", session({
+    secret: process.env.SESSION_KEY,
+    resave: false,
+    saveUninitialized: false
+    //,cookie: { secure: true } << Cant enable while running locally
+}));
+
 // Intercepting all requests
 app.use("/*", require("./routes/components/authentication.js"));
 
@@ -37,14 +44,6 @@ var multerUpload = multer({
     }
   })
 });
-
-app.use("/", session({
-    secret: process.env.SESSION_KEY,
-    resave: false,
-    saveUninitialized: false
-    //,cookie: { secure: true } << Cant enable while running locally
-}));
-
 app.use("/feeds", multerUpload.single("file"));
 
 // Setting up the routing structure of the app. Sending requests to a different
