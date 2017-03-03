@@ -122,7 +122,7 @@ function uploadFiles(cb){
 
 function uploadFile(fileInput, cb){
     console.log(fileInput.files[0]);
-    sendAjaxRequest("/feeds/" + projectID + "?action=uploadFile", {file: fileInput.files[0]}, function(responseObject){
+    sendAjaxRequest("/feeds/" + projectID + "?action=mediaItems", {file: fileInput.files[0]}, function(responseObject){
         fileInput.setAttribute("data-file_url", responseObject.fileUrl);
         updateThumbnailImage(fileInput, responseObject.fileUrl);
         cb();

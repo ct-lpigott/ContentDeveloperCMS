@@ -55,7 +55,7 @@ function clickEventHandler(e){
             var imageInput = e.target.parentNode.getElementsByTagName("input")[0];
             imagePreviewContainer.setAttribute("data-for_input", imageInput.id);
             var nextPageToken = imageInput.getAttribute("data-next_page_token");
-            sendAjaxRequest("/feeds/" + projectID + "?action=mediaFiles&numFiles=9&nextPageToken=" + nextPageToken, {}, function(responseObject){
+            sendAjaxRequest("/feeds/" + projectID + "?action=mediaItems&numFiles=9&nextPageToken=" + nextPageToken, {}, function(responseObject){
                 if(responseObject != null){
                     if(responseObject.nextPageToken != null){
                         imageInput.setAttribute("data-next_page_token", responseObject.nextPageToken);
