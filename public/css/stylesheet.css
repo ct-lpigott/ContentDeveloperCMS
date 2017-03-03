@@ -80,6 +80,9 @@ button {
 #projectContent, table, td, th {
     border: 1px solid #aaa;
 }
+#projectContent label {
+    margin-right: 2%;
+}
 #projectCollectionsContent {
     min-height: 40vh;
 }

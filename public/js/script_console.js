@@ -216,6 +216,9 @@ function createItemInputElements(collection, itemContent=null, itemIndex=-1){
                     }   
                 }
             } else {
+                if(inputAttribute == "required"){
+                    newLabel.innerHTML += " *"
+                }
                 // For all other attributes defined in the project structure (excluding "options", which
                 // are dealt with above) setting them as attributes on the new element
                 newInputElement.setAttribute(inputAttribute, projectStructure[collection]["attributes"][inputAttribute]);
@@ -295,6 +298,9 @@ function createItemInputElements(collection, itemContent=null, itemIndex=-1){
                         }
                     }
                 } else {
+                    if(inputAttribute == "required"){
+                        newLabel.innerHTML += " *"
+                    }
                     // For all other attributes defined in the project structure (excluding "options", which
                     // are dealt with above) setting them as attributes on the new element
                     newElement.setAttribute(inputAttribute, projectStructure[collection]["items"][itemInput]["attributes"][inputAttribute]);
