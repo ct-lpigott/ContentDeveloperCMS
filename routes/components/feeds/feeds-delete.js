@@ -8,7 +8,13 @@ router.delete("/:projectID", function(req, res, next){
     res.send("DELETE request received from userID=" + req.userID + " for projectID=" + req.params.project);
 });
 
-// Request to delete an item or collections CONTENT in a project
+/**
+ * @api {delete} /feeds/:projectID/:itemPath Delete a content item
+ * @apiParam {int} :projectID Projects unique ID
+ * @apiParam {string} :itemPath Encapsulation path to item within the project
+ * @apiName DeleteContent
+ * @apiGroup ProjectContent
+ */
 // Note project structure cannot be deleted
 router.delete("/:projectID/*", function(req, res, next){
     // Checking that the request contains more than just the project ID

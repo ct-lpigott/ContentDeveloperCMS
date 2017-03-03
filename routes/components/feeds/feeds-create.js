@@ -7,8 +7,15 @@ var accessLevels = require("../../../custom_modules/access_levels.js");
 
 var validation = require("../../../custom_modules/validation.js");
 
-// Request to create a new item or collections STRUCTURE in a project
-router.post("/:projectID/*", function(req, res, next){
+/**
+ * @api {post} /feeds/:projectID/:itemPath Create a new item structure
+ * @apiParam {int} :projectID Projects unique ID
+ * @apiParam {string} :itemPath Encapsulation path to item within the project
+ * @apiParam {json} structure JSON to be added to to the projects structure
+ * @apiName CreateItemStructure
+ * @apiGroup ProjectStructure
+ */
+router.post("/:projectID/:itemPath", function(req, res, next){
     // Checking that the request contains more than just the project ID
     if(req.allParams.length > 1){
         // Checking that the body of the request contains structure i.e. the structure
@@ -285,7 +292,14 @@ router.post("/:projectID/*", function(req, res, next){
     }
 });
 
-// Request to create a new item or collections CONTENT in a project
+/**
+ * @api {post} /feeds/:projectID/:itemPath Create a new content item
+ * @apiParam {int} :projectID Projects unique ID
+ * @apiParam {string} :itemPath Encapsulation path to item within the project
+ * @apiParam {any} content Content to be added to the project (datatype depends on project structure)
+ * @apiName CreateItemContent
+ * @apiGroup ProjectContent
+ */
 router.post("/:projectID/*", function(req, res, next){
     // Checking that the request contains more than just the project ID
     if(req.allParams.length > 1){

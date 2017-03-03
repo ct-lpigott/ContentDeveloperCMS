@@ -34,7 +34,18 @@ router.get("/:projectID", function(req, res, next){
     }
 });
 
-// Request to get the entire content of a project
+/**
+ * @api {get} /feeds/:projectID Get entire project structure
+ * @apiParam {int} :projectID Projects unique ID
+ * @apiName GetProjectStructure
+ * @apiGroup ProjectStructure
+ */
+/**
+ * @api {get} /feeds/:projectID Get entire project content
+ * @apiParam {int} :projectID Projects unique ID
+ * @apiName GetProjectContent
+ * @apiGroup ProjectContent
+ */
 router.get("/:projectID", function(req, res, next){
     if(req.fileData.admin != null){
         // Adding the value of the project structure property of the project admin file, 
@@ -97,7 +108,20 @@ router.get("/:projectID", function(req, res, next){
     }
 });
 
-// Request to get the content of a collection in a project
+/**
+ * @api {get} /feeds/:projectID/:itemPath Get an items structure
+ * @apiParam {int} :projectID Projects unique ID
+ * @apiParam {string} :itemPath Encapsulation path to item within the project
+ * @apiName GetItemStructure
+ * @apiGroup ProjectStructure
+ */
+/**
+ * @api {get} /feeds/:projectID/:itemPath Get an items content
+ * @apiParam {int} :projectID Projects unique ID
+ * @apiParam {string} :itemPath Encapsulation path to item within the project
+ * @apiName GetItemContent
+ * @apiGroup ProjectContent
+ */
 router.get("/:projectID/*", function(req, res, next){
     var contentData = req.fileData.content;
     var structureData = req.fileData.admin != null ? req.fileData.admin.project_structure : req.projectStructure;

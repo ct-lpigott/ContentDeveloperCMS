@@ -90,7 +90,7 @@ router.get("/", function(req, res, next){
  * @api {post} /feeds?action=createProject Create a new project
  * @apiParam {string} projectName Name for the new proejct
  * @apiName CreateProject
- * @apiGroup Projects
+ * @apiGroup ProjectDetails
  */
 router.post("/", function(req, res, next){
     if(req.query.action == "createProject"){
@@ -740,7 +740,7 @@ router.get("/:projectID", function(req, res, next){
  * @apiParam {int} :projectID Projects unique ID
  * @apiParam {string} projectName New name for the project
  * @apiName UpdateProjectName
- * @apiGroup Projects
+ * @apiGroup ProjectDetails
  */
 router.put("/:projectID", function(req, res, next){
     if(req.query.action == "projectName"){
@@ -765,7 +765,7 @@ router.put("/:projectID", function(req, res, next){
  * @api {get} /feeds/:projectID?action=cache Get maximum cache age
  * @apiParam {int} :projectID Projects unique ID
  * @apiName GetCacheAge
- * @apiGroup Cache
+ * @apiGroup ProjectDetails
  */
 router.get("/:projectID", function(req, res, next){
     if(req.query.action == "cache"){
@@ -791,7 +791,7 @@ router.get("/:projectID", function(req, res, next){
  * @apiParam {int} :projectID Projects unique ID
  * @apiParam {int} max_cache_age Time in milliseconds
  * @apiName UpdateCacheAge
- * @apiGroup Cache
+ * @apiGroup ProjectDetails
  */
 router.put("/:projectID", function(req, res, next){
     if(req.query.action == "cache"){
