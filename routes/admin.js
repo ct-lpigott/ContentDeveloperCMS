@@ -50,6 +50,11 @@ router.get("/", function(req, res, next){
     });
 });
 
+router.get("/logout", function(req, res, next){
+    req.userID = null;
+    res.redirect("/");
+});
+
 // Request to view a specific project belonging to this user
 router.get("/:projectID", function(req, res, next){
     // Querying the database, to check if this user has permissions to access this project, using

@@ -17,8 +17,9 @@ html
                 if user != undefined
                     div.col-4-12.right
                         span Welcome back 
-                            if user.displayName
-                            | #{user.displayName}
-                
+                            if user.display_name
+                            | #{user.display_name}
+                        button
+                            a(href="/admin/logout") Logout
                         if user.google_profile_image_url
-                            img(src=user.google_profile_image_url title=user.displayName class="profileImage")
+                            img(src=user.google_profile_image_url title=user.display_name class="profileImage")
