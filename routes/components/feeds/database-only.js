@@ -15,67 +15,81 @@ var simpleGit = require("simple-git");
 
 var accessLevels = require("../../../custom_modules/access_levels.js");
 
-/**
- * @api {get} /feeds/ Get user's projects
- * @apiName GetUserProjects
- * @apiGroup User
- */
-router.get("/", function(req, res, next){
-    console.log("GET request from " + req.userID + " to view all projects");  
-
-    // Checking that a userID has been provided within the request
-    if(req.userID != null){
-        // Querying the database, to find the projects that this user has access to, by joining
-        // the user table to the user_projects table. Returning only the columns needed for the 
-        // reponse to the user
-        dbconn.query("SELECT up.user_id, up.project_id, up.access_level_int, p.project_name FROM User_Project up LEFT JOIN Project p ON p.id = up.project_id WHERE up.user_id =" + dbconn.escape(req.userID), function(err, rows, fields){
-            if(err){
-                // Logging this error to the console
-                console.log(err);
-
-                // An error has occurred in the database. Adding this as an error to the feedsErrors array.
-                req.feedsErrors.push("Server error - unable to access this users projects");
-
-                // Since this is a significant issue, passing this request to the feeds-errors
-                // route, by calling the next method with an empty error (as all errors will be
-                // accessible from the feedsErrors array).
-                next(new Error());
-            } else {
-                // Checking that at least one project has been returned from the database
-                if(rows.length > 0){
-                    accessLevels.appendAllAccessLevelNames(rows, null, function(fullAccessLevelDetails){
-                        res.send(fullAccessLevelDetails);
-                    });
-                } else {
-                    // This user has no projects
-                    res.send("{}");
-                }
-            }
-        });
-    } else {
-        // This request has no userID, and so it was not possible to find this
-        // users projects. Adding this as an error to the feedsErrors array.
-        req.feedsErrors.push("No body provided in the request");
-
-        // Since this is a significant issue, passing this request to the feeds-errors
-        // route, by calling the next method with an empty error (as all errors will be
-        // accessible from the feedsErrors array).
-        next(new Error());
-    }
-    
-});
-
-router.post("/:projectID", function(req, res, next){
+router.all("/:projectID", function(req, res, next){
     if(req.query.action != null){
-        next();
+        if(req.userID != null){
+            next();
+        } else {
+            req.feedsErrors.push("Only authenticated users can request actions");
+            next(new Error());
+        }        
     } else {
         next("route");
     }
 });
 
-// Request to add a collaborator to a project
+/**
+ * @api {get} /feeds?action=collaborators Get projects that current user is a collaborator on
+ * @apiName GetUserProjects
+ * @apiGroup Collaborators
+ */
+router.get("/", function(req, res, next){
+    if(req.query.action == "collaborators"){
+        console.log("GET request from " + req.userID + " to view all projects");  
+
+        // Checking that a userID has been provided within the request
+        if(req.userID != null){
+            // Querying the database, to find the projects that this user has access to, by joining
+            // the user table to the user_projects table. Returning only the columns needed for the 
+            // reponse to the user
+            dbconn.query("SELECT up.user_id, up.project_id, up.access_level_int, p.project_name FROM User_Project up LEFT JOIN Project p ON p.id = up.project_id WHERE up.user_id =" + dbconn.escape(req.userID), function(err, rows, fields){
+                if(err){
+                    // Logging this error to the console
+                    console.log(err);
+
+                    // An error has occurred in the database. Adding this as an error to the feedsErrors array.
+                    req.feedsErrors.push("Server error - unable to access this users projects");
+
+                    // Since this is a significant issue, passing this request to the feeds-errors
+                    // route, by calling the next method with an empty error (as all errors will be
+                    // accessible from the feedsErrors array).
+                    next(new Error());
+                } else {
+                    // Checking that at least one project has been returned from the database
+                    if(rows.length > 0){
+                        accessLevels.appendAllAccessLevelNames(rows, null, function(fullAccessLevelDetails){
+                            res.send(fullAccessLevelDetails);
+                        });
+                    } else {
+                        // This user has no projects
+                        res.send("{}");
+                    }
+                }
+            });
+        } else {
+            // This request has no userID, and so it was not possible to find this
+            // users projects. Adding this as an error to the feedsErrors array.
+            req.feedsErrors.push("No body provided in the request");
+
+            // Since this is a significant issue, passing this request to the feeds-errors
+            // route, by calling the next method with an empty error (as all errors will be
+            // accessible from the feedsErrors array).
+            next(new Error());
+        }
+    } else {
+        next();
+    }    
+});
+
+/**
+ * @api {post} /feeds/:projectID?action=collaborators Add a collaborator to a project
+ * @apiParam {int} :projectID Projects unique ID
+ * @apiParam {string} email Email address of the collaborator to be added
+ * @apiName AddCollaborator
+ * @apiGroup Collaborators
+ */
 router.post("/:projectID", function(req, res, next){
-    if(req.query.action == "addCollaborator"){
+    if(req.query.action == "collaborators"){
         // Checking that an email address has been included in the request object
         if(req.body.email != null && req.body.email.length > 0){
             // Querying the database, to see if a user with this email address already exists
@@ -141,7 +155,7 @@ router.post("/:projectID", function(req, res, next){
 });
 // Continued - Continuation of route for request to add a collaborator to a project
 router.post("/:projectID", function(req, res, next){
-    if(req.query.action == "addCollaborator"){
+    if(req.query.action == "collaborators"){
         // Checking if an access level property was provided in the request, and that the
         // value of that property is greater than 0
         if(req.body.accessLevelInt != null){
@@ -169,7 +183,7 @@ router.post("/:projectID", function(req, res, next){
                             // Logging the error to the console
                             console.log("This user is already a collaborator on this project");
 
-                            res.redirect(303, "/feeds/" + req.params.projectID + "?action=getCollaborators");
+                            res.redirect(303, "/feeds/" + req.params.projectID + "?action=collaborators");
                         } else {
                             // As this is a different access level for this user, for this project, updating the
                             // user_project table to reflect this i.e. changing this users level for this project
@@ -200,7 +214,7 @@ router.post("/:projectID", function(req, res, next){
                                         }
                                     }); 
 
-                                    res.redirect(303, "/feeds/" + req.params.projectID + "?action=getCollaborators");
+                                    res.redirect(303, "/feeds/" + req.params.projectID + "?action=collaborators");
                                 }
                             });
                         }
@@ -242,7 +256,7 @@ router.post("/:projectID", function(req, res, next){
                                                         }
                                                     });                    
                     
-                                                    res.redirect(303, "/feeds/" + req.params.projectID + "?action=getCollaborators");
+                                                    res.redirect(303, "/feeds/" + req.params.projectID + "?action=collaborators");
                                                 }
                                             });
                                         }
@@ -273,9 +287,14 @@ router.post("/:projectID", function(req, res, next){
     }
 });
 
-// Request to get all collaborators for a project
+/**
+ * @api {get} /feeds/:projectID?action=collaborators Get all collaborators for a project
+ * @apiParam {int} :projectID Projects unique ID
+ * @apiName GetCollaborators
+ * @apiGroup Collaborators
+ */
 router.get("/:projectID", function(req, res, next){
-    if(req.query.action == "getCollaborators"){
+    if(req.query.action == "collaborators"){
         // Querying the database, to get all collaborators for this project
 
         dbconn.query("SELECT u.display_name, up.user_id, up.access_level_int FROM User_Project up LEFT JOIN User u ON up.user_id = u.id WHERE up.project_id=" + dbconn.escape(req.params.projectID), function(err, rows, fields){
@@ -294,9 +313,15 @@ router.get("/:projectID", function(req, res, next){
     }
 });
 
-// Request to delete a collaborator from a project
+/**
+ * @api {delete} /feeds/:projectID?action=collaborators Remove a collaborator from a project
+ * @apiParam {int} :projectID Projects unique ID
+ * @apiParam {int} collaboratorID ID of the collaborator to be removed
+ * @apiName DeleteCollaborator
+ * @apiGroup Collaborators
+ */
 router.delete("/:projectID", function(req, res, next){
-    if(req.query.action == "removeCollaborator"){
+    if(req.query.action == "collaborators"){
         if(req.body.collaboratorID != null){
             dbconn.query("SELECT * FROM User_Project up LEFT JOIN User u ON up.user_id = u.id LEFT JOIN Project p ON up.project_id = p.id WHERE up.project_id = " + req.params.projectID, function(err, rows, fields){
                if(err){
@@ -330,7 +355,7 @@ router.delete("/:projectID", function(req, res, next){
                                             }
                                         });   
                                 
-                                        res.redirect(303, "/feeds/" + req.params.projectID + "?action=getCollaborators");
+                                        res.redirect(303, "/feeds/" + req.params.projectID + "?action=collaborators");
                                     }
                                 });
                             });
@@ -351,7 +376,13 @@ router.delete("/:projectID", function(req, res, next){
     }
 });
 
-// Request to upload a media item to a project
+/**
+ * @api {post} /feeds/:projectID?action=mediaItems Upload a media item
+ * @apiParam {int} :projectID Projects unique ID
+ * @apiParam {file} file Media item file to be uploaded
+ * @apiName UploadMediaItem
+ * @apiGroup MediaItems
+ */
 router.post("/:projectID", function(req, res, next){
     if(req.query.action == "uploadFile"){
         console.log("Uploading file");
@@ -379,7 +410,12 @@ router.post("/:projectID", function(req, res, next){
     }
 });
 
-// Request to get all access levels for a project
+/**
+ * @api {get} /feeds/:projectID?action=accessLevels Get project access levels
+ * @apiParam {int} :projectID Projects unique ID
+ * @apiName GetAccessLevels
+ * @apiGroup AccessLevels
+ */
 router.get("/:projectID", function(req, res, next){
     if(req.query.action == "accessLevels"){
         accessLevels.getProjectAccessLevels(req.params.projectID, function(projectAccessLevels){
@@ -392,7 +428,13 @@ router.get("/:projectID", function(req, res, next){
     }
 });
 
-// Request to create new access level
+/**
+ * @api {post} /feeds/:projectID?action=accessLevels Create a new access level
+ * @apiParam {int} :projectID Projects unique ID
+ * @apiParam {string} access_level_name Name for the new access level
+ * @apiName CreateAccessLevel
+ * @apiGroup AccessLevels
+ */
 router.post("/:projectID", function(req, res, next){
     if(req.query.action == "accessLevels"){
         if(req.body.access_level_name != null){
@@ -407,7 +449,13 @@ router.post("/:projectID", function(req, res, next){
     }
 });
 
-// Request to delete an access level
+/**
+ * @api {delete} /feeds/:projectID?action=accessLevels Delete access level
+ * @apiParam {int} :projectID Projects unique ID
+ * @apiParam {int} access_level_int Number of the access level to be deleted
+ * @apiName DeleteAccessLevel
+ * @apiGroup AccessLevels
+ */
 router.delete("/:projectID", function(req, res, next){
     if(req.query.action == "accessLevels"){
         if(req.body.access_level_int != null){
@@ -422,7 +470,14 @@ router.delete("/:projectID", function(req, res, next){
     }
 });
 
-// Request to update an access level
+/**
+ * @api {put} /feeds/:projectID?action=accessLevels Update access level name
+ * @apiParam {int} :projectID Projects unique ID
+ * @apiParam {int} access_level_int Number of the access level to be updated
+ * @apiParam {string} access_level_name New name for the access level
+ * @apiName UpdateAccessLevelName
+ * @apiGroup AccessLevels
+ */
 router.put("/:projectID", function(req, res, next){
     if(req.query.action == "accessLevels"){
         if(req.body.access_level_int != null && req.body.access_level_name != null){
@@ -437,7 +492,12 @@ router.put("/:projectID", function(req, res, next){
     }
 });
 
-// Request to update an access level
+/**
+ * @api {get} /feeds/:projectID?action=mediaFiles Get all media files for a project
+ * @apiParam {int} :projectID Projects unique ID
+ * @apiName GetMediaFiles
+ * @apiGroup MediaFiles
+ */
 router.get("/:projectID", function(req, res, next){
     if(req.query.action == "mediaFiles"){
         dbconn.query("SELECT * FROM User_Project up LEFT JOIN User u ON up.user_id = u.id LEFT JOIN Project p ON up.project_id = p.id WHERE up.project_id=" + req.params.projectID, function(err, rows, fields){
@@ -458,7 +518,13 @@ router.get("/:projectID", function(req, res, next){
     }
 });
 
-// Request to update a projects name
+/**
+ * @api {put} /feeds/:projectID?action=projectName Update projects name
+ * @apiParam {int} :projectID Projects unique ID
+ * @apiParam {string} projectName New name for the project
+ * @apiName UpdateProjectName
+ * @apiGroup ProjectDetails
+ */
 router.put("/:projectID", function(req, res, next){
     if(req.query.action == "projectName"){
         if(req.body.projectName != null){
@@ -479,10 +545,35 @@ router.put("/:projectID", function(req, res, next){
 });
 
 /**
+ * @api {get} /feeds/:projectID?action=cache Get maximum cache age
+ * @apiParam {int} :projectID Projects unique ID
+ * @apiName GetCacheAge
+ * @apiGroup Cache
+ */
+router.get("/:projectID", function(req, res, next){
+    if(req.query.action == "cache"){
+        dbconn.query("SELECT max_cache_age FROM Project WHERE id=" + req.params.projectID, function(err, rows, fields){
+            if(err){
+                console.log(err);
+            } else {
+                if(rows.length > 0){
+                    res.send({max_cache_age: rows[0].max_cache_age})
+                } else {
+                    req.feedsErrors.push("Unable to access the maximum cache age for this project");
+                    next(new Error());
+                }  
+            }
+        });       
+    } else {
+        next();
+    }
+});
+
+/**
  * @api {put} /feeds/:projectID?action=cache Update maximum cache age
- * @apiParam {Number} :projectID Projects unique ID
- * @apiParam {Number} max_cache_age Time in milliseconds
- * @apiName UpdateCache
+ * @apiParam {int} :projectID Projects unique ID
+ * @apiParam {int} max_cache_age Time in milliseconds
+ * @apiName UpdateCacheAge
  * @apiGroup Cache
  */
 router.put("/:projectID", function(req, res, next){
@@ -506,7 +597,7 @@ router.put("/:projectID", function(req, res, next){
 
 /**
  * @api {get} /feeds/:projectID?action=css Get custom css
- * @apiParam {Number} projectID Projects unique ID
+ * @apiParam {int} :projectID Projects unique ID
  * @apiName ReadCustomCss
  * @apiGroup CustomCSS
  */
@@ -530,7 +621,7 @@ router.get("/:projectID", function(req, res, next){
 
 /**
  * @api {post} /feeds/:projectID?action=css Create/append to custom css
- * @apiParam {Number} projectID Projects unique ID
+ * @apiParam {int} :projectID Projects unique ID
  * @apiParam {string} custom_css Custom css rules to be added
  * @apiName CreateAppendCustomCss
  * @apiGroup CustomCSS
@@ -562,7 +653,7 @@ router.post("/:projectID", function(req, res, next){
 
 /**
  * @api {put} /feeds/:projectID?action=css Update custom content css
- * @apiParam {Number} projectID Projects unique ID
+ * @apiParam {int} :projectID Projects unique ID
  * @apiParam {string} custom_css Custom css rules to be added
  * @apiName UpdateCustomCss
  * @apiGroup CustomCSS
@@ -581,6 +672,7 @@ router.put("/:projectID", function(req, res, next){
     }
 });
 
+// No API Documentation necessary (part of a route)
 router.all("/:projectID", function(req, res, next){
     if(req.query.action == "css"){
         if(req.custom_css != null){

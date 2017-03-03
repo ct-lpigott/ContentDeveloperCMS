@@ -346,7 +346,7 @@ function createItemInputElements(collection, itemContent=null, itemIndex=-1){
 }
 
 function getProjectCollaborators(){
-    sendAjaxRequest("/feeds/" + projectID + "?action=getCollaborators", {}, function(responseObject){
+    sendAjaxRequest("/feeds/" + projectID + "?action=collaborators", {}, function(responseObject){
         updateProjectCollaborators(responseObject)
     });
 }

@@ -7,7 +7,7 @@ var projectContentHistoryPreviewTextarea;
 function customAdminWindowOnload(){
 
     if(document.getElementById("userProjects")){
-        sendAjaxRequest("/feeds/", {}, function(responseObject){
+        sendAjaxRequest("/feeds/?action=collaborators", {}, function(responseObject){
             updateUserProjects(responseObject);
         });
     }
@@ -64,7 +64,7 @@ function customAdminClickEventHandler(e){
             var accessLevel = document.getElementById("accessLevel").value;
 
             if(email.length > 0 && accessLevel > 0){
-                sendAjaxRequest("/feeds/" + projectID + "?action=addCollaborator", {email: email, accessLevelInt: accessLevel}, function(responseObject){
+                sendAjaxRequest("/feeds/" + projectID + "?action=collaborators", {email: email, accessLevelInt: accessLevel}, function(responseObject){
                     updateProjectCollaborators(responseObject);
                 }, "POST");
             }
@@ -146,7 +146,7 @@ function customAdminClickEventHandler(e){
     // BY CLASS
     if(hasClass(e.target, "removeCollaborator")){
         
-        sendAjaxRequest("/feeds/" + projectID + "?action=removeCollaborator", {collaboratorID: e.target.getAttribute("data-userID")}, function(responseObject){
+        sendAjaxRequest("/feeds/" + projectID + "?action=collaborators", {collaboratorID: e.target.getAttribute("data-userID")}, function(responseObject){
             console.log("Deleted Collab " + e.target.getAttribute("data-userID"));
             updateProjectCollaborators(responseObject);
         }, "DELETE");
