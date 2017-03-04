@@ -267,7 +267,7 @@ router.post("/", function(req, res, next){
                                                                         // to the /feeds/userID route, so that the list of projects belonging to this
                                                                         // user (which will now include this new project) will be returned in the
                                                                         // response object
-                                                                        res.redirect("/feeds?userID=" + req.userID);
+                                                                        res.redirect("/feeds?action=collaborators");
                                                                     }
                                                                 });
                                                             }
@@ -656,7 +656,7 @@ router.post("/:projectID", function(req, res, next){
     if(req.query.action == "accessLevels"){
         if(req.body.access_level_name != null){
             accessLevels.createNewAccessLevel(req.params.projectID, req.body.access_level_name, req.body.access_level_int, function(){
-                res.redirect(303, "/feeds/" + req.params.projectID + "?action=accessLevels&userID=" + req.userID);
+                res.redirect(303, "/feeds/" + req.params.projectID + "?action=accessLevels");
             });
         } else {
             console.log("Not enough info supplied");
@@ -677,7 +677,7 @@ router.delete("/:projectID", function(req, res, next){
     if(req.query.action == "accessLevels"){
         if(req.body.access_level_int != null){
             accessLevels.removeAccessLevel(req.params.projectID, req.body.access_level_int, function(){
-                res.redirect(303, "/feeds/" + req.params.projectID + "?action=accessLevels&userID=" + req.userID);
+                res.redirect(303, "/feeds/" + req.params.projectID + "?action=accessLevels");
             });
         } else {
             console.log("Not enough info supplied");
@@ -699,7 +699,7 @@ router.put("/:projectID", function(req, res, next){
     if(req.query.action == "accessLevels"){
         if(req.body.access_level_int != null && req.body.access_level_name != null){
             accessLevels.updateAccessLevelName(req.params.projectID, req.body.access_level_int, req.body.access_level_name, function(){
-                res.redirect(303, "/feeds/" + req.params.projectID + "?action=accessLevels&userID=" + req.userID);
+                res.redirect(303, "/feeds/" + req.params.projectID + "?action=accessLevels");
             });
         } else {
             console.log("Not enough info supplied");
