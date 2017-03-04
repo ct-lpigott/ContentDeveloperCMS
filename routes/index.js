@@ -13,10 +13,10 @@ router.get("/", function(req, res, next){
     // OAuth module, so as to provide the user will a link to click to allow
     // them to log in to their Google account to authenticate themselves on
     // this server.
-    var oauthURL = googleOAuth.generateOAuthUrl();
-
-    // Rendering the index template, passing the oauthURL as the loginURL.
-    res.render("index", {loginURL: oauthURL});
+    googleOAuth.generateOAuthUrl(function(oauthURL){
+        // Rendering the index template, passing the oauthURL as the loginURL.
+        res.render("index", {loginURL: oauthURL});
+    });    
 });
 
 // Exporting the router that was set up in this file, so that it can be included
