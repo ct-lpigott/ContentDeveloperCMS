@@ -47,7 +47,6 @@ router.use(function(req, res, next){
 			userAuthToken = req.headers.user_auth_token;
 		} else if(req.session != null && req.session.user_auth_token != null){
 			userAuthToken = req.session.user_auth_token;
-			req.session.destroy();
 		}
 			
 		if(userAuthToken != null){
