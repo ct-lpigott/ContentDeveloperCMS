@@ -75,7 +75,7 @@ router.get("/oauthRedirectURL", function(req, res, next){
                                     
                                     // Updating this users google profile ID and auth token, based on those returned from 
                                     // the Google API request
-                                     dbconn.query("UPDATE User SET display_name= " + dbconn.escape(user.displayName) + ", google_profile_image_url= " + dbconn.escape(userProfileImageURL) + ", google_profile_id= " + dbconn.escape(user.id) + ", google_access_token= " + dbconn.escape(jsonToken) + " WHERE id = " + dbconn.escape(rows[0].id), function(err, result){
+                                     dbconn.query("UPDATE User SET display_name= " + dbconn.escape(user.displayName) + ", google_profile_image_url= " + dbconn.escape(userProfileImageURL) + ", google_profile_id= " + dbconn.escape(user.id) + ", google_access_token= " + dbconn.escape(accessToken) + " WHERE id = " + dbconn.escape(rows[0].id), function(err, result){
                                         if(err) {
                                             console.log("Unable to update users Google profile ID and auth token. " + err);
                                         } else {
