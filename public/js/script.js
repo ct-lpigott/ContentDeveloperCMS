@@ -143,6 +143,8 @@ function clickEventHandler(e){
 function sendAjaxRequest(url, requestData, callback, method="GET"){
     var queryStringURL = url.indexOf("?") > -1 ? url + "&" : url + "?";
 
+    queryStringURL += "include=content,structure,history";
+    
     var formData = new FormData();
 
     for(var data in requestData){

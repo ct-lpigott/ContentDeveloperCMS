@@ -35,8 +35,9 @@ router.get("/:projectID", function(req, res, next){
 });
 
 /**
- * @api {get} /feeds/:projectID Get entire project structure
+ * @api {get} /feeds/:projectID?include=structure,content,history Get entire project structure
  * @apiParam {int} :projectID Projects unique ID
+ * @apiParam {string}  ?include Optional - to include the structure, content and commit history of the project
  * @apiName GetProjectStructure
  * @apiGroup ProjectStructure
  */
@@ -48,50 +49,63 @@ router.get("/:projectID", function(req, res, next){
  */
 router.get("/:projectID", function(req, res, next){
     if(req.fileData.admin != null){
-        // Adding the value of the project structure property of the project admin file, 
-        // as the structure property on the responseObject.
-        req.responseObject.structure = req.fileData.admin.project_structure;
+        if(req.query.include != null){
+            if(req.query.include.indexOf("structure") > -1){
+                // Adding the value of the project structure property of the project admin file, 
+                // as the structure property on the responseObject.
+                req.responseObject.structure = req.fileData.admin.project_structure;
+            }
+            if(req.query.include.indexOf("content") > -1){
+                // Adding the content of the project (as returned from the content.json file) as 
+                // a property on the response object, as the response will contain both the content
+                // and the structure
+                req.responseObject.content = req.fileData.content;
+            }
+            if(req.query.include.indexOf("history") > -1){
+                // Accessing the git repository for this project
+                var projectGit = simpleGit("./projects/" + req.params.projectID);
 
-        // Adding the content of the project (as returned from the content.json file) as 
-        // a property on the response object, as the response will contain both the content
-        // and the structure
-        req.responseObject.content = req.fileData.content;
-
-        // Accessing the git repository for this project
-        var projectGit = simpleGit("./projects/" + req.params.projectID);
-
-        // Preforming a git log on the content.json file, to get all commits relating
-        // to changes to the content only
-        projectGit.log(["content.json"], function(err, contentHistoryData){
-            if(err){
-                console.log(err);
-            } else {
-                // Checking that there are commits to return to the caller
-                if(contentHistoryData.total > 0){
-                    // Appending the content history returned to the response object
-                    req.responseObject.content_history = contentHistoryData;
-                }
-                
-                // Preforming a git log on the admin.json file, to get all commits relating
-                // to changes to the structure only
-                projectGit.log(["admin.json"], function(err, adminHistoryData){
+                // Preforming a git log on the content.json file, to get all commits relating
+                // to changes to the content only
+                projectGit.log(["content.json"], function(err, contentHistoryData){
                     if(err){
                         console.log(err);
                     } else {
                         // Checking that there are commits to return to the caller
-                        if(adminHistoryData.total > 0){
-                            // Appending the structure history returned to the response object
-                            req.responseObject.structure_history = adminHistoryData;
+                        if(contentHistoryData.total > 0){
+                            // Appending the content history returned to the response object
+                            req.responseObject.content_history = contentHistoryData;
                         }
                         
-                        // Returning the response object to the caller, which should now contain
-                        // the project structure, content and commit history for each of these seperatley
-                        res.send(req.responseObject);
+                        // Preforming a git log on the admin.json file, to get all commits relating
+                        // to changes to the structure only
+                        projectGit.log(["admin.json"], function(err, adminHistoryData){
+                            if(err){
+                                console.log(err);
+                            } else {
+                                // Checking that there are commits to return to the caller
+                                if(adminHistoryData.total > 0){
+                                    // Appending the structure history returned to the response object
+                                    req.responseObject.structure_history = adminHistoryData;
+                                }
+                                
+                                // Returning the response object to the caller, which should now contain
+                                // the project structure, content and commit history for each of these seperatley
+                                res.send(req.responseObject);
+                            }
+                        });
                     }
                 });
+            } else {
+                res.send(req.responseObject);
             }
-        });
-        
+        } else {
+            // Adding the content of the project (as returned from the content.json file) as 
+            // a property on the response object, as the response will contain both the content
+            // and the structure
+            req.responseObject.content = req.fileData.content;
+            res.send(req.responseObject);
+        }        
     } else {
         if(req.max_cache_age != null && req.max_cache_age > 0){
             res.setHeader("Cache-control", "public; max-age=" + req.max_cache_age);
