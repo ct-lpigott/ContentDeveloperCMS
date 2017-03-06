@@ -32,17 +32,6 @@ function customAdminSetupEventListeners(){
 function customAdminClickEventHandler(e){
     // BY ID
     switch(e.target.id){
-        case "createNewProject": {
-            var newProjectName = document.getElementById("newProjectName").value;
-            if(newProjectName != null && newProjectName.length > 0){
-                sendAjaxRequest("/feeds?action=createProject", {projectName: newProjectName}, function(responseObject){
-                    document.getElementById("newProjectName").value = "";
-                    updateUserProjects(responseObject);
-                }, "POST");
-            }
-            break;
-            
-        }
         case "updateProjectStructure": {
             parsedProjectStructure = parseProjectStructureToJSON();
 
@@ -150,6 +139,14 @@ function customAdminClickEventHandler(e){
             console.log("Deleted Collab " + e.target.getAttribute("data-userID"));
             updateProjectCollaborators(responseObject);
         }, "DELETE");
+    } else if(hasClass(e.target, "createNewProject")){
+        var newProjectName = document.getElementById("newProjectName").value;
+        if(newProjectName != null && newProjectName.length > 0){
+            sendAjaxRequest("/feeds?action=createProject", {projectName: newProjectName, template: e.target.getAttribute("data-template")}, function(responseObject){
+                document.getElementById("newProjectName").value = "";
+                updateUserProjects(responseObject);
+            }, "POST");
+        }
     } else if(hasClass(e.target, "previewHistory")){
         previewCommitHistory(e.target);
     } else if(hasClass(e.target, "addAccessLevel")){

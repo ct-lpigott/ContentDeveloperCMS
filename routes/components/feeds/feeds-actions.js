@@ -157,118 +157,20 @@ router.post("/", function(req, res, next){
                                         // accessible from the feedsErrors array).
                                         next(new Error());
                                     } else {
-                                        // Loading in the project template file, which will be used to instantiate the
-                                        // admin.json file for this project 
-                                        fs.readFile("./project_defaults/project_template.json", function(err, data){
-                                            // Creating a projectTemplate object. Defaulting this to be an empty
-                                            // object, which will be replaced by the contents of the template file,
-                                            // if this was loaded without error.
-                                            var projectTemplate = {};
-
-                                            // Checking if an error occurred when loading the template
-                                            if(err){
-                                                // Logging this to the console
-                                                console.log("Error reading project template file " + err);
-                                            } else {
-                                                // Setting the project template to be equal to the contents
-                                                // of the template file, parsed from JSON to be an object
-                                                projectTemplate = JSON.parse(data);
-                                            }
-                                                
-                                            // Setting the default values for the properties of the project template 
-                                            // file i.e. the ID and name of the project, the date it was created,
-                                            // as well as the date it was last updated (both will be the same date
-                                            // as this is a new project). Finally, setting the last_updated_by
-                                            // property to the current users ID
-                                            projectTemplate.project_id = req.projectID;
-                                            projectTemplate.date_created = projectTemplate.date_updated = Date.now();
-                                            projectTemplate.last_updated_by = req.userID;
-
-                                            // Creating the admin.json file for this project, within the directory that
-                                            // was created above. Passing in a JSON string of the projectTemplate
-                                            // object created above, so that this will be the initial content for this
-                                            // file.
-                                            fs.writeFile("./projects/" + req.projectID + "/admin.json", JSON.stringify(projectTemplate), function(err){
-                                                if(err) {
-                                                    // Logging the error to the console
-                                                    console.log("Error making admin.json file " + err);
-
-                                                    // As it has not been possible to create the admin.json file for this 
-                                                    // project, adding this as an error to the feedsErrors array.
-                                                    req.feedsErrors.push("Server error - unable to create project");
-
-                                                    // Since this is a significant issue, passing this request to the feeds-errors
-                                                    // route, by calling the next method with an empty error (as all errors will be
-                                                    // accessible from the feedsErrors array).
-                                                    next(new Error());
+                                        if(req.body.template != "null" && req.body.template != null && req.body.template.length > 0){
+                                            // Loading in the project template file, which will be used to instantiate the
+                                            // admin.json file for this project 
+                                            fs.readFile("./project_defaults/templates/" + req.body.template + ".json", function(err, data){
+                                                if(err){
+                                                    console.log(err);
                                                 } else {
-                                                    console.log("Project admin file created");
-
-                                                    // Creating a new content.json file for this project, within the project
-                                                    // directory created above. Passing in an empty object (as a JSON string)
-                                                    // as this file will not yet contain any content
-                                                    fs.writeFile("./projects/" + req.projectID + "/content.json", "{}", function(err){
-                                                        if(err) {
-                                                            // Logging the error to the console
-                                                            console.log("Error making file " + err);
-
-                                                            // As it has not been possible to create the content.json file for this 
-                                                            // project, adding this as an error to the feedsErrors array.
-                                                            req.feedsErrors.push("Server error - unable to create project");
-
-                                                            // Since this is a significant issue, passing this request to the feeds-errors
-                                                            // route, by calling the next method with an empty error (as all errors will be
-                                                            // accessible from the feedsErrors array).
-                                                            next(new Error());
-                                                        } else {
-                                                            console.log("Project content file created");
-
-                                                            // Setting defaults to be used as the Git Credentials, incase there
-                                                            // is any issue with the query to the database, or the user's details
-                                                            // are not available
-                                                            var gitDisplayName = "Content Developer";
-                                                            var gitEmailAddress = process.env.EMAIL_ADDRESS;
-                                                        
-                                                            // Creating a new Git repository for this project, and initialising it
-                                                            var newGitRepo = simpleGit("./projects/" + req.projectID);
-                                                            newGitRepo.init();
-
-                                                            var userDetails = dbconn.query("SELECT * FROM User WHERE id=" + req.userID, function(err, rows, fields){
-                                                                
-                                                                if(err){
-                                                                    console.log("Issue when querying the database for the users details - git - " + err);
-                                                                    // Not dealing with the error any further, as a response will already have been sent
-                                                                    // to the client
-                                                                } else {
-                                                                    if(rows.length > 0){
-                                                                        // Accessing the user's name and email address from the database
-                                                                        gitDisplayName = rows[0].display_name;
-                                                                        gitEmailAddress = rows[0].email_address;
-                                                                    }
-                                                                }
-
-                                                                // Setting up the configuration for this user, and then committing
-                                                                // all files in the project folder i.e. as the first commit to the
-                                                                // project
-                                                                newGitRepo
-                                                                    .addConfig("user.name", gitDisplayName)
-                                                                    .addConfig("user.email", gitEmailAddress)
-                                                                    .add("./*")
-                                                                    .commit("'" + req.body.projectName + "' project files created");
-                                                            });
-
-                                                            
-
-                                                            // As this project has now successfully been created, redirecting this request
-                                                            // to the /feeds/userID route, so that the list of projects belonging to this
-                                                            // user (which will now include this new project) will be returned in the
-                                                            // response object
-                                                            res.redirect("/feeds?action=collaborators");
-                                                        }
-                                                    });
+                                                    req.templateProjectStructure = JSON.parse(data);
+                                                    next();
                                                 }
                                             });
-                                        });
+                                        } else {
+                                            next();
+                                        }
                                     }
                                 });
                             }
@@ -289,6 +191,109 @@ router.post("/", function(req, res, next){
     } else {
         next();
     }    
+});
+
+// No API documentation needed - continuation of route
+router.post("/", function(req, res, next){
+    if(req.query.action == "createProject"){
+        // Setting the default values for the properties of the project template 
+        // file i.e. the ID and name of the project, the date it was created,
+        // as well as the date it was last updated (both will be the same date
+        // as this is a new project). Finally, setting the last_updated_by
+        // property to the current users ID
+        var projectAdmin = {};
+        projectAdmin.project_id = req.projectID;
+        projectAdmin.date_created = projectAdmin.date_updated = Date.now();
+        projectAdmin.last_updated_by = req.userID;
+        projectAdmin.project_structure = req.templateProjectStructure || {};
+
+        // Creating the admin.json file for this project, within the directory that
+        // was created above. Passing in a JSON string of the projectTemplate
+        // object created above, so that this will be the initial content for this
+        // file.
+        fs.writeFile("./projects/" + req.projectID + "/admin.json", JSON.stringify(projectAdmin), function(err){
+            if(err) {
+                // Logging the error to the console
+                console.log("Error making admin.json file " + err);
+
+                // As it has not been possible to create the admin.json file for this 
+                // project, adding this as an error to the feedsErrors array.
+                req.feedsErrors.push("Server error - unable to create project");
+
+                // Since this is a significant issue, passing this request to the feeds-errors
+                // route, by calling the next method with an empty error (as all errors will be
+                // accessible from the feedsErrors array).
+                next(new Error());
+            } else {
+                console.log("Project admin file created");
+
+                // Creating a new content.json file for this project, within the project
+                // directory created above. Passing in an empty object (as a JSON string)
+                // as this file will not yet contain any content
+                fs.writeFile("./projects/" + req.projectID + "/content.json", "{}", function(err){
+                    if(err) {
+                        // Logging the error to the console
+                        console.log("Error making file " + err);
+
+                        // As it has not been possible to create the content.json file for this 
+                        // project, adding this as an error to the feedsErrors array.
+                        req.feedsErrors.push("Server error - unable to create project");
+
+                        // Since this is a significant issue, passing this request to the feeds-errors
+                        // route, by calling the next method with an empty error (as all errors will be
+                        // accessible from the feedsErrors array).
+                        next(new Error());
+                    } else {
+                        console.log("Project content file created");
+
+                        // Setting defaults to be used as the Git Credentials, incase there
+                        // is any issue with the query to the database, or the user's details
+                        // are not available
+                        var gitDisplayName = "Content Developer";
+                        var gitEmailAddress = process.env.EMAIL_ADDRESS;
+                    
+                        // Creating a new Git repository for this project, and initialising it
+                        var newGitRepo = simpleGit("./projects/" + req.projectID);
+                        newGitRepo.init();
+
+                        var userDetails = dbconn.query("SELECT * FROM User WHERE id=" + req.userID, function(err, rows, fields){
+                            
+                            if(err){
+                                console.log("Issue when querying the database for the users details - git - " + err);
+                                // Not dealing with the error any further, as a response will already have been sent
+                                // to the client
+                            } else {
+                                if(rows.length > 0){
+                                    // Accessing the user's name and email address from the database
+                                    gitDisplayName = rows[0].display_name;
+                                    gitEmailAddress = rows[0].email_address;
+                                }
+                            }
+
+                            // Setting up the configuration for this user, and then committing
+                            // all files in the project folder i.e. as the first commit to the
+                            // project
+                            newGitRepo
+                                .addConfig("user.name", gitDisplayName)
+                                .addConfig("user.email", gitEmailAddress)
+                                .add("./*")
+                                .commit("'" + req.body.projectName + "' project files created");
+                        });
+
+                        
+
+                        // As this project has now successfully been created, redirecting this request
+                        // to the /feeds/userID route, so that the list of projects belonging to this
+                        // user (which will now include this new project) will be returned in the
+                        // response object
+                        res.redirect("/feeds?action=collaborators");
+                    }
+                });
+            }
+        });
+    } else {
+        next();
+    }
 });
 
 /**

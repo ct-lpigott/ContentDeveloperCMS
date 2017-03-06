@@ -1,0 +1,133 @@
+{
+  "home": {
+    "type": "object",
+    "items": {
+      "main_content": {
+        "type": "html",
+        "attributes": {}
+      }
+    }
+  },
+  "about_us": {
+    "type": "object",
+    "items": {
+      "history": {
+        "type": "html",
+        "attributes": {}
+      },
+      "board_of_directors": {
+        "type": "array",
+        "items": {
+          "name": {
+            "attributes": {}
+          }
+        }
+      }
+    }
+  },
+  "contact_details": {
+    "type": "object",
+    "items": {
+      "google_map_url": {
+        "attributes": {}
+      },
+      "phone": {
+        "attributes": {
+          "type": "tel"
+        }
+      },
+      "address": {
+        "type": "html",
+        "attributes": {}
+      }
+    }
+  },
+  "special_offers": {
+    "type": "array",
+    "items": {
+      "offer_name": {
+        "attributes": {}
+      },
+      "start_date": {
+        "attributes": {
+          "type": "date"
+        }
+      },
+      "end_date": {
+        "attributes": {
+          "type": "date"
+        }
+      },
+      "details": {
+        "type": "html",
+        "attributes": {}
+      }
+    }
+  },
+  "header": {
+    "type": "object",
+    "items": {
+      "logo": {
+        "attributes": {
+          "type": "file"
+        }
+      },
+      "navigation": {
+        "type": "array",
+        "items": {
+          "title": {
+            "attributes": {
+              "required": "required"
+            }
+          },
+          "link": {
+            "type": "link",
+            "attributes": {
+              "required": "required"
+            }
+          }
+        }
+      }
+    }
+  },
+  "footer": {
+    "type": "object",
+    "items": {
+      "copyright": {
+        "attributes": {}
+      },
+      "locations": {
+        "type": "array",
+        "items": {
+          "title": {
+            "attributes": {
+              "required": "required"
+            }
+          },
+          "link": {
+            "type": "link",
+            "attributes": {
+              "required": "required"
+            }
+          }
+        }
+      },
+      "further_information": {
+        "type": "array",
+        "items": {
+          "title": {
+            "attributes": {
+              "required": "required"
+            }
+          },
+          "link": {
+            "type": "link",
+            "attributes": {
+              "required": "required"
+            }
+          }
+        }
+      }
+    }
+  }
+}

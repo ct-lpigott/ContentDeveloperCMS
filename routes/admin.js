@@ -40,7 +40,7 @@ router.get("/", function(req, res, next){
                 // page and the user
                 res.render("admin", {
                     pageTitle: "Admin Panel",
-                    user: rows[0], 
+                    user: rows[0]
                 });
             } else {
                 req.adminErrors.push("This user is not recognised");

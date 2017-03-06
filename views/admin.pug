@@ -24,6 +24,8 @@ block main-body
                 input(id="newProjectName" type="text")
             div(id="templates").row
                 h3 Templates
-                button(id="createNewProject") No Template
+                button(class="createNewProject") No Template
+                button(class="createNewProject" data-template="website_template") Website Template
+                button(class="createNewProject" data-template="mediaitems_template") Media Items Template
 
     script(src='/js/script_admin.js')

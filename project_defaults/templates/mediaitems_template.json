@@ -1,0 +1,42 @@
+{
+  "books": {
+    "type": "array",
+    "items": {
+      "title": {
+        "attributes": {}
+      },
+      "author": {
+        "attributes": {}
+      },
+      "category": {
+        "attributes": {
+          "options": [
+            "pop",
+            "rock",
+            "other"
+          ]
+        }
+      }
+    }
+  },
+  "albums": {
+    "type": "array",
+    "items": {
+      "title": {
+        "attributes": {}
+      },
+      "author": {
+        "attributes": {}
+      },
+      "genre": {
+        "attributes": {
+          "options": [
+            "pop",
+            "rock",
+            "other"
+          ]
+        }
+      }
+    }
+  }
+}
