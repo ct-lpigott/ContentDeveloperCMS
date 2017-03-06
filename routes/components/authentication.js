@@ -34,7 +34,7 @@ router.use(function(req, res, next){
 	// Setting the Strict Transport Security header to be valid for 1 year,
 	// and to include all subdomains. Implementing HSTS (HTTP Strict-Transport-Security)
 	// to ensure the site can only ever be accessed through HTTPS
-	res.setHeader("Strict-Transport-Security", "max-age=31536000");
+	res.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
 
 	if(req.method == "OPTIONS"){
 		res = setAccessControlHeaders(req, res, "crud");

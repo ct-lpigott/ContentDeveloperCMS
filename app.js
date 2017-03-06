@@ -80,9 +80,9 @@ if(process.env.DEBUG == null || process.env.DEBUG == "false"){
 
   // Setting up a HTTP server, whose only purpose is to redirect any HTTP requests as 
   // HTTPS requests i.e. if a request is recieved at the process.env.PORT, it will be
-  // redirected to the process.env.PORT_HTTPS (which will be received by the HTTPS
-  // server running below).
-  http.createServer(redirectHttps({port:process.env.PORT_HTTPS})).listen(process.env.PORT, function () {
+  // redirected to the 443 (which will be received by the Apache HTTPS server, and 
+  // redirected to the server running below).
+  http.createServer(redirectHttps({port:443})).listen(process.env.PORT, function () {
     console.log("Listening for HTTP requests on " + process.env.PORT);
   });
 
