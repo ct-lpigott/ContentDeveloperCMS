@@ -37,13 +37,14 @@ router.get("/:projectID", function(req, res, next){
 /**
  * @api {get} /feeds/:projectID?include=structure,content,history Get entire project structure
  * @apiParam {int} :projectID Projects unique ID
- * @apiParam {string}  ?include Optional - to include the structure, content and commit history of the project
+ * @apiParam {string="structure", "content", "history"}  [include] To include the structure, content and commit history of the project
  * @apiName GetProjectStructure
  * @apiGroup ProjectStructure
  */
 /**
  * @api {get} /feeds/:projectID Get entire project content
  * @apiParam {int} :projectID Projects unique ID
+ * @apiParam {string="structure", "content", "history"}  [include] To include the structure, content and commit history of the project
  * @apiName GetProjectContent
  * @apiGroup ProjectContent
  */
@@ -123,9 +124,10 @@ router.get("/:projectID", function(req, res, next){
 });
 
 /**
- * @api {get} /feeds/:projectID/:itemPath Get an items structure
+ * @api {get} /feeds/:projectID/:itemPath?include=structure Get an items structure
  * @apiParam {int} :projectID Projects unique ID
  * @apiParam {string} :itemPath Encapsulation path to item within the project
+ * @apiParam {string="structure", "content"} [include] To include the structure and content of the item
  * @apiName GetItemStructure
  * @apiGroup ProjectStructure
  */
@@ -133,6 +135,7 @@ router.get("/:projectID", function(req, res, next){
  * @api {get} /feeds/:projectID/:itemPath Get an items content
  * @apiParam {int} :projectID Projects unique ID
  * @apiParam {string} :itemPath Encapsulation path to item within the project
+ * @apiParam {string="structure", "content"} [include] To include the structure and content of the item
  * @apiName GetItemContent
  * @apiGroup ProjectContent
  */
@@ -193,26 +196,28 @@ router.get("/:projectID/*", function(req, res, next){
 
     // Checking if admin data has been read from the projects admin.json file
     if(req.fileData.admin != null){
-        // Adding the value of the collections project structure property of the project admin file, 
-        // as the structure property on the responseObject.
-        req.responseObject.structure = structureData;
-
-        // Adding the content of the project (as returned from the content.json file) as 
-        // a property on the response object, as the response will contain both the content
-        // and the structure
-        req.responseObject.content = contentData;
+        if(req.query.include != null){
+            if(req.query.include.indexOf("structure") > -1){
+                req.responseObject.structure = structureData;
+            }
+            if(req.query.include.indexOf("content") > -1){
+                req.responseObject.content = contentData;
+            }
+        } else {
+            req.responseObject = contentData;
+        }    
     } else {
+        if(structureData.max_cache_age != null && structureData.max_cache_age > 0){
+            res.setHeader("Cache-control", "public; max-age=" + structureData.max_cache_age);
+        } else if(req.max_cache_age != null && req.max_cache_age > 0){
+            res.setHeader("Cache-control", "public; max-age=" + req.max_cache_age);
+        } else {
+            res.setHeader("Cache-control", "no-cache");
+        }
+        
         // Setting the collection content of the project as the response object, as no structure 
         // will be returned alongside the content
         req.responseObject = contentData;
-    }
-
-    if(structureData.max_cache_age != null && structureData.max_cache_age > 0){
-        res.setHeader("Cache-control", "public; max-age=" + structureData.max_cache_age);
-    } else if(req.max_cache_age != null && req.max_cache_age > 0){
-        res.setHeader("Cache-control", "public; max-age=" + req.max_cache_age);
-    } else {
-        res.setHeader("Cache-control", "no-cache");
     }
             
     // Sending the response object back in the response (which may contain the project structure,
