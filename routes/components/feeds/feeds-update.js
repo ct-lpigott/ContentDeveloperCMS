@@ -36,6 +36,8 @@ router.put("/:projectID", function(req, res, next){
                     console.log("Entire contents of project structure updated");
                     if(req.body.short_commit_id != null){
                         req.gitCommitMessage = "Project structure rolled back to commit id: " + req.body.short_commit_id;
+                    } else if(req.body.commit_message != null){
+                        req.gitCommitMessage = req.body.commit_message;
                     } else {
                         req.gitCommitMessage = "Update to entire structure of project";
                     }
@@ -113,6 +115,8 @@ router.put("/:projectID", function(req, res, next){
             console.log("Entire contents of project content updated");
             if(req.body.short_commit_id != null){
                 req.gitCommitMessage = "Project content rolled back to commit id: " + req.body.short_commit_id;
+            } else if(req.body.commit_message != null){
+                req.gitCommitMessage = req.body.commit_message;
             } else {
                 req.gitCommitMessage = "Update to entire contents of project";
             }
