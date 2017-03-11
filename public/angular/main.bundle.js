@@ -1873,7 +1873,7 @@ var ContentDeveloperServerService = (function () {
     function ContentDeveloperServerService(_http, _coPipe) {
         this._http = _http;
         this._coPipe = _coPipe;
-        this._serverUrl = "http://localhost:3000";
+        this._serverUrl = "./..";
         this._headers = new __WEBPACK_IMPORTED_MODULE_1__angular_http__["b" /* Headers */]();
         this._headers.append("Content-Type", "application/json");
     }
@@ -1882,7 +1882,7 @@ var ContentDeveloperServerService = (function () {
         var getLoginUrlObservable = this._http
             .get(requestUrl)
             .map(function (responseObject) { return responseObject.json(); })
-            .catch(function (error) { return __WEBPACK_IMPORTED_MODULE_2_rxjs_Observable__["Observable"].throw(error.json().error) || "Unknown error getting login url"; })
+            .catch(function (error) { return __WEBPACK_IMPORTED_MODULE_2_rxjs_Observable__["Observable"].throw(error) || "Unknown error getting login url"; })
             .do(function (responseObject) { return responseObject.loginUrl; });
         return getLoginUrlObservable;
     };
@@ -1892,14 +1892,16 @@ var ContentDeveloperServerService = (function () {
         var loadUserObservable = this._http
             .get(requestUrl)
             .map(function (responseObject) { return responseObject.json(); })
-            .catch(function (error) { return __WEBPACK_IMPORTED_MODULE_2_rxjs_Observable__["Observable"].throw(error.json().error) || "Unknown error getting users details"; })
+            .catch(function (error) { return __WEBPACK_IMPORTED_MODULE_2_rxjs_Observable__["Observable"].throw(error) || "Unknown error getting users details"; })
             .do(function (responseObject) { return _this._currentUser = responseObject.user; });
         return loadUserObservable;
     };
     ContentDeveloperServerService.prototype.logout = function () {
         var logoutUrl = this._serverUrl + "/admin/logout";
-        this._http.get(logoutUrl)
-            .catch(function (error) { return __WEBPACK_IMPORTED_MODULE_2_rxjs_Observable__["Observable"].throw(error.json().error) || "Unknown error when logging user out"; });
+        this._http
+            .get(logoutUrl)
+            .map(function (responseObject) { return responseObject.json(); })
+            .catch(function (error) { return __WEBPACK_IMPORTED_MODULE_2_rxjs_Observable__["Observable"].throw(error) || "Unknown error when logging user out"; });
         this._currentUser = null;
         this.leaveProject();
     };
@@ -2377,7 +2379,7 @@ module.exports = "<div class=\"row\">\r\n  <div class=\"col-8-12\">\r\n    <h1>{
 /***/ 666:
 /***/ (function(module, exports) {
 
-module.exports = "<ng-container *ngIf=\"_loginUrl != null\">\n  <a [href]=\"_loginUrl\">Login with Google</a>\n</ng-container>\n"
+module.exports = "<ng-container *ngIf=\"_loginUrl != null\">\n  <a [href]=\"_loginUrl\">\n    <button>Login with Google</button>\n  </a>\n</ng-container>\n"
 
 /***/ }),
 

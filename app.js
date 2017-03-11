@@ -50,7 +50,7 @@ app.use("/feeds", multerUpload.single("file"));
 // with all requests for static elements of the site, such as JavaScript, CSS etc.
 app.use(express.static("./public"));
 
-app.use("/", function(req, res, next){
+app.get("/", function(req, res, next){
   res.redirect("/angular");
 });
 
