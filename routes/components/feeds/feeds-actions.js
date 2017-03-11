@@ -20,6 +20,19 @@ var simpleGit = require("simple-git");
 
 var accessLevels = require("../../../custom_modules/access_levels.js");
 
+/**
+ * @api {get} /feeds/:projectID?allSettings Get all settings for a project
+ * @apiParam {int} :projectID Projects unique ID
+ * @apiName GetProjectSettings
+ * @apiGroup ProjectDetails
+ */
+router.get("/:projectID", function(req, res, next){
+    if(req.query.allSettings != null){
+        req.query.action = "collaborators";
+        next();
+    }
+})
+
 router.all("/:projectID", function(req, res, next){
     if(req.query.action != null){
         if(req.userID != null){
@@ -518,7 +531,13 @@ router.get("/:projectID", function(req, res, next){
             } else {
                 if(rows.length > 0){
                     accessLevels.appendAllAccessLevelNames(rows, req.params.projectID, function(fullAccessLevelDetails){
-                        res.send(fullAccessLevelDetails);
+                        if(req.query.allSettings != null){
+                            req.responseObject.collaborators = fullAccessLevelDetails;
+                            req.query.action = "accessLevels";
+                            next();
+                        } else {
+                            res.send(fullAccessLevelDetails);
+                        }
                     });
                 }
             }
@@ -623,7 +642,13 @@ router.get("/:projectID", function(req, res, next){
     if(req.query.action == "accessLevels"){
         accessLevels.getProjectAccessLevels(req.params.projectID, function(projectAccessLevels){
             accessLevels.appendAccessLevelsInUse(req.params.projectID, projectAccessLevels, function(updatedProjectAccessLevels){
-                res.send(projectAccessLevels);
+                if(req.query.allSettings != null){
+                    req.responseObject.access_levels = projectAccessLevels;
+                    req.query.action = "projectName";
+                    next();
+                } else {
+                    res.send(projectAccessLevels);
+                }
             });
         });
     } else {
@@ -722,6 +747,33 @@ router.get("/:projectID", function(req, res, next){
 });
 
 /**
+ * @api {get} /feeds/:projectID?action=projectName Get projects name
+ * @apiParam {int} :projectID Projects unique ID
+ * @apiName GetProjectName
+ * @apiGroup ProjectDetails
+ */
+router.get("/:projectID", function(req, res, next){
+    if(req.query.action == "projectName"){
+        dbconn.query("SELECT project_name FROM Project WHERE id=" + req.params.projectID, function(err, rows, fields){
+            if(err){
+                console.log(err);
+            } else {
+                var projectName = rows[0].project_name || null;
+                if(req.query.allSettings != null){
+                    req.responseObject.projectName = projectName;
+                    req.query.action = "cache";
+                    next();
+                } else {
+                    res.send(projectName);
+                }
+            }
+        });
+    } else {
+        next();
+    }
+});
+
+/**
  * @api {put} /feeds/:projectID?action=projectName Update projects name
  * @apiParam {int} :projectID Projects unique ID
  * @apiParam {string} projectName New name for the project
@@ -760,7 +812,13 @@ router.get("/:projectID", function(req, res, next){
                 console.log(err);
             } else {
                 if(rows.length > 0){
-                    res.send({max_cache_age: rows[0].max_cache_age})
+                    if(req.query.allSettings != null){
+                        req.responseObject.max_cache_age = rows[0].max_cache_age;
+                        req.query.action = "css";
+                        next();
+                    } else {
+                        res.send(rows[0].max_cache_age);
+                    }                    
                 } else {
                     req.feedsErrors.push("Unable to access the maximum cache age for this project");
                     next(new Error());
@@ -811,7 +869,13 @@ router.get("/:projectID", function(req, res, next){
                 console.log(err);
             } else {
                 if(rows.length > 0){
-                    res.send({custom_css: rows[0].custom_css})
+                    if(req.query.allSettings != null){
+                        req.responseObject.custom_css = rows[0].custom_css;
+                        req.query.action = null;
+                        next();
+                    } else {
+                        res.send(rows[0].custom_css);
+                    }
                 } else {
                     console.log("Cannot find project");
                 }
@@ -894,6 +958,16 @@ router.all("/:projectID", function(req, res, next){
         next();
     }
 });
+
+router.all("/:projectID", function(req, res, next){
+    if(req.query.allSettings != null){
+        res.send(req.responseObject);
+    } else {
+        next();
+    }
+});
+
+
 // Exporting the router that was set up in this file, so that it can be included
 // in the app.js file and specified as the route for all requests to the "/feeds" route
 module.exports = router;
