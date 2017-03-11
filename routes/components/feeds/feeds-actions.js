@@ -29,9 +29,25 @@ var accessLevels = require("../../../custom_modules/access_levels.js");
 router.get("/:projectID", function(req, res, next){
     if(req.query.allSettings != null){
         req.query.action = "collaborators";
-        next();
     }
-})
+    next();
+});
+
+/**
+ * @api {put} /feeds/:projectID?allSettings Update all settings for a project
+ * @apiParam {int} :projectID Projects unique ID
+ * @apiParam {string} [project_name]
+ * @apiParam {int} [max_cache_age]
+ * @apiParam {string} [custom_css]
+ * @apiName UpdateProjectSettings
+ * @apiGroup ProjectDetails
+ */
+router.put("/:projectID", function(req, res, next){
+    if(req.query.allSettings != null){
+        req.query.action = "project_name";
+    }
+    next();
+});
 
 router.all("/:projectID", function(req, res, next){
     if(req.query.action != null){
@@ -101,7 +117,7 @@ router.get("/", function(req, res, next){
 
 /**
  * @api {post} /feeds?action=createProject Create a new project
- * @apiParam {string} projectName Name for the new proejct
+ * @apiParam {string} project_name Name for the new proejct
  * @apiName CreateProject
  * @apiGroup ProjectDetails
  */
@@ -110,13 +126,13 @@ router.post("/", function(req, res, next){
         console.log("POST to create new project");
 
         // Checking that a project name has been included in the request body
-        if(req.body.projectName != null){
+        if(req.body.project_name != null){
 
-            googleOAuth.createNewProjectFolder(req.body.projectName, req.userID, function(newGoogleFolderId){
+            googleOAuth.createNewProjectFolder(req.body.project_name, req.userID, function(newGoogleFolderId){
                 console.log(newGoogleFolderId);
                 // Creating a new project in the database, using the project name provided 
                 // in the request body, escaping this value before passing it to the database
-                dbconn.query("INSERT INTO Project(project_name, access_levels, media_folder_id) VALUES(" + dbconn.escape(req.body.projectName) + ", " + dbconn.escape(JSON.stringify(accessLevels.getDefaultAccessLevels())) + ", " + dbconn.escape(newGoogleFolderId) + ")", function(err, result){
+                dbconn.query("INSERT INTO Project(project_name, access_levels, media_folder_id) VALUES(" + dbconn.escape(req.body.project_name) + ", " + dbconn.escape(JSON.stringify(accessLevels.getDefaultAccessLevels())) + ", " + dbconn.escape(newGoogleFolderId) + ")", function(err, result){
                     if(err){
                         // Logging the error to the console
                         console.log(err);
@@ -290,16 +306,18 @@ router.post("/", function(req, res, next){
                                 .addConfig("user.name", gitDisplayName)
                                 .addConfig("user.email", gitEmailAddress)
                                 .add("./*")
-                                .commit("'" + req.body.projectName + "' project files created");
+                                .commit("'" + req.body.project_name + "' project files created");
                         });
-
                         
-
-                        // As this project has now successfully been created, redirecting this request
-                        // to the /feeds/userID route, so that the list of projects belonging to this
-                        // user (which will now include this new project) will be returned in the
-                        // response object
-                        res.redirect("/feeds?action=collaborators");
+                        if(req.headers.origin != null){
+                            res.send({});
+                        } else {
+                            // As this project has now successfully been created, redirecting this request
+                            // to the /feeds/userID route, so that the list of projects belonging to this
+                            // user (which will now include this new project) will be returned in the
+                            // response object
+                            res.redirect("/feeds?action=collaborators");
+                        }
                     }
                 });
             }
@@ -313,6 +331,7 @@ router.post("/", function(req, res, next){
  * @api {post} /feeds/:projectID?action=collaborators Add a collaborator to a project
  * @apiParam {int} :projectID Projects unique ID
  * @apiParam {string} email Email address of the collaborator to be added
+ * @apiParam {int} accessLevelInt Requested access level
  * @apiName AddCollaborator
  * @apiGroup Collaborators
  */
@@ -411,7 +430,11 @@ router.post("/:projectID", function(req, res, next){
                             // Logging the error to the console
                             console.log("This user is already a collaborator on this project");
 
-                            res.redirect(303, "/feeds/" + req.params.projectID + "?action=collaborators");
+                            if(req.headers.origin != null){
+                                res.send({});
+                            } else {
+                                res.redirect(303, "/feeds/" + req.params.projectID + "?action=collaborators");
+                            }
                         } else {
                             // As this is a different access level for this user, for this project, updating the
                             // user_project table to reflect this i.e. changing this users level for this project
@@ -441,8 +464,11 @@ router.post("/:projectID", function(req, res, next){
                                             } 
                                         }
                                     }); 
-
-                                    res.redirect(303, "/feeds/" + req.params.projectID + "?action=collaborators");
+                                    if(req.headers.origin != null){
+                                        res.send({});
+                                    } else {
+                                        res.redirect(303, "/feeds/" + req.params.projectID + "?action=collaborators");
+                                    }
                                 }
                             });
                         }
@@ -484,7 +510,11 @@ router.post("/:projectID", function(req, res, next){
                                                         }
                                                     });                    
                     
-                                                    res.redirect(303, "/feeds/" + req.params.projectID + "?action=collaborators");
+                                                    if(req.headers.origin != null){
+                                                        res.send({});
+                                                    } else {
+                                                        res.redirect(303, "/feeds/" + req.params.projectID + "?action=collaborators");
+                                                    }
                                                 }
                                             });
                                         }
@@ -509,6 +539,35 @@ router.post("/:projectID", function(req, res, next){
             // route, by calling the next method with an empty error (as all errors will be
             // accessible from the feedsErrors array).
             next(new Error());
+        }
+    } else {
+        next();
+    }
+});
+
+/**
+ * @api {put} /feeds/:projectID?action=collaborators Update a collaborators access level to a project
+ * @apiParam {int} :projectID Projects unique ID
+ * @apiParam {string} collaboratorID User id of the collaborator to be updated
+ * @apiParam {int} accessLevelInt  Requested access level
+ * @apiName UpdateCollaborator
+ * @apiGroup Collaborators
+ */
+router.put("/:projectID", function(req, res, next){
+    if(req.query.action == "collaborators"){
+        // Checking that an email address has been included in the request object
+        if(req.body.collaboratorID != null && req.body.accessLevelInt != null){
+            dbconn.query("UPDATE User_Project SET access_level_int=" + dbconn.escape(req.body.accessLevelInt) + "WHERE user_id=" + req.body.collaboratorID, function(err, result) {
+                if(err){
+                    console.log(err);
+                } else {
+                    if(req.headers.origin != null){
+                        res.send({});
+                    } else {
+                        res.redirect(303, "/feeds/" + req.params.projectID + "?action=collaborators");
+                    }                    
+                }
+            });
         }
     } else {
         next();
@@ -556,20 +615,21 @@ router.get("/:projectID", function(req, res, next){
  */
 router.delete("/:projectID", function(req, res, next){
     if(req.query.action == "collaborators"){
-        if(req.body.collaboratorID != null){
+        var collaboratorID = req.body.collaboratorID || req.query.collaboratorID;
+        if(collaboratorID != null){
             dbconn.query("SELECT * FROM User_Project up LEFT JOIN Project p ON up.project_id = p.id WHERE up.project_id = " + req.params.projectID + " AND up.user_id=" + req.userID, function(err, rows, fields){
                if(err){
                    console.log(err);
                } else {
                    if(rows.length > 0){
-                        googleOAuth.removeUserFromMediaFolder(rows[0].media_folder_id, rows[0].media_folder_permission_id, userID, function(){
-                            dbconn.query("DELETE FROM User_Project WHERE project_id=" + dbconn.escape(req.params.projectID) + " AND user_id=" + dbconn.escape(req.body.collaboratorID), function(err, rows, fields){
+                        googleOAuth.removeUserFromMediaFolder(rows[0].media_folder_id, rows[0].media_folder_permission_id, collaboratorID, function(){
+                            dbconn.query("DELETE FROM User_Project WHERE project_id=" + dbconn.escape(req.params.projectID) + " AND user_id=" + dbconn.escape(collaboratorID), function(err, rows, fields){
                                 if(err){
                             
                                 } else {
-                                    console.log("Collaborator " + req.body.collaboratorID + " has been removed from project " + req.params.projectID);
+                                    console.log("Collaborator " + collaboratorID + " has been removed from project " + req.params.projectID);
                                     
-                                    dbconn.query("SELECT email_address, display_name FROM User WHERE id=" + dbconn.escape(req.body.collaboratorID), function(err, rows, fields){
+                                    dbconn.query("SELECT email_address, display_name FROM User WHERE id=" + dbconn.escape(collaboratorID), function(err, rows, fields){
                                         if(err){
                                             console.log(err);
                                         } else {
@@ -579,7 +639,11 @@ router.delete("/:projectID", function(req, res, next){
                                         }
                                     });   
                             
-                                    res.redirect(303, "/feeds/" + req.params.projectID + "?action=collaborators");
+                                    if(req.headers.origin != null){
+                                        res.send({});
+                                    } else {
+                                        res.redirect(303, "/feeds/" + req.params.projectID + "?action=collaborators");
+                                    }
                                 }
                             });
                         });
@@ -644,7 +708,7 @@ router.get("/:projectID", function(req, res, next){
             accessLevels.appendAccessLevelsInUse(req.params.projectID, projectAccessLevels, function(updatedProjectAccessLevels){
                 if(req.query.allSettings != null){
                     req.responseObject.access_levels = projectAccessLevels;
-                    req.query.action = "projectName";
+                    req.query.action = "project_name";
                     next();
                 } else {
                     res.send(projectAccessLevels);
@@ -667,7 +731,11 @@ router.post("/:projectID", function(req, res, next){
     if(req.query.action == "accessLevels"){
         if(req.body.access_level_name != null){
             accessLevels.createNewAccessLevel(req.params.projectID, req.body.access_level_name, req.body.access_level_int, function(){
-                res.redirect(303, "/feeds/" + req.params.projectID + "?action=accessLevels");
+                if(req.headers.origin != null){
+                    res.send({});
+                } else {
+                    res.redirect(303, "/feeds/" + req.params.projectID + "?action=accessLevels");
+                }
             });
         } else {
             console.log("Not enough info supplied");
@@ -686,9 +754,14 @@ router.post("/:projectID", function(req, res, next){
  */
 router.delete("/:projectID", function(req, res, next){
     if(req.query.action == "accessLevels"){
-        if(req.body.access_level_int != null){
-            accessLevels.removeAccessLevel(req.params.projectID, req.body.access_level_int, function(){
-                res.redirect(303, "/feeds/" + req.params.projectID + "?action=accessLevels");
+        var accessLevelInt = req.body.access_level_int || req.query.access_level_int;
+        if(accessLevelInt != null){
+            accessLevels.removeAccessLevel(req.params.projectID, accessLevelInt, function(){
+                if(req.headers.origin != null){
+                    res.send({});
+                } else {
+                    res.redirect(303, "/feeds/" + req.params.projectID + "?action=accessLevels");
+                }
             });
         } else {
             console.log("Not enough info supplied");
@@ -710,7 +783,11 @@ router.put("/:projectID", function(req, res, next){
     if(req.query.action == "accessLevels"){
         if(req.body.access_level_int != null && req.body.access_level_name != null){
             accessLevels.updateAccessLevelName(req.params.projectID, req.body.access_level_int, req.body.access_level_name, function(){
-                res.redirect(303, "/feeds/" + req.params.projectID + "?action=accessLevels");
+                if(req.headers.origin != null){
+                    res.send({});
+                } else {
+                    res.redirect(303, "/feeds/" + req.params.projectID + "?action=accessLevels");
+                }
             });
         } else {
             console.log("Not enough info supplied");
@@ -747,24 +824,24 @@ router.get("/:projectID", function(req, res, next){
 });
 
 /**
- * @api {get} /feeds/:projectID?action=projectName Get projects name
+ * @api {get} /feeds/:projectID?action=project_name Get projects name
  * @apiParam {int} :projectID Projects unique ID
- * @apiName GetProjectName
+ * @apiName GetProject_name
  * @apiGroup ProjectDetails
  */
 router.get("/:projectID", function(req, res, next){
-    if(req.query.action == "projectName"){
+    if(req.query.action == "project_name"){
         dbconn.query("SELECT project_name FROM Project WHERE id=" + req.params.projectID, function(err, rows, fields){
             if(err){
                 console.log(err);
             } else {
-                var projectName = rows[0].project_name || null;
+                var project_name = rows[0].project_name || null;
                 if(req.query.allSettings != null){
-                    req.responseObject.projectName = projectName;
+                    req.responseObject.project_name = project_name;
                     req.query.action = "cache";
                     next();
                 } else {
-                    res.send(projectName);
+                    res.send(project_name);
                 }
             }
         });
@@ -774,25 +851,36 @@ router.get("/:projectID", function(req, res, next){
 });
 
 /**
- * @api {put} /feeds/:projectID?action=projectName Update projects name
+ * @api {put} /feeds/:projectID?action=project_name Update projects name
  * @apiParam {int} :projectID Projects unique ID
- * @apiParam {string} projectName New name for the project
- * @apiName UpdateProjectName
+ * @apiParam {string} project_name New name for the project
+ * @apiName UpdateProject_name
  * @apiGroup ProjectDetails
  */
 router.put("/:projectID", function(req, res, next){
-    if(req.query.action == "projectName"){
-        if(req.body.projectName != null){
-            dbconn.query("UPDATE Project SET project_name = " + dbconn.escape(req.body.projectName) + " WHERE id=" + req.params.projectID, function(err, rows, fields){
+    if(req.query.action == "project_name"){
+        if(req.body.project_name != null){
+            dbconn.query("UPDATE Project SET project_name = " + dbconn.escape(req.body.project_name) + " WHERE id=" + req.params.projectID, function(err, rows, fields){
                 if(err){
                     console.log(err);
                 } else {
-                    res.send("{}");
+                    if(req.query.allSettings != null){
+                        req.responseObject.project_name = req.body.project_name;
+                        req.query.action = "cache";
+                        next();
+                    } else {
+                        res.send(req.body.project_name);
+                    }                    
                 }
             });
         } else {
-            req.feedsErrors.push("No project name provided in the request");
-            next(new Error());
+            if(req.query.allSettings != null){
+                req.query.action = "cache";
+                next();
+            } else {
+                req.feedsErrors.push("No project name provided in the request");
+                next(new Error());
+            }            
         }        
     } else {
         next();
@@ -844,12 +932,23 @@ router.put("/:projectID", function(req, res, next){
                 if(err){
                     console.log(err);
                 } else {
-                    res.send({max_cache_age: req.body.max_cache_age});
+                    if(req.query.allSettings != null){
+                        req.responseObject.max_cache_age = req.body.max_cache_age;
+                        req.query.action = "css";
+                        next();
+                    } else {
+                        res.send(req.body.max_cache_age);
+                    }
                 }
             });
         } else {
-            req.feedsErrors.push("No maximum cache age included in the request");
-            next(new Error());
+            if(req.query.allSettings != null){
+                req.query.action = "css";
+                next();
+            } else {
+                req.feedsErrors.push("No maximum cache age included in the request");
+                next(new Error());
+            }            
         }        
     } else {
         next();
@@ -947,12 +1046,27 @@ router.all("/:projectID", function(req, res, next){
                 if(err){
                     console.log(err);
                 } else {
-                    res.redirect(303, "/feeds/" + req.params.projectID + "?action=css");
+                    if(req.query.allSettings != null){
+                        req.responseObject.custom_css = req.custom_css;
+                        req.query.action = null;
+                        next();
+                    } else {
+                        if(req.headers.origin != null){
+                            res.send({});
+                        } else {
+                            res.redirect(303, "/feeds/" + req.params.projectID + "?action=css");
+                        }
+                    }
                 }
             });
         } else {
-            req.feedsErrors.push("No custom css included in the request");
-            next(new Error());
+            if(req.query.allSettings != null){
+                req.query.action = null;
+                next();
+            } else {
+                req.feedsErrors.push("No custom css included in the request");
+                next(new Error());
+            }
         }
     } else {
         next();
