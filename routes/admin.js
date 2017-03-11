@@ -19,8 +19,7 @@ router.use(function(req, res, next){
     // any errors occur).
     req.adminErrors = [];
     
-    if(req.userID != null){
-        //req.headers.origin == null
+    if(req.userID != null || req.headers.origin == null){
         next();
     } else {
         res.send({});

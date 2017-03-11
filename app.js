@@ -25,7 +25,7 @@ app.use("/", session({
 }));
 
 // Intercepting all requests
-app.use("/*", require("./routes/components/authentication.js"));
+app.use("/*", require("./routes/authentication.js"));
 
 // Setting the app to use the body parser for all requests to the server.
 // Using the json() method for parsing requests with a content type of
