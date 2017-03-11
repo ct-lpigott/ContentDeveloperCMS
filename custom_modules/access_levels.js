@@ -121,23 +121,22 @@ module.exports = {
             }
         });
     },
-    createNewAccessLevel: function(projectID, accessLevelName, accessLevelInt=null, cb){
+    createNewAccessLevel: function(projectID, accessLevelName, accessLevelInt, cb){
         getProjectAccessLevels(projectID, function(currentAccessLevels){
+            accessLevelInt = accessLevelInt == "" || isNaN(accessLevelInt) ? 4 : parseInt(accessLevelInt);
             if(currentAccessLevels != null){
-                var accessLevelInt = accessLevelInt == null ? currentAccessLevels[currentAccessLevels.length-1].access_level_int + 1 : accessLeveLInt;
-                if(accessLevelInt > 3 && accessLevelExists(accessLevelInt, currentAccessLevels) == false){
-                    currentAccessLevels.push({
-                        access_level_name: accessLevelName,
-                        access_level_int: accessLevelInt
-                    });
-
-                    updateProjectAccessLevels(projectID, currentAccessLevels, function(){
-                        cb();
-                    });
-                } else {
-                    console.log("This access level already exists");
-                    cb();
+                while(accessLevelExists(accessLevelInt, currentAccessLevels)){
+                    accessLevelInt++;
                 }
+
+                currentAccessLevels.push({
+                    access_level_name: accessLevelName,
+                    access_level_int: accessLevelInt
+                });
+
+                updateProjectAccessLevels(projectID, currentAccessLevels, function(){
+                    cb();
+                });
             } else {
                 console.log("No access levels exist");
             }            
