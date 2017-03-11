@@ -306,18 +306,10 @@ router.post("/", function(req, res, next){
                                 .addConfig("user.name", gitDisplayName)
                                 .addConfig("user.email", gitEmailAddress)
                                 .add("./*")
-                                .commit("'" + req.body.project_name + "' project files created");
-                        });
-                        
-                        if(req.headers.origin != null){
-                            res.send({});
-                        } else {
-                            // As this project has now successfully been created, redirecting this request
-                            // to the /feeds/userID route, so that the list of projects belonging to this
-                            // user (which will now include this new project) will be returned in the
-                            // response object
-                            res.redirect("/feeds?action=collaborators");
-                        }
+                                .commit("'" + req.body.project_name + "' project files created", function(){
+                                    res.send({new_project_id: req.projectID});
+                                });
+                        });                      
                     }
                 });
             }

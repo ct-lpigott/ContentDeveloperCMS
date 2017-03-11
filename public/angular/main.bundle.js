@@ -1463,6 +1463,16 @@ var UserProjectsComponent = (function () {
         var _this = this;
         this._cdService.loadUserProjects().subscribe(function (responesObject) { return _this._userProjects = responesObject; });
     };
+    UserProjectsComponent.prototype.createNewProject = function (projectNameInput, template) {
+        var _this = this;
+        if (template === void 0) { template = ""; }
+        if (projectNameInput.value.length > 0) {
+            this._cdService.createNewProject(projectNameInput.value, template).subscribe(function (responseObject) {
+                _this.editProject(responseObject.new_project_id, projectNameInput.value, 1);
+                projectNameInput.value = "";
+            });
+        }
+    };
     UserProjectsComponent.prototype.editProject = function (projectId, projectName, userAccessLevel) {
         var projectData = {
             projectId: projectId,
@@ -2019,6 +2029,15 @@ var ContentDeveloperServerService = (function () {
         });
         return commitContentObservable;
     };
+    ContentDeveloperServerService.prototype.createNewProject = function (projectName, template) {
+        if (template === void 0) { template = ""; }
+        var requestUrl = this._serverUrl + "/feeds/?action=createProject";
+        var createProjectObservable = this._http
+            .post(requestUrl, { project_name: projectName, template: template }, { headers: this._headers })
+            .map(function (responseObject) { return responseObject.json(); })
+            .catch(function (error) { return __WEBPACK_IMPORTED_MODULE_2_rxjs_Observable__["Observable"].throw(error.json().error) || "Unknown error creating project content"; });
+        return createProjectObservable;
+    };
     ContentDeveloperServerService.prototype.createProjectContent = function (projectContent, encapsulationPath) {
         if (encapsulationPath === void 0) { encapsulationPath = ""; }
         var requestUrl = this._serverUrl + "/feeds/" + this._currentProjectId + "/" + encapsulationPath;
@@ -2358,7 +2377,7 @@ module.exports = "<p>\n  history-preview works!\n</p>\n"
 /***/ 663:
 /***/ (function(module, exports) {
 
-module.exports = "<div class=\"row\">\n  <div class=\"col-8-12\">\n    <div *ngIf=\"_userProjects != null\">\n      <table>\n        <thead>\n          <tr>\n            <th>Project Name</th>\n            <th>Access Level</th>\n            <th>Last Modified</th>\n            <th>Last Modified By</th>\n            <th>Options</th>\t\t\t\n          </tr>\n        </thead>\n      </table>\n\n      <div class=\"scrollable\">\n        <table>\n          <tbody>\n            <tr *ngFor=\"let project of _userProjects\">\n              <td>{{project.project_name}}</td>\n              <td>{{project.access_level_name}}</td>\n              <td>&nbsp;</td>\n              <td>&nbsp;</td>\n              <td><button (click)=\"editProject(project.project_id, project.project_name, project.access_level_int)\">Edit</button></td>\n            </tr>\n          </tbody>\n        </table>\n      </div>\n    </div>\n  </div>\n  <div class=\"col-4-12\">\n    <h2>Create a New Project</h2>\n    <h3>Project Name</h3>\n    <input type=\"text\">\n    \n    <h3>Templates</h3>\n    <span class=\"templates\">\n      <button (click)=\"createNewProject()\">No Template</button>\n      <button (click)=\"createNewProject('website_template')\">Website Template</button>\n      <button (click)=\"createNewProject('mediaitems_template')\">Media Items Template</button>\n    </span>\n  </div>\n</div>"
+module.exports = "<div class=\"row\">\n  <div class=\"col-8-12\">\n    <div *ngIf=\"_userProjects != null\">\n      <table>\n        <thead>\n          <tr>\n            <th>Project Name</th>\n            <th>Access Level</th>\n            <th>Last Modified</th>\n            <th>Last Modified By</th>\n            <th>Options</th>\t\t\t\n          </tr>\n        </thead>\n      </table>\n\n      <div class=\"scrollable\">\n        <table>\n          <tbody>\n            <tr *ngFor=\"let project of _userProjects\">\n              <td>{{project.project_name}}</td>\n              <td>{{project.access_level_name}}</td>\n              <td>&nbsp;</td>\n              <td>&nbsp;</td>\n              <td><button (click)=\"editProject(project.project_id, project.project_name, project.access_level_int)\">Edit</button></td>\n            </tr>\n          </tbody>\n        </table>\n      </div>\n    </div>\n  </div>\n  <div class=\"col-4-12\">\n    <h2>Create a New Project</h2>\n    <h3>Project Name</h3>\n    <input #pnInput type=\"text\">\n    \n    <h3>Templates</h3>\n    <span class=\"templates\">\n      <button (click)=\"createNewProject(pnInput)\">No Template</button>\n      <button (click)=\"createNewProject(pnInput, 'website_template')\">Website Template</button>\n      <button (click)=\"createNewProject(pnInput, 'mediaitems_template')\">Media Items Template</button>\n    </span>\n  </div>\n</div>"
 
 /***/ }),
 
