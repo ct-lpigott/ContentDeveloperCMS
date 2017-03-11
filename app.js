@@ -49,7 +49,6 @@ app.use("/feeds", multerUpload.single("file"));
 // Setting up the routing structure of the app. Sending requests to a different
 // route in the server based on the first URL parameter of their request i.e.
 // requests that begin with "/admin" will be routed through the admin route etc. 
-app.use("/", require("./routes/index.js"));
 app.use("/google", require("./routes/google.js"));
 app.use("/admin", require("./routes/admin.js"));
 app.use("/feeds", require("./routes/feeds.js"));
