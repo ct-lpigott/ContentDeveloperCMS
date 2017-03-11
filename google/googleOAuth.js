@@ -166,21 +166,25 @@ module.exports = {
     });
   },
   removeUserFromMediaFolder: function(mediaFolderId, userPermissionId, userID, cb){
-    this.generateOAuth2Client(userID, function(oauth2Client){
-      dbconn.query("SELECT media_folder_permission_id")
-      drive.permissions.delete({
-        auth: oauth2Client,
-        fileId: mediaFolderId,
-        permissionId: userPermissionId
-      }, function(err, res) {
-        if (err) {
-          console.log(err);
-        } else {
-          console.log("User successfully removed from media folder");
-          cb();
-        }
+    if(userPermissionId != null){
+      this.generateOAuth2Client(userID, function(oauth2Client){
+        dbconn.query("SELECT media_folder_permission_id")
+        drive.permissions.delete({
+          auth: oauth2Client,
+          fileId: mediaFolderId,
+          permissionId: userPermissionId
+        }, function(err, res) {
+          if (err) {
+            console.log(err);
+          } else {
+            console.log("User successfully removed from media folder");
+            cb();
+          }
+        });
       });
-    });
+    } else {
+      cb();
+    }    
   },
   getAllProjectImages: function(projectID, mediaFolderId, userID, numFiles=10, nextPageToken=null, cb){
     this.generateOAuth2Client(userID, function(oauth2Client){
