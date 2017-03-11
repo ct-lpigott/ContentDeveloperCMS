@@ -46,6 +46,14 @@ var multerUpload = multer({
 });
 app.use("/feeds", multerUpload.single("file"));
 
+// Setting the route for all static request to be "/public" i.e. this will deal
+// with all requests for static elements of the site, such as JavaScript, CSS etc.
+app.use(express.static("./public"));
+
+app.use("/", function(req, res, next){
+  res.redirect("/angular");
+});
+
 // Setting up the routing structure of the app. Sending requests to a different
 // route in the server based on the first URL parameter of their request i.e.
 // requests that begin with "/admin" will be routed through the admin route etc. 
@@ -65,10 +73,6 @@ app.use(require("./routes/error-routes/general-errors.js"));
 // will be stored to be "/views".
 app.set("view engine", "pug");
 app.set("views", "./views");
-
-// Setting the route for all static request to be "/public" i.e. this will deal
-// with all requests for static elements of the site, such as JavaScript, CSS etc.
-app.use(express.static("./public"));
 
 if(process.env.DEBUG == null || process.env.DEBUG == "false"){
 
