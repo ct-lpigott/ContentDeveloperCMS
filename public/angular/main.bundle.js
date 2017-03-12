@@ -301,8 +301,8 @@ var AppComponent = (function () {
         });
     };
     AppComponent.prototype.logout = function () {
-        this.user = null;
-        this._cdService.logout();
+        var _this = this;
+        this._cdService.logout().subscribe(function (response) { return _this.user = null; });
     };
     AppComponent.prototype.updatePageTitle = function (title) {
         this.pageTitle = title;
@@ -1907,13 +1907,15 @@ var ContentDeveloperServerService = (function () {
         return loadUserObservable;
     };
     ContentDeveloperServerService.prototype.logout = function () {
+        var _this = this;
         var logoutUrl = this._serverUrl + "/admin/logout";
-        this._http
+        var logoutObservable = this._http
             .get(logoutUrl)
             .map(function (responseObject) { return responseObject.json(); })
-            .catch(function (error) { return __WEBPACK_IMPORTED_MODULE_2_rxjs_Observable__["Observable"].throw(error) || "Unknown error when logging user out"; });
-        this._currentUser = null;
+            .catch(function (error) { return __WEBPACK_IMPORTED_MODULE_2_rxjs_Observable__["Observable"].throw(error) || "Unknown error when logging user out"; })
+            .do(function (response) { return _this._currentUser = null; });
         this.leaveProject();
+        return logoutObservable;
     };
     ContentDeveloperServerService.prototype.loadUserProjects = function () {
         var requestUrl = this._serverUrl + "/feeds/?action=collaborators";
