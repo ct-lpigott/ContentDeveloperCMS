@@ -35,10 +35,17 @@ router.use(["/feeds/:projectID", "/admin/settings/:projectID"], function(req, re
 			console.log(err);
 		} else {
 			if(rows.length > 0){
-				req.allowedOrigins = {
-					update_origins:rows[0].update_origins.split(","),
-					read_origins:rows[0].read_origins.split(",")
-				};
+				if(rows[0].update_origins != null || rows[0].read_origins != null){
+					req.allowedOrigins = {};
+
+					if(rows[0].update_origins != null){
+						req.allowedOrigins.update_origins = rows[0].update_origins.split(",");
+					}
+
+					if(rows[0].read_origins != null){
+						req.allowedOrigins.read_origins = rows[0].read_origins.split(",");
+					}
+				}
 			}
 			next();
 		}
