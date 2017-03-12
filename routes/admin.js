@@ -18,12 +18,7 @@ router.use(function(req, res, next){
     // be rendered in the error page for the admin-errors route (should
     // any errors occur).
     req.adminErrors = [];
-    
-    if(req.userID != null || req.headers.origin == null){
-        next();
-    } else {
-        res.send({});
-    }
+    next();
 });
 
 router.get("/loginUrl", function(req, res, next){
@@ -36,6 +31,15 @@ router.get("/loginUrl", function(req, res, next){
         res.send({loginUrl: oauthURL});
     });  
 });
+
+router.use(function(req, res, next){    
+    if(req.userID != null){
+        next();
+    } else {
+        res.send({});
+    }
+});
+
 
 router.get("/user", function(req, res, next){
     dbconn.query("SELECT * FROM User WHERE id=" + req.userID, function(err, rows, fields){
@@ -59,6 +63,37 @@ router.get("/logout", function(req, res, next){
     req.session.destroy();
     req.userID = null;
     res.send();
+});
+
+
+router.get("/settings/:projectID", function(req, res, next){
+    dbconn.query("SELECT * FROM Project WHERE id=" + req.params.projectID, function(err, rows, fields){
+        if(err){
+            console.log(err);
+        } else {
+            if(rows.length > 0){
+                var adminSettings = {
+                    update_origins: rows[0].update_origins,
+                    read_origins: rows[0].read_origins
+                };
+                res.send(adminSettings);
+            } else {
+                res.send({});
+            }
+        }
+    });
+});
+
+router.put("/settings/:projectID", function(req, res, next){
+    if(req.body.update_origins != null && req.body.read_origins != null){
+        dbconn.query("UPDATE Project SET update_origins=" + dbconn.escape(req.body.update_origins) + ", read_origins=" + dbconn.escape(req.body.read_origins) + " WHERE id=" + req.params.projectID, function(err, result){
+            if(err){
+                console.log(err);
+            } else {
+                res.send({});
+            }
+        })
+    }
 });
 
 

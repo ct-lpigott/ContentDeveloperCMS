@@ -15,13 +15,20 @@ module.exports = function (err, req, res, next) {
         }
     }
     
-    if(req.feedsErrors == null){
-        req.responseObject.errors.push(err.message);
-    } else {
+    if(req.feedsErrors != null){
         // Creating an errors array on the response object, and setting it to be
         // equal to any errors that occurred within the feeds route, so that they
         // can be passed back to the user.
         req.responseObject.errors = req.feedsErrors;
+        
+    } if(req.adminErrors != null){
+        // Creating an errors array on the response object, and setting it to be
+        // equal to any errors that occurred within the admin route, so that they
+        // can be passed back to the user.
+        req.responseObject.errors = req.adminErrors;
+        
+    } else {
+        req.responseObject.errors.push(err.message);
     }    
 
     // Sending the responseObject back as the response for this request. This 

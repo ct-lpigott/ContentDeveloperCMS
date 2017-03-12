@@ -25,7 +25,8 @@ app.use("/", session({
 }));
 
 // Intercepting all requests
-app.use("/*", require("./routes/authentication.js"));
+app.use("/", require("./routes/cross-origin.js"));
+app.use("/", require("./routes/authentication.js"));
 
 // Setting the app to use the body parser for all requests to the server.
 // Using the json() method for parsing requests with a content type of
@@ -64,8 +65,7 @@ app.use("/feeds", require("./routes/feeds.js"));
 // Setting up the error routes for the app. Errors in the admin panel and 
 // feeds API will be dealt with through individual error routes, while all
 // other errors will be dealt with through the general errors route.
-app.use("/admin", require("./routes/error-routes/admin-errors.js"));
-app.use("/feeds", require("./routes/error-routes/feeds-errors.js"));
+app.use(["/feeds", "/admin"], require("./routes/error-routes/feeds-errors.js"));
 app.use(require("./routes/error-routes/general-errors.js"));
 
 // Setting the view engine (or tempate engine) that the app will use to be "pug"

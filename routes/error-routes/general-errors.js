@@ -7,8 +7,7 @@ module.exports = function (err, req, res, next) {
     // setting it to 500 - Internal Server Error).
     res.status(err.status || 500);
 
-    // Rendering the general error page, passing in the error that occurred
-    res.render("error-views/general-errors", {
-        error: err
-    });
+    res.send({});
+
+    console.log(err);
 };
