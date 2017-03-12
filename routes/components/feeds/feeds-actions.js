@@ -12,7 +12,7 @@ var fs = require("fs");
 // connection to the database can be reused throughout the application.
 var dbconn = require("../../../database/connection.js");
 
-var sendEmail = require("../../../email/send_email.js");
+var sendEmail = require("../../../custom_modules/send_email.js");
 
 var googleOAuth = require("../../../google/googleOAuth.js");
 
