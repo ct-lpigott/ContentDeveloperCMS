@@ -730,11 +730,9 @@ var SettingsViewComponent = (function () {
     SettingsViewComponent.prototype.addNewAccessLevel = function (accessLevelNameInput, accessLevelIntInput) {
         var _this = this;
         var requestedAccessLevel = accessLevelIntInput.value;
-        /*
-        while(this._accessLevelExists(requestedAccessLevel)){
-          requestedAccessLevel++;
+        while (this._accessLevelExists(requestedAccessLevel)) {
+            requestedAccessLevel++;
         }
-        */
         this._cdService.createAccessLevel(requestedAccessLevel, accessLevelNameInput.value).subscribe(function (responseObject) {
             console.log("Access level added!!");
             accessLevelIntInput.value = accessLevelNameInput.value = "";
@@ -750,10 +748,8 @@ var SettingsViewComponent = (function () {
     };
     SettingsViewComponent.prototype.saveAllProjectSettings = function () {
         var _this = this;
-        this._cdService.updateProjectSettings(this.projectSettings.project_name, this.projectSettings.max_cache_age, this.projectSettings.custom_css).subscribe(function (responseObject) {
-            console.log("Project settings updated!!");
-            _this.settingsUpdated.emit();
-        });
+        this._cdService.updateProjectSettings(this.projectSettings.project_name, this.projectSettings.max_cache_age, this.projectSettings.custom_css).subscribe(function (responseObject) { return _this.settingsUpdated.emit(); });
+        this._cdService.updateAdminSettings(this.projectSettings.update_origins, this.projectSettings.read_origins).subscribe(function (responseObject) { return _this.settingsUpdated.emit(); });
         var currentProjectSettings = this._cdService.getCurrentProjectSettings();
         if (currentProjectSettings.collaborators != this.projectSettings.collaborators) {
             var updatedCollaborators = [];
@@ -973,7 +969,12 @@ var CmsComponent = (function () {
     };
     CmsComponent.prototype.loadProjectSettings = function () {
         var _this = this;
-        this._cdService.loadProjectSettings().subscribe(function (responseObject) { return _this.resetProjectSettings(); });
+        this._cdService.loadProjectSettings().subscribe(function (responseObject) {
+            _this._cdService.loadAdminSettings().subscribe(function (responseObject) {
+                _this.resetProjectSettings();
+                console.log(_this.projectSettings);
+            });
+        });
     };
     CmsComponent.prototype.saveProjectStructure = function (structureData) {
         var _this = this;
@@ -1948,7 +1949,9 @@ var ContentDeveloperServerService = (function () {
             .get(requestUrl, { headers: this._headers })
             .map(function (responseObject) { return responseObject.json(); })
             .catch(function (error) { return __WEBPACK_IMPORTED_MODULE_2_rxjs_Observable__["Observable"].throw(error.json().error); })
-            .do(function (responseObject) { return _this._currentProjectSettings = responseObject; });
+            .do(function (responseObject) {
+            _this._currentProjectSettings = responseObject;
+        });
         return loadProjectSettingsObservable;
     };
     ContentDeveloperServerService.prototype.updateProjectSettings = function (projectName, maxCacheAge, customCss) {
@@ -1961,6 +1964,30 @@ var ContentDeveloperServerService = (function () {
             .map(function (responseObject) { return responseObject.json(); })
             .catch(function (error) { return __WEBPACK_IMPORTED_MODULE_2_rxjs_Observable__["Observable"].throw(error.json().error); })
             .do(function (responseObject) { return console.log("Project settings updated!!"); });
+        return updateProjectSettingsObservable;
+    };
+    ContentDeveloperServerService.prototype.loadAdminSettings = function () {
+        var _this = this;
+        var requestUrl = this._serverUrl + "/admin/settings/" + this._currentProjectId;
+        var loadAdminSettingsObservable = this._http
+            .get(requestUrl, { headers: this._headers })
+            .map(function (responseObject) { return responseObject.json(); })
+            .catch(function (error) { return __WEBPACK_IMPORTED_MODULE_2_rxjs_Observable__["Observable"].throw(error.json().error); })
+            .do(function (responseObject) {
+            _this._currentProjectSettings.update_origins = responseObject.update_origins;
+            _this._currentProjectSettings.read_origins = responseObject.read_origins;
+        });
+        return loadAdminSettingsObservable;
+    };
+    ContentDeveloperServerService.prototype.updateAdminSettings = function (updateOrigins, readOrigins) {
+        if (updateOrigins === void 0) { updateOrigins = null; }
+        if (readOrigins === void 0) { readOrigins = null; }
+        var requestUrl = this._serverUrl + "/admin/settings/" + this._currentProjectId;
+        var updateProjectSettingsObservable = this._http
+            .put(requestUrl, { update_origins: updateOrigins, read_origins: readOrigins }, { headers: this._headers })
+            .map(function (responseObject) { return responseObject.json(); })
+            .catch(function (error) { return __WEBPACK_IMPORTED_MODULE_2_rxjs_Observable__["Observable"].throw(error.json().error); })
+            .do(function (responseObject) { return console.log("Admin settings updated!!"); });
         return updateProjectSettingsObservable;
     };
     ContentDeveloperServerService.prototype.updateProjectStructure = function (projectStructure, commitMessage) {
@@ -2316,7 +2343,7 @@ module.exports = "<div class=\"row\">\n  <app-history-display\n    [history]=\"p
 /***/ 654:
 /***/ (function(module, exports) {
 
-module.exports = "<h2>Project Settings</h2>\n<button (click)=\"saveAllProjectSettings()\">Save All</button>\n\n<div *ngIf=\"projectSettings != null\">\n  <div class=\"row\">\n    <h3>General</h3>\n\n    <div class=\"col-6-12\">\n      <div class=\"row\">\n        <label>Project Name:\n          <input #pnInput type=\"text\" [(ngModel)]=\"projectSettings.project_name\">\n        </label>\n      </div>\n\n      <div class=\"row\">\n        <label>Maximum Content Cache Time (in milliseconds)\n          <input #pmcInput type=\"number\" [(ngModel)]=\"projectSettings.max_cache_age\">ms\n        </label>\n      </div>\n    </div>\n\n    <div class=\"col-6-12\">\n      <div class=\"row\">\n        <label>Custom Content Editor CSS\n          <textarea #cssInput [(ngModel)]=\"projectSettings.custom_css\">\n          </textarea>\n        </label>\n      </div>\n    </div>\n  </div>\n\n  <div class=\"row\">\n    <div class=\"col-6-12\">\n      <h3>Collaborators</h3>\n      <div class=\"row\">\n        <h4>Add Collaborator</h4>\n        <label>Email Address:\n          <input #acEmailInput type=\"text\">\n        </label>\n        <br>\n        <label>Access Level\n          <select #acAccessInput>\n            <option\n              *ngFor=\"let accessLevel of projectSettings.access_levels\"\n              [value]=\"accessLevel.access_level_int\">\n              {{accessLevel.access_level_name}}\n            </option>\n          </select>\n        </label>\n        <br>\n        <button (click)=\"addCollaborator(acEmailInput, acAccessInput)\">Add Collaborator</button>\n      </div>\n      <div class=\"row\">\n        <h4>Project Collaborators</h4>\n        <table>\n          <thead>\n            <tr>\n              <th>User</th>\n              <th>Access Level</th>\n              <th>Options</th>\n            </tr>\n          </thead>\n          <tbody>\n            <tr *ngFor=\"let collaborator of projectSettings.collaborators\">\n              <td>{{collaborator.display_name}}</td>\n              <td>\n                <select\n                  #calInput\n                  [(ngModel)]=\"collaborator.access_level_int\">\n                  <option\n                    *ngFor=\"let accessLevel of projectSettings.access_levels\"\n                    [value]=\"accessLevel.access_level_int\">\n                    {{accessLevel.access_level_name}}\n                  </option>\n                </select>\n              </td>\n              <td>\n                <button\n                  (click)=\"deleteCollaborator(collaborator)\">Delete</button>\n              </td>\n            </tr>\n          </tbody>\n        </table>\n      </div>\n    </div>\n\n    <div class=\"col-6-12\">\n      <h3>Access Levels</h3>\n      <div class=\"row\">\n        <h4>Add Access Level</h4>\n        <label>Access Level Name:\n          <input #aalLevelNameInput type=\"text\">\n        </label>\n        <br>\n        <label>Access Level Int:\n          <input #aalLevelIntInput type=\"text\">\n        </label>\n        <br>\n        <button (click)=\"addNewAccessLevel(aalLevelNameInput, aalLevelIntInput)\">Add New Access Level</button>\n      </div>\n      <div class=\"row\">\n        <h4>Project Access Levels</h4>\n        <table>\n          <thead>\n            <tr>\n              <th>Access Level Name</th>\n              <th>Access Level Int</th>\n              <th>In Use</th>\n              <th>Options</th>\n            </tr>\n          </thead>\n          <tbody>\n            <tr *ngFor=\"let accessLevel of projectSettings.access_levels\">\n              <td>\n                <input type=\"text\" [(ngModel)]=\"accessLevel.access_level_name\">\n              </td>\n              <td>\n                {{accessLevel.access_level_int}}\n              </td>\n              <td>{{accessLevel.in_use ? \"Yes\" : \"No\"}}</td>\n              <td>\n                <button\n                  *ngIf=\"accessLevel.access_level_int > 3\"\n                  (click)=\"deleteAccessLevel(accessLevel.access_level_int)\">Delete</button>\n              </td>\n            </tr>\n          </tbody>\n        </table>\n      </div>\n    </div>\n  </div>\n</div>"
+module.exports = "<h2>Project Settings</h2>\n<button (click)=\"saveAllProjectSettings()\">Save All</button>\n\n<div *ngIf=\"projectSettings != null\">\n  <div class=\"row\">\n    <h3>General</h3>\n\n    <div class=\"col-6-12\">\n      <div class=\"row\">\n        <label>Project Name:\n          <input #pnInput type=\"text\" [(ngModel)]=\"projectSettings.project_name\">\n        </label>\n      </div>\n\n      <div class=\"row\">\n        <label>Maximum Content Cache Time (in milliseconds)\n          <input #pmcInput type=\"number\" [(ngModel)]=\"projectSettings.max_cache_age\">ms\n        </label>\n      </div>\n\n      <div class=\"row\">\n        <label>Allowed Update Origins:\n          <textarea [(ngModel)]=\"projectSettings.update_origins\"></textarea>\n        </label>\n      </div>\n\n      <div class=\"row\">\n        <label>Allowed Read Origins:\n          <textarea [(ngModel)]=\"projectSettings.read_origins\"></textarea>\n        </label>\n      </div>\n    </div>\n\n    <div class=\"col-6-12\">\n      <div class=\"row\">\n        <label>Custom Content Editor CSS\n          <textarea #cssInput [(ngModel)]=\"projectSettings.custom_css\">\n          </textarea>\n        </label>\n      </div>\n    </div>\n  </div>\n\n  <div class=\"row\">\n    <div class=\"col-6-12\">\n      <h3>Collaborators</h3>\n      <div class=\"row\">\n        <h4>Add Collaborator</h4>\n        <label>Email Address:\n          <input #acEmailInput type=\"text\">\n        </label>\n        <br>\n        <label>Access Level\n          <select #acAccessInput>\n            <option\n              *ngFor=\"let accessLevel of projectSettings.access_levels\"\n              [value]=\"accessLevel.access_level_int\">\n              {{accessLevel.access_level_name}}\n            </option>\n          </select>\n        </label>\n        <br>\n        <button (click)=\"addCollaborator(acEmailInput, acAccessInput)\">Add Collaborator</button>\n      </div>\n      <div class=\"row\">\n        <h4>Project Collaborators</h4>\n        <table>\n          <thead>\n            <tr>\n              <th>User</th>\n              <th>Access Level</th>\n              <th>Options</th>\n            </tr>\n          </thead>\n          <tbody>\n            <tr *ngFor=\"let collaborator of projectSettings.collaborators\">\n              <td>{{collaborator.display_name}}</td>\n              <td>\n                <select\n                  #calInput\n                  [(ngModel)]=\"collaborator.access_level_int\">\n                  <option\n                    *ngFor=\"let accessLevel of projectSettings.access_levels\"\n                    [value]=\"accessLevel.access_level_int\">\n                    {{accessLevel.access_level_name}}\n                  </option>\n                </select>\n              </td>\n              <td>\n                <button\n                  (click)=\"deleteCollaborator(collaborator)\">Delete</button>\n              </td>\n            </tr>\n          </tbody>\n        </table>\n      </div>\n    </div>\n\n    <div class=\"col-6-12\">\n      <h3>Access Levels</h3>\n      <div class=\"row\">\n        <h4>Add Access Level</h4>\n        <label>Access Level Name:\n          <input #aalLevelNameInput type=\"text\">\n        </label>\n        <br>\n        <label>Access Level Int:\n          <input #aalLevelIntInput type=\"text\">\n        </label>\n        <br>\n        <button (click)=\"addNewAccessLevel(aalLevelNameInput, aalLevelIntInput)\">Add New Access Level</button>\n      </div>\n      <div class=\"row\">\n        <h4>Project Access Levels</h4>\n        <table>\n          <thead>\n            <tr>\n              <th>Access Level Name</th>\n              <th>Access Level Int</th>\n              <th>In Use</th>\n              <th>Options</th>\n            </tr>\n          </thead>\n          <tbody>\n            <tr *ngFor=\"let accessLevel of projectSettings.access_levels\">\n              <td>\n                <input type=\"text\" [(ngModel)]=\"accessLevel.access_level_name\">\n              </td>\n              <td>\n                {{accessLevel.access_level_int}}\n              </td>\n              <td>{{accessLevel.in_use ? \"Yes\" : \"No\"}}</td>\n              <td>\n                <button\n                  *ngIf=\"accessLevel.access_level_int > 3\"\n                  (click)=\"deleteAccessLevel(accessLevel.access_level_int)\">Delete</button>\n              </td>\n            </tr>\n          </tbody>\n        </table>\n      </div>\n    </div>\n  </div>\n</div>"
 
 /***/ }),
 
@@ -2379,7 +2406,7 @@ module.exports = "<p>\n  history-preview works!\n</p>\n"
 /***/ 663:
 /***/ (function(module, exports) {
 
-module.exports = "<div class=\"row\">\n  <div class=\"col-8-12\">\n    <div *ngIf=\"_userProjects != null\">\n      <table>\n        <thead>\n          <tr>\n            <th>Project Name</th>\n            <th>Access Level</th>\n            <th>Last Modified</th>\n            <th>Last Modified By</th>\n            <th>Options</th>\t\t\t\n          </tr>\n        </thead>\n      </table>\n\n      <div class=\"scrollable\">\n        <table>\n          <tbody>\n            <tr *ngFor=\"let project of _userProjects\">\n              <td>{{project.project_name}}</td>\n              <td>{{project.access_level_name}}</td>\n              <td>&nbsp;</td>\n              <td>&nbsp;</td>\n              <td><button (click)=\"editProject(project.project_id, project.project_name, project.access_level_int)\">Edit</button></td>\n            </tr>\n          </tbody>\n        </table>\n      </div>\n    </div>\n  </div>\n  <div class=\"col-4-12\">\n    <h2>Create a New Project</h2>\n    <h3>Project Name</h3>\n    <input #pnInput type=\"text\">\n    \n    <h3>Templates</h3>\n    <span class=\"templates\">\n      <button (click)=\"createNewProject(pnInput)\">No Template</button>\n      <button (click)=\"createNewProject(pnInput, 'website_template')\">Website Template</button>\n      <button (click)=\"createNewProject(pnInput, 'mediaitems_template')\">Media Items Template</button>\n    </span>\n  </div>\n</div>"
+module.exports = "<div class=\"row\">\n  <div class=\"col-8-12\">\n    <div *ngIf=\"_userProjects == null || _userProjects.length == 0\">\n      You have no projects\n    </div>\n\n    <div *ngIf=\"_userProjects != null && _userProjects.length > 0\">\n      <table>\n        <thead>\n          <tr>\n            <th>Project Name</th>\n            <th>Access Level</th>\n            <th>Last Modified</th>\n            <th>Last Modified By</th>\n            <th>Options</th>\t\t\t\n          </tr>\n        </thead>\n      </table>\n\n      <div class=\"scrollable\">\n        <table>\n          <tbody>\n            <tr *ngFor=\"let project of _userProjects\">\n              <td>{{project.project_name}}</td>\n              <td>{{project.access_level_name}}</td>\n              <td>&nbsp;</td>\n              <td>&nbsp;</td>\n              <td><button (click)=\"editProject(project.project_id, project.project_name, project.access_level_int)\">Edit</button></td>\n            </tr>\n          </tbody>\n        </table>\n      </div>\n    </div>\n  </div>\n  <div class=\"col-4-12\">\n    <h2>Create a New Project</h2>\n    <h3>Project Name</h3>\n    <input #pnInput type=\"text\">\n    \n    <h3>Templates</h3>\n    <span class=\"templates\">\n      <button (click)=\"createNewProject(pnInput)\">No Template</button>\n      <button (click)=\"createNewProject(pnInput, 'website_template')\">Website Template</button>\n      <button (click)=\"createNewProject(pnInput, 'mediaitems_template')\">Media Items Template</button>\n    </span>\n  </div>\n</div>"
 
 /***/ }),
 

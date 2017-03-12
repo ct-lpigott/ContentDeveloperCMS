@@ -96,7 +96,7 @@ router.get("/", function(req, res, next){
                         });
                     } else {
                         // This user has no projects
-                        res.send("{}");
+                        res.send("[]");
                     }
                 }
             });
@@ -962,7 +962,6 @@ router.get("/:projectID", function(req, res, next){
                 if(rows.length > 0){
                     if(req.query.allSettings != null){
                         req.responseObject.custom_css = rows[0].custom_css;
-                        req.query.action = null;
                         next();
                     } else {
                         res.send(rows[0].custom_css);
@@ -1001,8 +1000,12 @@ router.post("/:projectID", function(req, res, next){
                 }
             });
         } else {
-            req.feedsErrors.push("No custom css included in the request");
-            next(new Error());
+            if(req.query.allSettings != null){
+                next();
+            } else {
+                req.feedsErrors.push("No custom css included in the request");
+                next(new Error());
+            }           
         }
     } else {
         next();
@@ -1022,8 +1025,12 @@ router.put("/:projectID", function(req, res, next){
             req.custom_css = req.body.custom_css;
             next();
         } else {
-            req.feedsErrors.push("No custom css included in the request");
-            next(new Error());
+            if(req.query.allSettings != null){
+                next();
+            } else {
+                req.feedsErrors.push("No custom css included in the request");
+                next(new Error());
+            }            
         }
     } else {
         next();
@@ -1040,7 +1047,6 @@ router.all("/:projectID", function(req, res, next){
                 } else {
                     if(req.query.allSettings != null){
                         req.responseObject.custom_css = req.custom_css;
-                        req.query.action = null;
                         next();
                     } else {
                         if(req.headers.origin != null){
@@ -1053,7 +1059,6 @@ router.all("/:projectID", function(req, res, next){
             });
         } else {
             if(req.query.allSettings != null){
-                req.query.action = null;
                 next();
             } else {
                 req.feedsErrors.push("No custom css included in the request");

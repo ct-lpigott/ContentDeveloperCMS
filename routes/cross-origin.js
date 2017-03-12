@@ -39,11 +39,11 @@ router.use(["/feeds/:projectID", "/admin/settings/:projectID"], function(req, re
 					req.allowedOrigins = {};
 
 					if(rows[0].update_origins != null){
-						req.allowedOrigins.update_origins = rows[0].update_origins.split(",");
+						req.allowedOrigins.update_origins = rows[0].update_origins;
 					}
 
 					if(rows[0].read_origins != null){
-						req.allowedOrigins.read_origins = rows[0].read_origins.split(",");
+						req.allowedOrigins.read_origins = rows[0].read_origins;
 					}
 				}
 			}
@@ -72,7 +72,7 @@ router.use(function(req, res, next){
             var rejectRequest = false;
 
 			if(req.method == "GET"){
-				if(req.allowedOrigins.read_origins.length > 0){
+				if(req.allowedOrigins.read_origins != null && req.allowedOrigins.read_origins.length > 0){
 					if(req.allowedOrigins.read_origins.indexOf(req.headers.origin) > -1){
 						res = setAccessControlHeaders(req, res, "r");			
 					} else {
@@ -83,7 +83,7 @@ router.use(function(req, res, next){
 				}
 				
 				if(rejectRequest){
-					if(req.allowedOrigins.update_origins.length > 0){
+					if(req.allowedOrigins.update_origins != null && req.allowedOrigins.update_origins.length > 0){
 						if(req.allowedOrigins.update_origins.indexOf(req.headers.origin) > -1){
 							if(req.originalUrl.indexOf("/feeds") == 0 || req.originalUrl.indexOf("/admin") == 0){
 								res = setAccessControlHeaders(req, res, "r");
@@ -100,7 +100,7 @@ router.use(function(req, res, next){
 					}
 				}					
 			} else {
-				if(req.allowedOrigins.update_origins.length > 0){
+				if(req.allowedOrigins.update_origins != null && req.allowedOrigins.update_origins.length > 0){
 					if(req.allowedOrigins.update_origins.indexOf(req.headers.origin) > -1 || req.allowedOrigins.update_origins.indexOf("*") > -1){
 						if(req.originalUrl.indexOf("/feeds") == 0){
 							res = setAccessControlHeaders(req, res, "crud");
@@ -112,8 +112,6 @@ router.use(function(req, res, next){
 					} else {
 						rejectRequest = true;
 					}	
-				} else {
-					res = setAccessControlHeaders(req, res, "crud");
 				}
 			}
 

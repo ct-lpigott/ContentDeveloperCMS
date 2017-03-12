@@ -84,16 +84,14 @@ router.get("/settings/:projectID", function(req, res, next){
     });
 });
 
-router.put("/settings/:projectID", function(req, res, next){
-    if(req.body.update_origins != null && req.body.read_origins != null){
-        dbconn.query("UPDATE Project SET update_origins=" + dbconn.escape(req.body.update_origins) + ", read_origins=" + dbconn.escape(req.body.read_origins) + " WHERE id=" + req.params.projectID, function(err, result){
-            if(err){
-                console.log(err);
-            } else {
-                res.send({});
-            }
-        })
-    }
+router.put("/settings/:projectID", function(req, res, next){ 
+    dbconn.query("UPDATE Project SET update_origins=" + dbconn.escape(req.body.update_origins) + ", read_origins=" + dbconn.escape(req.body.read_origins) + " WHERE id=" + req.params.projectID, function(err, result){
+        if(err){
+            console.log(err);
+        } else {
+            res.send({});
+        }
+    });
 });
 
 
