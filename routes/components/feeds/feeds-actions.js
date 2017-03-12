@@ -662,7 +662,7 @@ router.delete("/:projectID", function(req, res, next){
  * @apiGroup MediaItems
  */
 router.post("/:projectID", function(req, res, next){
-    if(req.query.action == "uploadFile"){
+    if(req.query.action == "mediaItems"){
         console.log("Uploading file");
         if(req.file != null){
             dbconn.query("SELECT media_folder_id FROM Project p LEFT JOIN User_Project up on p.id = up.project_id WHERE p.id = " + req.params.projectID + " AND up.user_id = " + req.userID, function(err, rows, fields){
