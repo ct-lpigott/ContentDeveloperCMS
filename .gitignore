@@ -5,4 +5,5 @@ letsencrypt
 projects/*
 public/uploads
 !projects/project_template.json
+ContentDeveloperCMS-AngularApp
 documentation
