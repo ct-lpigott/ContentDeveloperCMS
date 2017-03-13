@@ -354,8 +354,7 @@ var ContentDeveloperServerService = (function () {
     function ContentDeveloperServerService(_http, _coPipe) {
         this._http = _http;
         this._coPipe = _coPipe;
-        //private _serverUrl = "./..";
-        this._serverUrl = "http://localhost:3000";
+        this._serverUrl = "./..";
         this._headers = new __WEBPACK_IMPORTED_MODULE_1__angular_http__["b" /* Headers */]();
         this._headers.append("Content-Type", "application/json");
     }
