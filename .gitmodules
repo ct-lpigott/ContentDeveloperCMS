@@ -1,0 +1,3 @@
+[submodule "ContentDeveloperCMS-AngularApp"]
+	path = ContentDeveloperCMS-AngularApp
+	url = https://github.com/pigottlaura/ContentDeveloperCMS-AngularApp.git
