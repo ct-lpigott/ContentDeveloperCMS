@@ -12,8 +12,8 @@
 				"input_type": "select",
 				"attributes": {
 					"options": [
-						"pop",
-						"rock",
+						"fiction",
+						"non-fiction",
 						"other"
 					]
 				}
