@@ -549,7 +549,7 @@ router.put("/:projectID", function(req, res, next){
     if(req.query.action == "collaborators"){
         // Checking that an email address has been included in the request object
         if(req.body.collaboratorID != null && req.body.accessLevelInt != null){
-            dbconn.query("UPDATE User_Project SET access_level_int=" + dbconn.escape(req.body.accessLevelInt) + "WHERE user_id=" + req.body.collaboratorID, function(err, result) {
+            dbconn.query("UPDATE User_Project SET access_level_int=" + dbconn.escape(req.body.accessLevelInt) + "WHERE user_id=" + req.body.collaboratorID + " AND project_id=" + req.params.projectID, function(err, result) {
                 if(err){
                     console.log(err);
                 } else {
@@ -609,42 +609,46 @@ router.delete("/:projectID", function(req, res, next){
     if(req.query.action == "collaborators"){
         var collaboratorID = req.body.collaboratorID || req.query.collaboratorID;
         if(collaboratorID != null){
-            dbconn.query("SELECT * FROM User_Project up LEFT JOIN Project p ON up.project_id = p.id WHERE up.project_id = " + req.params.projectID + " AND up.user_id=" + req.userID, function(err, rows, fields){
-               if(err){
-                   console.log(err);
-               } else {
-                   if(rows.length > 0){
-                        googleOAuth.removeUserFromMediaFolder(rows[0].media_folder_id, rows[0].media_folder_permission_id, collaboratorID, function(){
-                            dbconn.query("DELETE FROM User_Project WHERE project_id=" + dbconn.escape(req.params.projectID) + " AND user_id=" + dbconn.escape(collaboratorID), function(err, rows, fields){
-                                if(err){
-                            
-                                } else {
-                                    console.log("Collaborator " + collaboratorID + " has been removed from project " + req.params.projectID);
-                                    
-                                    dbconn.query("SELECT email_address, display_name FROM User WHERE id=" + dbconn.escape(collaboratorID), function(err, rows, fields){
+            if(collaboratorID != req.userID){
+                dbconn.query("SELECT * FROM User_Project up LEFT JOIN Project p ON up.project_id = p.id WHERE up.project_id = " + req.params.projectID + " AND up.user_id=" + req.userID, function(err, rows, fields){
+                    if(err){
+                        console.log(err);
+                    } else {
+                        if(rows.length > 0){
+                                googleOAuth.removeUserFromMediaFolder(rows[0].media_folder_id, rows[0].media_folder_permission_id, collaboratorID, function(){
+                                    dbconn.query("DELETE FROM User_Project WHERE project_id=" + dbconn.escape(req.params.projectID) + " AND user_id=" + dbconn.escape(collaboratorID), function(err, rows, fields){
                                         if(err){
-                                            console.log(err);
+                                    
                                         } else {
-                                            if(rows.length > 0){
-                                                sendEmail.removedFromProject(rows[0].email_address, rows[0].display_name, req.params.projectID);
-                                            } 
+                                            console.log("Collaborator " + collaboratorID + " has been removed from project " + req.params.projectID);
+                                            
+                                            dbconn.query("SELECT email_address, display_name FROM User WHERE id=" + dbconn.escape(collaboratorID), function(err, rows, fields){
+                                                if(err){
+                                                    console.log(err);
+                                                } else {
+                                                    if(rows.length > 0){
+                                                        sendEmail.removedFromProject(rows[0].email_address, rows[0].display_name, req.params.projectID);
+                                                    } 
+                                                }
+                                            });   
+                                    
+                                            if(req.headers.origin != null){
+                                                res.send({});
+                                            } else {
+                                                res.redirect(303, "/feeds/" + req.params.projectID + "?action=collaborators");
+                                            }
                                         }
-                                    });   
-                            
-                                    if(req.headers.origin != null){
-                                        res.send({});
-                                    } else {
-                                        res.redirect(303, "/feeds/" + req.params.projectID + "?action=collaborators");
-                                    }
-                                }
-                            });
-                        });
+                                    });
+                                });
 
-                   } else {
-                       console.log("User could not be found");
-                   }
-               }
-            });
+                        } else {
+                            console.log("User could not be found");
+                        }
+                    }
+                    });
+            } else {
+                res.send();
+            }            
         } else {
             // Error - no collaborator specified
         }

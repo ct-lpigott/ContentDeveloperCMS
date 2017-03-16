@@ -49,7 +49,8 @@ router.get("/user", function(req, res, next){
             if(rows.length > 0){
                 var user = {
                     displayName: rows[0].display_name,
-                    profileImage: rows[0].google_profile_image_url
+                    profileImage: rows[0].google_profile_image_url,
+                    id: req.userID
                 }
                 res.send({user: user});
             } else {
