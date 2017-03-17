@@ -68,7 +68,7 @@ router.use(function(req, res, next){
 		// Responding to preflight requests
 		res.send();
 	} else {
-		if(req.headers.origin != null && req.allowedOrigins != null){
+		if(req.headers.origin != null && req.headers.origin != process.env.SITE_URL && req.allowedOrigins != null){
             var rejectRequest = false;
 
 			if(req.method == "GET"){
