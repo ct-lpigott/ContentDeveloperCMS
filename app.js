@@ -12,6 +12,10 @@ var bodyParser = require('body-parser');
 var checkDirectories = require("./custom_modules/check_directories.js");
 var session = require("express-session");
 
+if(fs.existsSync("./env_config.js")){
+  require("./env_config.js");
+}
+
 checkDirectories();
 
 // Generating a new app using the express module
