@@ -3,19 +3,16 @@
 // which this route will accept.
 var router = require('express').Router();
 
-var simpleGit = require("simple-git");
+var gitRepo = require("../../../custom_modules/git_repo");
 
 // Request to get the contents of a specific commit
 router.get("/:projectID", function(req, res, next){
     if(req.query.action == "previewCommit"){
         if(req.query.commit_hash != null && req.query.historyof != null){
-            var projectGit = simpleGit("./projects/" + req.params.projectID);
-            var filePath = req.query.historyof == "content" ? "content.json" : "admin.json";
-            projectGit.show([req.query.commit_hash + ":" + filePath], function(err, commitData){
+            gitRepo.getCommitContent(req.params.projectID, req.query.historyof, req.query.commit_hash, function(err, commitDataObject){
                 if(err){
-
+                    res.send({});
                 } else {
-                    var commitDataObject = JSON.parse(commitData);
                     req.responseObject.hash = req.query.commit_hash;
                     if(req.query.historyof == "content"){
                         req.responseObject.commit_content = commitDataObject;
@@ -27,7 +24,7 @@ router.get("/:projectID", function(req, res, next){
                 }
             });
         } else {
-
+            res.send({});
         }
     } else {
         next();
@@ -63,39 +60,19 @@ router.get("/:projectID", function(req, res, next){
                 req.responseObject.content = req.fileData.content;
             }
             if(req.query.include.indexOf("history") > -1){
-                // Accessing the git repository for this project
-                var projectGit = simpleGit("./projects/" + req.params.projectID);
-
-                // Preforming a git log on the content.json file, to get all commits relating
-                // to changes to the content only
-                projectGit.log(["content.json"], function(err, contentHistoryData){
-                    if(err){
-                        console.log(err);
-                    } else {
-                        // Checking that there are commits to return to the caller
-                        if(contentHistoryData.total > 0){
-                            // Appending the content history returned to the response object
-                            req.responseObject.content_history = contentHistoryData;
-                        }
-                        
-                        // Preforming a git log on the admin.json file, to get all commits relating
-                        // to changes to the structure only
-                        projectGit.log(["admin.json"], function(err, adminHistoryData){
-                            if(err){
-                                console.log(err);
-                            } else {
-                                // Checking that there are commits to return to the caller
-                                if(adminHistoryData.total > 0){
-                                    // Appending the structure history returned to the response object
-                                    req.responseObject.structure_history = adminHistoryData;
-                                }
-                                
-                                // Returning the response object to the caller, which should now contain
-                                // the project structure, content and commit history for each of these seperatley
-                                res.send(req.responseObject);
-                            }
-                        });
+                gitRepo.logFromRepo(req.params.projectID, "content", function(err, contentGitLog){
+                    if(contentGitLog != null){
+                        req.responseObject.content_history = contentGitLog;
                     }
+                    
+                    gitRepo.logFromRepo(req.params.projectID, "structure", function(err, structureGitLog){
+                        if(structureGitLog != null){
+                            req.responseObject.structure_history = structureGitLog;
+                        }
+                        // Returning the response object to the caller, which should now contain
+                        // the project structure, content and commit history for each of these seperatley
+                        res.send(req.responseObject);
+                    });
                 });
             } else {
                 res.send(req.responseObject);

@@ -8,9 +8,7 @@ var router = require('express').Router();
 // and save project files to the /projects directory
 var fs = require("fs");
 
-// Requiring the custom database connection module, so that the one
-// connection to the database can be reused throughout the application.
-var dbconn = require("../../../database/connection.js");
+var dbQuery = require("../../../custom_modules/database_query");
 
 // PRE for requests to read/update/delete the contents of a project, it's collection or any items within those collections
 router.use(function(req, res, next){
@@ -48,55 +46,35 @@ router.use(function(req, res, next){
             // Querying the database, to find the projects that this user has access to, by joining
             // the user table to the user_projects table. Returning only the columns needed for the 
             // reponse to the user. 
-            dbconn.query("SELECT * FROM Project p LEFT JOIN User_Project up ON p.id = up.project_id LEFT JOIN User u ON up.user_id = u.id WHERE p.id = " + dbconn.escape(req.projectID) + " AND up.user_id = " + dbconn.escape(req.userID), function(err, rows, fields){
-                if(err){
-                    // Logging this error to the console
-                    console.log(err);
-    
-                    // Unable to query the database to check if this user has access to the structure
-                    // of this project. Adding this as an error to the feedsErrors array.
-                    req.feedsErrors.push("Unable to confirm user access to this project so no project structure has been returned");
-    
-                    // Passing this request on to the next stage of this route
+            dbQuery.get_UserProject_Project_User("up.access_level_int, u.display_name, u.email_address", req.userID, req.projectID, function(err, row){
+                if(err){ console.log(err); }
+                if(row){
+                    // Storing the users access level on the request object, to be used throughout
+                    // the rest of this route
+                    req.user_access_level = row.access_level_int;
+
                     next();
                 } else {
-                    // Checking that a row has been returned from the database i.e. that this user has
-                    // been matched with this project.
-                    if(rows.length > 0){
-    
-                        // Storing the users access level on the request object, to be used throughout
-                        // the rest of this route
-                        req.user_access_level = rows[0].access_level_int;
-                        req.user_display_name = rows[0].display_name;
-                        req.user_email_address = rows[0].email_address;
-    
-                        next();
-                    } else {
-                        // Since no rows were returned from the database, this user does not have access
-                        // to this project structure. Adding this as an error to the feedsErrors array.
-                        req.feedsErrors.push("Server error - this user does not have admin access to this project");
-    
-                        // Since this is a significant issue, passing this request to the feeds-errors
-                        // route, by calling the next method with an empty error (as all errors will be
-                        // accessible from the feedsErrors array).
-                        next(new Error());
-                    }          
+                    // Since no rows were returned from the database, this user does not have access
+                    // to this project structure. Adding this as an error to the feedsErrors array.
+                    req.feedsErrors.push("Server error - this user does not have admin access to this project");
+
+                    // Since this is a significant issue, passing this request to the feeds-errors
+                    // route, by calling the next method with an empty error (as all errors will be
+                    // accessible from the feedsErrors array).
+                    next(new Error());
                 }
             });
         } else if(req.projectID != null){
-            dbconn.query("SELECT * FROM Project WHERE id=" + req.projectID, function(err, rows, fields){
-                if(err){
+            dbQuery.get_Project("max_cache_age", req.projectID, function(err, row){
+                if(err || row == null){
                     console.log(err);
                 } else {
-                    if(rows.length > 0){
-                        if(rows[0].max_cache_age != null){
-                            req.max_cache_age = rows[0].max_cache_age;
-                        }
-                    } else {    
-                        console.log("This project does not exist");
+                    if(row.max_cache_age != null){
+                        req.max_cache_age = row.max_cache_age;
                     }
-                    next();
                 }
+                next();
             });
         } else {
             // Since no userID or projectID was supplied in the request, passing this on to the next

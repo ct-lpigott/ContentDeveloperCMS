@@ -3,9 +3,7 @@
 // of the projects client secret keys)
 var fs = require("fs");
 
-// Requiring the custom database connection module, so that the one
-// connection to the database can be reused throughout the application.
-var dbconn = require("../database/connection.js");
+var dbQuery = require("../custom_modules/database_query");
 
 // Requiring the Google auth library, which will be used to 
 // generate new OAuth2 clients (to be used to authorise, and
@@ -70,19 +68,13 @@ module.exports = {
       newOAuth2Client.redirectUri_ = redirectURL;
       cb(newOAuth2Client);
     } else {
-      dbconn.query("SELECT google_access_token, google_refresh_token FROM User WHERE id=" + userID, function(err, rows, fields){
-        if(err){
-          console.log(err);
-        } else {
-          if(rows.length > 0){
-            var userAccessToken = JSON.parse(rows[0].google_access_token);
-            userAccessToken.refresh_token = rows[0].google_refresh_token;
-            newOAuth2Client.credentials = userAccessToken;
-            cb(newOAuth2Client);
-          } else {
-            console.log("User could not be found");
-          }
+      dbQuery.get_User("google_access_token, google_refresh_token", userID, function(err, row){
+        if(row){
+          var userAccessToken = JSON.parse(row.google_access_token);
+          userAccessToken.refresh_token = row.google_refresh_token;
+          newOAuth2Client.credentials = userAccessToken;
         }
+        cb(newOAuth2Client);
       });
     }
   },
@@ -168,7 +160,6 @@ module.exports = {
   removeUserFromMediaFolder: function(mediaFolderId, userPermissionId, userID, cb){
     if(userPermissionId != null){
       this.generateOAuth2Client(userID, function(oauth2Client){
-        dbconn.query("SELECT media_folder_permission_id")
         drive.permissions.delete({
           auth: oauth2Client,
           fileId: mediaFolderId,

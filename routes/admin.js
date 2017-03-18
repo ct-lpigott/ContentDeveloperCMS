@@ -5,11 +5,9 @@ var router = require('express').Router();
 
 // Requiring the custom google OAuth module, which exports an object with 
 // a method to generate a new oauth url.
-var googleOAuth = require("../google/googleOAuth");
+var googleOAuth = require("../custom_modules/google_oauth");
 
-// Requiring the custom database connection module, so that the one
-// connection to the database can be reused throughout the application.
-var dbconn = require("../database/connection.js");
+var dbQuery = require("./../custom_modules/database_query");
 
 // ALL REQUESTS
 router.use(function(req, res, next){
@@ -42,20 +40,17 @@ router.use(function(req, res, next){
 
 
 router.get("/user", function(req, res, next){
-    dbconn.query("SELECT * FROM User WHERE id=" + req.userID, function(err, rows, fields){
-        if(err){
-            console.log(err);
-        } else {
-            if(rows.length > 0){
-                var user = {
-                    displayName: rows[0].display_name,
-                    profileImage: rows[0].google_profile_image_url,
-                    id: req.userID
-                }
-                res.send({user: user});
-            } else {
-                res.send({});
+    dbQuery.get_User("*", req.userID, function(err, row){
+        if(err){ console.log(err); }
+        if(row){
+            var user = {
+                displayName: row.display_name,
+                profileImage: row.google_profile_image_url,
+                id: req.userID
             }
+            res.send({user: user});
+        } else {
+            res.send({});
         }
     });
 });
@@ -68,30 +63,24 @@ router.get("/logout", function(req, res, next){
 
 
 router.get("/settings/:projectID", function(req, res, next){
-    dbconn.query("SELECT * FROM Project WHERE id=" + req.params.projectID, function(err, rows, fields){
-        if(err){
-            console.log(err);
+    dbQuery.get_Project("update_origins, read_origins", req.params.projectID, function(err, row){
+        if(err){ console.log(err); }
+        if(row){
+            var adminSettings = {
+                update_origins: row.update_origins,
+                read_origins: row.read_origins
+            };
+            res.send(adminSettings);
         } else {
-            if(rows.length > 0){
-                var adminSettings = {
-                    update_origins: rows[0].update_origins,
-                    read_origins: rows[0].read_origins
-                };
-                res.send(adminSettings);
-            } else {
-                res.send({});
-            }
+            res.send({});
         }
     });
 });
 
 router.put("/settings/:projectID", function(req, res, next){ 
-    dbconn.query("UPDATE Project SET update_origins=" + dbconn.escape(req.body.update_origins) + ", read_origins=" + dbconn.escape(req.body.read_origins) + " WHERE id=" + req.params.projectID, function(err, result){
-        if(err){
-            console.log(err);
-        } else {
-            res.send({});
-        }
+    dbQuery.update_Project(["update_origins", "read_origins"], [req.body.update_origins, req.body.read_origins], req.userID, req.params.projectID, function(err, success){
+        if(err){ console.log(err); }
+        res.send({success: success});
     });
 });
 

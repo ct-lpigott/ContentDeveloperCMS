@@ -3,9 +3,7 @@
 // which this route will accept.
 var router = require('express').Router();
 
-// Requiring the custom database connection module, so that the one
-// connection to the database can be reused throughout the application.
-var dbconn = require("../database/connection.js");
+var dbQuery = require("../custom_modules/database_query");
 
 router.use(function(req, res, next){
 	var userAuthToken;
@@ -15,20 +13,15 @@ router.use(function(req, res, next){
 	} else if(req.session != null && req.session.user_auth_token != null){
 		userAuthToken = req.session.user_auth_token;
 	}
-
+	
 	if(userAuthToken != null){
-		dbconn.query("SELECT * FROM User WHERE cd_user_auth_token=" + dbconn.escape(userAuthToken) + "", function(err, rows, fields){
-			if(err){
-				console.log(err);
-				next(new Error("Unable to find user", null));			
+		dbQuery.getWhere_User("id", ["cd_user_auth_token"], [userAuthToken], function(err, row){
+			if(row){
+				req.userID = row.id;
+				//console.log("Successful Auth");
+				next();
 			} else {
-				if(rows.length > 0){
-					req.userID = rows[0].id;
-					console.log("Successful Auth");
-					next();
-				} else {
-					next(new Error("Invalid user authentication token", null));
-				}
+				next(new Error("Invalid user authentication token", null));
 			}
 		});
 	} else {

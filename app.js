@@ -9,7 +9,7 @@ var https = require("https");
 var redirectHttps = require("redirect-https");
 var multer = require("multer");
 var bodyParser = require('body-parser');
-var checkDirectories = require("./custom_modules/check_directories.js");
+var checkDirectories = require("./custom_modules/check_directories");
 var session = require("express-session");
 
 if(fs.existsSync("./env_config.js")){
@@ -40,7 +40,7 @@ app.use(bodyParser.json());
 var multerUpload = multer({
   storage: multer.diskStorage({
     destination: function (req, file, cb) {
-      var uploadDirectory = process.env.HOST_NAME == "localhost" ? "./public/uploads" : "./uploads";
+      var uploadDirectory = process.env.HOST_NAME == "./uploads";
 
       cb(null, uploadDirectory);
     },

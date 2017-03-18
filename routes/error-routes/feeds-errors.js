@@ -8,6 +8,7 @@ module.exports = function (err, req, res, next) {
     if(err.message != "notify"){
         res.status(err.status || 500);
     }    
+    //console.log(err);
 
     if(req.responseObject == null){
         req.responseObject = {
@@ -27,9 +28,7 @@ module.exports = function (err, req, res, next) {
         // can be passed back to the user.
         req.responseObject.errors = req.adminErrors;
         
-    } else {
-        req.responseObject.errors.push(err.message);
-    }    
+    }   
 
     // Sending the responseObject back as the response for this request. This 
     // will contain the array of any errors that have occurred within the feeds

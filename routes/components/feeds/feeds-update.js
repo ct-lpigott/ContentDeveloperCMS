@@ -3,7 +3,7 @@
 // which this route will accept.
 var router = require('express').Router();
 
-var validation = require("../../../custom_modules/validation.js");
+var validation = require("../../../custom_modules/validation");
 
 /**
  * @api {put} /feeds/:projectID Update entire project structure

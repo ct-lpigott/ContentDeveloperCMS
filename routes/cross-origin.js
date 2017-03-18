@@ -3,9 +3,7 @@
 // which this route will accept.
 var router = require('express').Router();
 
-// Requiring the custom database connection module, so that the one
-// connection to the database can be reused throughout the application.
-var dbconn = require("../database/connection.js");
+var dbQuery = require("../custom_modules/database_query");
 
 function setAccessControlHeaders(req, res, controlLevel){
 	res.setHeader("Access-Control-Allow-Origin", "*");
@@ -29,26 +27,19 @@ function setAccessControlHeaders(req, res, controlLevel){
 	return res;
 }
 
-router.use(["/feeds/:projectID", "/admin/settings/:projectID"], function(req, res, next){
-	dbconn.query("SELECT update_origins, read_origins FROM Project WHERE id=" + req.params.projectID, function(err, rows, fields){
-		if(err){
-			console.log(err);
-		} else {
-			if(rows.length > 0){
-				if(rows[0].update_origins != null || rows[0].read_origins != null){
-					req.allowedOrigins = {};
-
-					if(rows[0].update_origins != null){
-						req.allowedOrigins.update_origins = rows[0].update_origins;
-					}
-
-					if(rows[0].read_origins != null){
-						req.allowedOrigins.read_origins = rows[0].read_origins;
-					}
-				}
+router.use(["/feeds/:projectID", "/admin/*/:projectID"], function(req, res, next){
+	dbQuery.get_Project("update_origins, read_origins", req.params.projectID, function(err, row){
+		req.allowedOrigins = {};
+		if(row && (row.update_origins != null || row.read_origins != null)){
+			if(row.update_origins != null){
+				req.allowedOrigins.update_origins = row.update_origins;
 			}
-			next();
+
+			if(row.read_origins != null){
+				req.allowedOrigins.read_origins = row.read_origins;
+			}
 		}
+		next();
 	});
 });
 
@@ -68,7 +59,7 @@ router.use(function(req, res, next){
 		// Responding to preflight requests
 		res.send();
 	} else {
-		if(req.headers.origin != null && req.headers.origin != process.env.SITE_URL && req.allowedOrigins != null){
+		if(req.headers.origin != null && req.headers.origin != process.env.SITE_URL && req.allowedOrigins != null  && req.allowedOrigins.read_origins != null){
             var rejectRequest = false;
 
 			if(req.method == "GET"){

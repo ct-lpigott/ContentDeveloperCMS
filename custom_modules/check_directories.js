@@ -5,10 +5,6 @@ var requiredDirectories = [
     "./projects"
 ];
 
-if(process.env.HOST_NAME == "localhost"){
-    requiredDirectories[0] = "./public/uploads";
-}
-
 function checkDirectory(directoryPath){
     fs.exists(directoryPath, function(exists){
         if(!exists){

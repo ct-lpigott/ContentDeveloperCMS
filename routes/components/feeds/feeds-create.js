@@ -3,9 +3,8 @@
 // which this route will accept.
 var router = require('express').Router();
 
-var accessLevels = require("../../../custom_modules/access_levels.js");
-
-var validation = require("../../../custom_modules/validation.js");
+var accessLevels = require("../../../custom_modules/access_levels");
+var validation = require("../../../custom_modules/validation");
 
 /**
  * @api {post} /feeds/:projectID/:itemPath Create a new item structure

@@ -7,18 +7,10 @@ var router = require('express').Router();
 // to the file system of the server i.e. to be able to create, open, edit 
 // and save project files to the /projects directory
 var fs = require("fs");
-
-// Requiring the custom database connection module, so that the one
-// connection to the database can be reused throughout the application.
-var dbconn = require("../../../database/connection.js");
-
-var sendEmail = require("../../../custom_modules/send_email.js");
-
-var googleOAuth = require("../../../google/googleOAuth.js");
-
-var simpleGit = require("simple-git");
-
-var accessLevels = require("../../../custom_modules/access_levels.js");
+var dbQuery = require("../../../custom_modules/database_query");
+var gitRepo = require("../../../custom_modules/git_repo");
+var googleOAuth = require("../../../custom_modules/google_oauth");
+var accessLevels = require("../../../custom_modules/access_levels");
 
 /**
  * @api {get} /feeds/:projectID?allSettings Get all settings for a project
@@ -76,28 +68,14 @@ router.get("/", function(req, res, next){
             // Querying the database, to find the projects that this user has access to, by joining
             // the user table to the user_projects table. Returning only the columns needed for the 
             // reponse to the user
-            dbconn.query("SELECT up.user_id, up.project_id, up.access_level_int, p.project_name FROM User_Project up LEFT JOIN Project p ON p.id = up.project_id WHERE up.user_id =" + dbconn.escape(req.userID), function(err, rows, fields){
-                if(err){
-                    // Logging this error to the console
-                    console.log(err);
-
-                    // An error has occurred in the database. Adding this as an error to the feedsErrors array.
-                    req.feedsErrors.push("Server error - unable to access this users projects");
-
-                    // Since this is a significant issue, passing this request to the feeds-errors
-                    // route, by calling the next method with an empty error (as all errors will be
-                    // accessible from the feedsErrors array).
-                    next(new Error());
+            dbQuery.get_UserProjects_forUser("user_id, project_id, project_name, access_level_int", req.userID, function(err, rows){
+                if(rows){
+                    accessLevels.appendAllAccessLevelNames(rows, null, function(fullAccessLevelDetails){
+                        res.send(fullAccessLevelDetails);
+                    });
                 } else {
-                    // Checking that at least one project has been returned from the database
-                    if(rows.length > 0){
-                        accessLevels.appendAllAccessLevelNames(rows, null, function(fullAccessLevelDetails){
-                            res.send(fullAccessLevelDetails);
-                        });
-                    } else {
-                        // This user has no projects
-                        res.send("[]");
-                    }
+                    // This user has no projects
+                    res.send("[]");
                 }
             });
         } else {
@@ -131,36 +109,33 @@ router.post("/", function(req, res, next){
             googleOAuth.createNewProjectFolder(req.body.project_name, req.userID, function(newGoogleFolderId){
                 console.log(newGoogleFolderId);
                 // Creating a new project in the database, using the project name provided 
-                // in the request body, escaping this value before passing it to the database
-                dbconn.query("INSERT INTO Project(project_name, access_levels, media_folder_id) VALUES(" + dbconn.escape(req.body.project_name) + ", " + dbconn.escape(JSON.stringify(accessLevels.getDefaultAccessLevels())) + ", " + dbconn.escape(newGoogleFolderId) + ")", function(err, result){
-                    if(err){
+                // in the request body
+                dbQuery.create_Project(req.body.project_name, accessLevels.getDefaultAccessLevelsJson(), newGoogleFolderId, req.userID, function(err, newProjectId){
+                    if(err || newProjectId == null){
                         // Logging the error to the console
-                        console.log(err);
+                        console.log("Error creating new project " + err);
 
-                        // As it has not been possible to create the new project in the 
-                        // projects table, adding this as an error to the feedsErrors array.
-                        req.feedsErrors.push("Unable to create this project");
+                        // As it has not been possible to create the folder for this project, 
+                        // adding this as an error to the feedsErrors array.
+                        req.feedsErrors.push("Server error - unable to create project");
 
                         // Since this is a significant issue, passing this request to the feeds-errors
                         // route, by calling the next method with an empty error (as all errors will be
                         // accessible from the feedsErrors array).
                         next(new Error());
                     } else {
-                        // Storing the ID of the newly created project, as returned in the result object
-                        // from the database query, as a temporary variable on the request object, so that
-                        // it can be used throughout the rest of this requests routing
-                        req.projectID = result.insertId;
-
-                        // Creating a new entry in the User_Project database, to add the current user as an
-                        // administrator of this project. Defaulting this user to have the highest level
-                        // of access to this project i.e. 1
-                        dbconn.query("INSERT INTO User_Project(user_id, project_id, access_level_int) VALUES(" + req.userID + ", " + req.projectID + ", 1)", function(err, result){
+                        req.projectID = newProjectId;
+                        // Creating a new directory within the /projects directory, so that all files
+                        // relating to this project can be stored within it. Setting the directory name
+                        // to be equal to the ID of the new project i.e. the first project created on this
+                        // server will have all of its project files stores in /projects/1/
+                        fs.mkdir("./projects/" + req.projectID, function(err){
                             if(err){
                                 // Logging the error to the console
-                                console.log("Error - Unable to link this new project with the current user", err);
+                                console.log("Error making folder " + err);
 
-                                // As it has not been possible to create the relationship between the new 
-                                // project and this user, adding this as an error to the feedsErrors array.
+                                // As it has not been possible to create the folder for this project, 
+                                // adding this as an error to the feedsErrors array.
                                 req.feedsErrors.push("Server error - unable to create project");
 
                                 // Since this is a significant issue, passing this request to the feeds-errors
@@ -168,40 +143,20 @@ router.post("/", function(req, res, next){
                                 // accessible from the feedsErrors array).
                                 next(new Error());
                             } else {
-                                // Creating a new directory within the /projects directory, so that all files
-                                // relating to this project can be stored within it. Setting the directory name
-                                // to be equal to the ID of the new project i.e. the first project created on this
-                                // server will have all of its project files stores in /projects/1/
-                                fs.mkdir("./projects/" + req.projectID, function(err){
-                                    if(err){
-                                        // Logging the error to the console
-                                        console.log("Error making folder " + err);
-
-                                        // As it has not been possible to create the folder for this project, 
-                                        // adding this as an error to the feedsErrors array.
-                                        req.feedsErrors.push("Server error - unable to create project");
-
-                                        // Since this is a significant issue, passing this request to the feeds-errors
-                                        // route, by calling the next method with an empty error (as all errors will be
-                                        // accessible from the feedsErrors array).
-                                        next(new Error());
-                                    } else {
-                                        if(req.body.template != "null" && req.body.template != null && req.body.template.length > 0){
-                                            // Loading in the project template file, which will be used to instantiate the
-                                            // admin.json file for this project 
-                                            fs.readFile("./project_defaults/templates/" + req.body.template + ".json", function(err, data){
-                                                if(err){
-                                                    console.log(err);
-                                                } else {
-                                                    req.templateProjectStructure = JSON.parse(data);
-                                                    next();
-                                                }
-                                            });
+                                if(req.body.template != "null" && req.body.template != null && req.body.template.length > 0){
+                                    // Loading in the project template file, which will be used to instantiate the
+                                    // admin.json file for this project 
+                                    fs.readFile("./project_defaults/templates/" + req.body.template + ".json", function(err, data){
+                                        if(err){
+                                            console.log(err);
                                         } else {
+                                            req.templateProjectStructure = JSON.parse(data);
                                             next();
                                         }
-                                    }
-                                });
+                                    });
+                                } else {
+                                    next();
+                                }
                             }
                         });
                     }
@@ -274,42 +229,11 @@ router.post("/", function(req, res, next){
                         next(new Error());
                     } else {
                         console.log("Project content file created");
-
-                        // Setting defaults to be used as the Git Credentials, incase there
-                        // is any issue with the query to the database, or the user's details
-                        // are not available
-                        var gitDisplayName = "Content Developer";
-                        var gitEmailAddress = process.env.EMAIL_ADDRESS;
                     
-                        // Creating a new Git repository for this project, and initialising it
-                        var newGitRepo = simpleGit("./projects/" + req.projectID);
-                        newGitRepo.init();
-
-                        var userDetails = dbconn.query("SELECT * FROM User WHERE id=" + req.userID, function(err, rows, fields){
-                            
-                            if(err){
-                                console.log("Issue when querying the database for the users details - git - " + err);
-                                // Not dealing with the error any further, as a response will already have been sent
-                                // to the client
-                            } else {
-                                if(rows.length > 0){
-                                    // Accessing the user's name and email address from the database
-                                    gitDisplayName = rows[0].display_name;
-                                    gitEmailAddress = rows[0].email_address;
-                                }
-                            }
-
-                            // Setting up the configuration for this user, and then committing
-                            // all files in the project folder i.e. as the first commit to the
-                            // project
-                            newGitRepo
-                                .addConfig("user.name", gitDisplayName)
-                                .addConfig("user.email", gitEmailAddress)
-                                .add("./*")
-                                .commit("'" + req.body.project_name + "' project files created", function(){
-                                    res.send({new_project_id: req.projectID});
-                                });
-                        });                      
+                        gitRepo.createNewRepo(req.projectID, req.userID, req.body.project_name, function(err, success){
+                            console.log("Git repo creation success = " + success);
+                            res.send({new_project_id: req.projectID});                            
+                        });    
                     }
                 });
             }
@@ -329,203 +253,41 @@ router.post("/", function(req, res, next){
  */
 router.post("/:projectID", function(req, res, next){
     if(req.query.action == "collaborators"){
-        // Checking that an email address has been included in the request object
-        if(req.body.email != null && req.body.email.length > 0){
-            // Querying the database, to see if a user with this email address already exists
-            dbconn.query("SELECT id FROM User WHERE email_address=" + dbconn.escape(req.body.email), function(err, rows, fields){
-                if(err){
-                    // Logging the error to the console
-                    console.log("Error checking if user exists " + err);
-
-                    // Unable to check if this user already exists. Adding this as an error to the 
-                    // feedsErrors array.
-                    req.feedsErrors.push("Server error - unable to add collaborator to project");
-
-                    // Since this is a significant issue, passing this request to the feeds-errors
-                    // route, by calling the next method with an empty error (as all errors will be
-                    // accessible from the feedsErrors array).
-                    next(new Error());
-                } else {
-                    // Checking if any results were returned from the database i.e. does this user
-                    // already exist
-                    if(rows.length > 0){
-                        console.log("This is an existing user");
-                        
-                        // This is an existing user. Setting the newCollaboratorID to be equal to
-                        // the ID of this user
-                        req.newCollaboratorID = rows[0].id;
-
-                        // Passing this request on to the next stage of this route, so that 
-                        // this existing user can be added to the project
-                        next();
-                    } else {
-                        console.log("This is a new user");
-
-                        // Creating a new user in the database, using the email provided in the request body
-                        dbconn.query("INSERT INTO User(email_address) VALUES(" + dbconn.escape(req.body.email) +")", function(err, result){
-                            if(err){
-                                // Logging the error to the console
-                                console.log("Error adding new user " + err);
-
-                                // Unable add this new user to the database. Adding this as an error to the 
-                                // feedsErrors array.
-                                req.feedsErrors.push("Server error - unable to add collaborator to project");
-
-                                // Since this is a significant issue, passing this request to the feeds-errors
-                                // route, by calling the next method with an empty error (as all errors will be
-                                // accessible from the feedsErrors array).
-                                next(new Error());
-                            } else {
-                                // Setting the newCollaboratorID to the ID of the newly created user
-                                req.newCollaboratorID = result.insertId;
-
-                                // Passing this request on to the next stage of this route, so that 
-                                // this new user can be added to the project
-                                next();
-                            }
-                        });
-                    }
-                }
-            });
-        }
-    } else {
-        next();
-    }
-});
-// Continued - Continuation of route for request to add a collaborator to a project
-router.post("/:projectID", function(req, res, next){
-    if(req.query.action == "collaborators"){
         // Checking if an access level property was provided in the request, and that the
         // value of that property is greater than 0
-        if(req.body.accessLevelInt != null){
-            // Querying the database, to check if this user is already connected with this project
-            dbconn.query("SELECT * FROM User_Project up WHERE user_id=" + req.newCollaboratorID + " AND project_id=" + req.params.projectID, function(err, rows, fields){
-                if(err){
-                    // Logging the error to the console
-                    console.log("Error checking if user is already a contributor to project " + err);
-
-                    // Unable to check if this user is already connected to this project. Adding this as 
-                    // an error to the feedsErrors array.
-                    req.feedsErrors.push("Server error - unable to add collaborator to project");
-
-                    // Since this is a significant issue, passing this request to the feeds-errors
-                    // route, by calling the next method with an empty error (as all errors will be
-                    // accessible from the feedsErrors array).
-                    next(new Error());
-                } else {
-                    // Checking if any results were returned from the database i.e. if this user is
-                    // already a collaborator on this project
-                    if(rows.length > 0){
-                        // Determining if this users current access level is the same as the one
-                        // included in the request i.e. to see if any change of access level is necessary
-                        if(req.body.accessLevelInt == rows[0].access_level_int){
+        if(req.body.accessLevelInt != null && req.body.email != null && req.body.email.length > 0){
+            dbQuery.check_User(req.body.email, function(err, collaboratorId){
+                if(collaboratorId){
+                    dbQuery.check_UserProject(collaboratorId, req.params.projectID, req.body.accessLevelInt, function(err, changed){
+                        if(err || changed == null){
                             // Logging the error to the console
-                            console.log("This user is already a collaborator on this project");
+                            console.log("Error checking if user is already a contributor to project " + err);
 
+                            // Unable to check if this user is already connected to this project. Adding this as 
+                            // an error to the feedsErrors array.
+                            req.feedsErrors.push("Server error - unable to add collaborator to project");
+
+                            // Since this is a significant issue, passing this request to the feeds-errors
+                            // route, by calling the next method with an empty error (as all errors will be
+                            // accessible from the feedsErrors array).
+                            next(new Error());
+                        } else {
                             if(req.headers.origin != null){
                                 res.send({});
                             } else {
                                 res.redirect(303, "/feeds/" + req.params.projectID + "?action=collaborators");
                             }
-                        } else {
-                            // As this is a different access level for this user, for this project, updating the
-                            // user_project table to reflect this i.e. changing this users level for this project
-                            dbconn.query("UPDATE User_Project SET access_level_int=" + dbconn.escape(req.body.accessLevelInt) + "WHERE user_id=" + req.newCollaboratorID, function(err, result) {
-                                if(err){
-                                    // Logging the error to the console
-                                    console.log("Error updating user on project " + err);
-
-                                    // Unable to update this users access level to this project. Adding this as 
-                                    // an error to the feedsErrors array.
-                                    req.feedsErrors.push("Server error - unable update this users access level to this project");
-
-                                    // Since this is a significant issue, passing this request to the feeds-errors
-                                    // route, by calling the next method with an empty error (as all errors will be
-                                    // accessible from the feedsErrors array).
-                                    next(new Error());
-                                } else {
-                                    console.log("Collaborators access level updated on project");
-
-                                    dbconn.query("SELECT * FROM User_Project up LEFT JOIN User u ON u.id = up.user_id LEFT JOIN Project p ON p.id = up.project_id WHERE u.id=" + dbconn.escape(req.newCollaboratorID), function(err, rows, fields){
-                                        if(err){
-                                            console.log(err);
-                                        } else {
-                                            if(rows.length > 0){
-                                                var accessLevelName = accessLevels.getAccessLevelName(rows[0].access_level_int, rows[0].access_levels);
-                                                sendEmail.accessLevelChanged(rows[0].email_address, rows[0].display_name, rows[0].project_name, accessLevelName);
-                                            } 
-                                        }
-                                    }); 
-                                    if(req.headers.origin != null){
-                                        res.send({});
-                                    } else {
-                                        res.redirect(303, "/feeds/" + req.params.projectID + "?action=collaborators");
-                                    }
-                                }
-                            });
                         }
-                    } else {
-                        
-                        dbconn.query("SELECT * FROM User_Project up LEFT JOIN Project p ON up.project_id = p.id WHERE up.project_id = " + req.params.projectID + " AND up.user_id = " + req.userID, function(err, rows, fields){
-                            if(err){
-                                console.log(err);
-                            } else {
-                                if(rows.length > 0){
-                                    googleOAuth.addUserToMediaFolder(rows[0].media_folder_id, req.body.email, req.userID, "writer", function(newPermissionId){
-                                        if(newPermissionId != null){
-                                            console.log(newPermissionId);
-                                            // This user has not previously been a collaborator on this project, so creating a new
-                                            // relationship between the user and the project, using the access level provided
-                                            dbconn.query("INSERT INTO User_Project(user_id, project_id, access_level_int, media_folder_permission_id) VALUES(" + req.newCollaboratorID + ", " + req.params.projectID + ", " + dbconn.escape(req.body.accessLevelInt) + ", " + dbconn.escape(newPermissionId) + ")", function(err, result) {
-                                                if(err){
-                                                    // Logging the error to the console
-                                                    console.log("Error adding user to project " + err);
-                    
-                                                    // Unable to create new entry in the user_project table. Adding this as 
-                                                    // an error to the feedsErrors array.
-                                                    req.feedsErrors.push("Server error - unable to add collaborator to project");
-                    
-                                                    // Since this is a significant issue, passing this request to the feeds-errors
-                                                    // route, by calling the next method with an empty error (as all errors will be
-                                                    // accessible from the feedsErrors array).
-                                                    next(new Error());
-                                                } else {
-                                                    console.log("New collaborator added to project");        
-                    
-                                                    dbconn.query("SELECT u.email_address, u.display_name, p.project_name FROM User_Project up LEFT JOIN User u ON u.id = up.user_id LEFT JOIN Project p ON p.id = up.project_id WHERE u.id=" + dbconn.escape(req.newCollaboratorID), function(err, rows, fields){
-                                                        if(err){
-                                                            console.log(err);
-                                                        } else {
-                                                            if(rows.length > 0){
-                                                                sendEmail.addedToProject(rows[0].email_address, rows[0].display_name, rows[0].project_name);
-                                                            } 
-                                                        }
-                                                    });                    
-                    
-                                                    if(req.headers.origin != null){
-                                                        res.send({});
-                                                    } else {
-                                                        res.redirect(303, "/feeds/" + req.params.projectID + "?action=collaborators");
-                                                    }
-                                                }
-                                            });
-                                        }
-                                    });
-                                } else {
-                                    console.log("No user could be found");
-                                }
-                            }
-                        });
-                    }
+                    });
                 }
             });
         } else {
             // Logging the error to the console
-            console.log("No access level provided in the request");
+            console.log("Not enough details provided in the request");
 
             // No access level was provided in the request, unable to add collaborator. Adding this as 
             // an error to the feedsErrors array.
-            req.feedsErrors.push("Unable to add collaborator to project - no access level provided in the request");
+            req.feedsErrors.push("Unable to add collaborator to project - not enouth details provided in the request");
 
             // Since this is a significant issue, passing this request to the feeds-errors
             // route, by calling the next method with an empty error (as all errors will be
@@ -547,18 +309,13 @@ router.post("/:projectID", function(req, res, next){
  */
 router.put("/:projectID", function(req, res, next){
     if(req.query.action == "collaborators"){
-        // Checking that an email address has been included in the request object
         if(req.body.collaboratorID != null && req.body.accessLevelInt != null){
-            dbconn.query("UPDATE User_Project SET access_level_int=" + dbconn.escape(req.body.accessLevelInt) + "WHERE user_id=" + req.body.collaboratorID + " AND project_id=" + req.params.projectID, function(err, result) {
-                if(err){
-                    console.log(err);
+            dbQuery.update_UserProject(["access_level_int"], [req.body.accessLevelInt], req.body.collaboratorID, req.params.projectID, function(err, success){
+                if(req.headers.origin != null){
+                    res.send({});
                 } else {
-                    if(req.headers.origin != null){
-                        res.send({});
-                    } else {
-                        res.redirect(303, "/feeds/" + req.params.projectID + "?action=collaborators");
-                    }                    
-                }
+                    res.redirect(303, "/feeds/" + req.params.projectID + "?action=collaborators");
+                } 
             });
         }
     } else {
@@ -575,22 +332,20 @@ router.put("/:projectID", function(req, res, next){
 router.get("/:projectID", function(req, res, next){
     if(req.query.action == "collaborators"){
         // Querying the database, to get all collaborators for this project
-
-        dbconn.query("SELECT u.display_name, up.user_id, up.access_level_int FROM User_Project up LEFT JOIN User u ON up.user_id = u.id WHERE up.project_id=" + dbconn.escape(req.params.projectID), function(err, rows, fields){
-            if(err){
-
+        dbQuery.get_UserProjects_forProject("u.display_name, up.user_id, up.access_level_int", req.params.projectID, function(err, rows){
+            if(err){console.log(err);}
+            if(rows){
+                accessLevels.appendAllAccessLevelNames(rows, req.params.projectID, function(fullAccessLevelDetails){
+                    if(req.query.allSettings != null){
+                        req.responseObject.collaborators = fullAccessLevelDetails;
+                        req.query.action = "accessLevels";
+                        next();
+                    } else {
+                        res.send(fullAccessLevelDetails);
+                    }
+                });
             } else {
-                if(rows.length > 0){
-                    accessLevels.appendAllAccessLevelNames(rows, req.params.projectID, function(fullAccessLevelDetails){
-                        if(req.query.allSettings != null){
-                            req.responseObject.collaborators = fullAccessLevelDetails;
-                            req.query.action = "accessLevels";
-                            next();
-                        } else {
-                            res.send(fullAccessLevelDetails);
-                        }
-                    });
-                }
+                res.send("[]");
             }
         });
     } else {
@@ -610,42 +365,22 @@ router.delete("/:projectID", function(req, res, next){
         var collaboratorID = req.body.collaboratorID || req.query.collaboratorID;
         if(collaboratorID != null){
             if(collaboratorID != req.userID){
-                dbconn.query("SELECT * FROM User_Project up LEFT JOIN Project p ON up.project_id = p.id WHERE up.project_id = " + req.params.projectID + " AND up.user_id=" + req.userID, function(err, rows, fields){
-                    if(err){
-                        console.log(err);
-                    } else {
-                        if(rows.length > 0){
-                                googleOAuth.removeUserFromMediaFolder(rows[0].media_folder_id, rows[0].media_folder_permission_id, collaboratorID, function(){
-                                    dbconn.query("DELETE FROM User_Project WHERE project_id=" + dbconn.escape(req.params.projectID) + " AND user_id=" + dbconn.escape(collaboratorID), function(err, rows, fields){
-                                        if(err){
-                                    
-                                        } else {
-                                            console.log("Collaborator " + collaboratorID + " has been removed from project " + req.params.projectID);
-                                            
-                                            dbconn.query("SELECT email_address, display_name FROM User WHERE id=" + dbconn.escape(collaboratorID), function(err, rows, fields){
-                                                if(err){
-                                                    console.log(err);
-                                                } else {
-                                                    if(rows.length > 0){
-                                                        sendEmail.removedFromProject(rows[0].email_address, rows[0].display_name, req.params.projectID);
-                                                    } 
-                                                }
-                                            });   
-                                    
-                                            if(req.headers.origin != null){
-                                                res.send({});
-                                            } else {
-                                                res.redirect(303, "/feeds/" + req.params.projectID + "?action=collaborators");
-                                            }
-                                        }
-                                    });
-                                });
-
-                        } else {
-                            console.log("User could not be found");
+                dbQuery.get_UserProject_Project("p.media_folder_id, up.media_folder_permission_id", req.userID, req.params.projectID, function(err, row){
+                    if(row){
+                        if(row.media_folder_id != null && row.media_folder_permission_id != null){
+                            googleOAuth.removeUserFromMediaFolder(row.media_folder_id, row.media_folder_permission_id, collaboratorID, function(){});
                         }
+                        dbQuery.delete_UserProject(collaboratorID, req.params.projectID, function(err, success){
+                            if(req.headers.origin != null){
+                                res.send({});
+                            } else {
+                                res.redirect(303, "/feeds/" + req.params.projectID + "?action=collaborators");
+                            }
+                        });
+                    } else {
+                        res.send();
                     }
-                    });
+                });
             } else {
                 res.send();
             }            
@@ -669,19 +404,16 @@ router.post("/:projectID", function(req, res, next){
     if(req.query.action == "mediaItems"){
         console.log("Uploading file");
         if(req.file != null){
-            dbconn.query("SELECT media_folder_id FROM Project p LEFT JOIN User_Project up on p.id = up.project_id WHERE p.id = " + req.params.projectID + " AND up.user_id = " + req.userID, function(err, rows, fields){
-                if(err){
+            dbQuery.get_UserProject_Project("p.media_folder_id", req.userID, req.params.projectID, function(err, row){
+                if(err || row == null){
                     console.log(err);
                 } else {
-                    if(rows.length > 0){
-                        googleOAuth.uploadMediaItem(req.file, rows[0].media_folder_id, req.userID, function(fileUrl){
-                            console.log("FILE UPLOAD");
-                            req.responseObject.fileUrl = "https://drive.google.com/uc?id=" + fileUrl;
-                            //req.responseObject.fileUrl = "../uploads/" + req.file.filename;
-                            res.send(req.responseObject);
-                        });
-                    }
-                }
+                    googleOAuth.uploadMediaItem(req.file, row.media_folder_id, req.userID, function(fileUrl){
+                        console.log("FILE UPLOAD");
+                        req.responseObject.fileUrl = "https://drive.google.com/uc?id=" + fileUrl;
+                        res.send(req.responseObject);
+                    });
+                }                
             });
         } else {
             console.log("No file");
@@ -726,7 +458,7 @@ router.get("/:projectID", function(req, res, next){
 router.post("/:projectID", function(req, res, next){
     if(req.query.action == "accessLevels"){
         if(req.body.access_level_name != null){
-            accessLevels.createNewAccessLevel(req.params.projectID, req.body.access_level_name, req.body.access_level_int, function(){
+            accessLevels.createNewAccessLevel(req.userID, req.params.projectID, req.body.access_level_name, req.body.access_level_int, function(){
                 if(req.headers.origin != null){
                     res.send({});
                 } else {
@@ -752,7 +484,7 @@ router.delete("/:projectID", function(req, res, next){
     if(req.query.action == "accessLevels"){
         var accessLevelInt = req.body.access_level_int || req.query.access_level_int;
         if(accessLevelInt != null){
-            accessLevels.removeAccessLevel(req.params.projectID, accessLevelInt, function(){
+            accessLevels.removeAccessLevel(req.userID, req.params.projectID, accessLevelInt, function(){
                 if(req.headers.origin != null){
                     res.send({});
                 } else {
@@ -778,7 +510,7 @@ router.delete("/:projectID", function(req, res, next){
 router.put("/:projectID", function(req, res, next){
     if(req.query.action == "accessLevels"){
         if(req.body.access_level_int != null && req.body.access_level_name != null){
-            accessLevels.updateAccessLevelName(req.params.projectID, req.body.access_level_int, req.body.access_level_name, function(){
+            accessLevels.updateAccessLevelName(req.userID, req.params.projectID, req.body.access_level_int, req.body.access_level_name, function(){
                 if(req.headers.origin != null){
                     res.send({});
                 } else {
@@ -801,17 +533,13 @@ router.put("/:projectID", function(req, res, next){
  */
 router.get("/:projectID", function(req, res, next){
     if(req.query.action == "mediaItems"){
-        dbconn.query("SELECT * FROM User_Project up LEFT JOIN Project p ON up.project_id = p.id WHERE up.project_id=" + req.params.projectID + " AND up.user_id=" + req.userID, function(err, rows, fields){
-            if(err){
-                console.log(err);
+        dbQuery.get_UserProject_Project("media_folder_id", req.userID, req.params.projectID, function(err, row){
+            if(row && row.media_folder_id != null){
+                googleOAuth.getAllProjectImages(req.params.projectID, row.media_folder_id, req.userID, req.query.numFiles, req.query.nextPageToken, function(results){
+                    res.send(results);
+                });
             } else {
-                if(rows.length > 0){
-                    googleOAuth.getAllProjectImages(req.params.projectID, rows[0].media_folder_id, req.userID, req.query.numFiles, req.query.nextPageToken, function(results){
-                        res.send(results);
-                    });
-                } else {
-                    console.log("Could not find user");
-                }
+                res.send(null);
             }
         });
     } else {
@@ -827,18 +555,14 @@ router.get("/:projectID", function(req, res, next){
  */
 router.get("/:projectID", function(req, res, next){
     if(req.query.action == "project_name"){
-        dbconn.query("SELECT project_name FROM Project WHERE id=" + req.params.projectID, function(err, rows, fields){
-            if(err){
-                console.log(err);
+        dbQuery.get_Project("project_name", req.params.projectID, function(err, row){
+            var project_name = row.project_name || null;
+            if(req.query.allSettings != null){
+                req.responseObject.project_name = project_name;
+                req.query.action = "cache";
+                next();
             } else {
-                var project_name = rows[0].project_name || null;
-                if(req.query.allSettings != null){
-                    req.responseObject.project_name = project_name;
-                    req.query.action = "cache";
-                    next();
-                } else {
-                    res.send(project_name);
-                }
+                res.send(project_name);
             }
         });
     } else {
@@ -856,18 +580,19 @@ router.get("/:projectID", function(req, res, next){
 router.put("/:projectID", function(req, res, next){
     if(req.query.action == "project_name"){
         if(req.body.project_name != null){
-            dbconn.query("UPDATE Project SET project_name = " + dbconn.escape(req.body.project_name) + " WHERE id=" + req.params.projectID, function(err, rows, fields){
-                if(err){
-                    console.log(err);
+            dbQuery.update_Project(["project_name"],[req.body.project_name], req.userID, req.params.projectID, function(err, success){
+                if(req.query.allSettings != null){
+                    req.responseObject.project_name = req.body.project_name;
+                    req.query.action = "cache";
+                    next();
                 } else {
-                    if(req.query.allSettings != null){
-                        req.responseObject.project_name = req.body.project_name;
-                        req.query.action = "cache";
-                        next();
-                    } else {
+                    if(success){
                         res.send(req.body.project_name);
-                    }                    
-                }
+                    } else {
+                        res.send("{}");
+                    }
+                    
+                }    
             });
         } else {
             if(req.query.allSettings != null){
@@ -891,24 +616,15 @@ router.put("/:projectID", function(req, res, next){
  */
 router.get("/:projectID", function(req, res, next){
     if(req.query.action == "cache"){
-        dbconn.query("SELECT max_cache_age FROM Project WHERE id=" + req.params.projectID, function(err, rows, fields){
-            if(err){
-                console.log(err);
+        dbQuery.get_Project("max_cache_age", req.params.projectID, function(err, row){
+            if(req.query.allSettings != null){
+                req.responseObject.max_cache_age = row.max_cache_age || null;
+                req.query.action = "css";
+                next();
             } else {
-                if(rows.length > 0){
-                    if(req.query.allSettings != null){
-                        req.responseObject.max_cache_age = rows[0].max_cache_age;
-                        req.query.action = "css";
-                        next();
-                    } else {
-                        res.send(rows[0].max_cache_age);
-                    }                    
-                } else {
-                    req.feedsErrors.push("Unable to access the maximum cache age for this project");
-                    next(new Error());
-                }  
+                res.send(row.max_cache_age || null);
             }
-        });       
+        });    
     } else {
         next();
     }
@@ -924,17 +640,13 @@ router.get("/:projectID", function(req, res, next){
 router.put("/:projectID", function(req, res, next){
     if(req.query.action == "cache"){
         if(req.body.max_cache_age != null){
-            dbconn.query("UPDATE Project SET max_cache_age=" + dbconn.escape(req.body.max_cache_age) + " WHERE id=" + req.params.projectID, function(err, result){
-                if(err){
-                    console.log(err);
+            dbQuery.update_Project(["max_cache_age"], [req.body.max_cache_age], req.userID, req.params.projectID, function(err, success){
+                if(req.query.allSettings != null){
+                    req.responseObject.max_cache_age = req.body.max_cache_age || null;
+                    req.query.action = "css";
+                    next();
                 } else {
-                    if(req.query.allSettings != null){
-                        req.responseObject.max_cache_age = req.body.max_cache_age;
-                        req.query.action = "css";
-                        next();
-                    } else {
-                        res.send(req.body.max_cache_age);
-                    }
+                    res.send(req.body.max_cache_age || null);
                 }
             });
         } else {
@@ -959,20 +671,12 @@ router.put("/:projectID", function(req, res, next){
  */
 router.get("/:projectID", function(req, res, next){
     if(req.query.action == "css"){
-        dbconn.query("SELECT * FROM Project WHERE id=" + req.params.projectID, function(err, rows, fields){
-            if(err){
-                console.log(err);
+        dbQuery.get_Project("custom_css", req.params.projectID, function(err, row){
+            if(req.query.allSettings != null){
+                req.responseObject.custom_css = row.custom_css || null;
+                next();
             } else {
-                if(rows.length > 0){
-                    if(req.query.allSettings != null){
-                        req.responseObject.custom_css = rows[0].custom_css;
-                        next();
-                    } else {
-                        res.send(rows[0].custom_css);
-                    }
-                } else {
-                    console.log("Cannot find project");
-                }
+                res.send(row.custom_css || null);
             }
         });
     } else {
@@ -990,17 +694,13 @@ router.get("/:projectID", function(req, res, next){
 router.post("/:projectID", function(req, res, next){
     if(req.query.action == "css"){
         if(req.body.custom_css != null){
-            dbconn.query("SELECT custom_css FROM Project WHERE id=" + req.params.projectID, function(err, rows, fields){
-                if(err){
-                    console.log(err);
+            dbQuery.get_Project("custom_css", req.params.projectID, function(err, row){
+                if(row){
+                    req.custom_css = row.custom_css + " " + req.body.custom_css;
+                    next();
                 } else {
-                    if(rows.length > 0){
-                        req.custom_css = rows[0].custom_css + " " + req.body.custom_css;
-                        next();
-                    } else {
-                        req.custom_css = req.body.custom_css;
-                        next();
-                    }
+                    req.custom_css = req.body.custom_css;
+                    next();
                 }
             });
         } else {
@@ -1045,19 +745,15 @@ router.put("/:projectID", function(req, res, next){
 router.all("/:projectID", function(req, res, next){
     if(req.query.action == "css"){
         if(req.custom_css != null){
-            dbconn.query("UPDATE Project SET custom_css=" + dbconn.escape(req.custom_css) + " WHERE id=" + req.params.projectID, function(err, result){
-                if(err){
-                    console.log(err);
+            dbQuery.update_Project(["custom_css"], [req.custom_css], req.userID, req.params.projectID, function(err, success){
+                if(req.query.allSettings != null){
+                    req.responseObject.custom_css = req.custom_css;
+                    next();
                 } else {
-                    if(req.query.allSettings != null){
-                        req.responseObject.custom_css = req.custom_css;
-                        next();
+                    if(req.headers.origin != null){
+                        res.send({});
                     } else {
-                        if(req.headers.origin != null){
-                            res.send({});
-                        } else {
-                            res.redirect(303, "/feeds/" + req.params.projectID + "?action=css");
-                        }
+                        res.redirect(303, "/feeds/" + req.params.projectID + "?action=css");
                     }
                 }
             });

@@ -8,9 +8,8 @@ var router = require('express').Router();
 // and save project files to the /projects directory
 var fs = require("fs");
 
-var simpleGit = require("simple-git");
-
-var validation = require("../../../custom_modules/validation.js");
+var gitRepo = require("../../../custom_modules/git_repo");
+var validation = require("../../../custom_modules/validation");
 
 router.use(function(req, res, next){
     if(req.updateFile != null) {
@@ -39,15 +38,12 @@ router.use(function(req, res, next){
                         req.gitCommitMessage = req.gitCommitMessage != null ? req.gitCommitMessage : "Project content updated";
                         req.resultData = req.resultData != null ? req.resultData : req.fileData.content;
 
-                        var projectGitRepo = simpleGit("./projects/" + req.projectID);
-                        projectGitRepo
-                            .addConfig("user.name", req.user_display_name)
-                            .addConfig("user.email", req.user_email_address)
-                            .add("./content.json")
-                            .commit(req.gitCommitMessage, function(){
-                                console.log("Project content file successfully updated");
-                                res.send(req.resultData);
-                            });
+                        gitRepo.commitToRepo(req.projectID, req.userID, "./content.json", req.gitCommitMessage, function(err, success){
+                            console.log("Project content file successfully updated");
+                            // Sending the new item as the response to the caller, so that they can
+                            // see the result of their request
+                            res.send(req.resultData);
+                        });
                     }
                 });
             } else {
@@ -100,16 +96,12 @@ router.use(function(req, res, next){
                     req.gitCommitMessage = req.gitCommitMessage != null ? req.gitCommitMessage : "Project structure updated";
                     req.resultData = req.resultData != null ? req.resultData : req.fileData.admin.project_structure;
                     
-                    var projectGitRepo = simpleGit("./projects/" + req.projectID);
-                    projectGitRepo
-                        .addConfig("user.name", req.user_display_name)
-                        .addConfig("user.email", req.user_email_address)
-                        .add("./admin.json")
-                        .commit(req.gitCommitMessage, function(){
-                            // Sending the new item as the response to the caller, so that they can
-                            // see the result of their request
-                            res.send(req.resultData);
-                        });                    
+                    gitRepo.commitToRepo(req.projectID, req.userID, "./admin.json", req.gitCommitMessage, function(err, success){
+                        console.log("Project admin file successfully updated");
+                        // Sending the new item as the response to the caller, so that they can
+                        // see the result of their request
+                        res.send(req.resultData);
+                    });   
                 }
             });
         } else {

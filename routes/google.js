@@ -8,16 +8,12 @@ var router = require('express').Router();
 // i.e. to make request to the Plus API, to get the users email address
 var google = require("googleapis");
 
-// Requiring the custom database connection module, so that the one
-// connection to the database can be reused throughout the application.
-var dbconn = require("../database/connection.js");
-
-var crypto = require('crypto');
+var dbQuery = require("../custom_modules/database_query");
 
 // Requiring the custom google OAuth module, which exports an object with 
 // a method to generate a new oauth url, and a method which returns
 // a new OAuth2Client.
-var googleOAuth = require("../google/googleOAuth");
+var googleOAuth = require("../custom_modules/google_oauth");
 
 // Request from the Google API, returning the user from a successful login to
 // their Google account
@@ -56,68 +52,30 @@ router.get("/oauthRedirectURL", function(req, res, next){
                         // Temporarily storing the link to the users profile image (with
                         // the size specification removed - as by default it is set to 50px)
                         var userProfileImageURL = user.image.url.replace("?sz=50", "");
-    
-                        // Querying the database, to find the user with the email address that matches this user
-                        dbconn.query("SELECT * FROM User WHERE email_address=" + dbconn.escape(user.emails[0].value), function(err, rows, fields){
-                            if(err) {
-                                console.log("Unable to find user that has this Google profiles email address. " + err);
-                            } else {
-                                // Temporarily storing the users access token in a JSON string
-                                var accessToken = JSON.stringify(token);
-                                var refreshToken = token.refresh_token;
-                                
-                                // Checking if any results were returned from the database i.e. has the user connected
-                                // with this Google account been fount
-                                if(rows.length > 0){
-                                    console.log("This is an existing user");
-    
-                                    req.userAuthToken = rows[0].cd_user_auth_token;
-                                    
-                                    // Updating this users google profile ID and auth token, based on those returned from 
-                                    // the Google API request
-                                     dbconn.query("UPDATE User SET display_name= " + dbconn.escape(user.displayName) + ", google_profile_image_url= " + dbconn.escape(userProfileImageURL) + ", google_profile_id= " + dbconn.escape(user.id) + ", google_access_token= " + dbconn.escape(accessToken) + " WHERE id = " + dbconn.escape(rows[0].id), function(err, result){
-                                        if(err) {
-                                            console.log("Unable to update users Google profile ID and auth token. " + err);
-                                        } else {
-                                            console.log("Existing user auth token updated");
-    
-                                            // Passing this request on to the next stage of this route
-                                            next();
-                                        }
+
+                        // Temporarily storing the users access token in a JSON string
+                        var accessToken = JSON.stringify(token);
+                        var refreshToken = token.refresh_token;
+
+                        dbQuery.check_User(user.emails[0].value, function(err, userId){
+                            dbQuery.get_User("cd_user_auth_token", userId, function(err, row){
+                                req.userAuthToken = row.cd_user_auth_token;
+
+                                if(refreshToken != null){
+                                    dbQuery.update_User(["display_name, google_profile_image_url, google_profile_id, google_access_token, google_refresh_token"], [user.displayName, userProfileImageURL, user.id, accessToken, refreshToken], userId, function(err, success){
+                                        // Passing this request on to the next stage of this route
+                                        next();
                                     });
                                 } else {
-                                    console.log("This is a new user");
-                                    
-                                    crypto.randomBytes(256, (err, buf) => {
-                                      if (err){
-                                          throw err;
-                                      } else {
-                                          var randomAuthToken = buf.toString("hex") + Date.now();
-                                          while(randomAuthToken.length > 525){
-                                              randomAuthToken = randomAuthToken.substring(1);
-                                          }
-                                          console.log(randomAuthToken);
-                                          // Creating a new user in the database, using the email address, Google profile ID
-                                            // and auth access token provided by the request to the Google API
-                                            dbconn.query("INSERT into User(display_name, email_address, google_profile_image_url, google_profile_id, google_access_token, google_refresh_token, cd_user_auth_token) VALUES(" + dbconn.escape(user.displayName) + ", " + dbconn.escape(user.emails[0].value) + ", " + dbconn.escape(userProfileImageURL) + ", " + dbconn.escape(user.id) + ", " + dbconn.escape(accessToken) + ", " + dbconn.escape(refreshToken) + ", " + dbconn.escape(randomAuthToken) + ")", function(err, result){
-                                                if(err) {
-                                                    console.log(err);
-                                                } else {
-                                                    console.log("New user created in DB");
-            
-                                                    req.userAuthToken = randomAuthToken;
-                                                    
-                                                    // Passing this request on to the next stage of this route
-                                                    next();
-                                                }
-                                            });
-                                      }
-                                    });                                
+                                    dbQuery.update_User(["display_name, google_profile_image_url, google_profile_id, google_access_token"], [user.displayName, userProfileImageURL, user.id, accessToken], userId, function(err, success){
+                                        // Passing this request on to the next stage of this route
+                                        next();
+                                    });
                                 }
-                            }
+                                
+                            });
                         });
                     }
-                    
                 });  
             }
         });

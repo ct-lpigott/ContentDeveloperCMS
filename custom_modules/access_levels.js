@@ -1,6 +1,4 @@
-// Requiring the custom database connection module, so that the one
-// connection to the database can be reused throughout the application.
-var dbconn = require("./../database/connection.js");
+var dbQuery = require("./database_query");
 
 var defaultAccessLevels = [
     {
@@ -29,33 +27,28 @@ function accessLevelExists(requestedAccessLevel, currentAccessLevels){
     return accessLevelExists;
 }
 
-function getProjectAccessLevels(projectID, cb){
-    dbconn.query("SELECT * FROM Project WHERE id=" + projectID, function(err, rows, fields){
-        if(err){
-            console.log(err);
-        } else {
-            if(rows.length > 0){
-                var projectAccessLevels = JSON.parse(rows[0].access_levels);
-                cb(projectAccessLevels);
-            } else {
-                cb();
-            }
-        }
-    });
-}
-
-function updateProjectAccessLevels(projectID, updatedProjectAccessLevels, cb){
-    dbconn.query("UPDATE Project SET access_levels = " + dbconn.escape(JSON.stringify(updatedProjectAccessLevels)) + " WHERE id=" + projectID, function(err, result){
-        if(err){
-            console.log(err);
+function getProjectAccessLevels(projectId, cb){
+    dbQuery.get_Project("access_levels", projectId, function(err, row){
+        if(row){
+            var projectAccessLevels = JSON.parse(row.access_levels);
+            cb(projectAccessLevels);
         } else {
             cb();
         }
     });
 }
 
+function updateProjectAccessLevels(adminUserId, projectId, updatedProjectAccessLevels, cb){
+    dbQuery.update_Project(["access_levels"], [JSON.stringify(updatedProjectAccessLevels)], adminUserId, projectId, function(err, success){
+        cb();
+    });
+}
+
 function getAccessLevelName(accessLevelInt, accessLevels){
     var accessLevelName = "";
+    if(typeof accessLevels == "string"){
+        accessLevels = JSON.parse(accessLevels);
+    }
 
     for(var i=0; i<accessLevels.length; i++){
         if(accessLevels[i].access_level_int == accessLevelInt){
@@ -70,11 +63,14 @@ module.exports = {
     getDefaultAccessLevels: function(){
         return defaultAccessLevels;
     },
+    getDefaultAccessLevelsJson: function(){
+        return JSON.stringify(defaultAccessLevels);
+    },
     getProjectAccessLevels: getProjectAccessLevels,
     getAccessLevelName: getAccessLevelName,
-    appendAllAccessLevelNames: function(arrayOfCollaborators, projectID, cb){
+    appendAllAccessLevelNames: function(arrayOfCollaborators, projectId, cb){
         var totalCompleted = 0;
-        if(projectID == null){
+        if(projectId == null){
             arrayOfCollaborators.forEach(function(row){
                 getProjectAccessLevels(row.project_id, function(currentAccessLevels){
                     if(currentAccessLevels != null){
@@ -88,7 +84,7 @@ module.exports = {
                 });
             });
         } else {
-            getProjectAccessLevels(projectID, function(currentAccessLevels){
+            getProjectAccessLevels(projectId, function(currentAccessLevels){
                 arrayOfCollaborators.forEach(function(row){
                     if(currentAccessLevels != null){
                         row.access_level_name = getAccessLevelName(row.access_level_int, currentAccessLevels);
@@ -102,27 +98,23 @@ module.exports = {
             });
         }
     },
-    appendAccessLevelsInUse: function(projectID, accessLevels, cb){
-        dbconn.query("SELECT * FROM User_Project WHERE project_id=" + projectID, function(err, rows, fields){
-            if(err){
-                console.log(err);
-            } else {
-                if(rows.length > 0){
-                    for(var a=0; a<accessLevels.length; a++){
-                        for(var r=0; r<rows.length; r++){
-                            if(rows[r].access_level_int == accessLevels[a].access_level_int){
-                                accessLevels[a].in_use = true;
-                                break;
-                            }
+    appendAccessLevelsInUse: function(projectId, accessLevels, cb){
+        dbQuery.get_UserProjects_forProject("access_level_int", projectId, function(err, rows){
+            if(rows.length > 0){
+                for(var a=0; a<accessLevels.length; a++){
+                    for(var r=0; r<rows.length; r++){
+                        if(rows[r].access_level_int == accessLevels[a].access_level_int){
+                            accessLevels[a].in_use = true;
+                            break;
                         }
                     }
                 }
-                cb(accessLevels);
             }
+            cb(accessLevels);
         });
     },
-    createNewAccessLevel: function(projectID, accessLevelName, accessLevelInt, cb){
-        getProjectAccessLevels(projectID, function(currentAccessLevels){
+    createNewAccessLevel: function(adminUserId, projectId, accessLevelName, accessLevelInt, cb){
+        getProjectAccessLevels(projectId, function(currentAccessLevels){
             accessLevelInt = accessLevelInt == "" || isNaN(accessLevelInt) ? 4 : parseInt(accessLevelInt);
             if(currentAccessLevels != null){
                 while(accessLevelExists(accessLevelInt, currentAccessLevels)){
@@ -134,7 +126,7 @@ module.exports = {
                     access_level_int: accessLevelInt
                 });
 
-                updateProjectAccessLevels(projectID, currentAccessLevels, function(){
+                updateProjectAccessLevels(adminUserId, projectId, currentAccessLevels, function(){
                     cb();
                 });
             } else {
@@ -142,9 +134,9 @@ module.exports = {
             }            
         });
     },
-    removeAccessLevel: function(projectID, accessLevelInt, cb){
+    removeAccessLevel: function(adminUserId, projectId, accessLevelInt, cb){
         if(accessLevelInt > 3){
-            getProjectAccessLevels(projectID, function(currentAccessLevels){
+            getProjectAccessLevels(projectId, function(currentAccessLevels){
                 if(currentAccessLevels != null){
                     if(accessLevelExists(accessLevelInt, currentAccessLevels)){
                         for(var i=0; i<currentAccessLevels.length; i++){
@@ -152,7 +144,7 @@ module.exports = {
                                 currentAccessLevels.splice(i, 1);
                             }
                         }
-                        updateProjectAccessLevels(projectID, currentAccessLevels, function(){
+                        updateProjectAccessLevels(adminUserId, projectId, currentAccessLevels, function(){
                             cb();
                         });
                     } else {
@@ -166,16 +158,16 @@ module.exports = {
             cb();
         }
     },
-    updateAccessLevelName: function(projectID, accessLevelInt, newName, cb){
+    updateAccessLevelName: function(userId, projectId, accessLevelInt, newName, cb){
         if(newName != null && newName.length > 0){
-            getProjectAccessLevels(projectID, function(currentAccessLevels){
+            getProjectAccessLevels(projectId, function(currentAccessLevels){
                 if(currentAccessLevels != null){
                     for(var i=0; i<currentAccessLevels.length; i++){
                         if(currentAccessLevels[i].access_level_int == accessLevelInt){
                             currentAccessLevels[i].access_level_name = newName;
                         }
                     }
-                    updateProjectAccessLevels(projectID, currentAccessLevels, function(){
+                    updateProjectAccessLevels(userId, projectId, currentAccessLevels, function(){
                         cb();
                     });
                 }
