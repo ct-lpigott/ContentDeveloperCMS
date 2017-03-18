@@ -70,8 +70,11 @@ router.get("/", function(req, res, next){
             // reponse to the user
             dbQuery.get_UserProjects_forUser("user_id, project_id, project_name, access_level_int", req.userID, function(err, rows){
                 if(rows){
-                    accessLevels.appendAllAccessLevelNames(rows, null, function(fullAccessLevelDetails){
-                        res.send(fullAccessLevelDetails);
+                    accessLevels.appendAllAccessLevelNames(rows, null, function(userProjects_withAccessLevelDetails){
+                        
+                        gitRepo.appendMostRecentCommitData(userProjects_withAccessLevelDetails, function(userProjects_withRecentCommits){
+                            res.send(userProjects_withRecentCommits);
+                        });
                     });
                 } else {
                     // This user has no projects

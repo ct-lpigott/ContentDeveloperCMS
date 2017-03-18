@@ -41,6 +41,33 @@ function getCommitContent(projectId, historyOf, commitHash, cb){
     });
 }
 
+function getMostRecentCommit(projectId, cb){
+    var projectGit = simpleGit(projectsDir + projectId);
+    projectGit.log([-1], function(err, singleCommit){
+        if(singleCommit != null){
+            cb(err, singleCommit.latest);
+        } else {
+            cb(err, null);
+        }   
+    });
+}
+
+function appendMostRecentCommitData(userProjects=[], cb){
+    var numberOfProjectsCompleted = 0;
+    userProjects.forEach(function(project, index){
+        getMostRecentCommit(project.project_id, function(err, mostRecentCommit){
+            if(mostRecentCommit != null){
+                project.last_modified_by = mostRecentCommit.author_name;
+                project.last_modified_on = mostRecentCommit.date;
+            }
+            numberOfProjectsCompleted++;
+            if(numberOfProjectsCompleted == userProjects.length){
+                cb(userProjects);
+            }
+        });
+    });
+}
+
 function logFromRepo(projectId, historyOf, cb){
     var projectGit = simpleGit(projectsDir + projectId);
     var filePath = historyOf == "content" ? "content.json" : "admin.json";
@@ -80,5 +107,7 @@ module.exports = {
     createNewRepo: createNewRepo,
     commitToRepo: commitToRepo,
     logFromRepo: logFromRepo,
-    getCommitContent: getCommitContent
+    getCommitContent: getCommitContent,
+    getMostRecentCommit: getMostRecentCommit,
+    appendMostRecentCommitData: appendMostRecentCommitData
 };
