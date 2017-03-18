@@ -36,7 +36,7 @@ router.get("/:projectID", function(req, res, next){
  */
 router.put("/:projectID", function(req, res, next){
     if(req.query.allSettings != null){
-        req.query.action = "project_name";
+        req.query.action = "projectName";
     }
     next();
 });
@@ -439,7 +439,7 @@ router.get("/:projectID", function(req, res, next){
             accessLevels.appendAccessLevelsInUse(req.params.projectID, projectAccessLevels, function(updatedProjectAccessLevels){
                 if(req.query.allSettings != null){
                     req.responseObject.access_levels = projectAccessLevels;
-                    req.query.action = "project_name";
+                    req.query.action = "projectName";
                     next();
                 } else {
                     res.send(projectAccessLevels);
@@ -551,13 +551,13 @@ router.get("/:projectID", function(req, res, next){
 });
 
 /**
- * @api {get} /feeds/:projectID?action=project_name Get projects name
+ * @api {get} /feeds/:projectID?action=projectName Get projects name
  * @apiParam {int} :projectID Projects unique ID
- * @apiName GetProject_name
+ * @apiName GetProjectName
  * @apiGroup ProjectDetails
  */
 router.get("/:projectID", function(req, res, next){
-    if(req.query.action == "project_name"){
+    if(req.query.action == "projectName"){
         dbQuery.get_Project("project_name", req.params.projectID, function(err, row){
             var project_name = row.project_name || null;
             if(req.query.allSettings != null){
@@ -565,7 +565,7 @@ router.get("/:projectID", function(req, res, next){
                 req.query.action = "cache";
                 next();
             } else {
-                res.send(project_name);
+                res.send({project_name: project_name});
             }
         });
     } else {
@@ -574,14 +574,14 @@ router.get("/:projectID", function(req, res, next){
 });
 
 /**
- * @api {put} /feeds/:projectID?action=project_name Update projects name
+ * @api {put} /feeds/:projectID?action=projectName Update projects name
  * @apiParam {int} :projectID Projects unique ID
  * @apiParam {string} project_name New name for the project
- * @apiName UpdateProject_name
+ * @apiName UpdateProjectName
  * @apiGroup ProjectDetails
  */
 router.put("/:projectID", function(req, res, next){
-    if(req.query.action == "project_name"){
+    if(req.query.action == "projectName"){
         if(req.body.project_name != null){
             dbQuery.update_Project(["project_name"],[req.body.project_name], req.userID, req.params.projectID, function(err, success){
                 if(req.query.allSettings != null){
@@ -625,7 +625,7 @@ router.get("/:projectID", function(req, res, next){
                 req.query.action = "css";
                 next();
             } else {
-                res.send(row.max_cache_age || null);
+                res.send({max_cache_age: row.max_cache_age || null});
             }
         });    
     } else {
@@ -679,7 +679,7 @@ router.get("/:projectID", function(req, res, next){
                 req.responseObject.custom_css = row.custom_css || null;
                 next();
             } else {
-                res.send(row.custom_css || null);
+                res.send({custom_css: row.custom_css || null});
             }
         });
     } else {
