@@ -1,8 +1,9 @@
 (function(){
     require("./../env_config.js");
-    process.env.DEBUG_PROJECT_ID = 1;
     process.env.DEBUG_FEEDS_URL = process.env.SITE_URL + "/feeds/";
-    process.env.DEBUG_COMMIT_HASH = "059c76c0edb2c465bea115f771e1bb42c4a1fe65";
+
+    // NEEDS TO BE UPDATED THE REFLECT THE APPROPRIATE PROJECT
+    process.env.DEBUG_PROJECT_ID = 34;
 
     console.log("All settings loaded");
 })();

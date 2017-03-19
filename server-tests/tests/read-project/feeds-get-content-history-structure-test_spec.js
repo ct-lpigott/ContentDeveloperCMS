@@ -1,6 +1,6 @@
 var frisby = require("frisby");
 if(process.env.DEBUG_FEEDS_URL == null){
-  require("./../all-test-settings");
+  require("./../../all-test-settings");
 }
 
 frisby.create("Feeds - Actions - Get Project Content Structure And History")
