@@ -5,32 +5,6 @@ var router = require('express').Router();
 
 var gitRepo = require("../../../custom_modules/git_repo");
 
-// Request to get the contents of a specific commit
-router.get("/:projectID", function(req, res, next){
-    if(req.query.action == "previewCommit"){
-        if(req.query.commit_hash != null && req.query.historyof != null){
-            gitRepo.getCommitContent(req.params.projectID, req.query.historyof, req.query.commit_hash, function(err, commitDataObject){
-                if(err){
-                    res.send({});
-                } else {
-                    req.responseObject.hash = req.query.commit_hash;
-                    if(req.query.historyof == "content"){
-                        req.responseObject.commit_content = commitDataObject;
-                        req.responseObject.structure = req.fileData.admin.project_structure;
-                    } else if(req.query.historyof == "structure"){
-                        req.responseObject.commit_structure = commitDataObject.project_structure;
-                    }
-                    res.send(req.responseObject);
-                }
-            });
-        } else {
-            res.send({});
-        }
-    } else {
-        next();
-    }
-});
-
 /**
  * @api {get} /feeds/:projectID?include=structure,content,history Get entire project structure
  * @apiParam {int} :projectID Projects unique ID
@@ -44,6 +18,13 @@ router.get("/:projectID", function(req, res, next){
  * @apiParam {string="structure", "content", "history"}  [include] To include the structure, content and commit history of the project
  * @apiName GetProjectContent
  * @apiGroup ProjectContent
+ */
+/**
+ * @api {get} /feeds/:projectID?include=history Get commit history of project
+ * @apiParam {int} :projectID Projects unique ID
+ * @apiParam {string="structure", "content", "history"}  [include] To include the structure, content and commit history of the project
+ * @apiName GetProjectCommitHistory
+ * @apiGroup ProjectHistory
  */
 router.get("/:projectID", function(req, res, next){
     if(req.fileData.admin != null){

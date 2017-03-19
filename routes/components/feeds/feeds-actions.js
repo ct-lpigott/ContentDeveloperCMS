@@ -247,6 +247,39 @@ router.post("/", function(req, res, next){
 });
 
 /**
+ * @api {post} /feeds/:projectID?action=previewCommit&historyOf=structure&commitHash=*** Preview contents of a file at a specific commit
+ * @apiParam {int} :projectID Projects unique ID
+ * @apiParam {string="structure", "content"} historyOf To get the contents for the history of the content or structure
+ * @apiParam {string} commitHash The hash of the commit to be accessed
+ * @apiName PreviewCommit
+ * @apiGroup ProjectHistory
+ */
+router.get("/:projectID", function(req, res, next){
+    if(req.query.action == "previewCommit"){
+        if(req.query.commitHash != null && req.query.historyOf != null){
+            gitRepo.getCommitContent(req.params.projectID, req.query.historyOf, req.query.commit_hash, function(err, commitDataObject){
+                if(err){
+                    res.send({});
+                } else {
+                    req.responseObject.hash = req.query.commit_hash;
+                    if(req.query.historyOf == "content"){
+                        req.responseObject.commit_content = commitDataObject;
+                        req.responseObject.structure = req.fileData.admin.project_structure;
+                    } else if(req.query.historyOf == "structure"){
+                        req.responseObject.commit_structure = commitDataObject.project_structure;
+                    }
+                    res.send(req.responseObject);
+                }
+            });
+        } else {
+            res.send({});
+        }
+    } else {
+        next();
+    }
+});
+
+/**
  * @api {post} /feeds/:projectID?action=collaborators Add a collaborator to a project
  * @apiParam {int} :projectID Projects unique ID
  * @apiParam {string} email Email address of the collaborator to be added
