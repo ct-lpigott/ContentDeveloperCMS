@@ -14,7 +14,7 @@ var validation = require("../../../custom_modules/validation");
  * @apiName CreateItemStructure
  * @apiGroup ProjectStructure
  */
-router.post("/:projectID/:itemPath", function(req, res, next){
+router.post("/:projectID/*", function(req, res, next){
     // Checking that the request contains more than just the project ID
     if(req.allParams.length > 1){
         // Checking that the body of the request contains structure i.e. the structure
@@ -436,7 +436,7 @@ router.post("/:projectID/*", function(req, res, next){
                                                 req.feedsErrors.push(itemName + " already exists in " + parentName + ". Use a PUT request to update it.");
                                                 return;
                                             } else {
-                                                var validateContent = validation.contentStructure(newItem, structureFileData[parentName]["items"]);   
+                                                var validateContent = validation.contentStructure(newItem, structureFileData[parentName]["items"][itemName]);   
                                                 if(validateContent.successful){
                                                     // Since this is an object, creating a new property on the parent item (with the item name
                                                     // supplied in the parameters), and setting its value to the new item value 

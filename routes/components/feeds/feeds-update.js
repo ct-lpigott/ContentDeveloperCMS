@@ -146,9 +146,9 @@ router.put("/:projectID", function(req, res, next){
  * @apiGroup ProjectContent
  */
 router.put("/:projectID/*", function(req, res, next){
-    if(req.fileData.content == null){
-        // Checking that the request contains more than just the project ID
-        if(req.allParams.length > 1){
+    // Checking that the request contains more than just the project ID
+    if(req.allParams.length > 1){
+        if(req.fileData.content != null){
 
             // Checking that the body of the request contains content i.e. the content
             // of the item we are about to update
@@ -245,7 +245,7 @@ router.put("/:projectID/*", function(req, res, next){
                                     // Since the next item in the encapsulatedData array is a number, then checking
                                     // to see if the current level of the structureFileData is set up to contain 
                                     // items
-                                    if(structureFileData[parentName].items == undefined){
+                                    if(structureFileData.items == undefined){
                                         // Since the next item in the encapsulatedData array was a number, but the project
                                         // structure at this point does not contain an items property, then this object
                                         // is not structured to accept items. Adding this as an error to the req.feedsErrors 
@@ -254,6 +254,8 @@ router.put("/:projectID/*", function(req, res, next){
                                         // be returned to the caller, further down along this route
                                         req.feedsErrors.push(encapsulationData[i] + " is not defined to contain items. Please update this items structure first.");
                                         return;
+                                    } else {
+                                        structureFileData = structureFileData.items;
                                     }
                                 }
                             }

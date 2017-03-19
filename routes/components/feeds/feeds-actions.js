@@ -191,7 +191,7 @@ router.post("/", function(req, res, next){
         var projectAdmin = {};
         projectAdmin.project_id = req.projectID;
         projectAdmin.date_created = projectAdmin.date_updated = Date.now();
-        projectAdmin.last_updated_by = req.userID;
+        projectAdmin.created_by = req.userID;
         projectAdmin.project_structure = req.templateProjectStructure || {};
 
         // Creating the admin.json file for this project, within the directory that
@@ -264,7 +264,6 @@ router.get("/:projectID", function(req, res, next){
                     req.responseObject.hash = req.query.commitHash;
                     if(req.query.historyOf == "content"){
                         req.responseObject.commit_content = commitDataObject;
-                        req.responseObject.structure = req.fileData.admin.project_structure;
                     } else if(req.query.historyOf == "structure"){
                         req.responseObject.commit_structure = commitDataObject.project_structure;
                     }

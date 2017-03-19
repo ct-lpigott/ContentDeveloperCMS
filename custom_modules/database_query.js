@@ -17,6 +17,7 @@ module.exports = {
     create_User: create_User,
     create_UserProject: create_UserProject,
     check_User: check_User,
+    create_Project: create_Project,
     check_UserProject: check_UserProject,
     delete_UserProject: delete_UserProject
 };

@@ -109,7 +109,7 @@ module.exports = {
             errors: []
         };
 
-        if(structure.type != null){
+        if(structure.type != null && structure.type != "html" && structure.type != "link"){
             if(content.constructor.name.toLowerCase() != structure.type){
                 response.errors.push("Incorrect content type provided in request. Expected " + structure.type);
                 response.successful = false;
