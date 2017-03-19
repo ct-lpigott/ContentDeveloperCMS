@@ -6,6 +6,5 @@ projects/*
 public/uploads
 !projects/project_template.json
 ContentDeveloperCMS-AngularApp
-documentation
 env_config.js
 server-tests/reports
