@@ -257,11 +257,11 @@ router.post("/", function(req, res, next){
 router.get("/:projectID", function(req, res, next){
     if(req.query.action == "previewCommit"){
         if(req.query.commitHash != null && req.query.historyOf != null){
-            gitRepo.getCommitContent(req.params.projectID, req.query.historyOf, req.query.commit_hash, function(err, commitDataObject){
+            gitRepo.getCommitContent(req.params.projectID, req.query.historyOf, req.query.commitHash, function(err, commitDataObject){
                 if(err){
                     res.send({});
                 } else {
-                    req.responseObject.hash = req.query.commit_hash;
+                    req.responseObject.hash = req.query.commitHash;
                     if(req.query.historyOf == "content"){
                         req.responseObject.commit_content = commitDataObject;
                         req.responseObject.structure = req.fileData.admin.project_structure;
