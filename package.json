@@ -4,7 +4,9 @@
   "description": "Lanugage and platform agnostic content management system",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js"
+    "start": "node app.js",
+    "frisby-test": "jasmine-node server-tests/feeds/ --junitreport --output server-tests/reports",
+    "build-doc": "apidoc -i routes/components/feeds -o public/documentation/"
   },
   "repository": {
     "type": "git",
@@ -29,5 +31,10 @@
     "pug": "^2.0.0-beta6",
     "redirect-https": "^1.1.1",
     "simple-git": "^1.65.0"
+  },
+  "devDependencies": {
+    "apidoc": "^0.17.5",
+    "frisby": "^0.8.5",
+    "jasmine-node": "^1.14.5"
   }
 }
