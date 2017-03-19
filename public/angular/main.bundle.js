@@ -243,7 +243,7 @@ var ContentDeveloperServerService = (function () {
     };
     ContentDeveloperServerService.prototype.getContentofCommit = function (commitHash, historyOf) {
         var _this = this;
-        var requestUrl = this._serverUrl + "/feeds/" + this._currentProjectId + "?action=previewCommit&commit_hash=" + commitHash + "&historyof=" + historyOf;
+        var requestUrl = this._serverUrl + "/feeds/" + this._currentProjectId + "?action=previewCommit&commitHash=" + commitHash + "&historyOf=" + historyOf;
         var commitContentObservable = this._http
             .get(requestUrl, { headers: this._headers })
             .map(function (responseObject) { return responseObject.json(); })
