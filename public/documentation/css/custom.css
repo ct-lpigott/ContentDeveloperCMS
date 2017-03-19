@@ -1,0 +1,65 @@
+.sidenav .type {
+    font-size: 10px;
+    display: inline-block;
+    width: 42px;
+    text-align: center;
+}
+.sidenav > li > a {
+    display: inline;
+}
+#sidenav {
+    width: 25%;
+    position: fixed;
+    height: 100vh;
+    overflow-y: scroll;
+}
+#content {
+    width: 72%;
+    margin-left: 29%;
+}
+#sidenav, #content {
+    display: inline-block;
+}
+#sidenav.miniNav {
+    padding: 50px 0 0 0;
+    top: 0;
+    overflow-y: hidden;
+}
+.sidenav, .sidenav-search {
+    width: 100%;
+    position: static;
+}
+
+.sidenav > li.active > a, #miniNav > li.active > a, #miniNav > li.isactive > a, .subNav .active > a {
+    background-color: #337ab7;
+    color: #ffffff;
+}
+
+.subNav .active {
+    opacity: 0.5;
+}
+.subNav {
+    display: none;
+}
+
+.subNav a {
+    display: block;
+    text-decoration: none;
+    padding-left: 20px;
+}
+.subNav {
+    list-style: none;
+    padding: 0;
+}
+
+#miniNav {
+    background-color: #ffffff;
+}
+
+#miniNav .active .subNav {
+    display: block;
+}
+
+pre {
+    tab-size: 3;
+}

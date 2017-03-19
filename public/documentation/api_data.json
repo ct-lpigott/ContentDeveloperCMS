@@ -1,5 +1,6 @@
 [
   {
+    "version": "1.0.0",
     "type": "post",
     "url": "/feeds/:projectID?action=accessLevels",
     "title": "Create a new access level",
@@ -23,13 +24,13 @@
         ]
       }
     },
-    "name": "CreateAccessLevel",
-    "group": "AccessLevels",
-    "version": "0.0.0",
+    "name": "Create_Access_Level",
+    "group": "Access_Levels",
     "filename": "routes/components/feeds/feeds-actions.js",
-    "groupTitle": "AccessLevels"
+    "groupTitle": "Access_Levels"
   },
   {
+    "version": "1.0.0",
     "type": "delete",
     "url": "/feeds/:projectID?action=accessLevels",
     "title": "Delete access level",
@@ -53,13 +54,13 @@
         ]
       }
     },
-    "name": "DeleteAccessLevel",
-    "group": "AccessLevels",
-    "version": "0.0.0",
+    "name": "Delete_Access_Level",
+    "group": "Access_Levels",
     "filename": "routes/components/feeds/feeds-actions.js",
-    "groupTitle": "AccessLevels"
+    "groupTitle": "Access_Levels"
   },
   {
+    "version": "1.0.0",
     "type": "get",
     "url": "/feeds/:projectID?action=accessLevels",
     "title": "Get project access levels",
@@ -76,13 +77,13 @@
         ]
       }
     },
-    "name": "GetAccessLevels",
-    "group": "AccessLevels",
-    "version": "0.0.0",
+    "name": "Get_Access_Levels",
+    "group": "Access_Levels",
     "filename": "routes/components/feeds/feeds-actions.js",
-    "groupTitle": "AccessLevels"
+    "groupTitle": "Access_Levels"
   },
   {
+    "version": "1.0.0",
     "type": "put",
     "url": "/feeds/:projectID?action=accessLevels",
     "title": "Update access level name",
@@ -113,13 +114,13 @@
         ]
       }
     },
-    "name": "UpdateAccessLevelName",
-    "group": "AccessLevels",
-    "version": "0.0.0",
+    "name": "Update_Access_Level_Name",
+    "group": "Access_Levels",
     "filename": "routes/components/feeds/feeds-actions.js",
-    "groupTitle": "AccessLevels"
+    "groupTitle": "Access_Levels"
   },
   {
+    "version": "1.0.0",
     "type": "post",
     "url": "/feeds/:projectID?action=collaborators",
     "title": "Add a collaborator to a project",
@@ -150,13 +151,13 @@
         ]
       }
     },
-    "name": "AddCollaborator",
+    "name": "Add_Collaborator",
     "group": "Collaborators",
-    "version": "0.0.0",
     "filename": "routes/components/feeds/feeds-actions.js",
     "groupTitle": "Collaborators"
   },
   {
+    "version": "1.0.0",
     "type": "delete",
     "url": "/feeds/:projectID?action=collaborators",
     "title": "Remove a collaborator from a project",
@@ -180,13 +181,13 @@
         ]
       }
     },
-    "name": "DeleteCollaborator",
+    "name": "Delete_Collaborator",
     "group": "Collaborators",
-    "version": "0.0.0",
     "filename": "routes/components/feeds/feeds-actions.js",
     "groupTitle": "Collaborators"
   },
   {
+    "version": "1.0.0",
     "type": "get",
     "url": "/feeds/:projectID?action=collaborators",
     "title": "Get all collaborators for a project",
@@ -203,23 +204,23 @@
         ]
       }
     },
-    "name": "GetCollaborators",
+    "name": "Get_Collaborators",
     "group": "Collaborators",
-    "version": "0.0.0",
     "filename": "routes/components/feeds/feeds-actions.js",
     "groupTitle": "Collaborators"
   },
   {
+    "version": "1.0.0",
     "type": "get",
     "url": "/feeds?action=collaborators",
     "title": "Get projects that current user is a collaborator on",
-    "name": "GetUserProjects",
+    "name": "Get_User_Projects",
     "group": "Collaborators",
-    "version": "0.0.0",
     "filename": "routes/components/feeds/feeds-actions.js",
     "groupTitle": "Collaborators"
   },
   {
+    "version": "1.0.0",
     "type": "put",
     "url": "/feeds/:projectID?action=collaborators",
     "title": "Update a collaborators access level to a project",
@@ -250,16 +251,16 @@
         ]
       }
     },
-    "name": "UpdateCollaborator",
+    "name": "Update_Collaborator",
     "group": "Collaborators",
-    "version": "0.0.0",
     "filename": "routes/components/feeds/feeds-actions.js",
     "groupTitle": "Collaborators"
   },
   {
+    "version": "1.0.0",
     "type": "post",
     "url": "/feeds/:projectID?action=css",
-    "title": "Create/append to custom css",
+    "title": "Create or append to custom css",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -280,13 +281,13 @@
         ]
       }
     },
-    "name": "CreateAppendCustomCss",
-    "group": "CustomCSS",
-    "version": "0.0.0",
+    "name": "Create_CustomCss",
+    "group": "Custom_CSS",
     "filename": "routes/components/feeds/feeds-actions.js",
-    "groupTitle": "CustomCSS"
+    "groupTitle": "Custom_CSS"
   },
   {
+    "version": "1.0.0",
     "type": "get",
     "url": "/feeds/:projectID?action=css",
     "title": "Get custom css",
@@ -303,13 +304,13 @@
         ]
       }
     },
-    "name": "ReadCustomCss",
-    "group": "CustomCSS",
-    "version": "0.0.0",
+    "name": "Get_Custom_Css",
+    "group": "Custom_CSS",
     "filename": "routes/components/feeds/feeds-actions.js",
-    "groupTitle": "CustomCSS"
+    "groupTitle": "Custom_CSS"
   },
   {
+    "version": "1.0.0",
     "type": "put",
     "url": "/feeds/:projectID?action=css",
     "title": "Update custom content css",
@@ -333,13 +334,13 @@
         ]
       }
     },
-    "name": "UpdateCustomCss",
-    "group": "CustomCSS",
-    "version": "0.0.0",
+    "name": "Update_Custom_Css",
+    "group": "Custom_CSS",
     "filename": "routes/components/feeds/feeds-actions.js",
-    "groupTitle": "CustomCSS"
+    "groupTitle": "Custom_CSS"
   },
   {
+    "version": "1.0.0",
     "type": "get",
     "url": "/feeds/:projectID?action=mediaItems",
     "title": "Get all media items for a project",
@@ -356,13 +357,13 @@
         ]
       }
     },
-    "name": "GetMediaItems",
-    "group": "MediaItems",
-    "version": "0.0.0",
+    "name": "Get_Media_Items",
+    "group": "Media_Items",
     "filename": "routes/components/feeds/feeds-actions.js",
-    "groupTitle": "MediaItems"
+    "groupTitle": "Media_Items"
   },
   {
+    "version": "1.0.0",
     "type": "post",
     "url": "/feeds/:projectID?action=mediaItems",
     "title": "Upload a media item",
@@ -386,13 +387,13 @@
         ]
       }
     },
-    "name": "UploadMediaItem",
-    "group": "MediaItems",
-    "version": "0.0.0",
+    "name": "Upload_Media_Item",
+    "group": "Media_Items",
     "filename": "routes/components/feeds/feeds-actions.js",
-    "groupTitle": "MediaItems"
+    "groupTitle": "Media_Items"
   },
   {
+    "version": "1.0.0",
     "type": "post",
     "url": "/feeds/:projectID/:itemPath",
     "title": "Create a new content item",
@@ -423,13 +424,13 @@
         ]
       }
     },
-    "name": "CreateItemContent",
-    "group": "ProjectContent",
-    "version": "0.0.0",
+    "name": "Create_New_Item_Content",
+    "group": "Project_Content",
     "filename": "routes/components/feeds/feeds-create.js",
-    "groupTitle": "ProjectContent"
+    "groupTitle": "Project_Content"
   },
   {
+    "version": "1.0.0",
     "type": "delete",
     "url": "/feeds/:projectID/:itemPath",
     "title": "Delete a content item",
@@ -453,13 +454,13 @@
         ]
       }
     },
-    "name": "DeleteContent",
-    "group": "ProjectContent",
-    "version": "0.0.0",
+    "name": "Delete_Content_Item",
+    "group": "Project_Content",
     "filename": "routes/components/feeds/feeds-delete.js",
-    "groupTitle": "ProjectContent"
+    "groupTitle": "Project_Content"
   },
   {
+    "version": "1.0.0",
     "type": "get",
     "url": "/feeds/:projectID/:itemPath",
     "title": "Get an items content",
@@ -494,13 +495,13 @@
         ]
       }
     },
-    "name": "GetItemContent",
-    "group": "ProjectContent",
-    "version": "0.0.0",
+    "name": "Get_Item_Content",
+    "group": "Project_Content",
     "filename": "routes/components/feeds/feeds-read.js",
-    "groupTitle": "ProjectContent"
+    "groupTitle": "Project_Content"
   },
   {
+    "version": "1.0.0",
     "type": "get",
     "url": "/feeds/:projectID",
     "title": "Get entire project content",
@@ -529,13 +530,13 @@
         ]
       }
     },
-    "name": "GetProjectContent",
-    "group": "ProjectContent",
-    "version": "0.0.0",
+    "name": "Get_Project_Content",
+    "group": "Project_Content",
     "filename": "routes/components/feeds/feeds-read.js",
-    "groupTitle": "ProjectContent"
+    "groupTitle": "Project_Content"
   },
   {
+    "version": "1.0.0",
     "type": "put",
     "url": "/feeds/:projectID/:itemPath",
     "title": "Update encapsulated project content",
@@ -566,13 +567,13 @@
         ]
       }
     },
-    "name": "UpdateEncapsulatedContent",
-    "group": "ProjectContent",
-    "version": "0.0.0",
+    "name": "Update_Encapsulated_Content",
+    "group": "Project_Content",
     "filename": "routes/components/feeds/feeds-update.js",
-    "groupTitle": "ProjectContent"
+    "groupTitle": "Project_Content"
   },
   {
+    "version": "1.0.0",
     "type": "put",
     "url": "/feeds/:projectID",
     "title": "Update entire project content",
@@ -596,13 +597,13 @@
         ]
       }
     },
-    "name": "UpdateProjectContent",
-    "group": "ProjectContent",
-    "version": "0.0.0",
+    "name": "Update_Project_Content",
+    "group": "Project_Content",
     "filename": "routes/components/feeds/feeds-update.js",
-    "groupTitle": "ProjectContent"
+    "groupTitle": "Project_Content"
   },
   {
+    "version": "1.0.0",
     "type": "post",
     "url": "/feeds?action=createProject",
     "title": "Create a new project",
@@ -619,13 +620,13 @@
         ]
       }
     },
-    "name": "CreateProject",
-    "group": "ProjectDetails",
-    "version": "0.0.0",
+    "name": "Create_Project",
+    "group": "Project_Details",
     "filename": "routes/components/feeds/feeds-actions.js",
-    "groupTitle": "ProjectDetails"
+    "groupTitle": "Project_Details"
   },
   {
+    "version": "1.0.0",
     "type": "get",
     "url": "/feeds/:projectID?action=cache",
     "title": "Get maximum cache age",
@@ -642,13 +643,13 @@
         ]
       }
     },
-    "name": "GetCacheAge",
-    "group": "ProjectDetails",
-    "version": "0.0.0",
+    "name": "Get_Maximum_Cache_Age",
+    "group": "Project_Details",
     "filename": "routes/components/feeds/feeds-actions.js",
-    "groupTitle": "ProjectDetails"
+    "groupTitle": "Project_Details"
   },
   {
+    "version": "1.0.0",
     "type": "get",
     "url": "/feeds/:projectID?action=projectName",
     "title": "Get projects name",
@@ -665,13 +666,13 @@
         ]
       }
     },
-    "name": "GetProjectName",
-    "group": "ProjectDetails",
-    "version": "0.0.0",
+    "name": "Get_Project_Name",
+    "group": "Project_Details",
     "filename": "routes/components/feeds/feeds-actions.js",
-    "groupTitle": "ProjectDetails"
+    "groupTitle": "Project_Details"
   },
   {
+    "version": "1.0.0",
     "type": "get",
     "url": "/feeds/:projectID?allSettings",
     "title": "Get all settings for a project",
@@ -688,13 +689,13 @@
         ]
       }
     },
-    "name": "GetProjectSettings",
-    "group": "ProjectDetails",
-    "version": "0.0.0",
+    "name": "Get_Project_Settings",
+    "group": "Project_Details",
     "filename": "routes/components/feeds/feeds-actions.js",
-    "groupTitle": "ProjectDetails"
+    "groupTitle": "Project_Details"
   },
   {
+    "version": "1.0.0",
     "type": "put",
     "url": "/feeds/:projectID?action=cache",
     "title": "Update maximum cache age",
@@ -718,13 +719,13 @@
         ]
       }
     },
-    "name": "UpdateCacheAge",
-    "group": "ProjectDetails",
-    "version": "0.0.0",
+    "name": "Update_Maximum_CacheAge",
+    "group": "Project_Details",
     "filename": "routes/components/feeds/feeds-actions.js",
-    "groupTitle": "ProjectDetails"
+    "groupTitle": "Project_Details"
   },
   {
+    "version": "1.0.0",
     "type": "put",
     "url": "/feeds/:projectID?action=projectName",
     "title": "Update projects name",
@@ -748,13 +749,13 @@
         ]
       }
     },
-    "name": "UpdateProjectName",
-    "group": "ProjectDetails",
-    "version": "0.0.0",
+    "name": "Update_Project_Name",
+    "group": "Project_Details",
     "filename": "routes/components/feeds/feeds-actions.js",
-    "groupTitle": "ProjectDetails"
+    "groupTitle": "Project_Details"
   },
   {
+    "version": "1.0.0",
     "type": "put",
     "url": "/feeds/:projectID?allSettings",
     "title": "Update all settings for a project",
@@ -792,13 +793,13 @@
         ]
       }
     },
-    "name": "UpdateProjectSettings",
-    "group": "ProjectDetails",
-    "version": "0.0.0",
+    "name": "Update_Project_Settings",
+    "group": "Project_Details",
     "filename": "routes/components/feeds/feeds-actions.js",
-    "groupTitle": "ProjectDetails"
+    "groupTitle": "Project_Details"
   },
   {
+    "version": "1.0.0",
     "type": "get",
     "url": "/feeds/:projectID?include=history",
     "title": "Get commit history of project",
@@ -827,13 +828,13 @@
         ]
       }
     },
-    "name": "GetProjectCommitHistory",
-    "group": "ProjectHistory",
-    "version": "0.0.0",
+    "name": "Get_Project_Commit_History",
+    "group": "Project_History",
     "filename": "routes/components/feeds/feeds-read.js",
-    "groupTitle": "ProjectHistory"
+    "groupTitle": "Project_History"
   },
   {
+    "version": "1.0.0",
     "type": "post",
     "url": "/feeds/:projectID?action=previewCommit&historyOf=structure&commitHash=***",
     "title": "Preview contents of a file at a specific commit",
@@ -868,13 +869,13 @@
         ]
       }
     },
-    "name": "PreviewCommit",
-    "group": "ProjectHistory",
-    "version": "0.0.0",
+    "name": "Preview_Commit_Content",
+    "group": "Project_History",
     "filename": "routes/components/feeds/feeds-actions.js",
-    "groupTitle": "ProjectHistory"
+    "groupTitle": "Project_History"
   },
   {
+    "version": "1.0.0",
     "type": "post",
     "url": "/feeds/:projectID/:itemPath",
     "title": "Create a new item structure",
@@ -905,13 +906,13 @@
         ]
       }
     },
-    "name": "CreateItemStructure",
-    "group": "ProjectStructure",
-    "version": "0.0.0",
+    "name": "Create_New_Item_Structure",
+    "group": "Project_Structure",
     "filename": "routes/components/feeds/feeds-create.js",
-    "groupTitle": "ProjectStructure"
+    "groupTitle": "Project_Structure"
   },
   {
+    "version": "1.0.0",
     "type": "get",
     "url": "/feeds/:projectID/:itemPath?include=structure",
     "title": "Get an items structure",
@@ -946,13 +947,13 @@
         ]
       }
     },
-    "name": "GetItemStructure",
-    "group": "ProjectStructure",
-    "version": "0.0.0",
+    "name": "Get_Item_Structure",
+    "group": "Project_Structure",
     "filename": "routes/components/feeds/feeds-read.js",
-    "groupTitle": "ProjectStructure"
+    "groupTitle": "Project_Structure"
   },
   {
+    "version": "1.0.0",
     "type": "get",
     "url": "/feeds/:projectID?include=structure,content,history",
     "title": "Get entire project structure",
@@ -981,13 +982,13 @@
         ]
       }
     },
-    "name": "GetProjectStructure",
-    "group": "ProjectStructure",
-    "version": "0.0.0",
+    "name": "Get_Project_Structure",
+    "group": "Project_Structure",
     "filename": "routes/components/feeds/feeds-read.js",
-    "groupTitle": "ProjectStructure"
+    "groupTitle": "Project_Structure"
   },
   {
+    "version": "1.0.0",
     "type": "put",
     "url": "/feeds/:projectID",
     "title": "Update entire project structure",
@@ -1011,10 +1012,9 @@
         ]
       }
     },
-    "name": "UpdateProjectStructure",
-    "group": "ProjectStructure",
-    "version": "0.0.0",
+    "name": "Update_Project_Structure",
+    "group": "Project_Structure",
     "filename": "routes/components/feeds/feeds-update.js",
-    "groupTitle": "ProjectStructure"
+    "groupTitle": "Project_Structure"
   }
 ]
