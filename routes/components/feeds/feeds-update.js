@@ -6,11 +6,12 @@ var router = require('express').Router();
 var validation = require("../../../custom_modules/validation");
 
 /**
+ * @apiVersion 1.0.0
  * @api {put} /feeds/:projectID Update entire project structure
  * @apiParam {int} :projectID Projects unique ID
  * @apiParam {json} structure JSON to update the projects structure
- * @apiName UpdateProjectStructure
- * @apiGroup ProjectStructure
+ * @apiName Update Project Structure
+ * @apiGroup Project Structure
  */
 router.put("/:projectID", function(req, res, next){
     // Determining the level of access this user has to this project
@@ -99,11 +100,12 @@ router.put("/:projectID", function(req, res, next){
 });
 
 /**
+ * @apiVersion 1.0.0
  * @api {put} /feeds/:projectID Update entire project content
  * @apiParam {int} :projectID Projects unique ID
  * @apiParam {any} content Content to be added to the project (datatype depends on project structure)
- * @apiName UpdateProjectContent
- * @apiGroup ProjectContent
+ * @apiName Update Project Content
+ * @apiGroup Project Content
  */
 router.put("/:projectID", function(req, res, next){
     if(req.body.content != null){
@@ -138,12 +140,13 @@ router.put("/:projectID", function(req, res, next){
 });
 
 /**
+ * @apiVersion 1.0.0
  * @api {put} /feeds/:projectID/:itemPath Update encapsulated project content
  * @apiParam {int} :projectID Projects unique ID
  * @apiParam {string} :itemPath Encapsulation path to item within the project
  * @apiParam {any} content Content to be added to the project (datatype depends on project structure)
- * @apiName UpdateEncapsulatedContent
- * @apiGroup ProjectContent
+ * @apiName Update Encapsulated Content
+ * @apiGroup Project Content
  */
 router.put("/:projectID/*", function(req, res, next){
     // Checking that the request contains more than just the project ID

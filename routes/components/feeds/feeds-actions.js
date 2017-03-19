@@ -13,10 +13,11 @@ var googleOAuth = require("../../../custom_modules/google_oauth");
 var accessLevels = require("../../../custom_modules/access_levels");
 
 /**
+ * @apiVersion 1.0.0
  * @api {get} /feeds/:projectID?allSettings Get all settings for a project
  * @apiParam {int} :projectID Projects unique ID
- * @apiName GetProjectSettings
- * @apiGroup ProjectDetails
+ * @apiName Get Project Settings
+ * @apiGroup Project Details
  */
 router.get("/:projectID", function(req, res, next){
     if(req.query.allSettings != null){
@@ -26,13 +27,14 @@ router.get("/:projectID", function(req, res, next){
 });
 
 /**
+ * @apiVersion 1.0.0
  * @api {put} /feeds/:projectID?allSettings Update all settings for a project
  * @apiParam {int} :projectID Projects unique ID
  * @apiParam {string} [project_name]
  * @apiParam {int} [max_cache_age]
  * @apiParam {string} [custom_css]
- * @apiName UpdateProjectSettings
- * @apiGroup ProjectDetails
+ * @apiName Update Project Settings
+ * @apiGroup Project Details
  */
 router.put("/:projectID", function(req, res, next){
     if(req.query.allSettings != null){
@@ -55,8 +57,9 @@ router.all("/:projectID", function(req, res, next){
 });
 
 /**
+ * @apiVersion 1.0.0
  * @api {get} /feeds?action=collaborators Get projects that current user is a collaborator on
- * @apiName GetUserProjects
+ * @apiName Get User Projects
  * @apiGroup Collaborators
  */
 router.get("/", function(req, res, next){
@@ -97,10 +100,11 @@ router.get("/", function(req, res, next){
 });
 
 /**
+ * @apiVersion 1.0.0
  * @api {post} /feeds?action=createProject Create a new project
  * @apiParam {string} project_name Name for the new proejct
- * @apiName CreateProject
- * @apiGroup ProjectDetails
+ * @apiName Create Project
+ * @apiGroup Project Details
  */
 router.post("/", function(req, res, next){
     if(req.query.action == "createProject"){
@@ -247,12 +251,13 @@ router.post("/", function(req, res, next){
 });
 
 /**
+ * @apiVersion 1.0.0
  * @api {post} /feeds/:projectID?action=previewCommit&historyOf=structure&commitHash=*** Preview contents of a file at a specific commit
  * @apiParam {int} :projectID Projects unique ID
  * @apiParam {string="structure", "content"} historyOf To get the contents for the history of the content or structure
  * @apiParam {string} commitHash The hash of the commit to be accessed
- * @apiName PreviewCommit
- * @apiGroup ProjectHistory
+ * @apiName Preview Commit Content
+ * @apiGroup Project History
  */
 router.get("/:projectID", function(req, res, next){
     if(req.query.action == "previewCommit"){
@@ -279,11 +284,12 @@ router.get("/:projectID", function(req, res, next){
 });
 
 /**
+ * @apiVersion 1.0.0
  * @api {post} /feeds/:projectID?action=collaborators Add a collaborator to a project
  * @apiParam {int} :projectID Projects unique ID
  * @apiParam {string} email Email address of the collaborator to be added
  * @apiParam {int} accessLevelInt Requested access level
- * @apiName AddCollaborator
+ * @apiName Add Collaborator
  * @apiGroup Collaborators
  */
 router.post("/:projectID", function(req, res, next){
@@ -335,11 +341,12 @@ router.post("/:projectID", function(req, res, next){
 });
 
 /**
+ * @apiVersion 1.0.0
  * @api {put} /feeds/:projectID?action=collaborators Update a collaborators access level to a project
  * @apiParam {int} :projectID Projects unique ID
  * @apiParam {string} collaboratorID User id of the collaborator to be updated
  * @apiParam {int} accessLevelInt  Requested access level
- * @apiName UpdateCollaborator
+ * @apiName Update Collaborator
  * @apiGroup Collaborators
  */
 router.put("/:projectID", function(req, res, next){
@@ -359,9 +366,10 @@ router.put("/:projectID", function(req, res, next){
 });
 
 /**
+ * @apiVersion 1.0.0
  * @api {get} /feeds/:projectID?action=collaborators Get all collaborators for a project
  * @apiParam {int} :projectID Projects unique ID
- * @apiName GetCollaborators
+ * @apiName Get Collaborators
  * @apiGroup Collaborators
  */
 router.get("/:projectID", function(req, res, next){
@@ -389,10 +397,11 @@ router.get("/:projectID", function(req, res, next){
 });
 
 /**
+ * @apiVersion 1.0.0
  * @api {delete} /feeds/:projectID?action=collaborators Remove a collaborator from a project
  * @apiParam {int} :projectID Projects unique ID
  * @apiParam {int} collaboratorID ID of the collaborator to be removed
- * @apiName DeleteCollaborator
+ * @apiName Delete Collaborator
  * @apiGroup Collaborators
  */
 router.delete("/:projectID", function(req, res, next){
@@ -429,11 +438,12 @@ router.delete("/:projectID", function(req, res, next){
 });
 
 /**
+ * @apiVersion 1.0.0
  * @api {post} /feeds/:projectID?action=mediaItems Upload a media item
  * @apiParam {int} :projectID Projects unique ID
  * @apiParam {file} file Media item file to be uploaded
- * @apiName UploadMediaItem
- * @apiGroup MediaItems
+ * @apiName Upload Media Item
+ * @apiGroup Media Items
  */
 router.post("/:projectID", function(req, res, next){
     if(req.query.action == "mediaItems"){
@@ -460,10 +470,11 @@ router.post("/:projectID", function(req, res, next){
 });
 
 /**
+ * @apiVersion 1.0.0
  * @api {get} /feeds/:projectID?action=accessLevels Get project access levels
  * @apiParam {int} :projectID Projects unique ID
- * @apiName GetAccessLevels
- * @apiGroup AccessLevels
+ * @apiName Get Access Levels
+ * @apiGroup Access Levels
  */
 router.get("/:projectID", function(req, res, next){
     if(req.query.action == "accessLevels"){
@@ -484,11 +495,12 @@ router.get("/:projectID", function(req, res, next){
 });
 
 /**
+ * @apiVersion 1.0.0
  * @api {post} /feeds/:projectID?action=accessLevels Create a new access level
  * @apiParam {int} :projectID Projects unique ID
  * @apiParam {string} access_level_name Name for the new access level
- * @apiName CreateAccessLevel
- * @apiGroup AccessLevels
+ * @apiName Create Access Level
+ * @apiGroup Access Levels
  */
 router.post("/:projectID", function(req, res, next){
     if(req.query.action == "accessLevels"){
@@ -509,11 +521,12 @@ router.post("/:projectID", function(req, res, next){
 });
 
 /**
+ * @apiVersion 1.0.0
  * @api {delete} /feeds/:projectID?action=accessLevels Delete access level
  * @apiParam {int} :projectID Projects unique ID
  * @apiParam {int} access_level_int Number of the access level to be deleted
- * @apiName DeleteAccessLevel
- * @apiGroup AccessLevels
+ * @apiName Delete Access Level
+ * @apiGroup Access Levels
  */
 router.delete("/:projectID", function(req, res, next){
     if(req.query.action == "accessLevels"){
@@ -535,12 +548,13 @@ router.delete("/:projectID", function(req, res, next){
 });
 
 /**
+ * @apiVersion 1.0.0
  * @api {put} /feeds/:projectID?action=accessLevels Update access level name
  * @apiParam {int} :projectID Projects unique ID
  * @apiParam {int} access_level_int Number of the access level to be updated
  * @apiParam {string} access_level_name New name for the access level
- * @apiName UpdateAccessLevelName
- * @apiGroup AccessLevels
+ * @apiName Update Access Level Name
+ * @apiGroup Access Levels
  */
 router.put("/:projectID", function(req, res, next){
     if(req.query.action == "accessLevels"){
@@ -561,10 +575,11 @@ router.put("/:projectID", function(req, res, next){
 });
 
 /**
+ * @apiVersion 1.0.0
  * @api {get} /feeds/:projectID?action=mediaItems Get all media items for a project
  * @apiParam {int} :projectID Projects unique ID
- * @apiName GetMediaItems
- * @apiGroup MediaItems
+ * @apiName Get Media Items
+ * @apiGroup Media Items
  */
 router.get("/:projectID", function(req, res, next){
     if(req.query.action == "mediaItems"){
@@ -583,10 +598,11 @@ router.get("/:projectID", function(req, res, next){
 });
 
 /**
+ * @apiVersion 1.0.0
  * @api {get} /feeds/:projectID?action=projectName Get projects name
  * @apiParam {int} :projectID Projects unique ID
- * @apiName GetProjectName
- * @apiGroup ProjectDetails
+ * @apiName Get Project Name
+ * @apiGroup Project Details
  */
 router.get("/:projectID", function(req, res, next){
     if(req.query.action == "projectName"){
@@ -606,11 +622,12 @@ router.get("/:projectID", function(req, res, next){
 });
 
 /**
+ * @apiVersion 1.0.0
  * @api {put} /feeds/:projectID?action=projectName Update projects name
  * @apiParam {int} :projectID Projects unique ID
  * @apiParam {string} project_name New name for the project
- * @apiName UpdateProjectName
- * @apiGroup ProjectDetails
+ * @apiName Update Project Name
+ * @apiGroup Project Details
  */
 router.put("/:projectID", function(req, res, next){
     if(req.query.action == "projectName"){
@@ -644,10 +661,11 @@ router.put("/:projectID", function(req, res, next){
 });
 
 /**
+ * @apiVersion 1.0.0
  * @api {get} /feeds/:projectID?action=cache Get maximum cache age
  * @apiParam {int} :projectID Projects unique ID
- * @apiName GetCacheAge
- * @apiGroup ProjectDetails
+ * @apiName Get Maximum Cache Age
+ * @apiGroup Project Details
  */
 router.get("/:projectID", function(req, res, next){
     if(req.query.action == "cache"){
@@ -666,11 +684,12 @@ router.get("/:projectID", function(req, res, next){
 });
 
 /**
+ * @apiVersion 1.0.0
  * @api {put} /feeds/:projectID?action=cache Update maximum cache age
  * @apiParam {int} :projectID Projects unique ID
  * @apiParam {int} max_cache_age Time in milliseconds
- * @apiName UpdateCacheAge
- * @apiGroup ProjectDetails
+ * @apiName Update Maximum CacheAge
+ * @apiGroup Project Details
  */
 router.put("/:projectID", function(req, res, next){
     if(req.query.action == "cache"){
@@ -699,10 +718,11 @@ router.put("/:projectID", function(req, res, next){
 });
 
 /**
+ * @apiVersion 1.0.0
  * @api {get} /feeds/:projectID?action=css Get custom css
  * @apiParam {int} :projectID Projects unique ID
- * @apiName ReadCustomCss
- * @apiGroup CustomCSS
+ * @apiName Get Custom Css
+ * @apiGroup Custom CSS
  */
 router.get("/:projectID", function(req, res, next){
     if(req.query.action == "css"){
@@ -720,11 +740,12 @@ router.get("/:projectID", function(req, res, next){
 });
 
 /**
- * @api {post} /feeds/:projectID?action=css Create/append to custom css
+ * @apiVersion 1.0.0
+ * @api {post} /feeds/:projectID?action=css Create or append to custom css
  * @apiParam {int} :projectID Projects unique ID
  * @apiParam {string} custom_css Custom css rules to be added
- * @apiName CreateAppendCustomCss
- * @apiGroup CustomCSS
+ * @apiName Create CustomCss
+ * @apiGroup Custom CSS
  */
 router.post("/:projectID", function(req, res, next){
     if(req.query.action == "css"){
@@ -752,11 +773,12 @@ router.post("/:projectID", function(req, res, next){
 });
 
 /**
+ * @apiVersion 1.0.0
  * @api {put} /feeds/:projectID?action=css Update custom content css
  * @apiParam {int} :projectID Projects unique ID
  * @apiParam {string} custom_css Custom css rules to be added
- * @apiName UpdateCustomCss
- * @apiGroup CustomCSS
+ * @apiName Update Custom Css
+ * @apiGroup Custom CSS
  */
 router.put("/:projectID", function(req, res, next){
     if(req.query.action == "css"){

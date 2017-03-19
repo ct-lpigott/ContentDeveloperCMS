@@ -9,11 +9,12 @@ router.delete("/:projectID", function(req, res, next){
 });
 
 /**
+ * @apiVersion 1.0.0
  * @api {delete} /feeds/:projectID/:itemPath Delete a content item
  * @apiParam {int} :projectID Projects unique ID
  * @apiParam {string} :itemPath Encapsulation path to item within the project
- * @apiName DeleteContent
- * @apiGroup ProjectContent
+ * @apiName Delete Content Item
+ * @apiGroup Project Content
  */
 // Note project structure cannot be deleted
 router.delete("/:projectID/*", function(req, res, next){

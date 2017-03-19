@@ -6,25 +6,28 @@ var router = require('express').Router();
 var gitRepo = require("../../../custom_modules/git_repo");
 
 /**
+ * @apiVersion 1.0.0
  * @api {get} /feeds/:projectID?include=structure,content,history Get entire project structure
  * @apiParam {int} :projectID Projects unique ID
  * @apiParam {string="structure", "content", "history"}  [include] To include the structure, content and commit history of the project
- * @apiName GetProjectStructure
- * @apiGroup ProjectStructure
+ * @apiName Get Project Structure
+ * @apiGroup Project Structure
  */
 /**
+ * @apiVersion 1.0.0
  * @api {get} /feeds/:projectID Get entire project content
  * @apiParam {int} :projectID Projects unique ID
  * @apiParam {string="structure", "content", "history"}  [include] To include the structure, content and commit history of the project
- * @apiName GetProjectContent
- * @apiGroup ProjectContent
+ * @apiName Get Project Content
+ * @apiGroup Project Content
  */
 /**
+ * @apiVersion 1.0.0
  * @api {get} /feeds/:projectID?include=history Get commit history of project
  * @apiParam {int} :projectID Projects unique ID
  * @apiParam {string="structure", "content", "history"}  [include] To include the structure, content and commit history of the project
- * @apiName GetProjectCommitHistory
- * @apiGroup ProjectHistory
+ * @apiName Get Project Commit History
+ * @apiGroup Project History
  */
 router.get("/:projectID", function(req, res, next){
     if(req.fileData.admin != null){
@@ -82,20 +85,22 @@ router.get("/:projectID", function(req, res, next){
 });
 
 /**
+ * @apiVersion 1.0.0
  * @api {get} /feeds/:projectID/:itemPath?include=structure Get an items structure
  * @apiParam {int} :projectID Projects unique ID
  * @apiParam {string} :itemPath Encapsulation path to item within the project
  * @apiParam {string="structure", "content"} [include] To include the structure and content of the item
- * @apiName GetItemStructure
- * @apiGroup ProjectStructure
+ * @apiName Get Item Structure
+ * @apiGroup Project Structure
  */
 /**
+ * @apiVersion 1.0.0
  * @api {get} /feeds/:projectID/:itemPath Get an items content
  * @apiParam {int} :projectID Projects unique ID
  * @apiParam {string} :itemPath Encapsulation path to item within the project
  * @apiParam {string="structure", "content"} [include] To include the structure and content of the item
- * @apiName GetItemContent
- * @apiGroup ProjectContent
+ * @apiName Get Item Content
+ * @apiGroup Project Content
  */
 router.get("/:projectID/*", function(req, res, next){
     var contentData = req.fileData.content;
