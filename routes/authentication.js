@@ -14,6 +14,10 @@ router.use(function(req, res, next){
 		userAuthToken = req.session.user_auth_token;
 	}
 	
+	if(userAuthToken == null && process.env.DEBUG_AUTH_TOKEN != null){
+		userAuthToken = process.env.DEBUG_AUTH_TOKEN;
+	}
+
 	if(userAuthToken != null){
 		dbQuery.getWhere_User("id", ["cd_user_auth_token"], [userAuthToken], function(err, row){
 			if(row){
