@@ -15,7 +15,14 @@ frisby.create("Feeds - Actions - Update Project Content")
   .expectMaxResponseTime(10000)
   .expectStatus(200)
   .expectHeaderContains("Content-Type", "application/json")
-  .expectJSONTypes("home_page",{
+  .expectJSONTypes({
+    content: Object,
+    errors: function(val){
+      expect(val).toBeTypeOrNull(Array);
+      console.log(val);
+    }
+  })
+  .expectJSONTypes("content.home_page",{
     heading: Object,
     further_info: Object
   })
@@ -28,5 +35,14 @@ frisby.create("Feeds - Actions - Create Project Item Content")
   .expectMaxResponseTime(10000)
   .expectStatus(200)
   .expectHeaderContains("Content-Type", "application/json")
-  .expectJSONTypes(String)
+  .expectJSONTypes({
+    content: Object,
+    errors: function(val){
+      expect(val).toBeTypeOrNull(Array);
+      console.log(val);
+    }
+  })
+  .expectJSONTypes("content.home_page",{
+    telephone: String
+  })
 .toss();

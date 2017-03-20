@@ -35,7 +35,14 @@ frisby.create("Feeds - Actions - Create Project Structure")
   .expectMaxResponseTime(10000)
   .expectStatus(200)
   .expectHeaderContains("Content-Type", "application/json")
-  .expectJSONTypes("home_page",{
+  .expectJSONTypes({
+      structure: Object,
+      errors: function(val){
+        expect(val).toBeTypeOrNull(Array);
+        console.log(val);
+      }
+  })
+  .expectJSONTypes("structure.home_page",{
     heading: Object,
     further_info: Object
   })
@@ -51,6 +58,13 @@ frisby.create("Feeds - Actions - Create Project Structure")
   .expectStatus(200)
   .expectHeaderContains("Content-Type", "application/json")
   .expectJSONTypes({
+      structure: Object,
+      errors: function(val){
+        expect(val).toBeTypeOrNull(Array);
+        console.log(val);
+      }
+  })
+  .expectJSONTypes("structure", {
     telephone: Object
   })
 .toss();

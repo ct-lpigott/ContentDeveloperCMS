@@ -42,7 +42,12 @@ router.use(function(req, res, next){
                             console.log("Project content file successfully updated");
                             // Sending the new item as the response to the caller, so that they can
                             // see the result of their request
-                            res.send(req.resultData);
+
+                            var responseObject = {
+                                content: req.resultData,
+                                errors: req.feedsErrors
+                            };
+                            res.send(responseObject);
                         });
                     }
                 });
@@ -100,7 +105,11 @@ router.use(function(req, res, next){
                         console.log("Project admin file successfully updated");
                         // Sending the new item as the response to the caller, so that they can
                         // see the result of their request
-                        res.send(req.resultData);
+                        var responseObject = {
+                            structure: req.resultData,
+                            errors: req.feedsErrors
+                        };
+                        res.send(responseObject);
                     });   
                 }
             });
