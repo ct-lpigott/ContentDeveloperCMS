@@ -104,8 +104,14 @@ router.post("/:projectID/*", function(req, res, next){
                                     return;
                                 } else {
                                     // Adding this as a new property on the parents attributes object
-                                    structureFileData[parentName]["attributes"][itemName] = newItem;
-                                    req.gitCommitMessage = "New attribute structure added to " + parentName + ": '" + itemName + "'";
+                                    var structureValidation = validation.validateNewStructure(itemName, newItem);
+                                    if(structureValidation.allowed){
+                                        structureFileData[parentName]["attributes"][itemName] = structureValidation.sanitisedStructure;
+                                        req.gitCommitMessage = "New attribute structure added to " + parentName + ": '" + itemName + "'";
+                                    }
+                                    for(var i=0; i<structureValidation.errors.length; i++){
+                                        req.feedsErrors.push(structureValidation.errors[i]);
+                                    }
                                 }
                             } else if(structureFileData[parentName]["items"] != undefined){
                                 // Checking if this item name is already a property on the parent items object
@@ -114,12 +120,18 @@ router.post("/:projectID/*", function(req, res, next){
                                     // item. Adding this to the feedsErrors array, and then returning this function so that no further 
                                     // attempt to create this item will be made. Since req.newItem will remain null, this error will 
                                     // be returned to the caller, further down along this route
-                                    req.feedsErrors.push(itemName + " already exists in " + parentName + ". Use a PUT request to update it.");
+                                    req.feedsErrors.push(itemName + " already exists in " + parentName + ".");
                                     return;
                                 } else {
                                     // Adding this as a new property on the parents items object
-                                    structureFileData[parentName]["items"][itemName] = newItem;
-                                    req.gitCommitMessage = "New item structure added to " + parentName + ": '" + itemName + "'";
+                                    var structureValidation = validation.validateNewStructure(itemName, newItem);
+                                    if(structureValidation.allowed){
+                                        structureFileData[parentName]["items"][itemName] = structureValidation.sanitisedStructure;
+                                        req.gitCommitMessage = "New item structure added to " + parentName + ": '" + itemName + "'";
+                                    }
+                                    for(var i=0; i<structureValidation.errors.length; i++){
+                                        req.feedsErrors.push(structureValidation.errors[i]);
+                                    }
                                 }
                             } else {
                                 // Checking if this item name is already a property on the parent object
@@ -128,12 +140,18 @@ router.post("/:projectID/*", function(req, res, next){
                                     // item. Adding this to the feedsErrors array, and then returning this function so that no further 
                                     // attempt to create this item will be made. Since req.newItem will remain null, this error will 
                                     // be returned to the caller, further down along this route
-                                    req.feedsErrors.push(itemName + " already exists in " + parentName + ". Use a PUT request to update it.");
+                                    req.feedsErrors.push(itemName + " already exists in " + parentName + ".");
                                     return;
                                 } else {
                                     // Adding this as a new property on the parents object
-                                    structureFileData[parentName][itemName] = newItem;
-                                    req.gitCommitMessage = "New structure added to " + parentName + ": '" + itemName + "'";
+                                    var structureValidation = validation.validateNewStructure(itemName, newItem);
+                                    if(structureValidation.allowed){
+                                        structureFileData[parentName][itemName] = structureValidation.sanitisedStructure;
+                                        req.gitCommitMessage = "New structure added to " + parentName + ": '" + itemName + "'";
+                                    }
+                                    for(var i=0; i<structureValidation.errors.length; i++){
+                                        req.feedsErrors.push(structureValidation.errors[i]);
+                                    }
                                 }
                             }
 
@@ -159,12 +177,18 @@ router.post("/:projectID/*", function(req, res, next){
                                     // item. Adding this to the feedsErrors array, and then returning this function so that no further 
                                     // attempt to create this item will be made. Since req.newItem will remain null, this error will 
                                     // be returned to the caller, further down along this route
-                                    req.feedsErrors.push(itemName + " already exists. Use a PUT request to update it.");
+                                    req.feedsErrors.push(itemName + " already exists.");
                                     return;
                                 } else {
                                     // Adding this as a new property on the global attributes object
-                                    structureFileData["attributes"][itemName] = newItem;
-                                    req.gitCommitMessage = parentName != null ? "New structure attribute added to " + parentName + ": " + itemName : "New structure attribute added to global object: '" + itemName + "'";
+                                    var structureValidation = validation.validateNewStructure(itemName, newItem);
+                                    if(structureValidation.allowed){
+                                        structureFileData["attributes"][itemName] = structureValidation.sanitisedStructure;
+                                        req.gitCommitMessage = parentName != null ? "New structure attribute added to " + parentName + ": " + itemName : "New structure attribute added to global object: '" + itemName + "'";
+                                    }
+                                    for(var i=0; i<structureValidation.errors.length; i++){
+                                        req.feedsErrors.push(structureValidation.errors[i]);
+                                    }
                                 } 
                                 // If the function has reached this point, then an item must have been created (as
                                 // if this proved not to be possible, then the function would have returned by now).
@@ -184,12 +208,18 @@ router.post("/:projectID/*", function(req, res, next){
                                     // item. Adding this to the feedsErrors array, and then returning this function so that no further 
                                     // attempt to create this item will be made. Since req.newItem will remain null, this error will 
                                     // be returned to the caller, further down along this route
-                                    req.feedsErrors.push(itemName + " already exists. Use a PUT request to update it.");
+                                    req.feedsErrors.push(itemName + " already exists.");
                                     return;
                                 } else {
                                     // Adding this as a new property on the global items object
-                                    structureFileData["items"][itemName] = newItem;
-                                    req.gitCommitMessage = parentName != null ? "New structure item added to " + parentName + ": " + itemName :"New structure item added to global object: '" + itemName + "'";
+                                    var structureValidation = validation.validateNewStructure(itemName, newItem, req.feedsErrors);
+                                    if(structureValidation.allowed){
+                                        structureFileData["items"][itemName] = structureValidation.sanitisedStructure;
+                                        req.gitCommitMessage = parentName != null ? "New structure item added to " + parentName + ": " + itemName :"New structure item added to global object: '" + itemName + "'";
+                                    }
+                                    for(var i=0; i<structureValidation.errors.length; i++){
+                                        req.feedsErrors.push(structureValidation.errors[i]);
+                                    }
                                 } 
                                 // If the function has reached this point, then an item must have been created (as
                                 // if this proved not to be possible, then the function would have returned by now).
@@ -216,8 +246,14 @@ router.post("/:projectID/*", function(req, res, next){
                                     
                                 } else {
                                     // Adding this as a new property on the global object
-                                    structureFileData[itemName] = newItem;
-                                    req.gitCommitMessage = parentName != null ? "New structure added to " + parentName + ": " + itemName : "New structure added to global object: '" + itemName + "'";
+                                    var structureValidation = validation.validateNewStructure(itemName, newItem);
+                                    if(structureValidation.allowed){
+                                        structureFileData[itemName] = structureValidation.sanitisedStructure;
+                                        req.gitCommitMessage = parentName != null ? "New structure added to " + parentName + ": " + itemName : "New structure added to global object: '" + itemName + "'";
+                                    }
+                                    for(var i=0; i<structureValidation.errors.length; i++){
+                                        req.feedsErrors.push(structureValidation.errors[i]);
+                                    }
                                 }
                                 // If the function has reached this point, then an item must have been created (as
                                 // if this proved not to be possible, then the function would have returned by now).
@@ -592,10 +628,13 @@ router.post("/:projectID/*", function(req, res, next){
                 return next(new Error());
             }   
         } else {
-            // As no content has been included in the request, unable to update the
-            // collection. Adding this as an error to the feeds errors array.
-            req.feedsErrors.push("No content provied in the request");
-            next();
+            if(req.body.structure == null){
+                // As no content has been included in the request, unable to update the
+                // collection. Adding this as an error to the feeds errors array.
+                req.feedsErrors.push("No content provied in the request");
+            } else {
+                next();
+            }
         }
     } else {
         // Adding this as an error to the feeds errors array.

@@ -64,6 +64,47 @@ function checkIfPropertyHasStructure(property, structureProperties, structureTyp
     }
 }
 
+function validateNewStructure(structureName, structure){
+    var responseObject = {
+        sanitisedStructure: structure,
+        errors: [],
+        allowed: true
+    };
+
+    if(responseObject.sanitisedStructure.attributes != undefined){
+        responseObject.sanitisedStructure.attributes = removeSuspiciousAttributes(responseObject.sanitisedStructure.attributes, responseObject.errors);
+    } else if(responseObject.sanitisedStructure.items != undefined){
+        for(var item in responseObject.sanitisedStructure.items){
+            if(responseObject.sanitisedStructure.items[item].attributes != undefined){
+                responseObject.sanitisedStructure.items[item].attributes = removeSuspiciousAttributes(responseObject.sanitisedStructure.items[item].attributes, responseObject.errors)
+            }
+        }
+    } else {
+        responseObject.allowed = checkAttributeAllowed(structureName, responseObject.errors);
+    }
+    
+    return responseObject;
+}
+
+function removeSuspiciousAttributes(structureAttributes, feedsErrors){
+    for(var attribute in structureAttributes){
+        if(checkAttributeAllowed(attribute, feedsErrors) == false){
+            delete structureAttributes[attribute];
+        }
+    }
+    return structureAttributes;
+}
+
+function checkAttributeAllowed(attributeName, feedsErrors){
+    var allowed = true;
+    var allowedAttributes = ["class", "id", "type", "required", "options"];
+    if(allowedAttributes.indexOf(attributeName) < 0){
+        allowed = false;
+        feedsErrors.push("The '" + attributeName + "' attribute is not allowed");
+    }
+    return allowed;
+}
+
 function enumMatch(propertyValue, allowedValues){
     var enumMatch = false;
     for(var option of allowedValues){
@@ -74,109 +115,116 @@ function enumMatch(propertyValue, allowedValues){
     return enumMatch;
 }
 
-module.exports = {
-    jsonToObject: function(jsonString){
-        var validJsObject = false;
-        var jsObj = {};
+function jsonToObject(jsonString){
+    var validJsObject = false;
+    var jsObj = {};
 
-        try {
-            jsObj = JSON.parse(jsonString);
-            validJsObject = true;
-        } catch(e) {
-            validJsObject = false;
+    try {
+        jsObj = JSON.parse(jsonString);
+        validJsObject = true;
+    } catch(e) {
+        validJsObject = false;
+    }
+    
+    console.log("VALIDATION | Valid object = " + validJsObject);
+    return validJsObject;
+}
+
+function objectToJson(jsObject){
+    var validJson = false;
+    var jsonString = "";
+
+    try {
+        jsonString = JSON.stringify(jsObject);
+        validJson = true;
+    } catch(e) {
+        validJson = false;
+    }
+    
+    console.log("VALIDATION | Valid JSON = " + validJson);
+    return validJson;
+}
+
+function contentStructure(content, structure){
+    var response = {
+        successful: true,
+        errors: []
+    };
+
+    if(structure.type != null && structure.type != "html" && structure.type != "link"){
+        if(content.constructor.name.toLowerCase() != structure.type){
+            response.errors.push("Incorrect content type provided in request. Expected " + structure.type);
+            response.successful = false;
+            return response;
         }
-        
-        console.log("VALIDATION | Valid object = " + validJsObject);
-        return validJsObject;
-    },
-    objectToJson: function(jsObject){
-        var validJson = false;
-        var jsonString = "";
+    }
 
-        try {
-            jsonString = JSON.stringify(jsObject);
-            validJson = true;
-        } catch(e) {
-            validJson = false;
-        }
-        
-        console.log("VALIDATION | Valid JSON = " + validJson);
-        return validJson;
-    },
-    contentStructure: function(content, structure){
-        var response = {
-            successful: true,
-            errors: []
-        };
-
-        if(structure.type != null && structure.type != "html" && structure.type != "link"){
-            if(content.constructor.name.toLowerCase() != structure.type){
-                response.errors.push("Incorrect content type provided in request. Expected " + structure.type);
-                response.successful = false;
-                return response;
-            }
-        }
-
-        if(structure.attributes != null){
-            checkIfPropertyMatchesAttributes("Content", content, structure["attributes"], null, response);
-        } else if(structure.items != null){
-            switch(content.constructor.name.toLowerCase()){
-                case "array": {
-                    for(var i=0; i<content.length; i++){
-                        // Checking for properties that are not defined
-                        for(var itemProperty in content[i]){
-                            checkIfPropertyHasStructure(itemProperty, structure["items"], structure.type, response);
-                        }
-                        
-                        // Checking for properties that are defined
-                        for(var property in structure["items"]){
-                            if(structure["items"][property]["attributes"] != null){
-                                checkIfPropertyMatchesAttributes(property, content[i][property], structure["items"][property]["attributes"], structure.type, response);
-                            }  
-                        }
-                        
-                    }
-                    break;
-                }
-                case "object": {
+    if(structure.attributes != null){
+        checkIfPropertyMatchesAttributes("Content", content, structure["attributes"], null, response);
+    } else if(structure.items != null){
+        switch(content.constructor.name.toLowerCase()){
+            case "array": {
+                for(var i=0; i<content.length; i++){
                     // Checking for properties that are not defined
-                    for(var key in content){
-                        checkIfPropertyHasStructure(key, structure["items"], structure.type, response);                             
+                    for(var itemProperty in content[i]){
+                        checkIfPropertyHasStructure(itemProperty, structure["items"], structure.type, response);
                     }
+                    
                     // Checking for properties that are defined
                     for(var property in structure["items"]){
                         if(structure["items"][property]["attributes"] != null){
-                            checkIfPropertyMatchesAttributes(property, content[property], structure["items"][property]["attributes"], structure.type, response);
-                        } 
+                            checkIfPropertyMatchesAttributes(property, content[i][property], structure["items"][property]["attributes"], structure.type, response);
+                        }  
                     }
-                    break;
+                    
                 }
+                break;
             }
-        } else {
-            switch(content.constructor.name.toLowerCase()){
-                case "object":
-                case "array": {
-                    // Checking for properties that are not defined
-                    for(var key in content){
-                        checkIfPropertyHasStructure(key, structure, structure.type, response);                       
-                    }
-                    // Checking for properties that are defined
-                    for(var property in structure){
-                        if(structure[property]["attributes"] != null){
-                            checkIfPropertyMatchesAttributes(property, content[property], structure[property]["attributes"], null, response);
-                        }   
-                    }                     
-                    break;
+            case "object": {
+                // Checking for properties that are not defined
+                for(var key in content){
+                    checkIfPropertyHasStructure(key, structure["items"], structure.type, response);                             
                 }
-                default: {
-                    response.errors.push("Content contained unexpected data");
-                    response.successful = false;
-                    break;
-                }                
+                // Checking for properties that are defined
+                for(var property in structure["items"]){
+                    if(structure["items"][property]["attributes"] != null){
+                        checkIfPropertyMatchesAttributes(property, content[property], structure["items"][property]["attributes"], structure.type, response);
+                    } 
+                }
+                break;
             }
         }
-
-
-        return response;
+    } else {
+        switch(content.constructor.name.toLowerCase()){
+            case "object":
+            case "array": {
+                // Checking for properties that are not defined
+                for(var key in content){
+                    checkIfPropertyHasStructure(key, structure, structure.type, response);                       
+                }
+                // Checking for properties that are defined
+                for(var property in structure){
+                    if(structure[property]["attributes"] != null){
+                        checkIfPropertyMatchesAttributes(property, content[property], structure[property]["attributes"], null, response);
+                    }   
+                }                     
+                break;
+            }
+            default: {
+                response.errors.push("Content contained unexpected data");
+                response.successful = false;
+                break;
+            }                
+        }
     }
+
+
+    return response;
+}
+
+module.exports = {
+    validateNewStructure: validateNewStructure,
+    jsonToObject: jsonToObject,
+    objectToJson: objectToJson,
+    contentStructure: contentStructure
 };
