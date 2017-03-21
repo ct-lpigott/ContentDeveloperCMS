@@ -442,22 +442,23 @@ router.post("/:projectID/*", function(req, res, next){
                                                 req.feedsErrors.push("Position " + itemName + " in " + parentName + " is already taken. Use a PUT request to update it.");
                                                 return;
                                             } else {
-                                                var validateContent = validation.contentStructure(newItem, structureFileData[parentName]["items"]);   
-                                                if(validateContent.successful){
+                                                var contentValidation = validation.validateNewContent(newItem, structureFileData[parentName]["items"]);   
+                                                // Looping through any errors that were returned from the content validation,
+                                                // and adding them to the req.feedsErrors array
+                                                for(var i=0; i<contentValidation.errors.length; i++){
+                                                    req.feedsErrors.push(contentValidation.errors[i]);
+                                                }
+                                                if(contentValidation.allowed){
                                                     // Since this is an array, pushing the new item into the parent
                                                     // Note that even if the user has specified an index position to insert
                                                     // this item at, this will be ignored as the item can only ever be created
                                                     // at the end of an array (PUT requests are used to update exisiting items)
-                                                    contentFileData[parentName].push(newItem);
+                                                    contentFileData[parentName].push(contentValidation.sanitisedContent);
                                                     req.gitCommitMessage = "New content pushed to array: '" + parentName + "'";
                                                 } else {
-                                                    // Looping through any errors that were returned from the content validation,
-                                                    // and adding them to the req.feedsErrors array, before returning the function,
-                                                    // as this content cannot be added to the project as it does not match with the
-                                                    // project structure (details of which will be inclued in the errors)
-                                                    for(var i=0; i<validateContent.errors.length; i++){
-                                                        req.feedsErrors.push(validateContent.errors[i]);
-                                                    }
+                                                    // Returning the function, as this content cannot be added to the project 
+                                                    // as it does not match with the project structure (details of which will 
+                                                    // inclued in the errors)
                                                     return;
                                                 }
                                             } 
@@ -474,20 +475,21 @@ router.post("/:projectID/*", function(req, res, next){
                                                 req.feedsErrors.push(itemName + " already exists in " + parentName + ". Use a PUT request to update it.");
                                                 return;
                                             } else {
-                                                var validateContent = validation.contentStructure(newItem, structureFileData[parentName]["items"][itemName]);   
-                                                if(validateContent.successful){
+                                                var contentValidation = validation.validateNewContent(newItem, structureFileData[parentName]["items"][itemName]);   
+                                                // Looping through any errors that were returned from the content validation,
+                                                // and adding them to the req.feedsErrors array
+                                                for(var i=0; i<contentValidation.errors.length; i++){
+                                                    req.feedsErrors.push(contentValidation.errors[i]);
+                                                }
+                                                if(contentValidation.allowed){
                                                     // Since this is an object, creating a new property on the parent item (with the item name
                                                     // supplied in the parameters), and setting its value to the new item value 
-                                                    contentFileData[parentName][itemName] = newItem;
+                                                    contentFileData[parentName][itemName] = contentValidation.sanitisedContent;
                                                     req.gitCommitMessage = "New content created in object:  '" + parentName + "." + itemName;
                                                 } else {
-                                                    // Looping through any errors that were returned from the content validation,
-                                                    // and adding them to the req.feedsErrors array, before returning the function,
-                                                    // as this content cannot be added to the project as it does not match with the
-                                                    // project structure (details of which will be inclued in the errors)
-                                                    for(var i=0; i<validateContent.errors.length; i++){
-                                                        req.feedsErrors.push(validateContent.errors[i]);
-                                                    }
+                                                    // Returning the function, as this content cannot be added to the project 
+                                                    // as it does not match with the project structure (details of which will 
+                                                    // inclued in the errors)
                                                     return;
                                                 }
                                             }
@@ -530,19 +532,20 @@ router.post("/:projectID/*", function(req, res, next){
                                     // an object into a string
                                     switch(structureFileData[itemName]["type"].toLowerCase()){
                                         case "array": {
-                                            var validateContent = validation.contentStructure(newItem, structureFileData[itemName]["items"]);   
-                                            if(validateContent.successful){
+                                            var contentValidation = validation.validateNewContent(newItem, structureFileData[itemName]["items"]);   
+                                            // Looping through any errors that were returned from the content validation,
+                                            // and adding them to the req.feedsErrors array
+                                            for(var i=0; i<contentValidation.errors.length; i++){
+                                                req.feedsErrors.push(contentValidation.errors[i]);
+                                            }
+                                            if(contentValidation.allowed){
                                                 // Since this is any array, pushing to the new item into it
-                                                contentFileData[itemName].push(newItem); 
+                                                contentFileData[itemName].push(contentValidation.sanitisedContent); 
                                                 req.gitCommitMessage = "New content added to array: " + itemName;
                                             } else {
-                                                // Looping through any errors that were returned from the content validation,
-                                                // and adding them to the req.feedsErrors array, before returning the function,
-                                                // as this content cannot be added to the project as it does not match with the
-                                                // project structure (details of which will be inclued in the errors)
-                                                for(var i=0; i<validateContent.errors.length; i++){
-                                                    req.feedsErrors.push(validateContent.errors[i]);
-                                                }
+                                                // Returning the function, as this content cannot be added to the project 
+                                                // as it does not match with the project structure (details of which will 
+                                                // inclued in the errors)
                                                 return;
                                             }
                                             break;                   
@@ -560,21 +563,22 @@ router.post("/:projectID/*", function(req, res, next){
                                         }
                                     }
                                 } else {
-                                    var validateContent = validation.contentStructure(newItem, structureFileData[itemName]);   
-                                    if(validateContent.successful){
+                                    var contentValidation = validation.validateNewContent(newItem, structureFileData[itemName]);   
+                                    // Looping through any errors that were returned from the content validation,
+                                    // and adding them to the req.feedsErrors array
+                                    for(var i=0; i<contentValidation.errors.length; i++){
+                                        req.feedsErrors.push(contentValidation.errors[i]);
+                                    }
+                                    if(contentValidation.allowed){
                                         // Since this is a new collection (top level property) on the file data object, 
                                         // creating a new property (with the item name supplied in the parameters), 
                                         // and setting its value to the new item value 
-                                        contentFileData[itemName] = newItem;
+                                        contentFileData[itemName] = contentValidation.sanitisedContent;
                                         req.gitCommitMessage = "New content created: '" + itemName + "'";
                                     } else {
-                                        // Looping through any errors that were returned from the content validation,
-                                        // and adding them to the req.feedsErrors array, before returning the function,
-                                        // as this content cannot be added to the project as it does not match with the
-                                        // project structure (details of which will be inclued in the errors)
-                                        for(var i=0; i<validateContent.errors.length; i++){
-                                            req.feedsErrors.push(validateContent.errors[i]);
-                                        }
+                                        // Returning the function, as this content cannot be added to the project 
+                                        // as it does not match with the project structure (details of which will 
+                                        // inclued in the errors)
                                         return;
                                     }
                                 }

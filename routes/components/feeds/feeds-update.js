@@ -117,17 +117,28 @@ router.put("/:projectID", function(req, res, next){
             req.body.content = JSON.stringify(req.body.content);
         }
         if(validation.jsonToObject(req.body.content)){
-            req.fileData.content = JSON.parse(req.body.content);
-            console.log("Entire contents of project content updated");
-            if(req.body.short_commit_id != null){
-                req.gitCommitMessage = "Project content rolled back to commit id: " + req.body.short_commit_id;
-            } else if(req.body.commit_message != null){
-                req.gitCommitMessage = req.body.commit_message;
-            } else {
-                req.gitCommitMessage = "Update to entire contents of project";
+            var contentValidation = validation.validateNewContent(JSON.parse(req.body.content), req.fileData.admin.project_structure);
+            // Looping through any errors that were returned from the content validation,
+            // and adding them to the req.feedsErrors array
+            for(var i=0; i<contentValidation.errors.length; i++){
+                req.feedsErrors.push(contentValidation.errors[i]);
             }
-            req.updateFile = "content";
-            next();
+            if(contentValidation.allowed){
+                req.fileData.content = contentValidation.sanitisedContent;
+                console.log("Entire contents of project content updated");
+                if(req.body.short_commit_id != null){
+                    req.gitCommitMessage = "Project content rolled back to commit id: " + req.body.short_commit_id;
+                } else if(req.body.commit_message != null){
+                    req.gitCommitMessage = req.body.commit_message;
+                } else {
+                    req.gitCommitMessage = "Update to entire contents of project";
+                }
+                req.updateFile = "content";
+                next();
+            } else {
+                // Returning any errors set in the content validation to the caller
+                return next(new Error());
+            }
         } else {
             // This is not a valid JSON object. Adding this as an 
             // error to the feedsErrors array.
@@ -283,9 +294,10 @@ router.put("/:projectID/*", function(req, res, next){
                                                 // Checking if the parent object/array we are trying to update already 
                                                 // contains a property/index with the same value as the itemName
                                                 if(contentFileData[parentName][itemName] != undefined || (arrayIndex != null && contentFileData[parentName][arrayIndex][itemName] != undefined)){
+                                                    //????????
                                                     var validateWith = structureFileData[parentName]["items"][itemName] || structureFileData[parentName]["items"];
-                                                    var validateContent = validation.contentStructure(updatedItemContent, validateWith);   
-                                                    if(validateContent.successful){
+                                                    var contentValidation = validation.validateNewContent(updatedItemContent, validateWith);   
+                                                    if(contentValidation.allowed){
                                                         req.gitCommitMessage = "Update to content of " + parentName + ": " + itemName;
                                                         if(arrayIndex != null){
                                                             contentFileData = contentFileData[parentName];
@@ -294,14 +306,14 @@ router.put("/:projectID/*", function(req, res, next){
                                                         // Since this is an object/array, updating the property/index on the parent 
                                                         // item (with the item name supplied in the parameters), and setting its 
                                                         // value to the updated item value 
-                                                        contentFileData[parentName][itemName] = updatedItemContent;
+                                                        contentFileData[parentName][itemName] = contentValidation.sanitisedContent;
                                                     } else {
                                                         // Looping through any errors that were returned from the content validation,
                                                         // and adding them to the req.feedsErrors array, before returning the function,
                                                         // as this content cannot be updated in the project as it does not match with the
                                                         // project structure (details of which will be inclued in the errors)
-                                                        for(var i=0; i<validateContent.errors.length; i++){
-                                                            req.feedsErrors.push(validateContent.errors[i]);
+                                                        for(var i=0; i<contentValidation.errors.length; i++){
+                                                            req.feedsErrors.push(contentValidation.errors[i]);
                                                         }
                                                         return;
                                                     }
@@ -351,18 +363,18 @@ router.put("/:projectID/*", function(req, res, next){
                             } else {
                                 if(structureFileData[itemName] != null){
                                     if(contentFileData[itemName] != null){
-                                        var validateContent = validation.contentStructure(updatedItemContent, structureFileData[itemName]);   
-                                        if(validateContent.successful){
+                                        var contentValidation = validation.validateNewContent(updatedItemContent, structureFileData[itemName]);   
+                                        if(contentValidation.allowed){
                                             // Updating the value of this top level item to the updated item value
-                                            contentFileData[itemName] = updatedItemContent; 
+                                            contentFileData[itemName] = contentValidation.sanitisedContent; 
                                             req.gitCommitMessage = "Update to content: " + itemName;
                                         } else {
                                             // Looping through any errors that were returned from the content validation,
                                             // and adding them to the req.feedsErrors array, before returning the function,
                                             // as this content cannot be updated as it does not match with the
                                             // project structure (details of which will be inclued in the errors)
-                                            for(var i=0; i<validateContent.errors.length; i++){
-                                                req.feedsErrors.push(validateContent.errors[i]);
+                                            for(var i=0; i<contentValidation.errors.length; i++){
+                                                req.feedsErrors.push(contentValidation.errors[i]);
                                             }
                                             return;
                                         }
