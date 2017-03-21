@@ -30,19 +30,23 @@ router.put("/:projectID", function(req, res, next){
                 req.body.structure = req.body.structure.toLowerCase();                   
 
                 if(validation.jsonToObject(req.body.structure)){
-                    // Setting the project_structure to the structure passed to the 
-                    // request body
-                    req.fileData.admin.project_structure = JSON.parse(req.body.structure);
+                    var structureValidation = validation.validateNewStructure(null, JSON.parse(req.body.structure));
+                    if(structureValidation.allowed){
+                        req.fileData.admin.project_structure = structureValidation.sanitisedStructure;
 
-                    console.log("Entire contents of project structure updated");
-                    if(req.body.short_commit_id != null){
-                        req.gitCommitMessage = "Project structure rolled back to commit id: " + req.body.short_commit_id;
-                    } else if(req.body.commit_message != null){
-                        req.gitCommitMessage = req.body.commit_message;
-                    } else {
-                        req.gitCommitMessage = "Update to entire structure of project";
+                        console.log("Entire contents of project structure updated");
+                        if(req.body.short_commit_id != null){
+                            req.gitCommitMessage = "Project structure rolled back to commit id: " + req.body.short_commit_id;
+                        } else if(req.body.commit_message != null){
+                            req.gitCommitMessage = req.body.commit_message;
+                        } else {
+                            req.gitCommitMessage = "Update to entire structure of project";
+                        }
+                        req.updateFile = "structure";
                     }
-                    req.updateFile = "structure";
+                    for(var i=0; i<structureValidation.errors.length; i++){
+                        req.feedsErrors.push(structureValidation.errors[i]);
+                    }
                     next();
                 } else {
                     // This is not a valid JSON object. Adding this as an 

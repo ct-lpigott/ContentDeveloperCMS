@@ -71,18 +71,72 @@ function validateNewStructure(structureName, structure){
         allowed: true
     };
 
+    if(typeof structure != "string"){
+        if(responseObject.sanitisedStructure.items != null){
+            var itemsValidation = validateStructureItem(structureName, responseObject.sanitisedStructure);
+            if(itemsValidation.allowed){
+                responseObject.sanitisedStructure = itemsValidation.sanitisedStructure;
+            } else {
+                responseObject.allowed = false;
+            }
+            for(var i=0; i<itemsValidation.errors.length; i++){
+                responseObject.errors.push(itemsValidation.errors[i]);
+            }
+        }else if(responseObject.sanitisedStructure.attributes != null){
+            var attributesValidation = validateStructureItem(structureName, responseObject.sanitisedStructure);
+            if(attributesValidation.allowed){
+                responseObject.sanitisedStructure = attributesValidation.sanitisedStructure;
+            } else {
+                responseObject.allowed = false;
+            }
+            for(var i=0; i<attributesValidation.errors.length; i++){
+                responseObject.errors.push(attributesValidation.errors[i]);
+            }
+        } else {
+            for(var property in responseObject.sanitisedStructure){
+                var propertyValidation = validateStructureItem(property, responseObject.sanitisedStructure[property]);
+                if(propertyValidation.allowed){
+                    responseObject.sanitisedStructure[property] = propertyValidation.sanitisedStructure;
+                } else {
+                    delete responseObject.sanitisedStructure[property];
+                }
+                for(var i=0; i<propertyValidation.errors.length; i++){
+                    responseObject.errors.push(propertyValidation.errors[i]);
+                }
+            }
+        }
+    } else {
+        if(structureName != null){
+            responseObject.allowed = checkAttributeAllowed(structureName, responseObject.errors);
+        } else {
+            responseObject.allowed = false;
+        }
+    }    
+    
+    return responseObject;
+}
+
+function validateStructureItem(itemName, itemStructure){
+    var responseObject = {
+        sanitisedStructure: itemStructure,
+        errors: [],
+        allowed: true
+    }
     if(responseObject.sanitisedStructure.attributes != undefined){
         responseObject.sanitisedStructure.attributes = removeSuspiciousAttributes(responseObject.sanitisedStructure.attributes, responseObject.errors);
     } else if(responseObject.sanitisedStructure.items != undefined){
         for(var item in responseObject.sanitisedStructure.items){
-            if(responseObject.sanitisedStructure.items[item].attributes != undefined){
-                responseObject.sanitisedStructure.items[item].attributes = removeSuspiciousAttributes(responseObject.sanitisedStructure.items[item].attributes, responseObject.errors)
+            var itemValidation = validateStructureItem(item, responseObject.sanitisedStructure.items[item]);
+            if(itemValidation.allowed){
+                responseObject.sanitisedStructure.items[item] = itemValidation.sanitisedStructure;
+            }
+            for(var i=0; i<itemValidation.errors.length; i++){
+                responseObject.errors.push(itemValidation.errors[i]);
             }
         }
     } else {
-        responseObject.allowed = checkAttributeAllowed(structureName, responseObject.errors);
+        responseObject.allowed = checkAttributeAllowed(itemName, responseObject.errors);
     }
-    
     return responseObject;
 }
 
@@ -100,7 +154,7 @@ function checkAttributeAllowed(attributeName, feedsErrors){
     var allowedAttributes = ["class", "id", "type", "required", "options"];
     if(allowedAttributes.indexOf(attributeName) < 0){
         allowed = false;
-        feedsErrors.push("The '" + attributeName + "' attribute is not allowed");
+        feedsErrors.push("The '" + attributeName + "' attribute is not allowed and has been removed");
     }
     return allowed;
 }
