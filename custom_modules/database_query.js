@@ -88,6 +88,7 @@ function getWhere_User(selectCols="", whereCols=[], whereVals=[], cb){
 // UPDATE
 function update_User(updateCols=[], updateVals=[], userId, cb){
     var setCols = "SET " + combineColVals(updateCols, updateVals);
+    console.log(setCols);
     userId = validation.sanitise(userId);
     dbconn.query("UPDATE User " + setCols + " WHERE id=" + dbconn.escape(userId), function(err, result){
         handleUpdateResult(err, result, cb);
