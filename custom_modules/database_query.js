@@ -1,5 +1,6 @@
-var dbconn = require("./database_connection.js");
-var sendEmail = require("./send_email.js");
+var dbconn = require("./database_connection");
+var sendEmail = require("./send_email");
+var validation = require("./validation");
 var crypto = require('crypto');
 
 module.exports = {
@@ -25,42 +26,52 @@ module.exports = {
 
 // GET
 function get_User(selectCols="", userId, cb){
+    userId = validation.sanitise(userId);
     dbconn.query("SELECT " + selectCols + " FROM User WHERE id=" + dbconn.escape(userId), function(err, rows, fields){
         handleGetResult(err, rows, "single", cb);
     });
 }
 
 function get_Project(selectCols="", projectId, cb){
+    projectId = validation.sanitise(projectId);
     dbconn.query("SELECT " + selectCols + " FROM Project WHERE id=" + dbconn.escape(projectId), function(err, rows, fields){
         handleGetResult(err, rows, "single", cb);
     });
 }
 
 function get_UserProject(selectCols="", userId, projectId, cb){
+    userId = validation.sanitise(userId);
+    projectId = validation.sanitise(projectId);
     dbconn.query("SELECT " + selectCols + " FROM User_Project WHERE user_id=" + dbconn.escape(userId) + " AND project_id=" + dbconn.escape(projectId), function(err, rows, fields){
         handleGetResult(err, rows, "single", cb);
     });
 }
 
 function get_UserProjects_forUser(selectCols, userId, cb){
+    userId = validation.sanitise(userId);
     dbconn.query("SELECT " + selectCols + " FROM User_Project up LEFT JOIN Project p ON up.project_id = p.id WHERE up.user_id=" + dbconn.escape(userId), function(err, rows, fields){
         handleGetResult(err, rows, "all", cb);
     });        
 }
 
 function get_UserProjects_forProject(selectCols, projectId, cb){
+    projectId = validation.sanitise(projectId);
     dbconn.query("SELECT " + selectCols + " FROM User_Project up LEFT JOIN User u ON up.user_id = u.id WHERE up.project_id=" + dbconn.escape(projectId), function(err, rows, fields){
         handleGetResult(err, rows, "all", cb);
     });        
 }
 
 function get_UserProject_Project(selectCols, userId, projectId, cb){
+    userId = validation.sanitise(userId);
+    projectId = validation.sanitise(projectId);
     dbconn.query("SELECT " + selectCols + " FROM User_Project up LEFT JOIN Project p ON up.project_id = p.id WHERE up.user_id=" + dbconn.escape(userId) + " AND up.project_id=" + dbconn.escape(projectId), function(err, rows, fields){
         handleGetResult(err, rows, "single", cb);
     });
 }
 
 function get_UserProject_Project_User(selectCols, userId, projectId, cb){
+    userId = validation.sanitise(userId);
+    projectId = validation.sanitise(projectId);
     dbconn.query("SELECT " + selectCols + " FROM User_Project up LEFT JOIN Project p ON up.project_id = p.id LEFT JOIN User u ON up.user_id = u.id WHERE up.user_id=" + dbconn.escape(userId) + " AND up.project_id=" + dbconn.escape(projectId), function(err, rows, fields){
         handleGetResult(err, rows, "single", cb);
     });
@@ -69,7 +80,6 @@ function get_UserProject_Project_User(selectCols, userId, projectId, cb){
 // GET WHERE
 function getWhere_User(selectCols="", whereCols=[], whereVals=[], cb){
     var where = "WHERE " + combineColVals(whereCols, whereVals, " AND ");
-    
     dbconn.query("SELECT " + selectCols + " FROM User " + where, function(err, rows, fields){
         handleGetResult(err, rows, "single", cb);
     });
@@ -78,6 +88,7 @@ function getWhere_User(selectCols="", whereCols=[], whereVals=[], cb){
 // UPDATE
 function update_User(updateCols=[], updateVals=[], userId, cb){
     var setCols = "SET " + combineColVals(updateCols, updateVals);
+    userId = validation.sanitise(userId);
     dbconn.query("UPDATE User " + setCols + " WHERE id=" + dbconn.escape(userId), function(err, result){
         handleUpdateResult(err, result, cb);
     });
@@ -85,6 +96,8 @@ function update_User(updateCols=[], updateVals=[], userId, cb){
 
 function update_Project(updateCols=[], updateVals=[], userId, projectId, cb){
     var setCols = "SET " + combineColVals(updateCols, updateVals);
+    userId = validation.sanitise(userId);
+    projectId = validation.sanitise(projectId);
     dbconn.query("UPDATE Project p LEFT JOIN User_Project up ON p.id = up.project_id " + setCols + " WHERE up.project_id=" + dbconn.escape(projectId) + " AND up.user_id=" + dbconn.escape(userId), function(err, result){
         handleUpdateResult(err, result, cb);
     });
@@ -92,6 +105,8 @@ function update_Project(updateCols=[], updateVals=[], userId, projectId, cb){
 
 function update_UserProject(updateCols=[], updateVals=[], userId, projectId, cb){
     var setCols = "SET " + combineColVals(updateCols, updateVals);
+    userId = validation.sanitise(userId);
+    projectId = validation.sanitise(projectId);
     dbconn.query("UPDATE User_Project " + setCols + " WHERE user_id=" + userId  + " AND project_id=" + projectId, function(err, result) {
         handleUpdateResult(err, result, function(err, success){
             if(err || success == null){
@@ -112,6 +127,7 @@ function update_UserProject(updateCols=[], updateVals=[], userId, projectId, cb)
 
 // CREATE
 function create_User(emailAddress, cb){
+    emailAddress = validation.sanitise(emailAddress);
     createUniqueUserAuthToken(function(newAuthToken){
         dbconn.query("INSERT INTO User(email_address, cd_user_auth_token) VALUES(" + dbconn.escape(emailAddress) + ", " + newAuthToken + ")", function(err, result){
             handleCreateResult(err, result, cb);
@@ -120,6 +136,8 @@ function create_User(emailAddress, cb){
 }
 
 function create_Project(projectName, accessLevels, mediaFolderId, userId, cb){
+    projectName = validation.sanitise(projectName);
+    userId = validation.sanitise(userId);
     dbconn.query("INSERT INTO Project(project_name, access_levels, media_folder_id) VALUES(" + dbconn.escape(projectName) + ", " + dbconn.escape(accessLevels) + ", " + dbconn.escape(mediaFolderId) + ")", function(err, result){
         handleCreateResult(err, result, function(err, newProjectId){
             if(err || newProjectId == null){
@@ -138,6 +156,9 @@ function create_Project(projectName, accessLevels, mediaFolderId, userId, cb){
 }
 
 function create_UserProject (userId, projectId, accessLevelInt, cb){
+    userId = validation.sanitise(userId);
+    projectId = validation.sanitise(projectId);
+    access_level_int = validation.sanitise(accessLevelInt);
     dbconn.query("INSERT INTO User_Project(user_id, project_id, access_level_int) VALUES(" + userId + ", " + projectId + ", " + accessLevelInt + ")", function(err, result){
         handleCreateResult(err, result, function(err, newUserProjectId){
             if(err){
@@ -151,6 +172,7 @@ function create_UserProject (userId, projectId, accessLevelInt, cb){
 
 // CHECK
 function check_User(emailAddress, cb){
+    emailAddress = validation.sanitise(emailAddress);
     getWhere_User("id", ["email_address"], [emailAddress], function(err, existingUser){
         if(err){console.log(err);}
         if(existingUser){
@@ -162,6 +184,9 @@ function check_User(emailAddress, cb){
 }
 
 function check_UserProject(userId, projectId, accessLevelInt, cb){
+    userId = validation.sanitise(userId);
+    projectId = validation.sanitise(projectId);
+    accessLevelInt = validation.sanitise(accessLevelInt);
     get_UserProject("access_level_int", userId, projectId, function(err, row){
         if(err){ console.log(err); }
         if(row){
@@ -189,6 +214,8 @@ function check_UserProject(userId, projectId, accessLevelInt, cb){
 
 // DELETE
 function delete_UserProject(userId, projectId, cb){
+    userId = validation.sanitise(userId);
+    projectId = validation.sanitise(projectId);
     get_UserProject_Project_User("u.email_address, u.display_name, p.project_name", userId, projectId, function(err, row){
         dbconn.query("DELETE FROM User_Project WHERE user_id=" + dbconn.escape(userId) + " AND project_id=" + dbconn.escape(projectId), function(err, result){
             handleUpdateResult(err, result, cb);
@@ -243,7 +270,8 @@ function handleCreateResult(err, result, cb){
 function combineColVals(cols=[], vals=[], split=", "){
     var colVals = "";
     for(var i=0; i<cols.length; i++){
-        colVals += cols[i] + "=" + dbconn.escape(vals[i]);
+        var sanitisedValue = cols[i] == "custom_css" ? validation.sanitise(vals[i], true) : validation.sanitise(vals[i]);
+        colVals += cols[i] + "=" + dbconn.escape(sanitisedValue);
         if(i != cols.length - 1){
             colVals += split;
         }

@@ -358,7 +358,7 @@ router.put("/:projectID/*", function(req, res, next){
                                     req.updatedItem = {};
                                     req.updatedItem[parentName] = contentFileData[parentName];
                                 } else {
-                                    
+                                    req.feedsErrors.push(parentName + " does not have a structure defined, so " + itemName + " cannot be added to it");
                                 }
                             } else {
                                 if(structureFileData[itemName] != null){

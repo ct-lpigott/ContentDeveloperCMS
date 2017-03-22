@@ -1,64 +1,75 @@
 function checkIfPropertyMatchesAttributes(propertyName, propertyValue, structureAttributes, structureType, responseObject){
-    var propertyMatchesAttributes = true;
+    var responseObject = {
+        allowed: true,
+        sanitisedContent: null
+    };
+
+    if(structureType != null && structureType == "html"){
+        responseObject.sanitisedContent = removeSuspiciousContent(propertyValue, true);
+    } else {
+        responseObject.sanitisedContent = removeSuspiciousContent(propertyValue);
+    } 
+
     propertyName = propertyName != null ? propertyName : "Content";
+
     for(var attribute in structureAttributes){
-        if(propertyValue == null || propertyValue.length == 0){
+        if(responseObject.sanitisedContent == null || responseObject.sanitisedContent.length == 0){
             if(attribute == "required"){
                 if(structureType != null){
                     responseObject.errors.push(propertyName + " is a required field for every item in this " + structureType);
                 } else {
                     responseObject.errors.push(propertyName + " is a required field");
                 }                
-                propertyMatchesAttributes = false;
+                responseObject.allowed = false;
             } 
         }
         
-        if(propertyValue != null) {
+        if(responseObject.sanitisedContent != null) { 
             if(attribute == "options"){
-                if(enumMatch(propertyValue, structureAttributes["options"]) == false){
+                if(enumMatch(responseObject.sanitisedContent, structureAttributes["options"]) == false){
                     responseObject.errors.push(propertyName + " value does not match with the allowed options");
-                    propertyMatchesAttributes = false;
+                    responseObject.allowed = false;
                 }
             } else if(attribute == "type"){
-                if(typeof propertyValue == "string" || isNaN(propertyValue) == false){
+                if(typeof responseObject.sanitisedContent == "string" || isNaN(responseObject.sanitisedContent) == false){
                     switch(structureAttributes["type"]){
                         case "file":
                         case "text": {
-                            if(propertyValue.constructor.name.toLowerCase() != "string"){
+                            if(responseObject.sanitisedContent.constructor.name.toLowerCase() != "string"){
                                 responseObject.errors.push(propertyName + " contained unexpected data. Expected string.");
-                                propertyMatchesAttributes = false;
+                                responseObject.allowed = false;
                             }
                             break;
                         }
                         case "tel":{
-                            if(isNaN(propertyValue.replace(/-| |\+/g, ""))){
+                            if(isNaN(responseObject.sanitisedContent.replace(/-| |\+/g, ""))){
                                 responseObject.errors.push(propertyName + " contained unexpected data. Expected telephone number.");
-                                propertyMatchesAttributes = false;
+                                responseObject.allowed = false;
                             }
                             break;
                         }
                         case "number":{
-                            if(isNaN(propertyValue)){
+                            if(isNaN(responseObject.sanitisedContent)){
                                 responseObject.errors.push(propertyName + " contained unexpected data. Expected number.");
-                                propertyMatchesAttributes = false;
+                                responseObject.allowed = false;
                             }
                             break;
                         }
                         case "email": {
-                            if(propertyValue.indexOf("@") < 0 || propertyValue.indexOf(".") < 0){
+                            if(responseObject.sanitisedContent.indexOf("@") < 0 || responseObject.sanitisedContent.indexOf(".") < 0){
                                 responseObject.errors.push(propertyName + " contained unexpected data. Expected email address.");
-                                propertyMatchesAttributes = false;
+                                responseObject.allowed = false;
                             }
                         }
                     }
                 } else {
                     responseObject.errors.push(propertyName + " value is not defined to contain anything other than a single value");
-                    propertyMatchesAttributes = false;
+                    responseObject.allowed = false;
                 }                
             }
         }
     }  
-    return propertyMatchesAttributes;
+    return responseObject;
 }
 
 function checkIfPropertyHasStructure(property, structureProperties, structureType, responseObject){
@@ -154,6 +165,48 @@ function removeSuspiciousAttributes(structureAttributes, feedsErrors){
         }
     }
     return structureAttributes;
+}
+
+function removeSuspiciousContent(propertyValue, htmlAllowed=false){
+    var sanitisedContent;
+
+    if(htmlAllowed){
+        sanitisedContent = sanitise(propertyValue, false, true);
+    } else {
+        sanitisedContent = sanitise(propertyValue);
+    }
+
+    return sanitisedContent;
+}
+
+function sanitise(data, cssAllowed=false, htmlAllowed=false){
+    var sanitisedData = data.toString();
+    sanitisedData = sanitisedData.replace(/<script/g, "");
+    sanitisedData = sanitisedData.replace(/script>/g, "");
+    sanitisedData = sanitisedData.replace(/'on(\w+)'=/g, "");
+    sanitisedData = sanitisedData.replace(/"on(\w+)"=/g, "");
+    sanitisedData = sanitisedData.replace(/&/g, "&amp;");
+    sanitisedData = sanitisedData.replace(/`/g, "&grave;");
+    sanitisedData = sanitisedData.replace(/=/g, "&equals;");
+    sanitisedData = sanitisedData.replace(/\\/g, "&bsol;");
+    sanitisedData = sanitisedData.replace(/\(/g, "&lpar;");
+    sanitisedData = sanitisedData.replace(/\)/g, "&rpar;");
+    sanitisedData = sanitisedData.replace(/\[/g, "&lsqb;");
+    sanitisedData = sanitisedData.replace(/\]/g, "&rbrack;");
+
+    if(htmlAllowed == false){
+        sanitisedData = sanitisedData.replace(/</g, "&lt;");
+        sanitisedData = sanitisedData.replace(/>/g, "&gt;");
+        sanitisedData = sanitisedData.replace(/\//g, "&sol;");
+        sanitisedData = sanitisedData.replace(/"/g, "&quot;");
+        sanitisedData = sanitisedData.replace(/'/g, "&apos;");
+    }  
+
+    if(cssAllowed == false){
+        sanitisedData = sanitisedData.replace(/{/g, "&lcub;");
+        sanitisedData = sanitisedData.replace(/}/g, "&rcub;"); 
+    }
+    return sanitisedData;
 }
 
 function checkAttributeAllowed(attributeName, feedsErrors){
@@ -268,8 +321,10 @@ function validateContentAgainstStructure(content, structure){
     }
 
     if(structure.attributes != null){
-        var allowed = checkIfPropertyMatchesAttributes(null, content, structure["attributes"], null, responseObject);
-        if(allowed == false){
+        var attributeCheck = checkIfPropertyMatchesAttributes(null, content, structure.attributes, structure.type, responseObject);
+        if(attributeCheck.allowed){
+            responseObject.sanitisedContent = attributeCheck.sanitisedContent;
+        }else {
             responseObject.allowed = false;
         }
     } else if(structure.items != null){
@@ -287,8 +342,10 @@ function validateContentAgainstStructure(content, structure){
                     // Checking for properties that are defined
                     for(var property in structure["items"]){
                         if(structure["items"][property]["attributes"] != null){
-                            var allowed = checkIfPropertyMatchesAttributes(property, content[i][property], structure["items"][property]["attributes"], structure.type, responseObject);
-                            if(allowed == false){
+                            var attributeCheck = checkIfPropertyMatchesAttributes(property, content[i][property], structure["items"][property]["attributes"], structure.type, responseObject);
+                            if(attributeCheck.allowed){
+                                responseObject.sanitisedContent[i][property] = attributeCheck.sanitisedContent;
+                            } else {
                                 responseObject.sanitisedContent[i][property] = "";
                             }
                         } else if(structure["items"][property]["items"] != null){         
@@ -318,8 +375,10 @@ function validateContentAgainstStructure(content, structure){
                 // Checking for properties that are defined
                 for(var property in structure["items"]){
                     if(structure["items"][property]["attributes"] != null){
-                        var allowed = checkIfPropertyMatchesAttributes(property, content[property], structure["items"][property]["attributes"], structure.type, responseObject);
-                        if(allowed == false){
+                        var attributeCheck = checkIfPropertyMatchesAttributes(property, content[property], structure["items"][property]["attributes"], structure.type, responseObject);
+                        if(attributeCheck.allowed){
+                            responseObject.sanitisedContent[property] = attributeCheck.sanitisedContent;
+                        } else {
                             responseObject.sanitisedContent[property] = "";
                         }
                     } else if(structure["items"][property]["items"] != null){
@@ -354,8 +413,10 @@ function validateContentAgainstStructure(content, structure){
                 // Checking for properties that are defined
                 for(var property in structure){
                     if(structure[property]["attributes"] != null){
-                        var allowed = checkIfPropertyMatchesAttributes(property, content[property], structure[property]["attributes"], null, responseObject);
-                        if(allowed == false){
+                        var attributeCheck = checkIfPropertyMatchesAttributes(property, content[property], structure[property]["attributes"], null, responseObject);
+                        if(attributeCheck.allowed){
+                            responseObject.sanitisedContent[property] = attributeCheck.sanitisedContent;
+                        } else {
                             responseObject.sanitisedContent[property] = "";
                         }
                     }   
@@ -378,5 +439,6 @@ module.exports = {
     validateNewStructure: validateNewStructure,
     validateNewContent: validateNewContent,
     jsonToObject: jsonToObject,
-    objectToJson: objectToJson
+    objectToJson: objectToJson,
+    sanitise: sanitise
 };
