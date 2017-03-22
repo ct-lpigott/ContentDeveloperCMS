@@ -25,14 +25,16 @@ router.use(function(req, res, next){
 				//console.log("Successful Auth");
 				next();
 			} else {
-				next(new Error("Invalid user authentication token", null));
+				req.preRequestErrors.push("Invalid user authentication token");
+				next(new Error());
 			}
 		});
 	} else {
 		if(req.method == "GET"){
 			next();
 		} else {
-			next(new Error("Valid user authentication token required to access this resource"));
+			req.preRequestErrors.push("Valid user authentication token required to access this resource");
+			next(new Error());
 		}
 	}
 });
