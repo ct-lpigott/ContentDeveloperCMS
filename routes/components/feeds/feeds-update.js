@@ -214,9 +214,7 @@ router.put("/:projectID/*", function(req, res, next){
                             // Looping through the encapsulationData array (i.e. parameters passed to the
                             // request URL) to drill down into the fileData object, to find the property that
                             // needs to have an item updated within it. 
-                            for(var i=0; i<encapsulationData.length; i++){
-
-                                
+                            for(var i=0; i<encapsulationData.length; i++){  
 
                                 // Not including the last two indexes of the
                                 // array, as these will be the parentName and itemName (as referenced above). By
@@ -263,7 +261,7 @@ router.put("/:projectID/*", function(req, res, next){
                                     // Since the next item in the encapsulatedData array is a number, then checking
                                     // to see if the current level of the structureFileData is set up to contain 
                                     // items
-                                    if(structureFileData.items == undefined){
+                                    if(structureFileData.items == undefined && structureFileData[parentName].items == undefined){
                                         // Since the next item in the encapsulatedData array was a number, but the project
                                         // structure at this point does not contain an items property, then this object
                                         // is not structured to accept items. Adding this as an error to the req.feedsErrors 
@@ -273,7 +271,9 @@ router.put("/:projectID/*", function(req, res, next){
                                         req.feedsErrors.push(encapsulationData[i] + " is not defined to contain items. Please update this items structure first.");
                                         return;
                                     } else {
-                                        structureFileData = structureFileData.items;
+                                        if(structureFileData.items != undefined){
+                                            structureFileData = structureFileData.items;
+                                        }                                        
                                     }
                                 }
                             }
