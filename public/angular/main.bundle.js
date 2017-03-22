@@ -203,7 +203,7 @@ var ContentDeveloperServerService = (function () {
             .map(function (responseObject) { return responseObject.json(); })
             .catch(function (error) { return __WEBPACK_IMPORTED_MODULE_2_rxjs_Observable__["Observable"].throw(error.json().error) || "Unknown error updating project structure"; })
             .do(function (responseObject) {
-            _this._currentProjectContentStructureHistory.structure = responseObject;
+            _this._currentProjectContentStructureHistory.structure = responseObject.structure;
             _this.refreshProjectHistory();
         });
         return structureUpdateObservable;
@@ -220,7 +220,7 @@ var ContentDeveloperServerService = (function () {
             .catch(function (error) { return __WEBPACK_IMPORTED_MODULE_2_rxjs_Observable__["Observable"].throw(error.json().error) || "Unknown error updating project content"; })
             .do(function (responseObject) {
             if (encapsulationPath.length == 0) {
-                _this._currentProjectContentStructureHistory.content = responseObject;
+                _this._currentProjectContentStructureHistory.content = responseObject.content;
                 _this.refreshProjectHistory();
             }
             else {
@@ -1095,15 +1095,14 @@ var StructureViewComponent = (function () {
         this._jsPipe = _jsPipe;
         this.viewRequestToSaveStructure = new __WEBPACK_IMPORTED_MODULE_0__angular_core__["G" /* EventEmitter */]();
         this.viewRequestToResetStructure = new __WEBPACK_IMPORTED_MODULE_0__angular_core__["G" /* EventEmitter */]();
-        this.formatJson = false;
     }
     StructureViewComponent.prototype.ngOnChanges = function (changes) {
-        if (changes.projectStructure && this.projectStructureJson == null) {
+        if (changes.projectStructure) {
             this.projectStructureJson = this._jsPipe.transform(this.projectStructure, "stringify");
+            if (this.projectStructureJson != null) {
+                this.projectStructureJson = this.projectStructureJson.split();
+            }
         }
-    };
-    StructureViewComponent.prototype.formatJsonClicked = function () {
-        this.formatJson = true;
     };
     StructureViewComponent.prototype.codeUpdated = function (updatedProjectStructure) {
         this.projectStructure = updatedProjectStructure;
@@ -1253,8 +1252,7 @@ var UserProjectsComponent = (function () {
         this.viewProject = new __WEBPACK_IMPORTED_MODULE_0__angular_core__["G" /* EventEmitter */]();
     }
     UserProjectsComponent.prototype.ngOnInit = function () {
-        var _this = this;
-        this._cdService.loadUserProjects().subscribe(function (responesObject) { return _this._userProjects = responesObject; });
+        this.refreshUserProjects();
     };
     UserProjectsComponent.prototype.createNewProject = function (projectNameInput, template) {
         var _this = this;
@@ -1273,6 +1271,10 @@ var UserProjectsComponent = (function () {
             userAccessLevel: userAccessLevel
         };
         this.viewProject.emit(projectData);
+    };
+    UserProjectsComponent.prototype.refreshUserProjects = function () {
+        var _this = this;
+        this._cdService.loadUserProjects().subscribe(function (responesObject) { return _this._userProjects = responesObject; });
     };
     __decorate([
         __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["T" /* Output */])(), 
@@ -1418,6 +1420,10 @@ var CmsComponent = (function () {
             _this.resetProjectHistory();
         });
     };
+    CmsComponent.prototype.refreshProject = function () {
+        console.log("REFRESH");
+        this.loadProjectContentAndStructure();
+    };
     CmsComponent.prototype.resetProjectContent = function () {
         this.projectContent = this._cdService.getCurrentProjectContent();
     };
@@ -1522,16 +1528,28 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var CodeEditorComponent = (function () {
     function CodeEditorComponent(_jsPipe) {
         this._jsPipe = _jsPipe;
-        this.formatJson = false;
         this.codeUpdated = new __WEBPACK_IMPORTED_MODULE_0__angular_core__["G" /* EventEmitter */]();
+        this.requestToResetProjectStructure = new __WEBPACK_IMPORTED_MODULE_0__angular_core__["G" /* EventEmitter */]();
+        this.requestToSaveProjectStructure = new __WEBPACK_IMPORTED_MODULE_0__angular_core__["G" /* EventEmitter */]();
+        this._updateFromStructure = false;
+        this._formatJson = false;
     }
     CodeEditorComponent.prototype.ngDoCheck = function () {
         if (this._textarea != null && this._textarea.selectionStart == this.codeJson.length) {
             this._textarea.setSelectionRange(this._cursorPosition, this._cursorPosition);
         }
-        if (this.formatJson) {
-            this._formatStructureJson();
-        }
+    };
+    CodeEditorComponent.prototype.formatJsonClicked = function () {
+        this._formatJson = true;
+        this._formatStructureJson();
+    };
+    CodeEditorComponent.prototype.resetProjectStructureClicked = function () {
+        this.requestToResetProjectStructure.emit();
+        this._updateFromStructure = true;
+    };
+    CodeEditorComponent.prototype.saveProjectStructureClicked = function () {
+        this.requestToSaveProjectStructure.emit();
+        this._updateFromStructure = true;
     };
     CodeEditorComponent.prototype.onKeyUp = function (e) {
         this._formatStructureJson(e);
@@ -1593,9 +1611,9 @@ var CodeEditorComponent = (function () {
         var tmpObj = this._jsPipe.transform(this.codeJson, "parse");
         if (tmpObj != null) {
             this.codeUpdated.emit(tmpObj);
-            if (this.formatJson) {
+            if (this._formatJson) {
                 this.codeJson = this._jsPipe.transform(tmpObj, "stringify");
-                this.formatJson = false;
+                this._formatJson = false;
             }
         }
     };
@@ -1604,13 +1622,17 @@ var CodeEditorComponent = (function () {
         __metadata('design:type', String)
     ], CodeEditorComponent.prototype, "codeJson", void 0);
     __decorate([
-        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["w" /* Input */])(), 
-        __metadata('design:type', Boolean)
-    ], CodeEditorComponent.prototype, "formatJson", void 0);
-    __decorate([
         __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["T" /* Output */])(), 
         __metadata('design:type', (typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_0__angular_core__["G" /* EventEmitter */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_0__angular_core__["G" /* EventEmitter */]) === 'function' && _a) || Object)
     ], CodeEditorComponent.prototype, "codeUpdated", void 0);
+    __decorate([
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["T" /* Output */])(), 
+        __metadata('design:type', (typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_0__angular_core__["G" /* EventEmitter */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_0__angular_core__["G" /* EventEmitter */]) === 'function' && _b) || Object)
+    ], CodeEditorComponent.prototype, "requestToResetProjectStructure", void 0);
+    __decorate([
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["T" /* Output */])(), 
+        __metadata('design:type', (typeof (_c = typeof __WEBPACK_IMPORTED_MODULE_0__angular_core__["G" /* EventEmitter */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_0__angular_core__["G" /* EventEmitter */]) === 'function' && _c) || Object)
+    ], CodeEditorComponent.prototype, "requestToSaveProjectStructure", void 0);
     __decorate([
         __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["V" /* HostListener */])("keyup", ["$event"]), 
         __metadata('design:type', Function), 
@@ -1629,10 +1651,10 @@ var CodeEditorComponent = (function () {
             template: __webpack_require__(676),
             styles: [__webpack_require__(651)]
         }), 
-        __metadata('design:paramtypes', [(typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_1__pipes_custom_json_pipe__["a" /* CustomJsonPipe */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_1__pipes_custom_json_pipe__["a" /* CustomJsonPipe */]) === 'function' && _b) || Object])
+        __metadata('design:paramtypes', [(typeof (_d = typeof __WEBPACK_IMPORTED_MODULE_1__pipes_custom_json_pipe__["a" /* CustomJsonPipe */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_1__pipes_custom_json_pipe__["a" /* CustomJsonPipe */]) === 'function' && _d) || Object])
     ], CodeEditorComponent);
     return CodeEditorComponent;
-    var _a, _b;
+    var _a, _b, _c, _d;
 }());
 //# sourceMappingURL=C:/GitHub/ContentDeveloperCMS/ContentDeveloperCMS-AngularApp/src/code-editor.component.js.map
 
@@ -3497,35 +3519,35 @@ module.exports = "<div class=\"row\">\n  <app-history-display\n    [history]=\"p
 /***/ 670:
 /***/ (function(module, exports) {
 
-module.exports = "<div class=\"col-6-12\">\n  <h2>Project Structure</h2>\n  <app-code-editor\n    [(codeJson)]=\"projectStructureJson\"\n    [(formatJson)]=\"formatJson\"\n    (codeUpdated)=\"codeUpdated($event)\">\n  </app-code-editor>\n  <button (click)=\"formatJsonClicked()\">Format JSON</button>\n  <button (click)=\"resetProjectStructure()\">Reset</button>\n  <button (click)=\"saveProjectStructure()\">Save</button>\n</div>\n<div class=\"col-6-12\">\n  <h2>Input Preview</h2>\n  <div *ngIf=\"projectStructure != null\">\n    <app-content-editor\n      [viewContent]=\"false\"\n      [viewOnly]=\"false\"\n      [projectStructure]=\"projectStructure\"\n      (structureCollectionTabsReordered)=\"structureCollectionTabsReordered($event)\">\n    </app-content-editor>\n  </div>\n</div>"
+module.exports = "<div class=\"col-6-12\">\r\n  <h2>Project Structure</h2>\r\n  <app-code-editor\r\n    [codeJson]=\"projectStructureJson\"\r\n    (codeUpdated)=\"codeUpdated($event)\"\r\n    (requestToResetProjectStructure)=\"resetProjectStructure()\"\r\n    (requestToSaveProjectStructure)=\"saveProjectStructure()\">\r\n  </app-code-editor>\r\n</div>\r\n<div class=\"col-6-12\">\r\n  <h2>Input Preview</h2>\r\n  <div *ngIf=\"projectStructure != null\">\r\n    <app-content-editor\r\n      [viewContent]=\"false\"\r\n      [viewOnly]=\"false\"\r\n      [projectStructure]=\"projectStructure\"\r\n      (structureCollectionTabsReordered)=\"structureCollectionTabsReordered($event)\">\r\n    </app-content-editor>\r\n  </div>\r\n</div>"
 
 /***/ }),
 
 /***/ 671:
 /***/ (function(module, exports) {
 
-module.exports = "<app-cms-navigation\n\t(requestToChangeView)=\"changeView($event)\"></app-cms-navigation>\n<div class=\"row\">\n\t<app-content-view\n\t\t*ngIf=\"_view == 'content'\"\n\t\t[customCss]=\"customCss\"\n\t\t[projectStructure]=\"projectStructure\"\n\t\t[(projectContent)]=\"projectContent\"\n\t\t(viewRequestToSaveContent)=\"viewRequestToSaveContent($event)\"\n\t\t(viewRequestToResetContent)=\"viewRequestToResetContent()\">\n\t</app-content-view>\n\n\t<app-settings-view\n\t\t*ngIf=\"_view == 'settings'\"\n\t\t[(projectSettings)]=\"projectSettings\"\n\t\t(settingsUpdated)=\"viewRequestToRefreshSettings($event)\"\n\t\t(viewRequestToRefreshSettings)=\"viewRequestToRefreshSettings($event)\">\n\t</app-settings-view>\n</div>\n"
+module.exports = "<app-cms-navigation\r\n\t(requestToChangeView)=\"changeView($event)\"></app-cms-navigation>\r\n<div class=\"row\">\r\n\t<app-content-view\r\n\t\t*ngIf=\"_view == 'content'\"\r\n\t\t[customCss]=\"customCss\"\r\n\t\t[projectStructure]=\"projectStructure\"\r\n\t\t[(projectContent)]=\"projectContent\"\r\n\t\t(viewRequestToSaveContent)=\"viewRequestToSaveContent($event)\"\r\n\t\t(viewRequestToResetContent)=\"viewRequestToResetContent()\">\r\n\t</app-content-view>\r\n\r\n\t<app-settings-view\r\n\t\t*ngIf=\"_view == 'settings'\"\r\n\t\t[(projectSettings)]=\"projectSettings\"\r\n\t\t(settingsUpdated)=\"viewRequestToRefreshSettings($event)\"\r\n\t\t(viewRequestToRefreshSettings)=\"viewRequestToRefreshSettings($event)\">\r\n\t</app-settings-view>\r\n</div>\r\n"
 
 /***/ }),
 
 /***/ 672:
 /***/ (function(module, exports) {
 
-module.exports = "<div class=\"row\">\n  <div class=\"col-8-12\">\n    <div *ngIf=\"_userProjects == null || _userProjects.length == 0\">\n      You have no projects\n    </div>\n\n    <div *ngIf=\"_userProjects != null && _userProjects.length > 0\">\n      <table>\n        <thead>\n          <tr>\n            <th>Project Name</th>\n            <th>Access Level</th>\n            <th>Last Modified By</th>\n            <th>Last Modified On</th>\n            <th>Options</th>\t\t\t\n          </tr>\n        </thead>\n      </table>\n\n      <div class=\"scrollable\">\n        <table>\n          <tbody>\n            <tr *ngFor=\"let project of _userProjects\">\n              <td>{{project.project_name}}</td>\n              <td>{{project.access_level_name}}</td>\n              <td>{{project.last_modified_by}}</td>\n              <td>{{project.last_modified_on != null ? (project.last_modified_on | customDate : false : true) : \"&nbsp;\"}}</td>\n              <td><button (click)=\"editProject(project.project_id, project.project_name, project.access_level_int)\">{{project.access_level_int == 3 ? \"View\" : \"Edit\"}}</button></td>\n            </tr>\n          </tbody>\n        </table>\n      </div>\n    </div>\n  </div>\n  <div class=\"col-4-12\">\n    <h2>Create a New Project</h2>\n    <h3>Project Name</h3>\n    <input #pnInput type=\"text\">\n    \n    <h3>Templates</h3>\n    <span class=\"templates\">\n      <button (click)=\"createNewProject(pnInput)\">No Template</button>\n      <button (click)=\"createNewProject(pnInput, 'website_template')\">Website Template</button>\n      <button (click)=\"createNewProject(pnInput, 'mediaitems_template')\">Media Items Template</button>\n    </span>\n  </div>\n</div>"
+module.exports = "<button (click)=\"refreshUserProjects()\">Refresh from Server</button>\n<div class=\"row\">\n  <div class=\"col-8-12\">\n    <div *ngIf=\"_userProjects != null && _userProjects.length > 0\">\n      <table>\n        <thead>\n          <tr>\n            <th>Project Name</th>\n            <th>Access Level</th>\n            <th>Last Modified By</th>\n            <th>Last Modified On</th>\n            <th>Options</th>\t\t\t\n          </tr>\n        </thead>\n      </table>\n\n      <div class=\"scrollable\">\n        <table>\n          <tbody>\n            <tr *ngFor=\"let project of _userProjects\">\n              <td>{{project.project_name}}</td>\n              <td>{{project.access_level_name}}</td>\n              <td>{{project.last_modified_by}}</td>\n              <td>{{project.last_modified_on != null ? (project.last_modified_on | customDate : false : true) : \"&nbsp;\"}}</td>\n              <td><button (click)=\"editProject(project.project_id, project.project_name, project.access_level_int)\">{{project.access_level_int == 3 ? \"View\" : \"Edit\"}}</button></td>\n            </tr>\n          </tbody>\n        </table>\n      </div>\n    </div>\n  </div>\n  <div class=\"col-4-12\">\n    <h2>Create a New Project</h2>\n    <h3>Project Name</h3>\n    <input #pnInput type=\"text\">\n    \n    <h3>Templates</h3>\n    <span class=\"templates\">\n      <button (click)=\"createNewProject(pnInput)\">No Template</button>\n      <button (click)=\"createNewProject(pnInput, 'website_template')\">Website Template</button>\n      <button (click)=\"createNewProject(pnInput, 'mediaitems_template')\">Media Items Template</button>\n    </span>\n  </div>\n</div>"
 
 /***/ }),
 
 /***/ 673:
 /***/ (function(module, exports) {
 
-module.exports = "<app-content-view\n  [projectContent]=\"projectContent\"\n  [projectStructure]=\"projectStructure\"\n  [customCss]=\"customCss\"\n  [viewOnly]=\"true\"></app-content-view>\n"
+module.exports = "<app-content-view\r\n  [projectContent]=\"projectContent\"\r\n  [projectStructure]=\"projectStructure\"\r\n  [customCss]=\"customCss\"\r\n  [viewOnly]=\"true\"></app-content-view>\r\n"
 
 /***/ }),
 
 /***/ 674:
 /***/ (function(module, exports) {
 
-module.exports = "<ng-container *ngIf=\"_projectId == null && _userAccessLevel == null\">\r\n    <app-user-projects\r\n        (viewProject)=\"viewProject($event)\"></app-user-projects>\r\n</ng-container>\r\n\r\n<ng-container *ngIf=\"_projectId != null && _userAccessLevel != null\">\r\n    <button (click)=\"viewUserProjects()\">Back to all Projects</button>\r\n    <app-cms-admin\r\n        *ngIf=\"_userAccessLevel == 1\"\r\n        [(projectStructure)]=\"projectStructure\"\r\n        [(projectContent)]=\"projectContent\"\r\n        [projectStructureHistory]=\"projectStructureHistory\"\r\n        [projectContentHistory]=\"projectContentHistory\"\r\n        [(projectSettings)]=\"projectSettings\"\r\n        (adminRequestToSaveStructure)=\"saveProjectStructure($event)\"\r\n        (adminRequestToResetStructure)=\"resetProjectStructure()\"\r\n        (adminRequestToSaveContent)=\"saveProjectContent($event)\"\r\n        (adminRequestToResetContent)=\"resetProjectContent()\"\r\n        (adminRequestToRefreshSettings)=\"loadProjectSettings()\">\r\n    </app-cms-admin>\r\n    <app-cms-editor\r\n        *ngIf=\"_userAccessLevel == 2 || _userAccessLevel > 3\"\r\n        [(projectContent)]=\"projectContent\"\r\n        [projectStructure]=\"projectStructure\"\r\n        [(projectSettings)]=\"projectSettings\"\r\n        [customCss]=\"projectSettings != null ? projectSettings.custom_css : ''\"\r\n        (editorRequestToSaveContent)=\"saveProjectContent($event)\"\r\n        (editorRequestToResetContent)=\"resetProjectContent()\"\r\n        (editorRequestToRefreshSettings)=\"loadProjectSettings()\">\r\n    </app-cms-editor>\r\n    <app-cms-view-only\r\n        *ngIf=\"_userAccessLevel == 3\"\r\n        [projectContent]=\"projectContent\"\r\n        [projectStructure]=\"projectStructure\"\r\n        [customCss]=\"projectSettings != null ? projectSettings.custom_css : ''\">\r\n    </app-cms-view-only>\r\n</ng-container>"
+module.exports = "<ng-container *ngIf=\"_projectId == null && _userAccessLevel == null\">\r\n    <app-user-projects\r\n        (viewProject)=\"viewProject($event)\"></app-user-projects>\r\n</ng-container>\r\n\r\n<ng-container *ngIf=\"_projectId != null && _userAccessLevel != null\">\r\n    <button (click)=\"viewUserProjects()\">Back to all Projects</button>\r\n    <button (click)=\"refreshProject()\">Refresh from Server</button>\r\n    <app-cms-admin\r\n        *ngIf=\"_userAccessLevel == 1\"\r\n        [(projectStructure)]=\"projectStructure\"\r\n        [(projectContent)]=\"projectContent\"\r\n        [projectStructureHistory]=\"projectStructureHistory\"\r\n        [projectContentHistory]=\"projectContentHistory\"\r\n        [(projectSettings)]=\"projectSettings\"\r\n        (adminRequestToSaveStructure)=\"saveProjectStructure($event)\"\r\n        (adminRequestToResetStructure)=\"resetProjectStructure()\"\r\n        (adminRequestToSaveContent)=\"saveProjectContent($event)\"\r\n        (adminRequestToResetContent)=\"resetProjectContent()\"\r\n        (adminRequestToRefreshSettings)=\"loadProjectSettings()\">\r\n    </app-cms-admin>\r\n    <app-cms-editor\r\n        *ngIf=\"_userAccessLevel == 2 || _userAccessLevel > 3\"\r\n        [(projectContent)]=\"projectContent\"\r\n        [projectStructure]=\"projectStructure\"\r\n        [(projectSettings)]=\"projectSettings\"\r\n        [customCss]=\"projectSettings != null ? projectSettings.custom_css : ''\"\r\n        (editorRequestToSaveContent)=\"saveProjectContent($event)\"\r\n        (editorRequestToResetContent)=\"resetProjectContent()\"\r\n        (editorRequestToRefreshSettings)=\"loadProjectSettings()\">\r\n    </app-cms-editor>\r\n    <app-cms-view-only\r\n        *ngIf=\"_userAccessLevel == 3\"\r\n        [projectContent]=\"projectContent\"\r\n        [projectStructure]=\"projectStructure\"\r\n        [customCss]=\"projectSettings != null ? projectSettings.custom_css : ''\">\r\n    </app-cms-view-only>\r\n</ng-container>"
 
 /***/ }),
 
@@ -3539,7 +3561,7 @@ module.exports = "<div class=\"row\">\n\t<nav>\n\t\t<ul>\n\t\t\t<li *ngIf=\"isAd
 /***/ 676:
 /***/ (function(module, exports) {
 
-module.exports = "<textarea\n  [(ngModel)]=\"codeJson\">\n</textarea>"
+module.exports = "<textarea\n  [(ngModel)]=\"codeJson\">\n</textarea>\n<button (click)=\"formatJsonClicked()\">Format JSON</button>\n<button (click)=\"resetProjectStructureClicked()\">Reset</button>\n<button (click)=\"saveProjectStructureClicked()\">Save</button>"
 
 /***/ }),
 
@@ -3567,7 +3589,7 @@ module.exports = "<div *ngIf=\"projectStructure != null\">\r\n  <div *ngIf=\"vie
 /***/ 680:
 /***/ (function(module, exports) {
 
-module.exports = "<div class=\"row\">\n  <div class=\"col-12-12\">\n    <h2>Project Content</h2>\n    <div *ngIf=\"projectStructure != null\">\n      <app-content-editor\n        [viewContent]=\"true\"\n        [viewOnly]=\"viewOnly\"\n        [(projectContent)]=\"projectContent\"\n        [projectStructure]=\"projectStructure\"\n        (requestToSaveProjectContent)=\"requestToSaveProjectContent($event)\"\n        (requestToResetProjectContent)=\"requestToResetProjectContent()\">\n      </app-content-editor>\n    </div>\n  </div>\n</div>"
+module.exports = "<div class=\"row\">\r\n  <div class=\"col-12-12\">\r\n    <h2>Project Content</h2>\r\n    <div *ngIf=\"projectStructure != null\">\r\n      <app-content-editor\r\n        [viewContent]=\"true\"\r\n        [viewOnly]=\"viewOnly\"\r\n        [(projectContent)]=\"projectContent\"\r\n        [projectStructure]=\"projectStructure\"\r\n        (requestToSaveProjectContent)=\"requestToSaveProjectContent($event)\"\r\n        (requestToResetProjectContent)=\"requestToResetProjectContent()\">\r\n      </app-content-editor>\r\n    </div>\r\n  </div>\r\n</div>"
 
 /***/ }),
 
