@@ -299,7 +299,7 @@ router.post("/:projectID", function(req, res, next){
         if(req.body.accessLevelInt != null && req.body.email != null && req.body.email.length > 0){
             dbQuery.check_User(req.body.email, function(err, collaboratorId){
                 if(collaboratorId){
-                    dbQuery.check_UserProject(collaboratorId, req.params.projectID, req.body.accessLevelInt, function(err, changed){
+                    dbQuery.check_UserProject(req.userID, collaboratorId, req.params.projectID, req.body.accessLevelInt, function(err, changed){
                         if(err || changed == null){
                             // Logging the error to the console
                             console.log("Error checking if user is already a contributor to project " + err);
@@ -352,7 +352,7 @@ router.post("/:projectID", function(req, res, next){
 router.put("/:projectID", function(req, res, next){
     if(req.query.action == "collaborators"){
         if(req.body.collaboratorID != null && req.body.accessLevelInt != null){
-            dbQuery.update_UserProject(["access_level_int"], [req.body.accessLevelInt], req.body.collaboratorID, req.params.projectID, function(err, success){
+            dbQuery.check_UserProject(req.userID, req.body.collaboratorID, req.params.projectID, req.body.accessLevelInt, function(err, success){
                 if(req.headers.origin != null){
                     res.send({});
                 } else {
@@ -409,12 +409,9 @@ router.delete("/:projectID", function(req, res, next){
         var collaboratorID = req.body.collaboratorID || req.query.collaboratorID;
         if(collaboratorID != null){
             if(collaboratorID != req.userID){
-                dbQuery.get_UserProject_Project("p.media_folder_id, up.media_folder_permission_id", req.userID, req.params.projectID, function(err, row){
+                dbQuery.get_UserProject_Project("p.media_folder_id, up.media_folder_permission_id", collaboratorID, req.params.projectID, function(err, row){
                     if(row){
-                        if(row.media_folder_id != null && row.media_folder_permission_id != null){
-                            googleOAuth.removeUserFromMediaFolder(row.media_folder_id, row.media_folder_permission_id, collaboratorID, function(){});
-                        }
-                        dbQuery.delete_UserProject(collaboratorID, req.params.projectID, function(err, success){
+                        dbQuery.delete_UserProject(req.userID, collaboratorID, req.params.projectID, function(err, success){
                             if(req.headers.origin != null){
                                 res.send({});
                             } else {

@@ -83,24 +83,30 @@ function update_Project(updateCols=[], updateVals=[], userId, projectId, cb){
     });
 }
 
-function update_UserProject(updateCols=[], updateVals=[], userId, projectId, cb){
-    var setCols = "SET " + combineColVals(updateCols, updateVals);
-    userId = validation.sanitise(userId);
-    projectId = validation.sanitise(projectId);
-    dbconn.query("UPDATE User_Project " + setCols + " WHERE user_id=" + userId  + " AND project_id=" + projectId, function(err, result) {
-        handleUpdateResult(err, result, function(err, success){
-            if(err || success == null){
-                cb(err, false);
-            } else {
-                get_UserProject_Project_User("u.email_address, u.display_name, up.access_level_int, p.project_name, p.access_levels", userId, projectId, function(err, row){
-                    if(row){
-                        let accessLevels = require("./access_levels.js");
-                        var accessLevelName = accessLevels.getAccessLevelName(row.access_level_int, row.access_levels);
-                        sendEmail.accessLevelChanged(row.email_address, row.display_name, row.project_name, accessLevelName);
+function update_UserProject(updateCols=[], updateVals=[], currentUserId, updateUserId, role, projectId, cb){
+    get_UserProject_Project("p.media_folder_id, up.media_folder_permission_id", updateUserId, projectId, function(err, row){
+        var googleOAuth = require("./google_oauth");
+        googleOAuth.updateUserAccessToFolder(row.media_folder_id, currentUserId, row.media_folder_permission_id, role, function(newPermissionId){
+            var setCols = "SET " + combineColVals(updateCols, updateVals);
+            if(newPermissionId != null){ updateCols.push("media_folder_permission_id"); updateVals.push(newPermissionId); }
+            updateUserId = validation.sanitise(updateUserId);
+            projectId = validation.sanitise(projectId);
+            dbconn.query("UPDATE User_Project " + setCols + " WHERE user_id=" + updateUserId  + " AND project_id=" + projectId, function(err, result) {
+                handleUpdateResult(err, result, function(err, success){
+                    if(err || success == null){
+                        cb(err, false);
+                    } else {
+                        get_UserProject_Project_User("u.email_address, u.display_name, up.access_level_int, p.project_name, p.access_levels", updateUserId, projectId, function(err, row){
+                            if(row){
+                                let accessLevels = require("./access_levels.js");
+                                var accessLevelName = accessLevels.getAccessLevelName(row.access_level_int, row.access_levels);
+                                sendEmail.accessLevelChanged(row.email_address, row.display_name, row.project_name, accessLevelName);
+                            }
+                            cb(err, success);
+                        });
                     }
-                    cb(err, success);
                 });
-            }
+            });
         });
     });
 }
@@ -123,8 +129,7 @@ function create_Project(projectName, accessLevels, mediaFolderId, userId, cb){
             if(err || newProjectId == null){
                 cb(err, null);
             } else {
-                var googleOAuth = require("./google_oauth");
-                create_UserProject(userId, newProjectId, 1, function(err, newUserProjectId){
+                create_UserProject(userId, userId, newProjectId, 1, "owner", mediaFolderId, function(err, newUserProjectId){
                     if(err || newUserProjectId == null){
                         cb(err, null);
                     } else {
@@ -136,19 +141,23 @@ function create_Project(projectName, accessLevels, mediaFolderId, userId, cb){
     });
 }
 
-function create_UserProject (userId, projectId, accessLevelInt, cb){
-    userId = validation.sanitise(userId);
-    projectId = validation.sanitise(projectId);
-    access_level_int = validation.sanitise(accessLevelInt);
-    dbconn.query("INSERT INTO User_Project(user_id, project_id, access_level_int) VALUES(" + userId + ", " + projectId + ", " + accessLevelInt + ")", function(err, result){
-        handleCreateResult(err, result, function(err, newUserProjectId){
-            if(err){
-                cb(err, null);
-            } else {
-                cb(err, newUserProjectId);
-            }
-        })
+function create_UserProject(currentUserId, newUserId, projectId, accessLevelInt, role,  mediaFolderId, cb){
+    var googleOAuth = require("./google_oauth");
+    googleOAuth.addUserToMediaFolder(mediaFolderId, currentUserId, newUserId, role, function(newPermissionId){
+        newUserId = validation.sanitise(newUserId);
+        projectId = validation.sanitise(projectId);
+        access_level_int = validation.sanitise(accessLevelInt);
+        dbconn.query("INSERT INTO User_Project(user_id, project_id, access_level_int, media_folder_permission_id) VALUES(" + dbconn.escape(newUserId) + ", " + dbconn.escape(projectId) + ", " + dbconn.escape(accessLevelInt) + ", " + dbconn.escape(newPermissionId) + ")", function(err, result){
+            handleCreateResult(err, result, function(err, newUserProjectId){
+                if(err){
+                    cb(err, null);
+                } else {
+                    cb(err, newUserProjectId);
+                }
+            })
+        });
     });
+    
 }
 
 // CHECK
@@ -163,15 +172,16 @@ function check_User(emailAddress, cb){
     });
 }
 
-function check_UserProject(userId, projectId, accessLevelInt, cb){
-    userId = validation.sanitise(userId);
+function check_UserProject(currentUserId, newUserId, projectId, accessLevelInt, cb){
+    newUserId = validation.sanitise(newUserId);
     projectId = validation.sanitise(projectId);
     accessLevelInt = validation.sanitise(accessLevelInt);
-    get_UserProject("access_level_int", userId, projectId, function(err, row){
+    var role = accessLevelInt == 3 ? "reader" : "writer";
+    get_UserProject("access_level_int", newUserId, projectId, function(err, row){
         if(err){ console.log(err); }
         if(row){
             if(row.access_level_int != accessLevelInt){
-                update_UserProject(["access_level_int"], [accessLevelInt], userId, projectId, function(err, success){
+                update_UserProject(["access_level_int"], [accessLevelInt], currentUserId, newUserId, role, projectId, function(err, success){
                     console.log("This users access level has been updated on this project");
                     cb(err, success);
                 });
@@ -180,12 +190,18 @@ function check_UserProject(userId, projectId, accessLevelInt, cb){
                 cb(null, false);
             }
         } else {
-            create_UserProject(userId, projectId, accessLevelInt, function(err, newUserProjectId){
-                if(err || newUserProjectId == null){
-                    cb(err, null);
+            get_Project("media_folder_id", projectId, function(err, row){
+                if(row){
+                    create_UserProject(currentUserId, newUserId, projectId, accessLevelInt, role, row.media_folder_id, function(err, newUserProjectId){
+                        if(err || newUserProjectId == null){
+                            cb(err, false);
+                        } else {
+                            console.log("New user has been added to this project");
+                            cb(null, true);
+                        }
+                    });
                 } else {
-                    console.log("New user has been added to this project");
-                    cb(null, true);
+                    cb(err, false);
                 }
             })
         }
@@ -237,15 +253,19 @@ function delete_Project(userId, projectId, projectName, cb){
     });
 };
 
-function delete_UserProject(userId, projectId, cb){
-    userId = validation.sanitise(userId);
+function delete_UserProject(currentUserId, removeUserId, projectId, cb){
+    removeUserId = validation.sanitise(removeUserId);
     projectId = validation.sanitise(projectId);
-    get_UserProject_Project_User("u.email_address, u.display_name, p.project_name", userId, projectId, function(err, row){
-        dbconn.query("DELETE FROM User_Project WHERE user_id=" + dbconn.escape(userId) + " AND project_id=" + dbconn.escape(projectId), function(err, result){
+    var googleOAuth = require("./google_oauth");
+    get_UserProject_Project_User("u.email_address, u.display_name, p.project_name, p.media_folder_id, up.media_folder_permission_id", removeUserId, projectId, function(err, row){
+        dbconn.query("DELETE FROM User_Project WHERE user_id=" + dbconn.escape(removeUserId) + " AND project_id=" + dbconn.escape(projectId), function(err, result){
             handleUpdateResult(err, result, cb);
         });
         
         if(row){
+            googleOAuth.removeUserFromMediaFolder(row.media_folder_id, row.media_folder_permission_id, currentUserId, function(success){
+
+            });
             sendEmail.removedFromProject(row.email_address, row.display_name, row.project_name);
         } 
     });               
@@ -345,7 +365,6 @@ module.exports = {
     getWhere_User: getWhere_User,
     update_User: update_User,
     update_Project: update_Project,
-    update_UserProject: update_UserProject,
     create_User: create_User,
     create_UserProject: create_UserProject,
     check_User: check_User,

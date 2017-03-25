@@ -48,7 +48,7 @@ function generateOAuthUrl (cb){
   });
 }
 
-function generateOAuth2Client(userID, cb){
+function generateOAuth2Client(currentUserID, cb){
   // Generating a new Auth object, using the Google Auth library
   var auth = new googleAuth();
 
@@ -61,11 +61,11 @@ function generateOAuth2Client(userID, cb){
     clientSecretData.web.client_secret
   );
 
-  if(userID == null){
+  if(currentUserID == null){
     newOAuth2Client.redirectUri_ = redirectURL;
     cb(newOAuth2Client);
   } else {
-    dbQuery.get_User("google_access_token, google_refresh_token", userID, function(err, row){
+    dbQuery.get_User("google_access_token, google_refresh_token", currentUserID, function(err, row){
       if(row){
         var userAccessToken = JSON.parse(row.google_access_token);
         userAccessToken.refresh_token = row.google_refresh_token;
@@ -76,9 +76,9 @@ function generateOAuth2Client(userID, cb){
   }
 }
 
-function createNewProjectFolder(projectName, userID, cb){
+function createNewProjectFolder(projectName, currentUserID, cb){
   console.log("About to create new folder");
-  generateOAuth2Client(userID, function(oauth2Client){
+  generateOAuth2Client(currentUserID, function(oauth2Client){
     var folderMeta = {
       "name" : "ContentDeveloper_" + projectName,
       "mimeType" : "application/vnd.google-apps.folder"
@@ -101,8 +101,8 @@ function createNewProjectFolder(projectName, userID, cb){
   });
 }
 
-function uploadMediaItem(fileInfo, mediaFolderId, userID, cb){  
-  generateOAuth2Client(userID, function(oauth2Client){
+function uploadMediaItem(fileInfo, mediaFolderId, currentUserID, cb){  
+  generateOAuth2Client(currentUserID, function(oauth2Client){
     if(mediaFolderId != null){
       var fileMetadata = {
         "name": fileInfo.originalname,
@@ -136,31 +136,37 @@ function uploadMediaItem(fileInfo, mediaFolderId, userID, cb){
   });    
 }
 
-function addUserToMediaFolder(mediaFolderId, userEmailAddress, userID, role, cb){
-  generateOAuth2Client(userID, function(oauth2Client){
-    drive.permissions.create({
-      auth: oauth2Client,
-      resource: {
-        "type": "user",
-        "role": role,
-        "emailAddress": userEmailAddress
-      },
-      fileId: mediaFolderId,
-      fields: "id",
-    }, function(err, res) {
-      if (err) {
-        console.log(err);
-      } else {
-        console.log("User successfully added to media folder: " + res.id);
-        cb(String(res.id));
-      }
-    });
+function addUserToMediaFolder(mediaFolderId, currentUserID, addUserID, role, cb){
+  dbQuery.get_User("email_address", addUserID, function(err, row){
+    if(row){
+      generateOAuth2Client(currentUserID, function(oauth2Client){
+        drive.permissions.create({
+          auth: oauth2Client,
+          resource: {
+            "type": "user",
+            "role": role,
+            "emailAddress": row.email_address
+          },
+          fileId: mediaFolderId,
+          fields: "id",
+          transferOwnership: role == "owner" ? true : false
+        }, function(err, res) {
+          if (err) {
+            console.log(err);
+            cb(null);
+          } else {
+            console.log("User successfully added to media folder: " + res.id);
+            cb(String(res.id));
+          }
+        });
+      });
+    }
   });
 }
 
-function removeUserFromMediaFolder(mediaFolderId, userPermissionId, userID, cb){
+function removeUserFromMediaFolder(mediaFolderId, userPermissionId, currentUserID, cb){
   if(userPermissionId != null){
-    generateOAuth2Client(userID, function(oauth2Client){
+    generateOAuth2Client(currentUserID, function(oauth2Client){
       drive.permissions.delete({
         auth: oauth2Client,
         fileId: mediaFolderId,
@@ -168,9 +174,10 @@ function removeUserFromMediaFolder(mediaFolderId, userPermissionId, userID, cb){
       }, function(err, res) {
         if (err) {
           console.log(err);
+          cb(false);
         } else {
           console.log("User successfully removed from media folder");
-          cb();
+          cb(true);
         }
       });
     });
@@ -179,8 +186,31 @@ function removeUserFromMediaFolder(mediaFolderId, userPermissionId, userID, cb){
   }    
 }
 
-function getAllProjectImages(projectID, mediaFolderId, userID, numFiles=10, nextPageToken=null, cb){
-  generateOAuth2Client(userID, function(oauth2Client){
+function updateUserAccessToFolder(mediaFolderId, currentUserID, userPermissionId, role, cb){
+  generateOAuth2Client(currentUserID, function(oauth2Client){
+    drive.permissions.update({
+        auth: oauth2Client,
+        fileId: mediaFolderId,
+        permissionId: userPermissionId,
+        resource: {
+          "role": role
+        },
+        fields: "id",
+        transferOwnership: role == "owner" ? true : false
+      }, function(err, res) {
+        if (err) {
+            console.log(err);
+          cb(null);
+        } else {
+          console.log("User access level successfully updated: " + res.id);
+          cb(String(res.id));
+        }
+      });
+  });
+}
+
+function getAllProjectImages(projectID, mediaFolderId, currentUserID, numFiles=10, nextPageToken=null, cb){
+  generateOAuth2Client(currentUserID, function(oauth2Client){
     nextPageToken = nextPageToken == "null" ? null : nextPageToken;
     numFiles = isNaN(numFiles) ? null : numFiles;
 
@@ -236,5 +266,6 @@ module.exports = {
   uploadMediaItem: uploadMediaItem,
   addUserToMediaFolder: addUserToMediaFolder,
   removeUserFromMediaFolder: removeUserFromMediaFolder,
+  updateUserAccessToFolder: updateUserAccessToFolder,
   getAllProjectImages: getAllProjectImages
 };
