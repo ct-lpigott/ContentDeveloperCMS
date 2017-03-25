@@ -47,7 +47,7 @@ router.get("/oauthRedirectURL", function(req, res, next){
                     auth: oauth2Client
                 }, function (err, user) {
                     if(err){
-                        console.log("Unable to get user");
+                        console.log("Unable to get user - " + err);
                     } else {
                         // Temporarily storing the link to the users profile image (with
                         // the size specification removed - as by default it is set to 50px)
