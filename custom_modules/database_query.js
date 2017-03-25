@@ -317,9 +317,9 @@ function combineColVals(cols=[], vals=[], split=", ", sanitise=true){
     for(var i=0; i<cols.length; i++){
         var value;
         if(sanitise){
-            if(cols[i] == "custom_css"){
+            if(cols[i] == "custom_css" || cols[i] == "google_access_token"){
                 value = validation.sanitise(vals[i], true);
-            } else if(cols[i] == "google_access_token"){
+            } else {
                 value = validation.sanitise(vals[i]);
             }
         } else {
