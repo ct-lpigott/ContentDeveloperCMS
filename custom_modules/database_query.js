@@ -316,7 +316,14 @@ function handleCreateResult(err, result, cb){
 function combineColVals(cols=[], vals=[], split=", "){
     var colVals = "";
     for(var i=0; i<cols.length; i++){
-        var sanitisedValue = cols[i] == "custom_css" ? validation.sanitise(vals[i], true) : validation.sanitise(vals[i]);
+        var sanitisedValue;
+        if(cols[i] == "custom_css"){
+            sanitisedValue = validation.sanitise(vals[i], true);
+        } else if(cols[i]= "google_access_token"){
+            sanitisedValue = vals[i];
+        } else {
+            sanitisedValue = validation.sanitise(vals[i]);
+        }
         colVals += cols[i] + "=" + dbconn.escape(sanitisedValue);
         if(i != cols.length - 1){
             colVals += split;
