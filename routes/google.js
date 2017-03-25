@@ -62,12 +62,12 @@ router.get("/oauthRedirectURL", function(req, res, next){
                                 req.userAuthToken = row.cd_user_auth_token;
 
                                 if(refreshToken != null){
-                                    dbQuery.update_User(["display_name, google_profile_image_url, google_profile_id, google_access_token, google_refresh_token"], [user.displayName, userProfileImageURL, user.id, accessToken, refreshToken], userId, function(err, success){
+                                    dbQuery.update_User(["display_name", "google_profile_image_url", "google_profile_id", "google_access_token", "google_refresh_token"], [user.displayName, userProfileImageURL, user.id, accessToken, refreshToken], userId, function(err, success){
                                         // Passing this request on to the next stage of this route
                                         next();
                                     });
                                 } else {
-                                    dbQuery.update_User(["display_name, google_profile_image_url, google_profile_id, google_access_token"], [user.displayName, userProfileImageURL, user.id, accessToken], userId, function(err, success){
+                                    dbQuery.update_User(["display_name", "google_profile_image_url", "google_profile_id", "google_access_token"], [user.displayName, userProfileImageURL, user.id, accessToken], userId, function(err, success){
                                         // Passing this request on to the next stage of this route
                                         next();
                                     });
