@@ -315,16 +315,18 @@ function handleCreateResult(err, result, cb){
 function combineColVals(cols=[], vals=[], split=", ", sanitise=true){
     var colVals = "";
     for(var i=0; i<cols.length; i++){
-        var value = vals[i];
+        var value;
         if(sanitise){
             if(cols[i] == "custom_css"){
                 value = validation.sanitise(vals[i], true);
             } else if(cols[i] == "google_access_token"){
                 value = validation.sanitise(vals[i]);
             }
+        } else {
+            value = vals[i];
         }
         colVals += cols[i] + "=" + dbconn.escape(value);
-        if(i != cols.length - 1){
+        if(i < cols.length - 1){
             colVals += split;
         }
     }
