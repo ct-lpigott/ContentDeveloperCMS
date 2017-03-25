@@ -10,7 +10,9 @@ var transporter = nodemailer.createTransport({
 });
 
 function sendEmail(to, subject, htmlBody){
-    if(process.env.DEBUG == null){
+    if(process.env.DEBUG){
+        console.log(htmlBody);
+    } else {
         var mailOptions = {
             from: "'Content Developer' <" + process.env.EMAIL_ADDRESS + ">",
             to: to,
@@ -25,8 +27,6 @@ function sendEmail(to, subject, htmlBody){
                 console.log("Email successfully sent: " + info.response);
             }
         });
-    } else {
-        return true;
     }
 }
 
@@ -64,5 +64,15 @@ module.exports = {
         });
         //console.log(emailContent);
         sendEmail(userEmail, "Removed as Collaborator", emailContent);
+    },
+    projectDeleted: function(userEmail, userDisplayName, projectName){
+        var projectDeletedTemplate = pug.compileFile("./views/emails/project_deleted.pug");
+        var emailContent = projectDeletedTemplate({
+            userEmail: userEmail,
+            userDisplayName: userDisplayName,
+            projectName: projectName,
+            siteUrl: process.env.SITE_URL
+        });
+        sendEmail(userEmail, "Project Deleted", emailContent);
     }
 };

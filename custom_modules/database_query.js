@@ -20,6 +20,7 @@ module.exports = {
     check_User: check_User,
     create_Project: create_Project,
     check_UserProject: check_UserProject,
+    delete_Project: delete_Project,
     delete_UserProject: delete_UserProject
 };
 
@@ -56,7 +57,7 @@ function get_UserProjects_forUser(selectCols, userId, cb){
 
 function get_UserProjects_forProject(selectCols, projectId, cb){
     projectId = validation.sanitise(projectId);
-    dbconn.query("SELECT " + selectCols + " FROM User_Project up LEFT JOIN User u ON up.user_id = u.id WHERE up.project_id=" + dbconn.escape(projectId), function(err, rows, fields){
+    dbconn.query("SELECT " + selectCols + " FROM User_Project up LEFT JOIN User u ON up.user_id = u.id LEFT JOIN Project p ON up.project_id = p.id WHERE up.project_id=" + dbconn.escape(projectId), function(err, rows, fields){
         handleGetResult(err, rows, "all", cb);
     });        
 }
@@ -214,6 +215,50 @@ function check_UserProject(userId, projectId, accessLevelInt, cb){
 }
 
 // DELETE
+function delete_Project(userId, projectId, projectName, cb){
+    userId = validation.sanitise(userId);
+    projectId = validation.sanitise(projectId);
+    projectName = validation.sanitise(projectName);
+    var emailUsers = [];
+    var allowDelete = false;
+    get_UserProjects_forProject("up.user_id, up.access_level_int, u.email_address, u.display_name, p.project_name", projectId, function(err, rows){
+        handleGetResult(err, rows, "all", function(err, rows){
+            if(rows){
+                for(var i=0; i<rows.length; i++){
+                    if(rows[i].user_id == userId && rows[i].access_level_int == 1 && rows[i].project_name == projectName){
+                        allowDelete = true;
+                    }
+                    emailUsers.push({
+                        emailAddress: rows[i].email_address,
+                        displayName: rows[i].display_name,
+                        projectName: rows[i].project_name
+                    });
+                }
+                if(allowDelete){
+                    dbconn.query("DELETE FROM User_Project WHERE project_id=" + dbconn.escape(projectId), function(err, result){
+                        handleUpdateResult(err, result, function(err, success){
+                            dbconn.query("DELETE FROM Project WHERE id=" + dbconn.escape(projectId), function(err, result){
+                                handleUpdateResult(err, result, function(err, success){
+                                    if(success){
+                                        for(var i=0; i<emailUsers.length; i++){
+                                            sendEmail.projectDeleted(emailUsers[i].emailAddress, emailUsers[i].displayName, emailUsers[i].projectName);
+                                        }     
+                                        cb(err, success);                                   
+                                    }
+                                });
+                            });
+                        });
+                    });
+                } else {
+                    cb("User does not have authority to delete this project", false);
+                }
+            } else {
+                cb("No users exist for this project", false);
+            }
+        })
+    });
+};
+
 function delete_UserProject(userId, projectId, cb){
     userId = validation.sanitise(userId);
     projectId = validation.sanitise(projectId);
@@ -230,7 +275,7 @@ function delete_UserProject(userId, projectId, cb){
 
 // RESULT HANDLERS
 function handleGetResult(err, rows, numRows="single", cb){
-    if(err){
+    if(err || rows == null){
         console.log(err);
         cb(err, null);
     } else {

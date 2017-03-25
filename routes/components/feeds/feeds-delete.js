@@ -3,11 +3,6 @@
 // which this route will accept.
 var router = require('express').Router();
 
-// Request to delete a project
-router.delete("/:projectID", function(req, res, next){
-    res.send("DELETE request received from userID=" + req.userID + " for projectID=" + req.params.project);
-});
-
 /**
  * @apiVersion 1.0.0
  * @api {delete} /feeds/:projectID/:itemPath Delete a content item

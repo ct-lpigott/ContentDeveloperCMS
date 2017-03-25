@@ -28,9 +28,6 @@ function setAccessControlHeaders(req, res, controlLevel){
 }
 
 router.use(["/feeds/:projectID", "/admin/*/:projectID"], function(req, res, next){
-	req.responseObject = {};
-	req.preRequestErrors = [];
-
 	dbQuery.get_Project("update_origins, read_origins", req.params.projectID, function(err, row){
 		req.allowedOrigins = {};
 		if(row && (row.update_origins != null || row.read_origins != null)){
@@ -47,15 +44,16 @@ router.use(["/feeds/:projectID", "/admin/*/:projectID"], function(req, res, next
 });
 
 router.use(function(req, res, next){
+	req.responseObject = {};
+	req.preRequestErrors = [];
+	
 	// Setting the Strict Transport Security header to be valid for 1 year,
 	// and to include all subdomains. Implementing HSTS (HTTP Strict-Transport-Security)
 	// to ensure the site can only ever be accessed through HTTPS
 	res.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload");
 
 	if(req.method == "OPTIONS"){
-		if(req.originalUrl.indexOf("/admin") == 0){
-			res = setAccessControlHeaders(req, res, "ru");
-		} else if(req.originalUrl.indexOf("/feeds") == 0){
+		if(req.originalUrl.indexOf("/feeds") == 0){
 			res = setAccessControlHeaders(req, res, "crud");
 		}
 

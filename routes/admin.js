@@ -9,6 +9,8 @@ var googleOAuth = require("../custom_modules/google_oauth");
 
 var dbQuery = require("./../custom_modules/database_query");
 
+var projectFiles = require("./../custom_modules/project_files");
+
 // ALL REQUESTS
 router.use(function(req, res, next){
     // Creating an empty array on the request object, to temporarily store
@@ -82,6 +84,24 @@ router.put("/settings/:projectID", function(req, res, next){
         if(err){ console.log(err); }
         res.send({success: success});
     });
+});
+
+// Request to delete a project
+router.delete("/:projectID", function(req, res, next){
+    if(req.query.projectName != null){
+        dbQuery.delete_Project(req.userID, req.params.projectID, req.query.projectName, function(err, success){
+            if(success){
+                projectFiles.deleteProject(req.params.projectID, function(err, success){
+                    res.send({success: success});
+                });
+            } else {
+                res.send({success: success});
+            }                        
+        });
+        //res.send({success: "DELETE request received from userID=" + req.userID + " for projectID=" + req.params.projectID});
+    } else {
+        req.adminErrors.push("Cannot delete this project");
+    }    
 });
 
 

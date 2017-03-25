@@ -1,75 +1,75 @@
 function checkIfPropertyMatchesAttributes(propertyName, propertyValue, structureAttributes, structureType, responseObject){
-    var responseObject = {
+    var response = {
         allowed: true,
         sanitisedContent: null
     };
 
     if(structureType != null && structureType == "html"){
-        responseObject.sanitisedContent = removeSuspiciousContent(propertyValue, true);
+        response.sanitisedContent = removeSuspiciousContent(propertyValue, true);
     } else {
-        responseObject.sanitisedContent = removeSuspiciousContent(propertyValue);
+        response.sanitisedContent = removeSuspiciousContent(propertyValue);
     } 
 
     propertyName = propertyName != null ? propertyName : "Content";
 
     for(var attribute in structureAttributes){
-        if(responseObject.sanitisedContent == null || responseObject.sanitisedContent.length == 0){
+        if(response.sanitisedContent == null || response.sanitisedContent.length == 0){
             if(attribute == "required"){
                 if(structureType != null){
                     responseObject.errors.push(propertyName + " is a required field for every item in this " + structureType);
                 } else {
                     responseObject.errors.push(propertyName + " is a required field");
                 }                
-                responseObject.allowed = false;
+                response.allowed = false;
             } 
         }
         
-        if(responseObject.sanitisedContent != null) { 
+        if(response.sanitisedContent != null) { 
             if(attribute == "options"){
-                if(enumMatch(responseObject.sanitisedContent, structureAttributes["options"]) == false){
+                if(enumMatch(response.sanitisedContent, structureAttributes["options"]) == false){
                     responseObject.errors.push(propertyName + " value does not match with the allowed options");
-                    responseObject.allowed = false;
+                    response.allowed = false;
                 }
             } else if(attribute == "type"){
-                if(typeof responseObject.sanitisedContent == "string" || isNaN(responseObject.sanitisedContent) == false){
+                if(typeof response.sanitisedContent == "string" || isNaN(response.sanitisedContent) == false){
                     switch(structureAttributes["type"]){
                         case "file":
                         case "text": {
-                            if(responseObject.sanitisedContent.constructor.name.toLowerCase() != "string"){
+                            if(response.sanitisedContent.constructor.name.toLowerCase() != "string"){
                                 responseObject.errors.push(propertyName + " contained unexpected data. Expected string.");
-                                responseObject.allowed = false;
+                                response.allowed = false;
                             }
                             break;
                         }
                         case "tel":{
-                            if(isNaN(responseObject.sanitisedContent.replace(/-| |\+/g, ""))){
+                            if(isNaN(response.sanitisedContent.replace(/-| |\+/g, ""))){
                                 responseObject.errors.push(propertyName + " contained unexpected data. Expected telephone number.");
-                                responseObject.allowed = false;
+                                response.allowed = false;
                             }
                             break;
                         }
                         case "number":{
-                            if(isNaN(responseObject.sanitisedContent)){
+                            if(isNaN(response.sanitisedContent)){
                                 responseObject.errors.push(propertyName + " contained unexpected data. Expected number.");
-                                responseObject.allowed = false;
+                                response.allowed = false;
                             }
                             break;
                         }
                         case "email": {
-                            if(responseObject.sanitisedContent.indexOf("@") < 0 || responseObject.sanitisedContent.indexOf(".") < 0){
+                            if(response.sanitisedContent.indexOf("@") < 0 || response.sanitisedContent.indexOf(".") < 0){
                                 responseObject.errors.push(propertyName + " contained unexpected data. Expected email address.");
-                                responseObject.allowed = false;
+                                response.allowed = false;
                             }
                         }
                     }
                 } else {
                     responseObject.errors.push(propertyName + " value is not defined to contain anything other than a single value");
-                    responseObject.allowed = false;
+                    response.allowed = false;
                 }                
             }
         }
     }  
-    return responseObject;
+    return response;
 }
 
 function checkIfPropertyHasStructure(property, structureProperties, structureType, responseObject){
@@ -180,31 +180,34 @@ function removeSuspiciousContent(propertyValue, htmlAllowed=false){
 }
 
 function sanitise(data, cssAllowed=false, htmlAllowed=false){
-    var sanitisedData = data.toString();
-    sanitisedData = sanitisedData.replace(/<script/g, "");
-    sanitisedData = sanitisedData.replace(/script>/g, "");
-    sanitisedData = sanitisedData.replace(/'on(\w+)'=/g, "");
-    sanitisedData = sanitisedData.replace(/"on(\w+)"=/g, "");
-    sanitisedData = sanitisedData.replace(/&/g, "&amp;");
-    sanitisedData = sanitisedData.replace(/`/g, "&grave;");
-    sanitisedData = sanitisedData.replace(/=/g, "&equals;");
-    sanitisedData = sanitisedData.replace(/\\/g, "&bsol;");
-    sanitisedData = sanitisedData.replace(/\(/g, "&lpar;");
-    sanitisedData = sanitisedData.replace(/\)/g, "&rpar;");
-    sanitisedData = sanitisedData.replace(/\[/g, "&lsqb;");
-    sanitisedData = sanitisedData.replace(/\]/g, "&rbrack;");
+    var sanitisedData = data;
+    if(data != undefined && data != null){
+        sanitisedData = sanitisedData.toString();
+        sanitisedData = sanitisedData.replace(/<script/g, "");
+        sanitisedData = sanitisedData.replace(/script>/g, "");
+        sanitisedData = sanitisedData.replace(/'on(\w+)'=/g, "");
+        sanitisedData = sanitisedData.replace(/"on(\w+)"=/g, "");
+        sanitisedData = sanitisedData.replace(/&/g, "&amp;");
+        sanitisedData = sanitisedData.replace(/`/g, "&grave;");
+        sanitisedData = sanitisedData.replace(/=/g, "&equals;");
+        sanitisedData = sanitisedData.replace(/\\/g, "&bsol;");
+        sanitisedData = sanitisedData.replace(/\(/g, "&lpar;");
+        sanitisedData = sanitisedData.replace(/\)/g, "&rpar;");
+        sanitisedData = sanitisedData.replace(/\[/g, "&lsqb;");
+        sanitisedData = sanitisedData.replace(/\]/g, "&rbrack;");
 
-    if(htmlAllowed == false){
-        sanitisedData = sanitisedData.replace(/</g, "&lt;");
-        sanitisedData = sanitisedData.replace(/>/g, "&gt;");
-        sanitisedData = sanitisedData.replace(/\//g, "&sol;");
-        sanitisedData = sanitisedData.replace(/"/g, "&quot;");
-        sanitisedData = sanitisedData.replace(/'/g, "&apos;");
-    }  
+        if(htmlAllowed == false){
+            sanitisedData = sanitisedData.replace(/</g, "&lt;");
+            sanitisedData = sanitisedData.replace(/>/g, "&gt;");
+            sanitisedData = sanitisedData.replace(/\//g, "&sol;");
+            sanitisedData = sanitisedData.replace(/"/g, "&quot;");
+            sanitisedData = sanitisedData.replace(/'/g, "&apos;");
+        }  
 
-    if(cssAllowed == false){
-        sanitisedData = sanitisedData.replace(/{/g, "&lcub;");
-        sanitisedData = sanitisedData.replace(/}/g, "&rcub;"); 
+        if(cssAllowed == false){
+            sanitisedData = sanitisedData.replace(/{/g, "&lcub;");
+            sanitisedData = sanitisedData.replace(/}/g, "&rcub;"); 
+        }
     }
     return sanitisedData;
 }

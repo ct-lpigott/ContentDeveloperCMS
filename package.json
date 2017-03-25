@@ -12,10 +12,10 @@
     "frisby-test-update": "jasmine-node server-tests/tests/update-project --junitreport --output server-tests/reports",
     "build-doc": "apidoc -i routes/components/feeds -o public/documentation/ -t documentation/template"
   },
-  "apidoc":{
+  "apidoc": {
     "name": "Content Developer CMS",
     "title": "Content Developer CMS - API Documentation",
-    "url" : "https://contentdevelopercms.eu"
+    "url": "https://contentdevelopercms.eu"
   },
   "repository": {
     "type": "git",
@@ -39,6 +39,7 @@
     "nodemailer": "^2.7.2",
     "pug": "^2.0.0-beta6",
     "redirect-https": "^1.1.1",
+    "rimraf": "^2.6.1",
     "simple-git": "^1.65.0"
   },
   "devDependencies": {

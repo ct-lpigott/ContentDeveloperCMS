@@ -194,7 +194,7 @@ router.post("/", function(req, res, next){
         // property to the current users ID
         var projectAdmin = {};
         projectAdmin.project_id = req.projectID;
-        projectAdmin.date_created = projectAdmin.date_updated = Date.now();
+        projectAdmin.date_created = Date.now();
         projectAdmin.created_by = req.userID;
         projectAdmin.project_structure = req.templateProjectStructure || {};
 
