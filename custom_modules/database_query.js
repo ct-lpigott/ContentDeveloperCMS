@@ -88,7 +88,7 @@ function getWhere_User(selectCols="", whereCols=[], whereVals=[], cb){
 
 // UPDATE
 function update_User(updateCols=[], updateVals=[], userId, cb){
-    var setCols = "SET " + combineColVals(updateCols, updateVals);
+    var setCols = "SET " + combineColVals(updateCols, updateVals, ", ", false);
     console.log(setCols);
     userId = validation.sanitise(userId);
     dbconn.query("UPDATE User " + setCols + " WHERE id=" + dbconn.escape(userId), function(err, result){
@@ -313,18 +313,20 @@ function handleCreateResult(err, result, cb){
     }
 };
 
-function combineColVals(cols=[], vals=[], split=", "){
+function combineColVals(cols=[], vals=[], split=", ", sanitise=true){
     var colVals = "";
     for(var i=0; i<cols.length; i++){
-        var sanitisedValue;
-        if(cols[i] == "custom_css"){
-            sanitisedValue = validation.sanitise(vals[i], true);
-        } else if(cols[i] == "google_access_token"){
-            sanitisedValue = vals[i];
+        var value;
+        if(sanitise){
+            if(cols[i] == "custom_css"){
+                value = validation.sanitise(vals[i], true);
+            } else if(cols[i] == "google_access_token"){
+                value = validation.sanitise(vals[i]);
+            }
         } else {
-            sanitisedValue = validation.sanitise(vals[i]);
+            value = vals[i];
         }
-        colVals += cols[i] + "=" + dbconn.escape(sanitisedValue);
+        colVals += cols[i] + "=" + dbconn.escape(value);
         if(i != cols.length - 1){
             colVals += split;
         }
