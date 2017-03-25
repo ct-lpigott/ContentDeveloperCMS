@@ -319,7 +319,7 @@ function combineColVals(cols=[], vals=[], split=", "){
         var sanitisedValue;
         if(cols[i] == "custom_css"){
             sanitisedValue = validation.sanitise(vals[i], true);
-        } else if(cols[i]= "google_access_token"){
+        } else if(cols[i] == "google_access_token"){
             sanitisedValue = vals[i];
         } else {
             sanitisedValue = validation.sanitise(vals[i]);
