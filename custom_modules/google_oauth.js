@@ -3,7 +3,7 @@
 // of the projects client secret keys)
 var fs = require("fs");
 
-var dbQuery = require("../custom_modules/database_query");
+var dbQuery = require("./database_query");
 
 // Requiring the Google auth library, which will be used to 
 // generate new OAuth2 clients (to be used to authorise, and
@@ -26,185 +26,186 @@ var clientSecretData = JSON.parse(fs.readFileSync("./google/client_secret.json")
 // vary depending on where the server is running
 var redirectURL = process.env.SITE_URL + "/google/oauthRedirectURL";
 
-// Setting the export of this module to be equal to an object, which 
-// contains two methods - one to generate a new OAuth URL, and the other
-// to generate new OAuth2Clients
-module.exports = {
-  generateOAuthUrl: function(cb){
-    // Generating a new OAuth2Client using the other method defined in this object
-    this.generateOAuth2Client(null, function(oauth2Client){
-      // Creating a new OAuthURL (which the user will use to access the login page
-      // on Google to authorise the server to access their account) by using the built
-      // in method of the Google Auth libraries OAuth2Client, passing in the access type
-      // and API scope that this login would authorise
-      var oauthURL = oauth2Client.generateAuthUrl({
-          access_type: "offline",
-          scope: [
-          "https://www.googleapis.com/auth/drive",
-          "https://www.googleapis.com/auth/userinfo.profile",
-          "https://www.googleapis.com/auth/userinfo.email"
-          ],
-          prompt: "select_account"
-      });
-
-      // Returning the OAuth URL to the caller
-      cb(oauthURL);
+function generateOAuthUrl (cb){
+  // Generating a new OAuth2Client using the other method defined in this object
+  generateOAuth2Client(null, function(oauth2Client){
+    // Creating a new OAuthURL (which the user will use to access the login page
+    // on Google to authorise the server to access their account) by using the built
+    // in method of the Google Auth libraries OAuth2Client, passing in the access type
+    // and API scope that this login would authorise
+    var oauthURL = oauth2Client.generateAuthUrl({
+        access_type: "offline",
+        scope: [
+        "https://www.googleapis.com/auth/drive",
+        "https://www.googleapis.com/auth/userinfo.profile",
+        "https://www.googleapis.com/auth/userinfo.email"
+        ],
+        prompt: "select_account"
     });
-  },
-  generateOAuth2Client: function(userID, cb){
-    // Generating a new Auth object, using the Google Auth library
-    var auth = new googleAuth();
 
-    // Creating a new OAuth2Client using the OAuth2 method of the 
-    // auth object, passing in the servers client id, client secret,
-    // and the redirect URL to return the user to the server following
-    // successful login
-    var newOAuth2Client = new auth.OAuth2(
-      clientSecretData.web.client_id,
-      clientSecretData.web.client_secret
-    );
-    
-    if(userID == null){
-      newOAuth2Client.redirectUri_ = redirectURL;
+    // Returning the OAuth URL to the caller
+    cb(oauthURL);
+  });
+}
+
+function generateOAuth2Client(userID, cb){
+  // Generating a new Auth object, using the Google Auth library
+  var auth = new googleAuth();
+
+  // Creating a new OAuth2Client using the OAuth2 method of the 
+  // auth object, passing in the servers client id, client secret,
+  // and the redirect URL to return the user to the server following
+  // successful login
+  var newOAuth2Client = new auth.OAuth2(
+    clientSecretData.web.client_id,
+    clientSecretData.web.client_secret
+  );
+
+  if(userID == null){
+    newOAuth2Client.redirectUri_ = redirectURL;
+    cb(newOAuth2Client);
+  } else {
+    dbQuery.get_User("google_access_token, google_refresh_token", userID, function(err, row){
+      if(row){
+        var userAccessToken = JSON.parse(row.google_access_token);
+        userAccessToken.refresh_token = row.google_refresh_token;
+        newOAuth2Client.credentials = userAccessToken;
+      }
       cb(newOAuth2Client);
-    } else {
-      dbQuery.get_User("google_access_token, google_refresh_token", userID, function(err, row){
-        if(row){
-          var userAccessToken = JSON.parse(row.google_access_token);
-          userAccessToken.refresh_token = row.google_refresh_token;
-          newOAuth2Client.credentials = userAccessToken;
-        }
-        cb(newOAuth2Client);
-      });
-    }
-  },
-  createNewProjectFolder: function(projectName, userID, cb){
-    console.log("About to create new folder");
-    this.generateOAuth2Client(userID, function(oauth2Client){
-      var folderMeta = {
-        "name" : "ContentDeveloper_" + projectName,
-        "mimeType" : "application/vnd.google-apps.folder"
-      };
-
-      drive.files.create({
-        auth: oauth2Client,
-        resource: folderMeta,
-        fields: "id"
-      }, function(error, file) {
-        if(error) {
-          console.log(error);
-        } else {
-          console.log("Successfully created folder. Id: = " + file.id);
-          makeFolderPublic(file.id, oauth2Client, function(){
-            cb(file.id);
-          });
-        }
-      });
     });
-  },
-  uploadMediaItem: function(fileInfo, mediaFolderId, userID, cb){  
-    this.generateOAuth2Client(userID, function(oauth2Client){
-      if(mediaFolderId != null){
-        var fileMetadata = {
-          "name": fileInfo.originalname,
-          parents: [ mediaFolderId ]
-        };
-        
-        var mediaItem = {
-          mimeType: fileInfo.mimetype,
-          body: fs.createReadStream(fileInfo.path)
-        };
-        
-        drive.files.create({
-          auth: oauth2Client,
-          resource: fileMetadata,
-          media: mediaItem,
-          fields: "id"
-        }, function(err, uploadedFile) {
-          if(err) {
-            console.log(err);
-          } else {
-            console.log("File successfully uploaded", uploadedFile.id);
-            fs.unlink(fileInfo.path, function(err){
-              if(err){
-                console.log(err);
-              }
-            });
-            cb(uploadedFile.id);
-          }
+  }
+}
+
+function createNewProjectFolder(projectName, userID, cb){
+  console.log("About to create new folder");
+  generateOAuth2Client(userID, function(oauth2Client){
+    var folderMeta = {
+      "name" : "ContentDeveloper_" + projectName,
+      "mimeType" : "application/vnd.google-apps.folder"
+    };
+
+    drive.files.create({
+      auth: oauth2Client,
+      resource: folderMeta,
+      fields: "id"
+    }, function(error, file) {
+      if(error) {
+        console.log(error);
+      } else {
+        console.log("Successfully created folder. Id: = " + file.id);
+        makeFolderPublic(file.id, oauth2Client, function(){
+          cb(file.id);
         });
       }
-    });    
-  },
-  addUserToMediaFolder: function(mediaFolderId, userEmailAddress, userID, role, cb){
-    this.generateOAuth2Client(userID, function(oauth2Client){
-      drive.permissions.create({
+    });
+  });
+}
+
+function uploadMediaItem(fileInfo, mediaFolderId, userID, cb){  
+  generateOAuth2Client(userID, function(oauth2Client){
+    if(mediaFolderId != null){
+      var fileMetadata = {
+        "name": fileInfo.originalname,
+        parents: [ mediaFolderId ]
+      };
+      
+      var mediaItem = {
+        mimeType: fileInfo.mimetype,
+        body: fs.createReadStream(fileInfo.path)
+      };
+      
+      drive.files.create({
         auth: oauth2Client,
-        resource: {
-          "type": "user",
-          "role": role,
-          "emailAddress": userEmailAddress
-        },
+        resource: fileMetadata,
+        media: mediaItem,
+        fields: "id"
+      }, function(err, uploadedFile) {
+        if(err) {
+          console.log(err);
+        } else {
+          console.log("File successfully uploaded", uploadedFile.id);
+          fs.unlink(fileInfo.path, function(err){
+            if(err){
+              console.log(err);
+            }
+          });
+          cb(uploadedFile.id);
+        }
+      });
+    }
+  });    
+}
+
+function addUserToMediaFolder(mediaFolderId, userEmailAddress, userID, role, cb){
+  generateOAuth2Client(userID, function(oauth2Client){
+    drive.permissions.create({
+      auth: oauth2Client,
+      resource: {
+        "type": "user",
+        "role": role,
+        "emailAddress": userEmailAddress
+      },
+      fileId: mediaFolderId,
+      fields: "id",
+    }, function(err, res) {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log("User successfully added to media folder: " + res.id);
+        cb(String(res.id));
+      }
+    });
+  });
+}
+
+function removeUserFromMediaFolder(mediaFolderId, userPermissionId, userID, cb){
+  if(userPermissionId != null){
+    generateOAuth2Client(userID, function(oauth2Client){
+      drive.permissions.delete({
+        auth: oauth2Client,
         fileId: mediaFolderId,
-        fields: "id",
+        permissionId: userPermissionId
       }, function(err, res) {
         if (err) {
           console.log(err);
         } else {
-          console.log("User successfully added to media folder: " + res.id);
-          cb(String(res.id));
+          console.log("User successfully removed from media folder");
+          cb();
         }
       });
     });
-  },
-  removeUserFromMediaFolder: function(mediaFolderId, userPermissionId, userID, cb){
-    if(userPermissionId != null){
-      this.generateOAuth2Client(userID, function(oauth2Client){
-        drive.permissions.delete({
-          auth: oauth2Client,
-          fileId: mediaFolderId,
-          permissionId: userPermissionId
-        }, function(err, res) {
-          if (err) {
-            console.log(err);
-          } else {
-            console.log("User successfully removed from media folder");
-            cb();
-          }
-        });
-      });
-    } else {
-      cb();
-    }    
-  },
-  getAllProjectImages: function(projectID, mediaFolderId, userID, numFiles=10, nextPageToken=null, cb){
-    this.generateOAuth2Client(userID, function(oauth2Client){
-      nextPageToken = nextPageToken == "null" ? null : nextPageToken;
-      numFiles = isNaN(numFiles) ? null : numFiles;
+  } else {
+    cb();
+  }    
+}
 
-      var getFields = "id, name, mimeType";
-      var queryString = "'" + mediaFolderId + "' in parents";
-      queryString += " and trashed = false";
-      
-      drive.files.list({
-        auth: oauth2Client,
-        q: queryString,
-        pageSize: numFiles,
-        pageToken: nextPageToken,
-        fields: "nextPageToken, files(" + getFields + ")"
-      }, function(err, results){      
-        if(results != null) {
-          for(var file of results.files){
-            file.url = "https://drive.google.com/uc?id=" + file.id;
-          }
-          cb(results);
-        } else {
-          cb(null);
+function getAllProjectImages(projectID, mediaFolderId, userID, numFiles=10, nextPageToken=null, cb){
+  generateOAuth2Client(userID, function(oauth2Client){
+    nextPageToken = nextPageToken == "null" ? null : nextPageToken;
+    numFiles = isNaN(numFiles) ? null : numFiles;
+
+    var getFields = "id, name, mimeType";
+    var queryString = "'" + mediaFolderId + "' in parents";
+    queryString += " and trashed = false";
+    
+    drive.files.list({
+      auth: oauth2Client,
+      q: queryString,
+      pageSize: numFiles,
+      pageToken: nextPageToken,
+      fields: "nextPageToken, files(" + getFields + ")"
+    }, function(err, results){      
+      if(results != null) {
+        for(var file of results.files){
+          file.url = "https://drive.google.com/uc?id=" + file.id;
         }
-      });
+        cb(results);
+      } else {
+        cb(null);
+      }
     });
-  }
-};
+  });
+}
 
 function makeFolderPublic(fileId, oauth2Client, cb) {
   drive.permissions.create({
@@ -224,3 +225,16 @@ function makeFolderPublic(fileId, oauth2Client, cb) {
     }
   }); 
 }
+
+// Setting the export of this module to be equal to an object, which 
+// contains two methods - one to generate a new OAuth URL, and the other
+// to generate new OAuth2Clients
+module.exports = {
+  generateOAuthUrl: generateOAuthUrl,
+  generateOAuth2Client: generateOAuth2Client,
+  createNewProjectFolder: createNewProjectFolder,
+  uploadMediaItem: uploadMediaItem,
+  addUserToMediaFolder: addUserToMediaFolder,
+  removeUserFromMediaFolder: removeUserFromMediaFolder,
+  getAllProjectImages: getAllProjectImages
+};

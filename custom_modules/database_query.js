@@ -3,28 +3,6 @@ var sendEmail = require("./send_email");
 var validation = require("./validation");
 var crypto = require('crypto');
 
-module.exports = {
-    get_User: get_User,
-    get_Project: get_Project,
-    get_UserProject: get_UserProject,
-    get_UserProject_Project: get_UserProject_Project,
-    get_UserProjects_forUser: get_UserProjects_forUser,
-    get_UserProjects_forProject: get_UserProjects_forProject,
-    get_UserProject_Project_User: get_UserProject_Project_User,
-    getWhere_User: getWhere_User,
-    update_User: update_User,
-    update_Project: update_Project,
-    update_UserProject: update_UserProject,
-    create_User: create_User,
-    create_UserProject: create_UserProject,
-    check_User: check_User,
-    create_Project: create_Project,
-    check_UserProject: check_UserProject,
-    delete_Project: delete_Project,
-    delete_UserProject: delete_UserProject
-};
-
-
 // GET
 function get_User(selectCols="", userId, cb){
     userId = validation.sanitise(userId);
@@ -145,6 +123,7 @@ function create_Project(projectName, accessLevels, mediaFolderId, userId, cb){
             if(err || newProjectId == null){
                 cb(err, null);
             } else {
+                var googleOAuth = require("./google_oauth");
                 create_UserProject(userId, newProjectId, 1, function(err, newUserProjectId){
                     if(err || newUserProjectId == null){
                         cb(err, null);
@@ -354,3 +333,24 @@ function createUniqueUserAuthToken(cb){
         }
     }); 
 }
+
+module.exports = {
+    get_User: get_User,
+    get_Project: get_Project,
+    get_UserProject: get_UserProject,
+    get_UserProject_Project: get_UserProject_Project,
+    get_UserProjects_forUser: get_UserProjects_forUser,
+    get_UserProjects_forProject: get_UserProjects_forProject,
+    get_UserProject_Project_User: get_UserProject_Project_User,
+    getWhere_User: getWhere_User,
+    update_User: update_User,
+    update_Project: update_Project,
+    update_UserProject: update_UserProject,
+    create_User: create_User,
+    create_UserProject: create_UserProject,
+    check_User: check_User,
+    create_Project: create_Project,
+    check_UserProject: check_UserProject,
+    delete_Project: delete_Project,
+    delete_UserProject: delete_UserProject
+};

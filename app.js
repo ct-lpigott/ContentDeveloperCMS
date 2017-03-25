@@ -40,7 +40,7 @@ app.use(bodyParser.json());
 var multerUpload = multer({
   storage: multer.diskStorage({
     destination: function (req, file, cb) {
-      var uploadDirectory = process.env.HOST_NAME == "./uploads";
+      var uploadDirectory = "./uploads";
 
       cb(null, uploadDirectory);
     },

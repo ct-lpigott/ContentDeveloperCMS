@@ -4,7 +4,7 @@ function checkIfPropertyMatchesAttributes(propertyName, propertyValue, structure
         sanitisedContent: null
     };
 
-    if(structureType != null && structureType == "html"){
+    if(structureType != null && structureType == "html" || structureAttributes.type == "file"){
         response.sanitisedContent = removeSuspiciousContent(propertyValue, true);
     } else {
         response.sanitisedContent = removeSuspiciousContent(propertyValue);
@@ -189,7 +189,6 @@ function sanitise(data, cssAllowed=false, htmlAllowed=false){
         sanitisedData = sanitisedData.replace(/"on(\w+)"=/g, "");
         sanitisedData = sanitisedData.replace(/&/g, "&amp;");
         sanitisedData = sanitisedData.replace(/`/g, "&grave;");
-        sanitisedData = sanitisedData.replace(/=/g, "&equals;");
         sanitisedData = sanitisedData.replace(/\\/g, "&bsol;");
         sanitisedData = sanitisedData.replace(/\(/g, "&lpar;");
         sanitisedData = sanitisedData.replace(/\)/g, "&rpar;");
@@ -197,6 +196,7 @@ function sanitise(data, cssAllowed=false, htmlAllowed=false){
         sanitisedData = sanitisedData.replace(/\]/g, "&rbrack;");
 
         if(htmlAllowed == false){
+            sanitisedData = sanitisedData.replace(/=/g, "&equals;");
             sanitisedData = sanitisedData.replace(/</g, "&lt;");
             sanitisedData = sanitisedData.replace(/>/g, "&gt;");
             sanitisedData = sanitisedData.replace(/\//g, "&sol;");
@@ -271,32 +271,37 @@ function validateNewContent(content, structure){
 
     if(typeof structure == "object"){
         if(structure.attributes != null || structure.items != null){
-            var contentValidation = validateContentAgainstStructure(content, structure);
-            if(contentValidation.allowed){
-                responseObject.sanitisedContent = contentValidation.sanitisedContent;
-            } else {
-                responseObject.sanitisedContent = "";
-                responseObject.allowed = false;
-            }
-            for(var i=0; i<contentValidation.errors.length; i++){
-                responseObject.errors.push(contentValidation.errors[i]);
+            if(content != null){
+                var contentValidation = validateContentAgainstStructure(content, structure);
+                if(contentValidation.allowed){
+                    responseObject.sanitisedContent = contentValidation.sanitisedContent;
+                } else {
+                    responseObject.sanitisedContent = "";
+                    responseObject.allowed = false;
+                }
+                for(var i=0; i<contentValidation.errors.length; i++){
+                    responseObject.errors.push(contentValidation.errors[i]);
+                }
             }
         } else {
             for(var property in structure){
-                if(structure[property].items != null || structure[property].attributes != null){
-                    var itemsValidation = validateContentAgainstStructure(content[property], structure[property]);
-                    if(itemsValidation.allowed){
-                        responseObject.sanitisedContent[property] = itemsValidation.sanitisedContent;
+                if(content[property] != null){
+                    if(structure[property].items != null || structure[property].attributes != null){
+                        var itemsValidation = validateContentAgainstStructure(content[property], structure[property]);
+                        if(itemsValidation.allowed){
+                            responseObject.sanitisedContent[property] = itemsValidation.sanitisedContent;
+                        } else {
+                            delete responseObject.sanitisedContent[property];
+                        }
+                        for(var i=0; i<itemsValidation.errors.length; i++){
+                            responseObject.errors.push(itemsValidation.errors[i]);
+                        }
                     } else {
-                        delete responseObject.sanitisedContent[property];
-                    }
-                    for(var i=0; i<itemsValidation.errors.length; i++){
-                        responseObject.errors.push(itemsValidation.errors[i]);
-                    }
-                } else {
-                    //responseObject.sanitisedContent[property] = "";
-                    //responseObject.allowed = false;
-                }          
+                        //responseObject.sanitisedContent[property] = "";
+                        //responseObject.allowed = false;
+                    } 
+                }
+                         
             }
         }
     } else {
