@@ -337,17 +337,17 @@ function combineColVals(cols=[], vals=[], setGet, split=", ", sanitise=true){
                 } else {
                     value = validation.sanitise(vals[i]);
                 }
-            } else {
-                value = dbconn.escape(vals[i]);
             }
 
             if(encryptedColumns.indexOf(cols[i]) == 0){
                 value = "AES_ENCRYPT(" + dbconn.escape(value) + ", " + dbconn.escape(process.env.DATABASE_KEY) + ")";
+            } else {
+                value = dbconn.escape(vals[i]);
             }
             
             colVals += cols[i] + "=" + value;
         } else if(setGet == "get"){
-            colVals += cols[i] + "=" + dbconn.escape(value);
+            colVals += cols[i] + "=" + dbconn.escape(vals[i]);
         }
         
         if(i < cols.length - 1){
