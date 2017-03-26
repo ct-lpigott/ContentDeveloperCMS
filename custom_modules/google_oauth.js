@@ -106,7 +106,7 @@ function uploadMediaItem(fileInfo, mediaFolderId, currentUserID, projectId, cb){
     if(mediaFolderId != null){
       var fileMetadata = {
         "name": fileInfo.originalname,
-        parents: [ mediaFolderId ]
+        parents: [ mediaFolderId.toString() ]
       };
       
       var mediaItem = {
@@ -149,7 +149,7 @@ function uploadMediaItem(fileInfo, mediaFolderId, currentUserID, projectId, cb){
 
 function addUserToMediaFolder(currentUserID, addUserID, projectId, accessLevelInt, cb){
   var role = decideUserRole(accessLevelInt);  
-  dbQuery.get_UserProject_Project_User(["p.media_folder_id, u.email_address"], addUserID, projectId, function(err, row){
+  dbQuery.get_UserProject_Project_User("p.media_folder_id, u.email_address", addUserID, projectId, function(err, row){
     if(row){
       generateOAuth2Client(currentUserID, function(oauth2Client){
         drive.permissions.create({
