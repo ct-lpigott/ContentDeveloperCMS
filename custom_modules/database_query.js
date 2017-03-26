@@ -161,8 +161,10 @@ function create_UserProject(currentUserId, newUserId, projectId, accessLevelInt,
                 if(userPermissionId == null){
                     var googleOAuth = require("./google_oauth");
                     googleOAuth.addUserToMediaFolder(currentUserId, newUserId, projectId, accessLevelInt, function(success){
-                        cb(err, success);
+                        cb(err, newUserProjectId);
                     });
+                } else {
+                    cb(err, newUserProjectId);
                 }
             }
         });
