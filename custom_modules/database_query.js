@@ -356,7 +356,11 @@ function combineColVals(cols=[], vals=[], method, split=", ", sanitise=true){
         } else if(method == "insert"){
             colVals += value;
         } else if(method == "where"){
-            colVals += cols[i] + "=" + dbconn.escape(vals[i]);
+            var col = cols[i];
+            if(encryptedColumns.indexOf(cols[i]) > -1){
+                col = "AES_DECRYPT(" + cols[i] + ", " + dbconn.escape(process.env.DATABASE_KEY) + ")";
+            }
+            colVals += col + "=" + dbconn.escape(vals[i]);
         }
         
         if(i < cols.length - 1){
