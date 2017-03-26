@@ -42,7 +42,7 @@ router.use(function(req, res, next){
 
 
 router.get("/user", function(req, res, next){
-    dbQuery.get_User("*", req.userID, function(err, row){
+    dbQuery.get_User("display_name, google_profile_image_url", req.userID, function(err, row){
         if(err){ console.log(err); }
         if(row){
             var user = {

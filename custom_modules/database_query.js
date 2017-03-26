@@ -292,7 +292,7 @@ function handleGetResult(err, rows, numRows="single", cb){
         console.log(err);
         cb(err, null);
     } else {
-        if(rows.length > 0){
+        if(rows != null && rows.length > 0){
             if(numRows == "single"){
                 cb(null, rows[0]);
             } else if(numRows = "all") {
@@ -342,7 +342,7 @@ function combineColVals(cols=[], vals=[], setGet, split=", ", sanitise=true){
             if(encryptedColumns.indexOf(cols[i]) == 0){
                 value = "AES_ENCRYPT(" + dbconn.escape(value) + ", " + dbconn.escape(process.env.DATABASE_KEY) + ")";
             } else {
-                value = dbconn.escape(vals[i]);
+                value = dbconn.escape(value);
             }
             
             colVals += cols[i] + "=" + value;
