@@ -360,7 +360,7 @@ function combineColVals(cols=[], vals=[], method, split=", ", sanitise=true){
         } else if(method == "where"){
             var col = cols[i];
             if(encryptedColumns.indexOf(cols[i]) > -1){
-                col = "AES_DECRYPT(" + cols[i] + ", " + dbconn.escape(process.env.DATABASE_KEY) + ") AS " + dbconn.escape(cols[i]);
+                col = "AES_DECRYPT(" + cols[i] + ", " + dbconn.escape(process.env.DATABASE_KEY) + ")";
             }
             colVals += col + "=" + dbconn.escape(vals[i]);
         }
