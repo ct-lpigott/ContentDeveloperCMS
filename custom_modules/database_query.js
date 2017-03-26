@@ -3,7 +3,7 @@ var sendEmail = require("./send_email");
 var validation = require("./validation");
 var crypto = require('crypto');
 
-const encryptedColumns = ["google_profile_id", "google_access_token", "google_refresh_token", "cd_user_auth_token", "media_folder_id", "update_origins", "read_origins", "media_folder_permission_id"];
+const encryptedColumns = ["google_profile_id", "google_access_token", "google_refresh_token", "cd_user_auth_token", "media_folder_id", "media_folder_permission_id"];
 
 // GET
 function get_User(selectCols="", userId, cb){

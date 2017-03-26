@@ -202,7 +202,7 @@ function removeUserFromMediaFolder(mediaFolderId, userPermissionId, currentUserI
 
 function updateUserAccessToFolder(currentUserID, updateUserId, projectId, accessLevelInt, cb){
   role = decideUserRole(accessLevelInt);
-  dbQuery.get_UserProject_Project(["p.media_folder_id, up.media_folder_permission_id"], updateUserId, projectId, function(err, row){
+  dbQuery.get_UserProject_Project("p.media_folder_id, up.media_folder_permission_id", updateUserId, projectId, function(err, row){
     generateOAuth2Client(currentUserID, function(oauth2Client){
       drive.permissions.update({
           auth: oauth2Client,
