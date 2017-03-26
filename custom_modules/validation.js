@@ -200,8 +200,6 @@ function sanitise(data, cssAllowed=false, htmlAllowed=false){
             sanitisedData = sanitisedData.replace(/</g, "&lt;");
             sanitisedData = sanitisedData.replace(/>/g, "&gt;");
             sanitisedData = sanitisedData.replace(/\//g, "&sol;");
-            sanitisedData = sanitisedData.replace(/"/g, "&quot;");
-            sanitisedData = sanitisedData.replace(/'/g, "&apos;");
         }  
 
         if(cssAllowed == false){
