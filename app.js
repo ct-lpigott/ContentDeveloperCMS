@@ -24,8 +24,11 @@ var app = express();
 app.use("/", session({
     secret: process.env.SESSION_KEY,
     resave: false,
-    saveUninitialized: false
-    //,cookie: { secure: true } << Cant enable while running locally
+    saveUninitialized: false,
+    cookie: {
+      secure: process.env.DEBUG != "true",
+      maxAge: 10000
+    }
 }));
 
 // Intercepting all requests
