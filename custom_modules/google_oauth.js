@@ -101,7 +101,7 @@ function createNewProjectFolder(projectName, currentUserID, cb){
   });
 }
 
-function uploadMediaItem(fileInfo, mediaFolderId, currentUserID, cb){  
+function uploadMediaItem(fileInfo, mediaFolderId, currentUserID, projectId, cb){  
   generateOAuth2Client(currentUserID, function(oauth2Client){
     if(mediaFolderId != null){
       var fileMetadata = {
@@ -121,7 +121,18 @@ function uploadMediaItem(fileInfo, mediaFolderId, currentUserID, cb){
         fields: "id"
       }, function(err, uploadedFile) {
         if(err) {
-          console.log(err);
+          if(err.code == 404){
+            recreateProjectFolder(currentUserID, projectId, function(newFolderID){
+              if(newFolderID != null){
+                uploadMediaItem(fileInfo, newFolderID, currentUserID, projectId, cb);
+              } else {
+                cb(null);
+              }
+            });
+          } else {
+            console.log(err);
+            cb(null);
+          }
         } else {
           console.log("File successfully uploaded", uploadedFile.id);
           fs.unlink(fileInfo.path, function(err){
@@ -136,8 +147,11 @@ function uploadMediaItem(fileInfo, mediaFolderId, currentUserID, cb){
   });    
 }
 
-function addUserToMediaFolder(mediaFolderId, currentUserID, addUserID, role, cb){
-  dbQuery.get_User("email_address", addUserID, function(err, row){
+function addUserToMediaFolder(currentUserID, addUserID, projectId, accessLevelInt, role, cb){
+  if(role == null){
+    role = decideUserRole(accessLevelInt);
+  }  
+  dbQuery.get_UserProject_Project_User(["p.media_folder_id, u.email_address"], addUserID, projectId, function(err, row){
     if(row){
       generateOAuth2Client(currentUserID, function(oauth2Client){
         drive.permissions.create({
@@ -147,16 +161,18 @@ function addUserToMediaFolder(mediaFolderId, currentUserID, addUserID, role, cb)
             "role": role,
             "emailAddress": row.email_address
           },
-          fileId: mediaFolderId,
+          fileId: row.media_folder_id,
           fields: "id",
           transferOwnership: role == "owner" ? true : false
         }, function(err, res) {
           if (err) {
             console.log(err);
-            cb(null);
+            cb(false);
           } else {
             console.log("User successfully added to media folder: " + res.id);
-            cb(String(res.id));
+            dbQuery.update_UserProject(["media_folder_permission_id"], [res.id], currentUserID, addUserID, role, projectId, function(err, success){
+              cb(success);
+            });
           }
         });
       });
@@ -186,26 +202,31 @@ function removeUserFromMediaFolder(mediaFolderId, userPermissionId, currentUserI
   }    
 }
 
-function updateUserAccessToFolder(mediaFolderId, currentUserID, userPermissionId, role, cb){
-  generateOAuth2Client(currentUserID, function(oauth2Client){
-    drive.permissions.update({
-        auth: oauth2Client,
-        fileId: mediaFolderId,
-        permissionId: userPermissionId,
-        resource: {
-          "role": role
-        },
-        fields: "id",
-        transferOwnership: role == "owner" ? true : false
-      }, function(err, res) {
-        if (err) {
-            console.log(err);
-          cb(null);
-        } else {
-          console.log("User access level successfully updated: " + res.id);
-          cb(String(res.id));
-        }
-      });
+function updateUserAccessToFolder(currentUserID, updateUserId, projectId, accessLevelInt, cb){
+  role = decideUserRole(accessLevelInt);
+  dbQuery.get_UserProject_Project(["p.media_folder_id, up.media_folder_permission_id"], updateUserId, projectId, function(err, row){
+    generateOAuth2Client(currentUserID, function(oauth2Client){
+      drive.permissions.update({
+          auth: oauth2Client,
+          fileId: row.media_folder_id,
+          permissionId: row.media_folder_permission_id,
+          resource: {
+            "role": role
+          },
+          fields: "id",
+          transferOwnership: role == "owner" ? true : false
+        }, function(err, res) {
+          if (err) {
+              console.log(err);
+            cb(false);
+          } else {
+            console.log("User access level successfully updated: " + res.id);
+            dbQuery.update_UserProject(["media_folder_permission_id"], [res.id], currentUserID, updateUserId, role, projectId, function(err, success){
+              cb(success);
+            });
+          }
+        });
+    });
   });
 }
 
@@ -254,6 +275,47 @@ function makeFolderPublic(fileId, oauth2Client, cb) {
       cb();
     }
   }); 
+}
+
+function recreateProjectFolder(currentUserID, projectId, cb){
+  dbQuery.get_Project("project_name", projectId, function(err, row){
+    if(row){
+      createNewProjectFolder(row.project_name, currentUserID, function(newFolderID){
+        if(newFolderID != null){
+          dbQuery.update_Project(["media_folder_id"], [newFolderID], currentUserID, projectId, function(err, success){
+            if(success){
+              cb(newFolderID);
+              dbQuery.get_UserProjects_forProject("up.access_level_int, up.user_id", projectId, function(err, rows){
+                if(rows){
+                  for(var i=0; i<rows.length; i++){
+                    if(rows[i].user_id != currentUserID){
+                      role = decideUserRole(rows[i].access_level_int);
+                      addUserToMediaFolder(currentUserID, rows[i].user_id, projectId, rows[i].access_level_int, role, function(success){
+                        if(success){
+                          console.log("User readded to project folder");
+                        }
+                      })
+                    }
+                  }
+                }
+              });
+            } else {
+              cb(null);
+            }
+          });
+        } else {
+          cb(null);
+        }
+      });
+    } else {
+      cb(null);
+    }
+  })
+}
+
+function decideUserRole(accessLevelInt){
+  var role = accessLevelInt == 3 ? "reader" : "writer";
+  return role;
 }
 
 // Setting the export of this module to be equal to an object, which 

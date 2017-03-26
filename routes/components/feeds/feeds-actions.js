@@ -450,7 +450,7 @@ router.post("/:projectID", function(req, res, next){
                 if(err || row == null){
                     console.log(err);
                 } else {
-                    googleOAuth.uploadMediaItem(req.file, row.media_folder_id, req.userID, function(fileUrl){
+                    googleOAuth.uploadMediaItem(req.file, row.media_folder_id, req.userID, req.params.projectID, function(fileUrl){
                         console.log("FILE UPLOAD");
                         req.responseObject.fileUrl = "https://drive.google.com/uc?id=" + fileUrl;
                         res.send(req.responseObject);
