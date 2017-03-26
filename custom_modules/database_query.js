@@ -342,14 +342,14 @@ function combineColVals(cols=[], vals=[], setGet, split=", ", sanitise=true){
             }
 
             if(encryptedColumns.indexOf(cols[i]) > -1){
-                value = "AES_ENCRYPT(" + process.env.DATABASE_KEY + ", " + dbconn.escape(value) + ")";
+                value = "AES_ENCRYPT(" + dbconn.escape(value) + ", " + process.env.DATABASE_KEY + ")";
             }
             
             colVals += cols[i] + "=" + value;
         } else if(setGet == "get"){
             var col = cols[i];
             if(encryptedColumns.indexOf(cols[i]) > -1){
-                col = "AES_DECRYPT(" + process.env.DATABASE_KEY + ", " + cols[i] + ")";
+                col = "AES_DECRYPT(" + cols[i] + ", " + process.env.DATABASE_KEY + ")";
             }
             colVals += col + "=" + dbconn.escape(value);
         }
@@ -386,7 +386,7 @@ function columnStringDecryption(stringOfCols){
     var columns = stringOfCols.split(", ");
     for(var i=0; i<columns.length; i++){
         if(encryptedColumns.indexOf(columns[i]) > -1){
-            columns[i] = "AES_DECRYPT(" + process.env.DATABASE_KEY + ", " + columns[i] + ")";
+            columns[i] = "AES_DECRYPT(" + columns[i] + ", " + process.env.DATABASE_KEY + ")";
         }
     }
     return columns.join(", ");
