@@ -358,13 +358,25 @@ var ContentDeveloperServerService = (function () {
         return this._currentUser;
     };
     ContentDeveloperServerService.prototype.getCurrentProjectContent = function () {
-        return this._coPipe.transform(this._currentProjectContentStructureHistory.content);
+        var result = null;
+        if (this._currentProjectContentStructureHistory.content != null) {
+            result = this._coPipe.transform(this._currentProjectContentStructureHistory.content);
+        }
+        return result;
     };
     ContentDeveloperServerService.prototype.getCurrentProjectStructure = function () {
-        return this._coPipe.transform(this._currentProjectContentStructureHistory.structure);
+        var result = null;
+        if (this._currentProjectContentStructureHistory.structure != null) {
+            result = this._coPipe.transform(this._currentProjectContentStructureHistory.structure);
+        }
+        return result;
     };
     ContentDeveloperServerService.prototype.getCurrentProjectSettings = function () {
-        return this._coPipe.transform(this._currentProjectSettings);
+        var result = null;
+        if (this._currentProjectSettings != null) {
+            result = this._coPipe.transform(this._currentProjectSettings);
+        }
+        return result;
     };
     ContentDeveloperServerService.prototype.getCurrentProjectContentHistory = function () {
         return this._currentProjectContentStructureHistory.content_history;
