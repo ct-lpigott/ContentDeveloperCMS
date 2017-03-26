@@ -68,7 +68,7 @@ function get_UserProject_Project_User(selectCols, userId, projectId, cb){
 // GET WHERE
 function getWhere_User(selectCols="", whereCols=[], whereVals=[], cb){
     selectCols = columnStringDecryption(selectCols);
-    var where = "WHERE " + combineColVals(whereCols, whereVals, "get",  " AND ");
+    var where = "WHERE " + combineColVals(whereCols, whereVals, "where",  " AND ");
     dbconn.query("SELECT " + selectCols + " FROM User " + where, function(err, rows, fields){
         handleGetResult(err, rows, "single", cb);
     });
@@ -133,7 +133,8 @@ function update_UserProject(updateCols=[], updateVals=[], currentUserId, updateU
 function create_User(emailAddress, cb){
     emailAddress = validation.sanitise(emailAddress);
     createUniqueUserAuthToken(function(newAuthToken){
-        dbconn.query("INSERT INTO User(email_address, cd_user_auth_token) VALUES(" + dbconn.escape(emailAddress) + ", " + dbconn.escape(newAuthToken) + ")", function(err, result){
+        var encryptedValues = combineColVals(["email_address", "cd_user_auth_token"], [emailAddress, newAuthToken], "insert");
+        dbconn.query("INSERT INTO User(email_address, cd_user_auth_token) VALUES(" + encryptedValues + ")", function(err, result){
             handleCreateResult(err, result, cb);
         });
     });
@@ -142,7 +143,8 @@ function create_User(emailAddress, cb){
 function create_Project(projectName, accessLevels, mediaFolderId, userPermissionId, currentUserId, cb){
     projectName = validation.sanitise(projectName);
     currentUserId = validation.sanitise(currentUserId);
-    dbconn.query("INSERT INTO Project(project_name, access_levels, media_folder_id) VALUES(" + dbconn.escape(projectName) + ", " + dbconn.escape(accessLevels) + ", " + dbconn.escape(mediaFolderId) + ")", function(err, result){
+    var encryptedValues = combineColVals(["project_name", "access_levels", "media_folder_id"], [projectName, accessLevels, mediaFolderId]);
+    dbconn.query("INSERT INTO Project(project_name, access_levels, media_folder_id) VALUES(" + encryptedValues + ")", function(err, result){
         handleCreateResult(err, result, function(err, newProjectId){
             if(err || newProjectId == null){
                 cb(err, null);
@@ -163,7 +165,8 @@ function create_UserProject(currentUserId, newUserId, projectId, accessLevelInt,
     newUserId = validation.sanitise(newUserId);
     projectId = validation.sanitise(projectId);
     access_level_int = validation.sanitise(accessLevelInt);
-    dbconn.query("INSERT INTO User_Project(user_id, project_id, access_level_int, media_folder_permission_id) VALUES(" + dbconn.escape(newUserId) + ", " + dbconn.escape(projectId) + ", " + dbconn.escape(accessLevelInt) + ", " + dbconn.escape(userPermissionId) + ")", function(err, result){
+    var encryptedValues = combineColVals(["user_id", "project_id", "access_level_int", "media_folder_permission_id"], [newUserId, projectId, accessLevelInt, userPermissionId], "insert");
+    dbconn.query("INSERT INTO User_Project(user_id, project_id, access_level_int, media_folder_permission_id) VALUES(" + encryptedValues + ")", function(err, result){
         handleCreateResult(err, result, function(err, newUserProjectId){
             if(err){
                 cb(err, null);
@@ -326,11 +329,11 @@ function handleCreateResult(err, result, cb){
     }
 };
 
-function combineColVals(cols=[], vals=[], setGet, split=", ", sanitise=true){
+function combineColVals(cols=[], vals=[], method, split=", ", sanitise=true){
     var colVals = "";
     for(var i=0; i<cols.length; i++){
         var value;
-        if(setGet == "set"){
+        if(method == "set" || method == "insert"){
             if(sanitise){
                 if(cols[i] == "custom_css" || cols[i] == "google_access_token"){
                     value = validation.sanitise(vals[i], true);
@@ -346,9 +349,13 @@ function combineColVals(cols=[], vals=[], setGet, split=", ", sanitise=true){
             } else {
                 value = dbconn.escape(value);
             }
-            
+        }
+
+        if(method == "set"){
             colVals += cols[i] + "=" + value;
-        } else if(setGet == "get"){
+        } else if(method == "insert"){
+            colVals += value;
+        } else if(method == "where"){
             colVals += cols[i] + "=" + dbconn.escape(vals[i]);
         }
         
