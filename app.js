@@ -27,7 +27,7 @@ app.use("/", session({
     saveUninitialized: false,
     cookie: {
       secure: process.env.DEBUG != "true",
-      maxAge: 10000
+      maxAge: 1000 * 60 * 15 // 15 minutes
     }
 }));
 

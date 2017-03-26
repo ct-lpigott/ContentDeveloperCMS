@@ -30,11 +30,11 @@ router.use(function(req, res, next){
 			}
 		});
 	} else {
-		if(req.method == "GET"){
+		if(req.method == "GET" && req.originalUrl.indexOf("/feeds") == 0){
 			next();
 		} else {
 			req.preRequestErrors.push("Valid user authentication token required to access this resource");
-			next(new Error());
+			res.send({loginRequired: true});
 		}
 	}
 });
