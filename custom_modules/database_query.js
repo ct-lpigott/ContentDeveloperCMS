@@ -67,7 +67,6 @@ function getWhere_User(selectCols="", whereCols=[], whereVals=[], cb){
 // UPDATE
 function update_User(updateCols=[], updateVals=[], userId, cb){
     var setCols = "SET " + combineColVals(updateCols, updateVals, ", ", false);
-    console.log(setCols);
     userId = validation.sanitise(userId);
     dbconn.query("UPDATE User " + setCols + " WHERE id=" + dbconn.escape(userId), function(err, result){
         handleUpdateResult(err, result, cb);
@@ -345,7 +344,6 @@ function createUniqueUserAuthToken(cb){
             while(randomAuthToken.length > 525){
                 randomAuthToken = randomAuthToken.substring(1);
             }
-            console.log(randomAuthToken);
             
             getWhere_User("id", ["cd_user_auth_token"], [randomAuthToken], function(err, row){
                 if(row != null && row.id != null){
