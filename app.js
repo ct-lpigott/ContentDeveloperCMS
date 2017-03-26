@@ -28,7 +28,8 @@ app.use("/", session({
     cookie: {
       secure: process.env.DEBUG != "true",
       maxAge: 1000 * 60 * 15 // 15 minutes
-    }
+    },
+    rolling: true
 }));
 
 // Setting the route for all static request to be "/public" i.e. this will deal
