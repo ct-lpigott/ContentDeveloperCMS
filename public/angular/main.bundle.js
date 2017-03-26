@@ -733,11 +733,15 @@ var AppComponent = (function () {
             if (_this.user == {}) {
                 _this.user = null;
             }
+            else {
+                _this.updatePageTitle("My Projects");
+            }
         });
     };
     AppComponent.prototype.logout = function () {
         this._cdService.logout().subscribe(function (response) { return console.log("Logout"); });
         this.user = null;
+        this.updatePageTitle("Content Developer CMS");
     };
     AppComponent.prototype.updatePageTitle = function (title) {
         this.pageTitle = title;
