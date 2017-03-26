@@ -341,17 +341,13 @@ function combineColVals(cols=[], vals=[], setGet, split=", ", sanitise=true){
                 value = dbconn.escape(vals[i]);
             }
 
-            if(encryptedColumns.indexOf(cols[i]) > -1){
-                value = "AES_ENCRYPT(" + dbconn.escape(value) + ", " + process.env.DATABASE_KEY + ")";
+            if(encryptedColumns.indexOf(cols[i]) == 0){
+                value = "AES_ENCRYPT(" + dbconn.escape(value) + ", " + dbconn.escape(process.env.DATABASE_KEY) + ")";
             }
             
             colVals += cols[i] + "=" + value;
         } else if(setGet == "get"){
-            var col = cols[i];
-            if(encryptedColumns.indexOf(cols[i]) > -1){
-                col = "AES_DECRYPT(" + cols[i] + ", " + process.env.DATABASE_KEY + ")";
-            }
-            colVals += col + "=" + dbconn.escape(value);
+            colVals += cols[i] + "=" + dbconn.escape(value);
         }
         
         if(i < cols.length - 1){
@@ -385,8 +381,13 @@ function createUniqueUserAuthToken(cb){
 function columnStringDecryption(stringOfCols){
     var columns = stringOfCols.split(", ");
     for(var i=0; i<columns.length; i++){
-        if(encryptedColumns.indexOf(columns[i]) > -1){
-            columns[i] = "AES_DECRYPT(" + columns[i] + ", " + process.env.DATABASE_KEY + ")";
+        var col = columns[i];
+        if(columns[i].indexOf(".")){
+            col = columns[i].split(".")[1];
+        }
+
+        if(encryptedColumns.indexOf(col) == 0){
+            columns[i] = "AES_DECRYPT(" + columns[i] + ", " + dbconn.escape(process.env.DATABASE_KEY) + ")";
         }
     }
     return columns.join(", ");
