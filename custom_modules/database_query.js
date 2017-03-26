@@ -143,7 +143,7 @@ function create_User(emailAddress, cb){
 function create_Project(projectName, accessLevels, mediaFolderId, userPermissionId, currentUserId, cb){
     projectName = validation.sanitise(projectName);
     currentUserId = validation.sanitise(currentUserId);
-    var encryptedValues = combineColVals(["project_name", "access_levels", "media_folder_id"], [projectName, accessLevels, mediaFolderId]);
+    var encryptedValues = combineColVals(["project_name", "access_levels", "media_folder_id"], [projectName, accessLevels, mediaFolderId], "insert");
     dbconn.query("INSERT INTO Project(project_name, access_levels, media_folder_id) VALUES(" + encryptedValues + ")", function(err, result){
         handleCreateResult(err, result, function(err, newProjectId){
             if(err || newProjectId == null){
