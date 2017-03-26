@@ -367,12 +367,12 @@ function combineColVals(cols=[], vals=[], method, split=", ", sanitise=true){
 }
 
 function createUniqueUserAuthToken(cb){
-    crypto.randomBytes(256, function(err, buf){
+    crypto.randomBytes(15, function(err, buf){
         if (err){
             createUniqueUserAuthToken();
         } else {
             var randomAuthToken = buf.toString("hex") + Date.now();
-            while(randomAuthToken.length > 525){
+            while(randomAuthToken.length > 40){
                 randomAuthToken = randomAuthToken.substring(1);
             }
             
@@ -391,12 +391,12 @@ function columnStringDecryption(stringOfCols){
     var columns = stringOfCols.split(", ");
     for(var i=0; i<columns.length; i++){
         var col = columns[i];
-        if(columns[i].indexOf(".")){
+        if(columns[i].indexOf(".") > -1){
             col = columns[i].split(".")[1];
         }
 
         if(encryptedColumns.indexOf(col) > -1){
-            columns[i] = "AES_DECRYPT(" + columns[i] + ", " + dbconn.escape(process.env.DATABASE_KEY) + ")";
+            columns[i] = "AES_DECRYPT(" + columns[i] + ", " + dbconn.escape(process.env.DATABASE_KEY) + ") AS " + dbconn.escape(columns[i]);
         }
     }
     return columns.join(", ");
