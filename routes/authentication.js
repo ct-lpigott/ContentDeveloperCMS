@@ -32,6 +32,8 @@ router.use(function(req, res, next){
 	} else {
 		if(req.method == "GET" && req.originalUrl.indexOf("/feeds") == 0){
 			next();
+		} else if(req.originalUrl.indexOf("/admin/loginUrl") == 0){
+			next();
 		} else {
 			req.preRequestErrors.push("Valid user authentication token required to access this resource");
 			res.send({loginRequired: true});

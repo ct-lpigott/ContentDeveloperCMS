@@ -729,22 +729,30 @@ var AppComponent = (function () {
     AppComponent.prototype.ngOnInit = function () {
         var _this = this;
         this._cdService.loadUser().subscribe(function (responseObject) {
-            _this.user = _this._cdService.getCurrentUser();
-            if (_this.user == {}) {
-                _this.user = null;
+            if (responseObject.loginRequired) {
+                _this.loginRequired();
             }
             else {
-                _this.updatePageTitle("My Projects");
+                _this.user = _this._cdService.getCurrentUser();
+                if (_this.user == {}) {
+                    _this.loginRequired();
+                }
+                else {
+                    _this.updatePageTitle("My Projects");
+                }
             }
         });
     };
     AppComponent.prototype.logout = function () {
         this._cdService.logout().subscribe(function (response) { return console.log("Logout"); });
-        this.user = null;
-        this.updatePageTitle("Content Developer CMS");
+        this.loginRequired();
     };
     AppComponent.prototype.updatePageTitle = function (title) {
         this.pageTitle = title;
+    };
+    AppComponent.prototype.loginRequired = function () {
+        this.user = null;
+        this.updatePageTitle("Content Developer CMS");
     };
     AppComponent = __decorate([
         __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["U" /* Component */])({
@@ -1397,6 +1405,7 @@ var CmsComponent = (function () {
     function CmsComponent(_cdService) {
         this._cdService = _cdService;
         this.requestToUpdatePageTitle = new __WEBPACK_IMPORTED_MODULE_0__angular_core__["G" /* EventEmitter */]();
+        this.loginRequired = new __WEBPACK_IMPORTED_MODULE_0__angular_core__["G" /* EventEmitter */]();
     }
     CmsComponent.prototype.viewProject = function (projectData) {
         this._projectId = projectData.projectId;
@@ -1418,19 +1427,29 @@ var CmsComponent = (function () {
     CmsComponent.prototype.loadProjectContentAndStructure = function () {
         var _this = this;
         this._cdService.loadProjectContentStructureHistory(this._projectId).subscribe(function (responseObject) {
-            console.log("Project Content and Structure Loaded!");
-            _this.resetProjectStructure();
-            _this.resetProjectContent();
-            _this.resetProjectHistory();
+            if (responseObject.loginRequired) {
+                _this.loginRequired.emit();
+            }
+            else {
+                console.log("Project Content and Structure Loaded!");
+                _this.resetProjectStructure();
+                _this.resetProjectContent();
+                _this.resetProjectHistory();
+            }
         });
     };
     CmsComponent.prototype.loadProjectSettings = function () {
         var _this = this;
         this._cdService.loadProjectSettings().subscribe(function (responseObject) {
-            _this._cdService.loadAdminSettings().subscribe(function (responseObject) {
-                _this.resetProjectSettings();
-                console.log(_this.projectSettings);
-            });
+            if (responseObject.loginRequired) {
+                _this.loginRequired.emit();
+            }
+            else {
+                _this._cdService.loadAdminSettings().subscribe(function (responseObject) {
+                    _this.resetProjectSettings();
+                    console.log(_this.projectSettings);
+                });
+            }
         });
     };
     CmsComponent.prototype.saveProjectStructure = function (structureData) {
@@ -1438,9 +1457,14 @@ var CmsComponent = (function () {
         var commitMessage = structureData != null ? structureData.commit_message : null;
         console.log("About to save structure");
         this._cdService.updateProjectStructure(structureData.structure, commitMessage).subscribe(function (responseObject) {
-            console.log("Structure Saved!!");
-            _this.resetProjectStructure();
-            _this.resetProjectHistory();
+            if (responseObject.loginRequired) {
+                _this.loginRequired.emit();
+            }
+            else {
+                console.log("Structure Saved!!");
+                _this.resetProjectStructure();
+                _this.resetProjectHistory();
+            }
         });
     };
     CmsComponent.prototype.saveProjectContent = function (contentData) {
@@ -1452,9 +1476,14 @@ var CmsComponent = (function () {
         if (updateProjectObservable != null) {
             console.log("About to save content");
             updateProjectObservable.subscribe(function (responseObject) {
-                console.log("Content Saved!!");
-                _this.resetProjectContent();
-                _this.resetProjectHistory();
+                if (responseObject.loginRequired) {
+                    _this.loginRequired.emit();
+                }
+                else {
+                    console.log("Content Saved!!");
+                    _this.resetProjectContent();
+                    _this.resetProjectHistory();
+                }
             });
         }
     };
@@ -1474,9 +1503,14 @@ var CmsComponent = (function () {
     CmsComponent.prototype.resetProjectHistory = function () {
         var _this = this;
         this._cdService.refreshProjectHistory().subscribe(function (responseObject) {
-            console.log("Project History Reset!!");
-            _this.projectContentHistory = _this._cdService.getCurrentProjectContentHistory();
-            _this.projectStructureHistory = _this._cdService.getCurrentProjectStructureHistory();
+            if (responseObject.loginRequired) {
+                _this.loginRequired.emit();
+            }
+            else {
+                console.log("Project History Reset!!");
+                _this.projectContentHistory = _this._cdService.getCurrentProjectContentHistory();
+                _this.projectStructureHistory = _this._cdService.getCurrentProjectStructureHistory();
+            }
         });
     };
     CmsComponent.prototype.projectDeleted = function () {
@@ -1486,16 +1520,20 @@ var CmsComponent = (function () {
         __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["T" /* Output */])(), 
         __metadata('design:type', (typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_0__angular_core__["G" /* EventEmitter */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_0__angular_core__["G" /* EventEmitter */]) === 'function' && _a) || Object)
     ], CmsComponent.prototype, "requestToUpdatePageTitle", void 0);
+    __decorate([
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["T" /* Output */])(), 
+        __metadata('design:type', (typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_0__angular_core__["G" /* EventEmitter */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_0__angular_core__["G" /* EventEmitter */]) === 'function' && _b) || Object)
+    ], CmsComponent.prototype, "loginRequired", void 0);
     CmsComponent = __decorate([
         __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["U" /* Component */])({
             selector: 'app-cms',
             template: __webpack_require__(675),
             styles: [__webpack_require__(650)]
         }), 
-        __metadata('design:paramtypes', [(typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__["a" /* ContentDeveloperServerService */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__["a" /* ContentDeveloperServerService */]) === 'function' && _b) || Object])
+        __metadata('design:paramtypes', [(typeof (_c = typeof __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__["a" /* ContentDeveloperServerService */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__["a" /* ContentDeveloperServerService */]) === 'function' && _c) || Object])
     ], CmsComponent);
     return CmsComponent;
-    var _a, _b;
+    var _a, _b, _c;
 }());
 //# sourceMappingURL=C:/GitHub/ContentDeveloperCMS/ContentDeveloperCMS-AngularApp/src/cms.component.js.map
 
@@ -3614,7 +3652,7 @@ module.exports = ""
 /***/ 668:
 /***/ (function(module, exports) {
 
-module.exports = "<app-header\r\n    [user]=\"user\"\r\n    [pageTitle]=\"pageTitle\"\r\n    (requestToLogout)=\"logout()\"></app-header>\r\n\r\n    <app-login\r\n        *ngIf=\"user == null\">\r\n    </app-login>\r\n\r\n    <app-cms \r\n        *ngIf=\"user != null\"\r\n        (requestToUpdatePageTitle)=\"updatePageTitle($event)\">\r\n    </app-cms>\r\n<app-footer></app-footer>\r\n"
+module.exports = "<app-header\r\n    [user]=\"user\"\r\n    [pageTitle]=\"pageTitle\"\r\n    (requestToLogout)=\"logout()\"></app-header>\r\n\r\n    <app-login\r\n        *ngIf=\"user == null\">\r\n    </app-login>\r\n\r\n    <app-cms \r\n        *ngIf=\"user != null\"\r\n        (requestToUpdatePageTitle)=\"updatePageTitle($event)\"\r\n        (loginRequired)=\"loginRequired($event)\">\r\n    </app-cms>\r\n<app-footer></app-footer>\r\n"
 
 /***/ }),
 

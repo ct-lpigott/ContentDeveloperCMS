@@ -31,6 +31,14 @@ app.use("/", session({
     }
 }));
 
+// Setting the route for all static request to be "/public" i.e. this will deal
+// with all requests for static elements of the site, such as JavaScript, CSS etc.
+app.use(express.static("./public"));
+
+app.get("/", function(req, res, next){
+  res.redirect("/angular");
+});
+
 // Intercepting all requests
 app.use("/", require("./routes/cross-origin.js"));
 app.use("/", require("./routes/authentication.js"));
@@ -53,14 +61,6 @@ var multerUpload = multer({
   })
 });
 app.use("/feeds", multerUpload.single("file"));
-
-// Setting the route for all static request to be "/public" i.e. this will deal
-// with all requests for static elements of the site, such as JavaScript, CSS etc.
-app.use(express.static("./public"));
-
-app.get("/", function(req, res, next){
-  res.redirect("/angular");
-});
 
 // Setting up the routing structure of the app. Sending requests to a different
 // route in the server based on the first URL parameter of their request i.e.
