@@ -36,7 +36,7 @@ router.use(function(req, res, next){
     if(req.userID != null){
         next();
     } else {
-        res.send({});
+        next(new Error("loginRequired"));
     }
 });
 

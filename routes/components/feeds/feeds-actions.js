@@ -43,13 +43,13 @@ router.put("/:projectID", function(req, res, next){
     next();
 });
 
-router.all("/:projectID", function(req, res, next){
+router.all("/", function(req, res, next){
     if(req.query.action != null){
         if(req.userID != null){
             next();
         } else {
             req.feedsErrors.push("Only authenticated users can request actions");
-            next(new Error());
+            next(new Error("loginRequired"));
         }        
     } else {
         next("route");
@@ -85,14 +85,7 @@ router.get("/", function(req, res, next){
                 }
             });
         } else {
-            // This request has no userID, and so it was not possible to find this
-            // users projects. Adding this as an error to the feedsErrors array.
-            req.feedsErrors.push("No body provided in the request");
-
-            // Since this is a significant issue, passing this request to the feeds-errors
-            // route, by calling the next method with an empty error (as all errors will be
-            // accessible from the feedsErrors array).
-            next(new Error());
+            next(new Error("loginRequired"));
         }
     } else {
         next();

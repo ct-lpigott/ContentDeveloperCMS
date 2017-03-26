@@ -5,7 +5,7 @@ module.exports = function (err, req, res, next) {
     // Setting the request status to be equal to the specified status
     // of the error, or failing that (i.e. if one has not been specified)
     // setting it to 500 - Internal Server Error).
-    if(err.message != "notify" || req.feedsErrors != null){
+    if(err.message != "notify" || err.message != "loginRequired" || req.feedsErrors != null){
         res.status(err.status || 500);
     }    
     //console.log(err);
@@ -37,6 +37,10 @@ module.exports = function (err, req, res, next) {
             req.responseObject.errors.push(req.preRequestErrors[i]);
         } 
     }   
+
+    if(err.message == "loginRequired"){
+        req.responseObject.loginRequired = true;
+    }
 
     // Sending the responseObject back as the response for this request. This 
     // will contain the array of any errors that have occurred within the feeds
