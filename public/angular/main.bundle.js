@@ -1305,6 +1305,7 @@ var UserProjectsComponent = (function () {
     function UserProjectsComponent(_cdService) {
         this._cdService = _cdService;
         this.viewProject = new __WEBPACK_IMPORTED_MODULE_0__angular_core__["G" /* EventEmitter */]();
+        this.viewLoginRequired = new __WEBPACK_IMPORTED_MODULE_0__angular_core__["G" /* EventEmitter */]();
     }
     UserProjectsComponent.prototype.ngOnInit = function () {
         this.refreshUserProjects();
@@ -1329,22 +1330,33 @@ var UserProjectsComponent = (function () {
     };
     UserProjectsComponent.prototype.refreshUserProjects = function () {
         var _this = this;
-        this._cdService.loadUserProjects().subscribe(function (responesObject) { return _this._userProjects = responesObject; });
+        this._cdService.loadUserProjects().subscribe(function (responseObject) {
+            if (responseObject.loginRequired) {
+                _this.viewLoginRequired.emit();
+            }
+            else {
+                _this._userProjects = responseObject;
+            }
+        });
     };
     __decorate([
         __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["T" /* Output */])(), 
         __metadata('design:type', (typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_0__angular_core__["G" /* EventEmitter */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_0__angular_core__["G" /* EventEmitter */]) === 'function' && _a) || Object)
     ], UserProjectsComponent.prototype, "viewProject", void 0);
+    __decorate([
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["T" /* Output */])(), 
+        __metadata('design:type', (typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_0__angular_core__["G" /* EventEmitter */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_0__angular_core__["G" /* EventEmitter */]) === 'function' && _b) || Object)
+    ], UserProjectsComponent.prototype, "viewLoginRequired", void 0);
     UserProjectsComponent = __decorate([
         __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["U" /* Component */])({
             selector: 'app-user-projects',
             template: __webpack_require__(673),
             styles: [__webpack_require__(648)]
         }), 
-        __metadata('design:paramtypes', [(typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__["a" /* ContentDeveloperServerService */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__["a" /* ContentDeveloperServerService */]) === 'function' && _b) || Object])
+        __metadata('design:paramtypes', [(typeof (_c = typeof __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__["a" /* ContentDeveloperServerService */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__["a" /* ContentDeveloperServerService */]) === 'function' && _c) || Object])
     ], UserProjectsComponent);
     return UserProjectsComponent;
-    var _a, _b;
+    var _a, _b, _c;
 }());
 //# sourceMappingURL=C:/GitHub/ContentDeveloperCMS/ContentDeveloperCMS-AngularApp/src/user-projects.component.js.map
 
@@ -1527,6 +1539,9 @@ var CmsComponent = (function () {
     };
     CmsComponent.prototype.projectDeleted = function () {
         this.viewUserProjects();
+    };
+    CmsComponent.prototype.viewLoginRequired = function () {
+        this.loginRequired.emit();
     };
     __decorate([
         __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["T" /* Output */])(), 
@@ -3713,7 +3728,7 @@ module.exports = "<app-content-view\r\n  [projectContent]=\"projectContent\"\r\n
 /***/ 675:
 /***/ (function(module, exports) {
 
-module.exports = "<ng-container *ngIf=\"_projectId == null && _userAccessLevel == null\">\r\n    <app-user-projects\r\n        (viewProject)=\"viewProject($event)\"></app-user-projects>\r\n</ng-container>\r\n\r\n<ng-container *ngIf=\"_projectId != null && _userAccessLevel != null\">\r\n    <button (click)=\"viewUserProjects()\">Back to all Projects</button>\r\n    <button (click)=\"refreshProject()\">Refresh from Server</button>\r\n    <app-cms-admin\r\n        *ngIf=\"_userAccessLevel == 1\"\r\n        [(projectStructure)]=\"projectStructure\"\r\n        [(projectContent)]=\"projectContent\"\r\n        [projectStructureHistory]=\"projectStructureHistory\"\r\n        [projectContentHistory]=\"projectContentHistory\"\r\n        [(projectSettings)]=\"projectSettings\"\r\n        (adminRequestToSaveStructure)=\"saveProjectStructure($event)\"\r\n        (adminRequestToResetStructure)=\"resetProjectStructure()\"\r\n        (adminRequestToSaveContent)=\"saveProjectContent($event)\"\r\n        (adminRequestToResetContent)=\"resetProjectContent()\"\r\n        (adminRequestToRefreshSettings)=\"loadProjectSettings()\"\r\n        (adminNotifyingOfProjectDeletion)=\"projectDeleted()\">\r\n    </app-cms-admin>\r\n    <app-cms-editor\r\n        *ngIf=\"_userAccessLevel == 2 || _userAccessLevel > 3\"\r\n        [(projectContent)]=\"projectContent\"\r\n        [projectStructure]=\"projectStructure\"\r\n        [(projectSettings)]=\"projectSettings\"\r\n        [customCss]=\"projectSettings != null ? projectSettings.custom_css : ''\"\r\n        (editorRequestToSaveContent)=\"saveProjectContent($event)\"\r\n        (editorRequestToResetContent)=\"resetProjectContent()\"\r\n        (editorRequestToRefreshSettings)=\"loadProjectSettings()\">\r\n    </app-cms-editor>\r\n    <app-cms-view-only\r\n        *ngIf=\"_userAccessLevel == 3\"\r\n        [projectContent]=\"projectContent\"\r\n        [projectStructure]=\"projectStructure\"\r\n        [customCss]=\"projectSettings != null ? projectSettings.custom_css : ''\">\r\n    </app-cms-view-only>\r\n</ng-container>"
+module.exports = "<ng-container *ngIf=\"_projectId == null && _userAccessLevel == null\">\r\n    <app-user-projects\r\n        (viewProject)=\"viewProject($event)\"\r\n        (viewLoginRequired)=\"viewLoginRequired($event)\"></app-user-projects>\r\n</ng-container>\r\n\r\n<ng-container *ngIf=\"_projectId != null && _userAccessLevel != null\">\r\n    <button (click)=\"viewUserProjects()\">Back to all Projects</button>\r\n    <button (click)=\"refreshProject()\">Refresh from Server</button>\r\n    <app-cms-admin\r\n        *ngIf=\"_userAccessLevel == 1\"\r\n        [(projectStructure)]=\"projectStructure\"\r\n        [(projectContent)]=\"projectContent\"\r\n        [projectStructureHistory]=\"projectStructureHistory\"\r\n        [projectContentHistory]=\"projectContentHistory\"\r\n        [(projectSettings)]=\"projectSettings\"\r\n        (adminRequestToSaveStructure)=\"saveProjectStructure($event)\"\r\n        (adminRequestToResetStructure)=\"resetProjectStructure()\"\r\n        (adminRequestToSaveContent)=\"saveProjectContent($event)\"\r\n        (adminRequestToResetContent)=\"resetProjectContent()\"\r\n        (adminRequestToRefreshSettings)=\"loadProjectSettings()\"\r\n        (adminNotifyingOfProjectDeletion)=\"projectDeleted()\">\r\n    </app-cms-admin>\r\n    <app-cms-editor\r\n        *ngIf=\"_userAccessLevel == 2 || _userAccessLevel > 3\"\r\n        [(projectContent)]=\"projectContent\"\r\n        [projectStructure]=\"projectStructure\"\r\n        [(projectSettings)]=\"projectSettings\"\r\n        [customCss]=\"projectSettings != null ? projectSettings.custom_css : ''\"\r\n        (editorRequestToSaveContent)=\"saveProjectContent($event)\"\r\n        (editorRequestToResetContent)=\"resetProjectContent()\"\r\n        (editorRequestToRefreshSettings)=\"loadProjectSettings()\">\r\n    </app-cms-editor>\r\n    <app-cms-view-only\r\n        *ngIf=\"_userAccessLevel == 3\"\r\n        [projectContent]=\"projectContent\"\r\n        [projectStructure]=\"projectStructure\"\r\n        [customCss]=\"projectSettings != null ? projectSettings.custom_css : ''\">\r\n    </app-cms-view-only>\r\n</ng-container>"
 
 /***/ }),
 
