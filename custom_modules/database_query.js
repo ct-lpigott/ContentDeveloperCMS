@@ -341,7 +341,7 @@ function combineColVals(cols=[], vals=[], setGet, split=", ", sanitise=true){
                 value = vals[i];
             }
 
-            if(encryptedColumns.indexOf(cols[i]) == 0 && value != null){
+            if(encryptedColumns.indexOf(cols[i]) > 0 && value != null){
                 value = "AES_ENCRYPT(" + dbconn.escape(value) + ", " + dbconn.escape(process.env.DATABASE_KEY) + ")";
             } else {
                 value = dbconn.escape(value);
@@ -388,7 +388,7 @@ function columnStringDecryption(stringOfCols){
             col = columns[i].split(".")[1];
         }
 
-        if(encryptedColumns.indexOf(col) == 0){
+        if(encryptedColumns.indexOf(col) > 0){
             columns[i] = "AES_DECRYPT(" + columns[i] + ", " + dbconn.escape(process.env.DATABASE_KEY) + ")";
         }
     }
