@@ -335,8 +335,10 @@ function combineColVals(cols=[], vals=[], method, split=", ", sanitise=true){
         var value;
         if(method == "set" || method == "insert"){
             if(sanitise){
-                if(cols[i] == "custom_css" || cols[i] == "google_access_token" || cols[i] == "access_levels"){
-                    value = validation.sanitise(vals[i], true, true);
+                if(cols[i] == "google_access_token" || cols[i] == "access_levels"){
+                    value = vals[i];
+                } else if(cols[i] == "custom_css"){
+                    value = validation.sanitise(vals[i], true);
                 } else {
                     value = validation.sanitise(vals[i]);
                 }
