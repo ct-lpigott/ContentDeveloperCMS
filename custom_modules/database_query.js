@@ -133,7 +133,7 @@ function update_UserProject(updateCols=[], updateVals=[], currentUserId, updateU
 function create_User(emailAddress, cb){
     emailAddress = validation.sanitise(emailAddress);
     createUniqueUserAuthToken(function(newAuthToken){
-        dbconn.query("INSERT INTO User(email_address, cd_user_auth_token) VALUES(" + dbconn.escape(emailAddress) + ", " + newAuthToken + ")", function(err, result){
+        dbconn.query("INSERT INTO User(email_address, cd_user_auth_token) VALUES(" + dbconn.escape(emailAddress) + ", " + dbconn.escape(newAuthToken) + ")", function(err, result){
             handleCreateResult(err, result, cb);
         });
     });
@@ -337,9 +337,11 @@ function combineColVals(cols=[], vals=[], setGet, split=", ", sanitise=true){
                 } else {
                     value = validation.sanitise(vals[i]);
                 }
+            } else {
+                value = vals[i];
             }
 
-            if(encryptedColumns.indexOf(cols[i]) == 0){
+            if(encryptedColumns.indexOf(cols[i]) == 0 && value != null){
                 value = "AES_ENCRYPT(" + dbconn.escape(value) + ", " + dbconn.escape(process.env.DATABASE_KEY) + ")";
             } else {
                 value = dbconn.escape(value);
