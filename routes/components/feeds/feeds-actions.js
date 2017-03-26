@@ -113,11 +113,11 @@ router.post("/", function(req, res, next){
         // Checking that a project name has been included in the request body
         if(req.body.project_name != null){
 
-            googleOAuth.createNewProjectFolder(req.body.project_name, req.userID, function(newGoogleFolderId){
+            googleOAuth.createNewProjectFolder(req.body.project_name, req.userID, function(newGoogleFolderId, userPermissionId){
                 console.log(newGoogleFolderId);
                 // Creating a new project in the database, using the project name provided 
                 // in the request body
-                dbQuery.create_Project(req.body.project_name, accessLevels.getDefaultAccessLevelsJson(), newGoogleFolderId, req.userID, function(err, newProjectId){
+                dbQuery.create_Project(req.body.project_name, accessLevels.getDefaultAccessLevelsJson(), newGoogleFolderId, userPermissionId, req.userID, function(err, newProjectId){
                     if(err || newProjectId == null){
                         // Logging the error to the console
                         console.log("Error creating new project " + err);

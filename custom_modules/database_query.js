@@ -83,7 +83,7 @@ function update_Project(updateCols=[], updateVals=[], userId, projectId, cb){
     });
 }
 
-function update_UserProject(updateCols=[], updateVals=[], currentUserId, updateUserId, role, projectId, cb){
+function update_UserProject(updateCols=[], updateVals=[], currentUserId, updateUserId, projectId, cb){
     var setCols = "SET " + combineColVals(updateCols, updateVals);
     updateUserId = validation.sanitise(updateUserId);
     projectId = validation.sanitise(projectId);
@@ -130,15 +130,15 @@ function create_User(emailAddress, cb){
     });
 }
 
-function create_Project(projectName, accessLevels, mediaFolderId, userId, cb){
+function create_Project(projectName, accessLevels, mediaFolderId, userPermissionId, currentUserId, cb){
     projectName = validation.sanitise(projectName);
-    userId = validation.sanitise(userId);
+    currentUserId = validation.sanitise(currentUserId);
     dbconn.query("INSERT INTO Project(project_name, access_levels, media_folder_id) VALUES(" + dbconn.escape(projectName) + ", " + dbconn.escape(accessLevels) + ", " + dbconn.escape(mediaFolderId) + ")", function(err, result){
         handleCreateResult(err, result, function(err, newProjectId){
             if(err || newProjectId == null){
                 cb(err, null);
             } else {
-                create_UserProject(userId, userId, newProjectId, 1, "owner", function(err, newUserProjectId){
+                create_UserProject(currentUserId, currentUserId, newProjectId, 1, userPermissionId, function(err, newUserProjectId){
                     if(err || newUserProjectId == null){
                         cb(err, null);
                     } else {
@@ -150,19 +150,21 @@ function create_Project(projectName, accessLevels, mediaFolderId, userId, cb){
     });
 }
 
-function create_UserProject(currentUserId, newUserId, projectId, accessLevelInt, role=null, cb){
+function create_UserProject(currentUserId, newUserId, projectId, accessLevelInt, userPermissionId=null, cb){
     newUserId = validation.sanitise(newUserId);
     projectId = validation.sanitise(projectId);
     access_level_int = validation.sanitise(accessLevelInt);
-    dbconn.query("INSERT INTO User_Project(user_id, project_id, access_level_int) VALUES(" + dbconn.escape(newUserId) + ", " + dbconn.escape(projectId) + ", " + dbconn.escape(accessLevelInt) + ")", function(err, result){
+    dbconn.query("INSERT INTO User_Project(user_id, project_id, access_level_int, media_folder_permission_id) VALUES(" + dbconn.escape(newUserId) + ", " + dbconn.escape(projectId) + ", " + dbconn.escape(accessLevelInt) + ", " + dbconn.escape(userPermissionId) + ")", function(err, result){
         handleCreateResult(err, result, function(err, newUserProjectId){
             if(err){
                 cb(err, null);
             } else {
-                var googleOAuth = require("./google_oauth");
-                googleOAuth.addUserToMediaFolder(currentUserId, newUserId, projectId, accessLevelInt, role, function(success){
-                    cb(err, success);
-                });
+                if(userPermissionId == null){
+                    var googleOAuth = require("./google_oauth");
+                    googleOAuth.addUserToMediaFolder(currentUserId, newUserId, projectId, accessLevelInt, function(success){
+                        cb(err, success);
+                    });
+                }
             }
         });
     });
@@ -185,12 +187,11 @@ function check_UserProject(currentUserId, newUserId, projectId, accessLevelInt, 
     newUserId = validation.sanitise(newUserId);
     projectId = validation.sanitise(projectId);
     accessLevelInt = validation.sanitise(accessLevelInt);
-    var role = accessLevelInt == 3 ? "reader" : "writer";
     get_UserProject("access_level_int", newUserId, projectId, function(err, row){
         if(err){ console.log(err); }
         if(row){
             if(row.access_level_int != accessLevelInt){
-                update_UserProject(["access_level_int"], [accessLevelInt], currentUserId, newUserId, role, projectId, function(err, success){
+                update_UserProject(["access_level_int"], [accessLevelInt], currentUserId, newUserId, projectId, function(err, success){
                     console.log("This users access level has been updated on this project");
                     cb(err, success);
                 });

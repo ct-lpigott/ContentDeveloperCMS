@@ -87,14 +87,14 @@ function createNewProjectFolder(projectName, currentUserID, cb){
     drive.files.create({
       auth: oauth2Client,
       resource: folderMeta,
-      fields: "id"
+      fields: "id, permissions"
     }, function(error, file) {
       if(error) {
         console.log(error);
       } else {
         console.log("Successfully created folder. Id: = " + file.id);
         makeFolderPublic(file.id, oauth2Client, function(){
-          cb(file.id);
+          cb(file.id, file.permissions[0].id);
         });
       }
     });
@@ -147,10 +147,8 @@ function uploadMediaItem(fileInfo, mediaFolderId, currentUserID, projectId, cb){
   });    
 }
 
-function addUserToMediaFolder(currentUserID, addUserID, projectId, accessLevelInt, role, cb){
-  if(role == null){
-    role = decideUserRole(accessLevelInt);
-  }  
+function addUserToMediaFolder(currentUserID, addUserID, projectId, accessLevelInt, cb){
+  var role = decideUserRole(accessLevelInt);  
   dbQuery.get_UserProject_Project_User(["p.media_folder_id, u.email_address"], addUserID, projectId, function(err, row){
     if(row){
       generateOAuth2Client(currentUserID, function(oauth2Client){
@@ -280,7 +278,7 @@ function makeFolderPublic(fileId, oauth2Client, cb) {
 function recreateProjectFolder(currentUserID, projectId, cb){
   dbQuery.get_Project("project_name", projectId, function(err, row){
     if(row){
-      createNewProjectFolder(row.project_name, currentUserID, function(newFolderID){
+      createNewProjectFolder(row.project_name, currentUserID, function(newFolderID, ownerPermissionId){
         if(newFolderID != null){
           dbQuery.update_Project(["media_folder_id"], [newFolderID], currentUserID, projectId, function(err, success){
             if(success){
@@ -288,9 +286,10 @@ function recreateProjectFolder(currentUserID, projectId, cb){
               dbQuery.get_UserProjects_forProject("up.access_level_int, up.user_id", projectId, function(err, rows){
                 if(rows){
                   for(var i=0; i<rows.length; i++){
-                    if(rows[i].user_id != currentUserID){
-                      role = decideUserRole(rows[i].access_level_int);
-                      addUserToMediaFolder(currentUserID, rows[i].user_id, projectId, rows[i].access_level_int, role, function(success){
+                    if(rows[i].user_id == currentUserID){
+                      dbQuery.update_UserProject(["media_folder_permission_id"], [ownerPermissionId], currentUserID, currentUserID, projectId, function(err, success){});
+                    } else {
+                      addUserToMediaFolder(currentUserID, rows[i].user_id, projectId, rows[i].access_level_int, function(success){
                         if(success){
                           console.log("User readded to project folder");
                         }
