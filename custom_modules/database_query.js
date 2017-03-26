@@ -3,8 +3,11 @@ var sendEmail = require("./send_email");
 var validation = require("./validation");
 var crypto = require('crypto');
 
+const encryptedColumns = ["google_profile_id", "google_access_token", "google_refresh_token", "cd_user_auth_token", "media_folder_id", "update_origins", "read_origins", "media_folder_permission_id"];
+
 // GET
 function get_User(selectCols="", userId, cb){
+    selectCols = columnStringDecryption(selectCols);
     userId = validation.sanitise(userId);
     dbconn.query("SELECT " + selectCols + " FROM User WHERE id=" + dbconn.escape(userId), function(err, rows, fields){
         handleGetResult(err, rows, "single", cb);
@@ -12,6 +15,7 @@ function get_User(selectCols="", userId, cb){
 }
 
 function get_Project(selectCols="", projectId, cb){
+    selectCols = columnStringDecryption(selectCols);
     projectId = validation.sanitise(projectId);
     dbconn.query("SELECT " + selectCols + " FROM Project WHERE id=" + dbconn.escape(projectId), function(err, rows, fields){
         handleGetResult(err, rows, "single", cb);
@@ -19,6 +23,7 @@ function get_Project(selectCols="", projectId, cb){
 }
 
 function get_UserProject(selectCols="", userId, projectId, cb){
+    selectCols = columnStringDecryption(selectCols);
     userId = validation.sanitise(userId);
     projectId = validation.sanitise(projectId);
     dbconn.query("SELECT " + selectCols + " FROM User_Project WHERE user_id=" + dbconn.escape(userId) + " AND project_id=" + dbconn.escape(projectId), function(err, rows, fields){
@@ -27,6 +32,7 @@ function get_UserProject(selectCols="", userId, projectId, cb){
 }
 
 function get_UserProjects_forUser(selectCols, userId, cb){
+    selectCols = columnStringDecryption(selectCols);
     userId = validation.sanitise(userId);
     dbconn.query("SELECT " + selectCols + " FROM User_Project up LEFT JOIN Project p ON up.project_id = p.id WHERE up.user_id=" + dbconn.escape(userId), function(err, rows, fields){
         handleGetResult(err, rows, "all", cb);
@@ -34,6 +40,7 @@ function get_UserProjects_forUser(selectCols, userId, cb){
 }
 
 function get_UserProjects_forProject(selectCols, projectId, cb){
+    selectCols = columnStringDecryption(selectCols);
     projectId = validation.sanitise(projectId);
     dbconn.query("SELECT " + selectCols + " FROM User_Project up LEFT JOIN User u ON up.user_id = u.id LEFT JOIN Project p ON up.project_id = p.id WHERE up.project_id=" + dbconn.escape(projectId), function(err, rows, fields){
         handleGetResult(err, rows, "all", cb);
@@ -41,6 +48,7 @@ function get_UserProjects_forProject(selectCols, projectId, cb){
 }
 
 function get_UserProject_Project(selectCols, userId, projectId, cb){
+    selectCols = columnStringDecryption(selectCols);
     userId = validation.sanitise(userId);
     projectId = validation.sanitise(projectId);
     dbconn.query("SELECT " + selectCols + " FROM User_Project up LEFT JOIN Project p ON up.project_id = p.id WHERE up.user_id=" + dbconn.escape(userId) + " AND up.project_id=" + dbconn.escape(projectId), function(err, rows, fields){
@@ -49,6 +57,7 @@ function get_UserProject_Project(selectCols, userId, projectId, cb){
 }
 
 function get_UserProject_Project_User(selectCols, userId, projectId, cb){
+    selectCols = columnStringDecryption(selectCols);
     userId = validation.sanitise(userId);
     projectId = validation.sanitise(projectId);
     dbconn.query("SELECT " + selectCols + " FROM User_Project up LEFT JOIN Project p ON up.project_id = p.id LEFT JOIN User u ON up.user_id = u.id WHERE up.user_id=" + dbconn.escape(userId) + " AND up.project_id=" + dbconn.escape(projectId), function(err, rows, fields){
@@ -58,7 +67,8 @@ function get_UserProject_Project_User(selectCols, userId, projectId, cb){
 
 // GET WHERE
 function getWhere_User(selectCols="", whereCols=[], whereVals=[], cb){
-    var where = "WHERE " + combineColVals(whereCols, whereVals, " AND ");
+    selectCols = columnStringDecryption(selectCols);
+    var where = "WHERE " + combineColVals(whereCols, whereVals, "get",  " AND ");
     dbconn.query("SELECT " + selectCols + " FROM User " + where, function(err, rows, fields){
         handleGetResult(err, rows, "single", cb);
     });
@@ -66,7 +76,7 @@ function getWhere_User(selectCols="", whereCols=[], whereVals=[], cb){
 
 // UPDATE
 function update_User(updateCols=[], updateVals=[], userId, cb){
-    var setCols = "SET " + combineColVals(updateCols, updateVals, ", ", false);
+    var setCols = "SET " + combineColVals(updateCols, updateVals, "set", ", ", false);
     userId = validation.sanitise(userId);
     dbconn.query("UPDATE User " + setCols + " WHERE id=" + dbconn.escape(userId), function(err, result){
         handleUpdateResult(err, result, cb);
@@ -74,7 +84,7 @@ function update_User(updateCols=[], updateVals=[], userId, cb){
 }
 
 function update_Project(updateCols=[], updateVals=[], userId, projectId, cb){
-    var setCols = "SET " + combineColVals(updateCols, updateVals);
+    var setCols = "SET " + combineColVals(updateCols, updateVals, "set");
     userId = validation.sanitise(userId);
     projectId = validation.sanitise(projectId);
     dbconn.query("UPDATE Project p LEFT JOIN User_Project up ON p.id = up.project_id " + setCols + " WHERE up.project_id=" + dbconn.escape(projectId) + " AND up.user_id=" + dbconn.escape(userId), function(err, result){
@@ -83,7 +93,7 @@ function update_Project(updateCols=[], updateVals=[], userId, projectId, cb){
 }
 
 function update_UserProject(updateCols=[], updateVals=[], currentUserId, updateUserId, projectId, cb){
-    var setCols = "SET " + combineColVals(updateCols, updateVals);
+    var setCols = "SET " + combineColVals(updateCols, updateVals, "set");
     updateUserId = validation.sanitise(updateUserId);
     projectId = validation.sanitise(projectId);
     dbconn.query("UPDATE User_Project " + setCols + " WHERE user_id=" + updateUserId  + " AND project_id=" + projectId, function(err, result) {
@@ -316,20 +326,34 @@ function handleCreateResult(err, result, cb){
     }
 };
 
-function combineColVals(cols=[], vals=[], split=", ", sanitise=true){
+function combineColVals(cols=[], vals=[], setGet, split=", ", sanitise=true){
     var colVals = "";
     for(var i=0; i<cols.length; i++){
         var value;
-        if(sanitise){
-            if(cols[i] == "custom_css" || cols[i] == "google_access_token"){
-                value = validation.sanitise(vals[i], true);
+        if(setGet == "set"){
+            if(sanitise){
+                if(cols[i] == "custom_css" || cols[i] == "google_access_token"){
+                    value = validation.sanitise(vals[i], true);
+                } else {
+                    value = validation.sanitise(vals[i]);
+                }
             } else {
-                value = validation.sanitise(vals[i]);
+                value = dbconn.escape(vals[i]);
             }
-        } else {
-            value = vals[i];
+
+            if(encryptedColumns.indexOf(cols[i]) > -1){
+                value = "AES_ENCRYPT(" + dbconn.escape(value) + ")";
+            }
+            
+            colVals += cols[i] + "=" + value;
+        } else if(setGet == "get"){
+            var col = cols[i];
+            if(encryptedColumns.indexOf(cols[i]) > -1){
+                col = "AES_DECRYPT(" + cols[i] + ")";
+            }
+            colVals += col + "=" + dbconn.escape(value);
         }
-        colVals += cols[i] + "=" + dbconn.escape(value);
+        
         if(i < cols.length - 1){
             colVals += split;
         }
@@ -356,6 +380,16 @@ function createUniqueUserAuthToken(cb){
             });
         }
     }); 
+}
+
+function columnStringDecryption(stringOfCols){
+    var columns = stringOfCols.split(", ");
+    for(var i=0; i<columns.length; i++){
+        if(encryptedColumns.indexOf(columns[i]) > -1){
+            columns[i] = "AES_DECRYPT(" + columns[i] + ")";
+        }
+    }
+    return columns.join(", ");
 }
 
 module.exports = {
