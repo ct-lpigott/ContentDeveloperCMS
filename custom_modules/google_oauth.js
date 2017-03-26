@@ -168,7 +168,7 @@ function addUserToMediaFolder(currentUserID, addUserID, projectId, accessLevelIn
             cb(false);
           } else {
             console.log("User successfully added to media folder: " + res.id);
-            dbQuery.update_UserProject(["media_folder_permission_id"], [res.id], currentUserID, addUserID, role, projectId, function(err, success){
+            dbQuery.update_UserProject(["media_folder_permission_id"], [res.id], currentUserID, addUserID, projectId, function(err, success){
               cb(success);
             });
           }
@@ -219,7 +219,7 @@ function updateUserAccessToFolder(currentUserID, updateUserId, projectId, access
             cb(false);
           } else {
             console.log("User access level successfully updated: " + res.id);
-            dbQuery.update_UserProject(["media_folder_permission_id"], [res.id], currentUserID, updateUserId, role, projectId, function(err, success){
+            dbQuery.update_UserProject(["media_folder_permission_id"], [res.id], currentUserID, updateUserId, projectId, function(err, success){
               cb(success);
             });
           }
