@@ -260,7 +260,7 @@ function objectToJson(jsObject){
     return validJson;
 }
 
-function validateNewContent(content, structure){
+function validateNewContent(content, structure, accessLevel){
     var responseObject = {
         sanitisedContent: content,
         errors: [],
@@ -270,22 +270,26 @@ function validateNewContent(content, structure){
     if(typeof structure == "object"){
         if(structure.attributes != null || structure.items != null){
             if(content != null){
-                var contentValidation = validateContentAgainstStructure(content, structure);
-                if(contentValidation.allowed){
-                    responseObject.sanitisedContent = contentValidation.sanitisedContent;
+                if(checkAccessLevelAllowedUpdate(structure, accessLevel, responseObject)){
+                    var contentValidation = validateContentAgainstStructure(content, structure, accessLevel);
+                    if(contentValidation.allowed){
+                        responseObject.sanitisedContent = contentValidation.sanitisedContent;
+                    } else {
+                        responseObject.sanitisedContent = "";
+                        responseObject.allowed = false;
+                    }
+                    for(var i=0; i<contentValidation.errors.length; i++){
+                        responseObject.errors.push(contentValidation.errors[i]);
+                    }
                 } else {
-                    responseObject.sanitisedContent = "";
                     responseObject.allowed = false;
-                }
-                for(var i=0; i<contentValidation.errors.length; i++){
-                    responseObject.errors.push(contentValidation.errors[i]);
                 }
             }
         } else {
             for(var property in structure){
                 if(content[property] != null){
                     if(structure[property].items != null || structure[property].attributes != null){
-                        var itemsValidation = validateContentAgainstStructure(content[property], structure[property]);
+                        var itemsValidation = validateContentAgainstStructure(content[property], structure[property], accessLevel);
                         if(itemsValidation.allowed){
                             responseObject.sanitisedContent[property] = itemsValidation.sanitisedContent;
                         } else {
@@ -298,8 +302,7 @@ function validateNewContent(content, structure){
                         //responseObject.sanitisedContent[property] = "";
                         //responseObject.allowed = false;
                     } 
-                }
-                         
+                }      
             }
         }
     } else {
@@ -311,7 +314,17 @@ function validateNewContent(content, structure){
     return responseObject;
 }
 
-function validateContentAgainstStructure(content, structure){
+function checkAccessLevelAllowedUpdate(structure, accessLevel, responseObject){
+    var allowedUpdate = false;
+    if(accessLevel <= 2 || structure.no_access == null || (structure.no_access != null && accessLevel != 3 && structure.no_access.indexOf(accessLevel) < 0)){
+        allowedUpdate = true;
+    } else {
+        responseObject.errors.push("This user does not have the appropriate access level to update this content");
+    }
+    return allowedUpdate;
+}
+
+function validateContentAgainstStructure(content, structure, accessLevel){
     var responseObject = {
         allowed: true,
         errors: [],
@@ -322,119 +335,127 @@ function validateContentAgainstStructure(content, structure){
         if(content.constructor.name.toLowerCase() != structure.type){
             responseObject.errors.push("Incorrect content type provided in request. Expected " + structure.type);
             responseObject.allowed = false;
-            return response;
+            return responseObject;
         }
     }
 
-    if(structure.attributes != null){
-        var attributeCheck = checkIfPropertyMatchesAttributes(null, content, structure.attributes, structure.type, responseObject);
-        if(attributeCheck.allowed){
-            responseObject.sanitisedContent = attributeCheck.sanitisedContent;
-        }else {
-            responseObject.allowed = false;
-        }
-    } else if(structure.items != null){
-        switch(structure.type){
-            case "array": {
-                for(var i=0; i<content.length; i++){
-                    // Checking for properties that are not defined
-                    for(var itemProperty in content[i]){
-                        var structureExists = checkIfPropertyHasStructure(itemProperty, structure["items"], structure.type, responseObject);
-                        if(structureExists == false){
-                            delete responseObject.sanitisedContent[i][itemProperty];
+    if(checkAccessLevelAllowedUpdate(structure, accessLevel, responseObject)){
+        if(structure.attributes != null){
+            var attributeCheck = checkIfPropertyMatchesAttributes(null, content, structure.attributes, structure.type, responseObject);
+            if(attributeCheck.allowed){
+                responseObject.sanitisedContent = attributeCheck.sanitisedContent;
+            }else {
+                responseObject.allowed = false;
+            }
+        } else if(structure.items != null){
+            switch(structure.type){
+                case "array": {
+                    for(var i=0; i<content.length; i++){
+                        // Checking for properties that are not defined
+                        for(var itemProperty in content[i]){
+                            var structureExists = checkIfPropertyHasStructure(itemProperty, structure["items"], structure.type, responseObject);
+                            if(structureExists == false){
+                                delete responseObject.sanitisedContent[i][itemProperty];
+                            }
                         }
+                        
+                        // Checking for properties that are defined
+                        for(var property in structure["items"]){
+                            if(structure["items"][property]["attributes"] != null){
+                                var attributeCheck = checkIfPropertyMatchesAttributes(property, content[i][property], structure["items"][property]["attributes"], structure.type, responseObject);
+                                if(attributeCheck.allowed){
+                                    responseObject.sanitisedContent[i][property] = attributeCheck.sanitisedContent;
+                                } else {
+                                    responseObject.sanitisedContent[i][property] = "";
+                                }
+                            } else if(structure["items"][property]["items"] != null){         
+                                var contentValidation = validateContentAgainstStructure(content[i][property], structure["items"][property], accessLevel);
+                                if(contentValidation.allowed){
+                                    responseObject.sanitisedContent[i][property] = contentValidation.sanitisedContent;
+                                } else {
+                                    delete responseObject.sanitisedContent[i][property];
+                                }
+                                for(var i=0; i<contentValidation.errors.length; i++){
+                                    responseObject.errors.push(contentValidation.errors[i]);
+                                }
+                            }
+                        }
+                        
                     }
-                    
+                    break;
+                }
+                default: {
+                    // Checking for properties that are not defined
+                    for(var key in content){
+                        var structureExists = checkIfPropertyHasStructure(key, structure["items"], structure.type, responseObject);
+                        if(structureExists == false){
+                            delete responseObject.sanitisedContent[key];
+                        }                     
+                    }
                     // Checking for properties that are defined
                     for(var property in structure["items"]){
-                        if(structure["items"][property]["attributes"] != null){
-                            var attributeCheck = checkIfPropertyMatchesAttributes(property, content[i][property], structure["items"][property]["attributes"], structure.type, responseObject);
-                            if(attributeCheck.allowed){
-                                responseObject.sanitisedContent[i][property] = attributeCheck.sanitisedContent;
-                            } else {
-                                responseObject.sanitisedContent[i][property] = "";
+                        if(checkAccessLevelAllowedUpdate(structure["items"][property], accessLevel, responseObject)){
+                            if(structure["items"][property]["attributes"] != null){
+                                var attributeCheck = checkIfPropertyMatchesAttributes(property, content[property], structure["items"][property]["attributes"], structure.type, responseObject);
+                                if(attributeCheck.allowed){
+                                    responseObject.sanitisedContent[property] = attributeCheck.sanitisedContent;
+                                } else {
+                                    responseObject.sanitisedContent[property] = "";
+                                }
+                            } else if(structure["items"][property]["items"] != null){
+                                if(content[property] != null){
+                                    var contentValidation = validateContentAgainstStructure(content[property], structure["items"][property], accessLevel);
+                                    if(contentValidation.allowed){
+                                        responseObject.sanitisedContent[property] = contentValidation.sanitisedContent;
+                                    } else {
+                                        delete responseObject.sanitisedContent[property];
+                                    }
+                                    for(var i=0; i<contentValidation.errors.length; i++){
+                                        responseObject.errors.push(contentValidation.errors[i]);
+                                    }
+                                } 
                             }
-                        } else if(structure["items"][property]["items"] != null){         
-                            var contentValidation = validateContentAgainstStructure(content[i][property], structure["items"][property]);
-                            if(contentValidation.allowed){
-                                responseObject.sanitisedContent[i][property] = contentValidation.sanitisedContent;
-                            } else {
-                                delete responseObject.sanitisedContent[i][property];
-                            }
-                            for(var i=0; i<contentValidation.errors.length; i++){
-                                responseObject.errors.push(contentValidation.errors[i]);
-                            }
-                        }
-                    }
-                    
-                }
-                break;
-            }
-            default: {
-                // Checking for properties that are not defined
-                for(var key in content){
-                    var structureExists = checkIfPropertyHasStructure(key, structure["items"], structure.type, responseObject);
-                    if(structureExists == false){
-                        delete responseObject.sanitisedContent[key];
-                    }                     
-                }
-                // Checking for properties that are defined
-                for(var property in structure["items"]){
-                    if(structure["items"][property]["attributes"] != null){
-                        var attributeCheck = checkIfPropertyMatchesAttributes(property, content[property], structure["items"][property]["attributes"], structure.type, responseObject);
-                        if(attributeCheck.allowed){
-                            responseObject.sanitisedContent[property] = attributeCheck.sanitisedContent;
                         } else {
-                            responseObject.sanitisedContent[property] = "";
+                            delete content[property];
                         }
-                    } else if(structure["items"][property]["items"] != null){
-                        if(content[property] != null){
-                            var contentValidation = validateContentAgainstStructure(content[property], structure["items"][property]);
-                            if(contentValidation.allowed){
-                                responseObject.sanitisedContent[property] = contentValidation.sanitisedContent;
-                            } else {
-                                delete responseObject.sanitisedContent[property];
-                            }
-                            for(var i=0; i<contentValidation.errors.length; i++){
-                                responseObject.errors.push(contentValidation.errors[i]);
-                            }
-                        } 
                     }
+                    break;
                 }
-                break;
             }
-        }
 
-    } else {
-        switch(content.constructor.name.toLowerCase()){
-            case "object":
-            case "array": {
-                // Checking for properties that are not defined
-                for(var key in content){
-                    var structureExists = checkIfPropertyHasStructure(key, structure, structure.type, responseObject);       
-                    if(structureExists == false){
-                        delete responseObject.sanitisedContent[key];
-                    }                
+        } else {
+            switch(content.constructor.name.toLowerCase()){
+                case "object":
+                case "array": {
+                    // Checking for properties that are not defined
+                    for(var key in content){
+                        var structureExists = checkIfPropertyHasStructure(key, structure, structure.type, responseObject);       
+                        if(structureExists == false){
+                            delete responseObject.sanitisedContent[key];
+                        }                
+                    }
+                    // Checking for properties that are defined
+                    for(var property in structure){
+                        if(structure[property]["attributes"] != null){
+                            var attributeCheck = checkIfPropertyMatchesAttributes(property, content[property], structure[property]["attributes"], null, responseObject);
+                            if(attributeCheck.allowed){
+                                responseObject.sanitisedContent[property] = attributeCheck.sanitisedContent;
+                            } else {
+                                responseObject.sanitisedContent[property] = "";
+                            }
+                        }   
+                    }                     
+                    break;
                 }
-                // Checking for properties that are defined
-                for(var property in structure){
-                    if(structure[property]["attributes"] != null){
-                        var attributeCheck = checkIfPropertyMatchesAttributes(property, content[property], structure[property]["attributes"], null, responseObject);
-                        if(attributeCheck.allowed){
-                            responseObject.sanitisedContent[property] = attributeCheck.sanitisedContent;
-                        } else {
-                            responseObject.sanitisedContent[property] = "";
-                        }
-                    }   
-                }                     
-                break;
+                default: {
+                    responseObject.errors.push("Content contained unexpected data");
+                    responseObject.allowed = false;
+                    break;
+                }                
             }
-            default: {
-                responseObject.errors.push("Content contained unexpected data");
-                responseObject.allowed = false;
-                break;
-            }                
         }
+    } else {
+        responseObject.allowed = false;
     }
 
 

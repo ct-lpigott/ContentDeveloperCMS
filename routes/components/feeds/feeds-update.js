@@ -117,7 +117,7 @@ router.put("/:projectID", function(req, res, next){
             req.body.content = JSON.stringify(req.body.content);
         }
         if(validation.jsonToObject(req.body.content)){
-            var contentValidation = validation.validateNewContent(JSON.parse(req.body.content), req.fileData.admin.project_structure);
+            var contentValidation = validation.validateNewContent(JSON.parse(req.body.content), req.fileData.admin.project_structure, req.user_access_level);
             // Looping through any errors that were returned from the content validation,
             // and adding them to the req.feedsErrors array
             for(var i=0; i<contentValidation.errors.length; i++){
@@ -296,7 +296,7 @@ router.put("/:projectID/*", function(req, res, next){
                                                 if(contentFileData[parentName][itemName] != undefined || (arrayIndex != null && contentFileData[parentName][arrayIndex][itemName] != undefined)){
                                                     //????????
                                                     var validateWith = structureFileData[parentName]["items"][itemName] || structureFileData[parentName]["items"];
-                                                    var contentValidation = validation.validateNewContent(updatedItemContent, validateWith);   
+                                                    var contentValidation = validation.validateNewContent(updatedItemContent, validateWith, req.user_access_level);   
                                                     if(contentValidation.allowed){
                                                         req.gitCommitMessage = "Update to content of " + parentName + ": " + itemName;
                                                         if(arrayIndex != null){
@@ -363,7 +363,7 @@ router.put("/:projectID/*", function(req, res, next){
                             } else {
                                 if(structureFileData[itemName] != null){
                                     if(contentFileData[itemName] != null){
-                                        var contentValidation = validation.validateNewContent(updatedItemContent, structureFileData[itemName]);   
+                                        var contentValidation = validation.validateNewContent(updatedItemContent, structureFileData[itemName], req.user_access_level);   
                                         if(contentValidation.allowed){
                                             // Updating the value of this top level item to the updated item value
                                             contentFileData[itemName] = contentValidation.sanitisedContent; 

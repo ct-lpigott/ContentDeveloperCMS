@@ -442,7 +442,7 @@ router.post("/:projectID/*", function(req, res, next){
                                                 req.feedsErrors.push("Position " + itemName + " in " + parentName + " is already taken. Use a PUT request to update it.");
                                                 return;
                                             } else {
-                                                var contentValidation = validation.validateNewContent(newItem, structureFileData[parentName]["items"]);   
+                                                var contentValidation = validation.validateNewContent(newItem, structureFileData[parentName]["items"], req.user_access_level);   
                                                 // Looping through any errors that were returned from the content validation,
                                                 // and adding them to the req.feedsErrors array
                                                 for(var i=0; i<contentValidation.errors.length; i++){
@@ -475,7 +475,7 @@ router.post("/:projectID/*", function(req, res, next){
                                                 req.feedsErrors.push(itemName + " already exists in " + parentName + ". Use a PUT request to update it.");
                                                 return;
                                             } else {
-                                                var contentValidation = validation.validateNewContent(newItem, structureFileData[parentName]["items"][itemName]);   
+                                                var contentValidation = validation.validateNewContent(newItem, structureFileData[parentName]["items"][itemName], req.user_access_level);   
                                                 // Looping through any errors that were returned from the content validation,
                                                 // and adding them to the req.feedsErrors array
                                                 for(var i=0; i<contentValidation.errors.length; i++){
@@ -532,7 +532,7 @@ router.post("/:projectID/*", function(req, res, next){
                                     // an object into a string
                                     switch(structureFileData[itemName]["type"].toLowerCase()){
                                         case "array": {
-                                            var contentValidation = validation.validateNewContent(newItem, structureFileData[itemName]["items"]);   
+                                            var contentValidation = validation.validateNewContent(newItem, structureFileData[itemName]["items"], req.user_access_level);   
                                             // Looping through any errors that were returned from the content validation,
                                             // and adding them to the req.feedsErrors array
                                             for(var i=0; i<contentValidation.errors.length; i++){
@@ -563,7 +563,7 @@ router.post("/:projectID/*", function(req, res, next){
                                         }
                                     }
                                 } else {
-                                    var contentValidation = validation.validateNewContent(newItem, structureFileData[itemName]);   
+                                    var contentValidation = validation.validateNewContent(newItem, structureFileData[itemName], req.user_access_level);   
                                     // Looping through any errors that were returned from the content validation,
                                     // and adding them to the req.feedsErrors array
                                     for(var i=0; i<contentValidation.errors.length; i++){
