@@ -172,7 +172,6 @@ var ContentDeveloperServerService = (function () {
             .catch(function (error) { return __WEBPACK_IMPORTED_MODULE_2_rxjs_Observable__["Observable"].throw(error.json().error) || "Unknown error updating project structure"; })
             .do(function (responseObject) {
             _this._currentProjectContentStructureHistory.structure = responseObject.structure;
-            _this.refreshProjectHistory();
         });
         return structureUpdateObservable;
     };
@@ -190,7 +189,6 @@ var ContentDeveloperServerService = (function () {
                 .do(function (responseObject) {
                 if (encapsulationPath.length == 0) {
                     _this._currentProjectContentStructureHistory.content = responseObject.content;
-                    _this.refreshProjectHistory();
                 }
                 else {
                 }
@@ -382,10 +380,18 @@ var ContentDeveloperServerService = (function () {
         return result;
     };
     ContentDeveloperServerService.prototype.getCurrentProjectContentHistory = function () {
-        return this._currentProjectContentStructureHistory.content_history;
+        var result = null;
+        if (this._currentProjectContentStructureHistory.content_history != null) {
+            result = this._currentProjectContentStructureHistory.content_history.slice();
+        }
+        return result;
     };
     ContentDeveloperServerService.prototype.getCurrentProjectStructureHistory = function () {
-        return this._currentProjectContentStructureHistory.structure_history;
+        var result = null;
+        if (this._currentProjectContentStructureHistory.structure_history != null) {
+            result = this._currentProjectContentStructureHistory.structure_history.slice();
+        }
+        return result;
     };
     ContentDeveloperServerService.prototype.leaveProject = function () {
         this._currentProjectId = null;
@@ -1585,8 +1591,8 @@ var CmsComponent = (function () {
             }
             else {
                 console.log("Project History Reset!!");
-                _this.projectContentHistory = _this._cdService.getCurrentProjectContentHistory();
-                _this.projectStructureHistory = _this._cdService.getCurrentProjectStructureHistory();
+                _this.projectContentHistory = responseObject.content_history;
+                _this.projectStructureHistory = responseObject.structure_history;
             }
         });
     };
@@ -1753,7 +1759,7 @@ var CodeEditorComponent = (function () {
             }
             else if (deletePrevChar) {
                 var prevChar = this.codeJson.slice(this._cursorPosition - 1, this._cursorPosition);
-                if (prevChar.replace(/\s/g, "").length == 0) {
+                if (prevChar != null && prevChar.replace(/\s/g, "").length == 0) {
                     this.codeJson = this.codeJson.slice(0, this._cursorPosition - 1) + this.codeJson.slice(this._cursorPosition);
                 }
                 this._cursorPosition = this._cursorPosition > 1 ? this._cursorPosition - 1 : this._cursorPosition;
