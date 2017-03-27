@@ -4,7 +4,7 @@ function checkIfPropertyMatchesAttributes(propertyName, propertyValue, structure
         sanitisedContent: null
     };
 
-    if(structureType != null && structureType == "html" || structureAttributes.type == "file"){
+    if((structureType != null && (structureType == "html" || structureType == "link")) || structureAttributes.type == "file"){
         response.sanitisedContent = removeSuspiciousContent(propertyValue, true);
     } else {
         response.sanitisedContent = removeSuspiciousContent(propertyValue);
@@ -183,29 +183,30 @@ function sanitise(data, cssAllowed=false, htmlAllowed=false){
     var sanitisedData = data;
     if(data != undefined && data != null){
         sanitisedData = sanitisedData.toString();
-        sanitisedData = sanitisedData.replace(/<script/g, "");
-        sanitisedData = sanitisedData.replace(/script>/g, "");
-        sanitisedData = sanitisedData.replace(/'on(\w+)'=/g, "");
-        sanitisedData = sanitisedData.replace(/"on(\w+)"=/g, "");
-        sanitisedData = sanitisedData.replace(/&/g, "&amp;");
-        sanitisedData = sanitisedData.replace(/`/g, "&grave;");
-        sanitisedData = sanitisedData.replace(/\\/g, "&bsol;");
-        sanitisedData = sanitisedData.replace(/\(/g, "&lpar;");
-        sanitisedData = sanitisedData.replace(/\)/g, "&rpar;");
-        sanitisedData = sanitisedData.replace(/\[/g, "&lsqb;");
-        sanitisedData = sanitisedData.replace(/\]/g, "&rbrack;");
 
         if(htmlAllowed == false){
+            sanitisedData = sanitisedData.replace(/&/g, "&amp;");
             sanitisedData = sanitisedData.replace(/=/g, "&equals;");
             sanitisedData = sanitisedData.replace(/</g, "&lt;");
             sanitisedData = sanitisedData.replace(/>/g, "&gt;");
             sanitisedData = sanitisedData.replace(/\//g, "&sol;");
+            sanitisedData = sanitisedData.replace(/\\/g, "&bsol;");
         }  
 
         if(cssAllowed == false){
             sanitisedData = sanitisedData.replace(/{/g, "&lcub;");
             sanitisedData = sanitisedData.replace(/}/g, "&rcub;"); 
         }
+
+        sanitisedData = sanitisedData.replace(/<script/g, "");
+        sanitisedData = sanitisedData.replace(/script>/g, "");
+        sanitisedData = sanitisedData.replace(/'on(\w+)'=/g, "");
+        sanitisedData = sanitisedData.replace(/"on(\w+)"=/g, "");
+        sanitisedData = sanitisedData.replace(/`/g, "&grave;");
+        sanitisedData = sanitisedData.replace(/\(/g, "&lpar;");
+        sanitisedData = sanitisedData.replace(/\)/g, "&rpar;");
+        sanitisedData = sanitisedData.replace(/\[/g, "&lsqb;");
+        sanitisedData = sanitisedData.replace(/\]/g, "&rbrack;");
     }
     return sanitisedData;
 }
@@ -362,7 +363,7 @@ function validateContentAgainstStructure(content, structure, accessLevel){
                         // Checking for properties that are defined
                         for(var property in structure["items"]){
                             if(structure["items"][property]["attributes"] != null){
-                                var attributeCheck = checkIfPropertyMatchesAttributes(property, content[i][property], structure["items"][property]["attributes"], structure.type, responseObject);
+                                var attributeCheck = checkIfPropertyMatchesAttributes(property, content[i][property], structure["items"][property]["attributes"], structure["items"][property].type, responseObject);
                                 if(attributeCheck.allowed){
                                     responseObject.sanitisedContent[i][property] = attributeCheck.sanitisedContent;
                                 } else {
@@ -396,7 +397,7 @@ function validateContentAgainstStructure(content, structure, accessLevel){
                     for(var property in structure["items"]){
                         if(checkAccessLevelAllowedUpdate(structure["items"][property], accessLevel, responseObject)){
                             if(structure["items"][property]["attributes"] != null){
-                                var attributeCheck = checkIfPropertyMatchesAttributes(property, content[property], structure["items"][property]["attributes"], structure.type, responseObject);
+                                var attributeCheck = checkIfPropertyMatchesAttributes(property, content[property], structure["items"][property]["attributes"], structure["items"][property].type, responseObject);
                                 if(attributeCheck.allowed){
                                     responseObject.sanitisedContent[property] = attributeCheck.sanitisedContent;
                                 } else {
