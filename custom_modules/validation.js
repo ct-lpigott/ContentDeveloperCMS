@@ -115,6 +115,7 @@ function validateNewStructure(structureName, structure){
                     responseObject.sanitisedStructure[property] = propertyValidation.sanitisedStructure;
                 } else {
                     delete responseObject.sanitisedStructure[property];
+                    responseObject.errors.push("The '" + property + "' property is not allowed and has been removed");
                 }
                 for(var i=0; i<propertyValidation.errors.length; i++){
                     responseObject.errors.push(propertyValidation.errors[i]);
@@ -125,6 +126,7 @@ function validateNewStructure(structureName, structure){
         if(structureName != null){
             responseObject.allowed = checkAttributeAllowed(structureName, responseObject.errors);
         } else {
+            responseObject.errors.push("This structure is not allowed and has been removed");
             responseObject.allowed = false;
         }
     }    
@@ -138,6 +140,12 @@ function validateStructureItem(itemName, itemStructure){
         errors: [],
         allowed: true
     }
+
+    if(responseObject.sanitisedStructure.attributes != undefined || responseObject.sanitisedStructure.items != undefined){
+        responseObject.sanitisedStructure = removeSuspiciousProperties(responseObject.sanitisedStructure, responseObject.errors);
+    }
+
+
     if(responseObject.sanitisedStructure.attributes != undefined){
         responseObject.sanitisedStructure.attributes = removeSuspiciousAttributes(responseObject.sanitisedStructure.attributes, responseObject.errors);
     } else if(responseObject.sanitisedStructure.items != undefined){
@@ -146,6 +154,7 @@ function validateStructureItem(itemName, itemStructure){
             if(itemValidation.allowed){
                 responseObject.sanitisedStructure.items[item] = itemValidation.sanitisedStructure;
             } else {
+                responseObject.errors.push("The '" + item + "' property is not allowed in items and has been removed");
                 delete responseObject.sanitisedStructure.items[item];
             }
             for(var i=0; i<itemValidation.errors.length; i++){
@@ -165,6 +174,15 @@ function removeSuspiciousAttributes(structureAttributes, feedsErrors){
         }
     }
     return structureAttributes;
+}
+
+function removeSuspiciousProperties(structure, feedsErrors){
+    for(var property in structure){
+        if(checkPropertyAllowed(property, feedsErrors) == false){
+            delete structure[property];
+        }
+    }
+    return structure;
 }
 
 function removeSuspiciousContent(propertyValue, htmlAllowed=false){
@@ -217,6 +235,16 @@ function checkAttributeAllowed(attributeName, feedsErrors){
     if(allowedAttributes.indexOf(attributeName) < 0){
         allowed = false;
         feedsErrors.push("The '" + attributeName + "' attribute is not allowed and has been removed");
+    }
+    return allowed;
+}
+
+function checkPropertyAllowed(propertyName, feedsErrors){
+    var allowed = true;
+    var allowedProperties = ["attributes", "items", "input_type", "type"];
+    if(allowedProperties.indexOf(propertyName) < 0){
+        allowed = false;
+        feedsErrors.push("The '" + propertyName + "' property is not allowed and has been removed");
     }
     return allowed;
 }
