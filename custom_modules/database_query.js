@@ -3,7 +3,7 @@ var sendEmail = require("./send_email");
 var validation = require("./validation");
 var crypto = require('crypto');
 
-const encryptedColumns = ["google_profile_id", "google_access_token", "google_refresh_token", "cd_user_auth_token", "media_folder_id", "media_folder_permission_id"];
+const encryptedColumns = ["google_profile_id", "google_access_token", "google_refresh_token", "cd_user_auth_token", "media_folder_id", "media_folder_permission_id", "public_auth_token"];
 
 // GET
 function get_User(selectCols="", userId, cb){
@@ -74,6 +74,14 @@ function getWhere_User(selectCols="", whereCols=[], whereVals=[], cb){
     });
 }
 
+function getWhere_UserProject(selectCols="", whereCols=[], whereVals=[], cb){
+    selectCols = columnStringDecryption(selectCols);
+    var where = "WHERE " + combineColVals(whereCols, whereVals, "where",  " AND ");
+    dbconn.query("SELECT " + selectCols + " FROM User_Project " + where, function(err, rows, fields){
+        handleGetResult(err, rows, "single", cb);
+    });
+}
+
 // UPDATE
 function update_User(updateCols=[], updateVals=[], userId, cb){
     var setCols = "SET " + combineColVals(updateCols, updateVals, "set", ", ", false);
@@ -129,6 +137,34 @@ function update_UserProject(updateCols=[], updateVals=[], currentUserId, updateU
     });
 }
 
+function update_UserProject_PublicAuthToken(userId, projectId, currentPublicAuthToken, cb){
+    userId = validation.sanitise(userId);
+    projectId = validation.sanitise(projectId);
+
+    get_UserProject("public_auth_token", userId, projectId, function(err, row){
+        if(row){
+            if(row.public_auth_token.toString() == currentPublicAuthToken){
+                createUniquePublicAuthToken(function(newPublicAuthToken){
+                    var setCols = "SET " + combineColVals(["public_auth_token"], [newPublicAuthToken], "set", ", ", false);
+                    dbconn.query("UPDATE User_Project " + setCols + " WHERE user_id=" + userId + " AND project_id=" + projectId, function(err, result){
+                        handleUpdateResult(err, result, function(err, success){
+                            if(success){
+                                cb(null, newPublicAuthToken.toString());
+                            } else {
+                                cb(err, null);
+                            }
+                        });
+                    });
+                });
+            } else {
+                cb("Valid auth token not included in the request", null);
+            }
+        } else {
+            cb(err, null);
+        }
+    });
+}
+
 // CREATE
 function create_User(emailAddress, cb){
     emailAddress = validation.sanitise(emailAddress);
@@ -165,24 +201,25 @@ function create_UserProject(currentUserId, newUserId, projectId, accessLevelInt,
     newUserId = validation.sanitise(newUserId);
     projectId = validation.sanitise(projectId);
     access_level_int = validation.sanitise(accessLevelInt);
-    var encryptedValues = combineColVals(["user_id", "project_id", "access_level_int", "media_folder_permission_id"], [newUserId, projectId, accessLevelInt, userPermissionId], "insert");
-    dbconn.query("INSERT INTO User_Project(user_id, project_id, access_level_int, media_folder_permission_id) VALUES(" + encryptedValues + ")", function(err, result){
-        handleCreateResult(err, result, function(err, newUserProjectId){
-            if(err){
-                cb(err, null);
-            } else {
-                if(userPermissionId == null){
-                    var googleOAuth = require("./google_oauth");
-                    googleOAuth.addUserToMediaFolder(currentUserId, newUserId, projectId, accessLevelInt, function(success){
-                        cb(err, newUserProjectId);
-                    });
+    createUniquePublicAuthToken(function(newPublicAuthToken){
+        var encryptedValues = combineColVals(["user_id", "project_id", "access_level_int", "media_folder_permission_id", "public_auth_token"], [newUserId, projectId, accessLevelInt, userPermissionId, newPublicAuthToken], "insert");
+        dbconn.query("INSERT INTO User_Project(user_id, project_id, access_level_int, media_folder_permission_id, public_auth_token) VALUES(" + encryptedValues + ")", function(err, result){
+            handleCreateResult(err, result, function(err, newUserProjectId){
+                if(err){
+                    cb(err, null);
                 } else {
-                    cb(err, newUserProjectId);
+                    if(userPermissionId == null){
+                        var googleOAuth = require("./google_oauth");
+                        googleOAuth.addUserToMediaFolder(currentUserId, newUserId, projectId, accessLevelInt, function(success){
+                            cb(err, newUserProjectId);
+                        });
+                    } else {
+                        cb(err, newUserProjectId);
+                    }
                 }
-            }
+            });
         });
-    });
-    
+    });    
 }
 
 // CHECK
@@ -372,25 +409,42 @@ function combineColVals(cols=[], vals=[], method, split=", ", sanitise=true){
     return colVals;
 }
 
-function createUniqueUserAuthToken(cb){
+function createRandomToken(cb){
     crypto.randomBytes(15, function(err, buf){
         if (err){
-            createUniqueUserAuthToken();
+            createRandomToken(cb);
         } else {
             var randomAuthToken = buf.toString("hex") + Date.now();
             while(randomAuthToken.length > 40){
                 randomAuthToken = randomAuthToken.substring(1);
             }
-            
-            getWhere_User("id", ["cd_user_auth_token"], [randomAuthToken], function(err, row){
-                if(row != null && row.id != null){
-                    createUniqueUserAuthToken();
-                } else {
-                    cb(randomAuthToken);
-                }
-            });
+            cb(randomAuthToken);
         }
-    }); 
+    });
+}
+
+function createUniqueUserAuthToken(cb){
+    createRandomToken(function(randomAuthToken){
+        getWhere_User("id", ["cd_user_auth_token"], [randomAuthToken], function(err, row){
+            if(row != null && row.id != null){
+                createUniqueUserAuthToken(cb);
+            } else {
+                cb(randomAuthToken);
+            }
+        });
+    });
+}
+
+function createUniquePublicAuthToken(cb){
+    createRandomToken(function(randomPublicToken){
+        getWhere_UserProject("id", ["public_auth_token"], [randomPublicToken], function(err, row){
+            if(row != null && row.id != null){
+                createUniquePublicAuthToken(cb);
+            } else {
+                cb(randomPublicToken);
+            }
+        });
+    });
 }
 
 function columnStringDecryption(stringOfCols){
@@ -417,8 +471,10 @@ module.exports = {
     get_UserProjects_forProject: get_UserProjects_forProject,
     get_UserProject_Project_User: get_UserProject_Project_User,
     getWhere_User: getWhere_User,
+    getWhere_UserProject: getWhere_UserProject,
     update_User: update_User,
     update_UserProject: update_UserProject,
+    update_UserProject_PublicAuthToken: update_UserProject_PublicAuthToken,
     update_Project: update_Project,
     create_User: create_User,
     create_UserProject: create_UserProject,

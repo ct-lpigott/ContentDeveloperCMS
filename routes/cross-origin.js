@@ -13,12 +13,12 @@ function setAccessControlHeaders(req, res, controlLevel){
 			break;
 		}
 		case "crud":{
-			res.setHeader("Access-Control-Allow-Headers", "Content-Type, user_auth_token");
+			res.setHeader("Access-Control-Allow-Headers", "Content-Type, public_auth_token");
 			res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
 			break;
 		}
 		case "ru":{
-			res.setHeader("Access-Control-Allow-Headers", "Content-Type, user_auth_token");
+			res.setHeader("Access-Control-Allow-Headers", "Content-Type, public_auth_token");
 			res.setHeader("Access-Control-Allow-Methods", "GET, PUT");
 			break;
 		}
@@ -60,7 +60,7 @@ router.use(function(req, res, next){
 		// Responding to preflight requests
 		res.send();
 	} else {
-		if(req.headers.origin != null && req.headers.origin != process.env.SITE_URL && req.allowedOrigins != null  && req.allowedOrigins.read_origins != null){
+		if(req.headers.origin != null && req.headers.origin != process.env.SITE_URL && req.allowedOrigins != null){
             var rejectRequest = false;
 
 			if(req.method == "GET"){
@@ -74,23 +74,18 @@ router.use(function(req, res, next){
 					res = setAccessControlHeaders(req, res, "r");
 				}
 				
-				if(rejectRequest){
-					if(req.allowedOrigins.update_origins != null && req.allowedOrigins.update_origins.length > 0){
-						if(req.allowedOrigins.update_origins.indexOf(req.headers.origin) > -1){
-							if(req.originalUrl.indexOf("/feeds") == 0 || req.originalUrl.indexOf("/admin") == 0){
-								res = setAccessControlHeaders(req, res, "r");
-								rejectRequest = false;
-							} else {
-								rejectRequest = true;
-							}					
+				if(req.allowedOrigins.update_origins != null && req.allowedOrigins.update_origins.length > 0){
+					if(req.allowedOrigins.update_origins.indexOf(req.headers.origin) > -1){
+						if(req.originalUrl.indexOf("/feeds") == 0 || req.originalUrl.indexOf("/admin") == 0){
+							res = setAccessControlHeaders(req, res, "r");
+							rejectRequest = false;
 						} else {
 							rejectRequest = true;
-						}			
+						}					
 					} else {
-						rejectRequest = false;
-						res = setAccessControlHeaders(req, res, "r");
-					}
-				}					
+						rejectRequest = true;
+					}			
+				}				
 			} else {
 				if(req.allowedOrigins.update_origins != null && req.allowedOrigins.update_origins.length > 0){
 					if(req.allowedOrigins.update_origins.indexOf(req.headers.origin) > -1 || req.allowedOrigins.update_origins.indexOf("*") > -1){

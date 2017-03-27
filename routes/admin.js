@@ -65,12 +65,13 @@ router.get("/logout", function(req, res, next){
 
 
 router.get("/settings/:projectID", function(req, res, next){
-    dbQuery.get_Project("update_origins, read_origins", req.params.projectID, function(err, row){
+    dbQuery.get_UserProject_Project("p.update_origins, p.read_origins, up.public_auth_token", req.userID, req.params.projectID, function(err, row){
         if(err){ console.log(err); }
         if(row){
             var adminSettings = {
                 update_origins: row.update_origins,
-                read_origins: row.read_origins
+                read_origins: row.read_origins,
+                public_auth_token: row.public_auth_token.toString()
             };
             res.send(adminSettings);
         } else {
@@ -84,6 +85,15 @@ router.put("/settings/:projectID", function(req, res, next){
         if(err){ console.log(err); }
         res.send({success: success});
     });
+});
+
+router.put("/settings/:projectID/publicAuthToken", function(req, res, next){
+    if(req.body.public_auth_token != null){
+        dbQuery.update_UserProject_PublicAuthToken(req.userID, req.params.projectID, req.body.public_auth_token, function(err, newPublicAuthToken){
+            res.send({success: newPublicAuthToken != null, public_auth_token: newPublicAuthToken});
+        })
+    }
+        
 });
 
 // Request to delete a project

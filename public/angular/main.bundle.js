@@ -131,6 +131,7 @@ var ContentDeveloperServerService = (function () {
             .do(function (responseObject) {
             _this._currentProjectSettings.update_origins = responseObject.update_origins;
             _this._currentProjectSettings.read_origins = responseObject.read_origins;
+            _this._currentProjectSettings.public_auth_token = responseObject.public_auth_token;
         });
         return loadAdminSettingsObservable;
     };
@@ -144,6 +145,21 @@ var ContentDeveloperServerService = (function () {
             .catch(function (error) { return __WEBPACK_IMPORTED_MODULE_2_rxjs_Observable__["Observable"].throw(error.json().error); })
             .do(function (responseObject) { return console.log("Admin settings updated!!"); });
         return updateProjectSettingsObservable;
+    };
+    ContentDeveloperServerService.prototype.generateNewPublicAuthToken = function (currentAuthToken) {
+        var _this = this;
+        var requestUrl = this._serverUrl + "/admin/settings/" + this._currentProjectId + "/publicAuthToken";
+        var generateNewPublicAuthTokenObservable = this._http
+            .put(requestUrl, { public_auth_token: currentAuthToken }, { headers: this._headers })
+            .map(function (responseObject) { return responseObject.json(); })
+            .catch(function (error) { return __WEBPACK_IMPORTED_MODULE_2_rxjs_Observable__["Observable"].throw(error.json().error); })
+            .do(function (responseObject) {
+            if (responseObject.public_auth_token != null) {
+                _this._currentProjectSettings.public_auth_token = responseObject.public_auth_token;
+                console.log("New public auth token generated!!");
+            }
+        });
+        return generateNewPublicAuthTokenObservable;
     };
     ContentDeveloperServerService.prototype.updateProjectStructure = function (projectStructure, commitMessage) {
         var _this = this;
@@ -3096,6 +3112,17 @@ var SettingsViewComponent = (function () {
             });
         }
     };
+    SettingsViewComponent.prototype.generateNewPublicAuthToken = function (currentAuthTokenInput) {
+        var _this = this;
+        if (currentAuthTokenInput.value != null) {
+            this._cdService.generateNewPublicAuthToken(currentAuthTokenInput.value).subscribe(function (responseObject) {
+                if (responseObject.public_auth_token != null) {
+                    currentAuthTokenInput.value = "";
+                    _this.settingsUpdated.emit();
+                }
+            });
+        }
+    };
     SettingsViewComponent.prototype.updateSettings = function () {
         this.settingsUpdated.emit();
     };
@@ -3826,7 +3853,7 @@ module.exports = "<h3>Collaborators</h3>\n<div class=\"row\">\n  <h4>Add Collabo
 /***/ 689:
 /***/ (function(module, exports) {
 
-module.exports = "<h2>Project Settings</h2>\n<button (click)=\"saveAllProjectSettings()\">Save All</button>\n<button (click)=\"resetAllProjectSettings()\">Reset All</button>\n\n<div *ngIf=\"projectSettings != null\">\n  <div class=\"row\">\n    <h3>General</h3>\n\n    <div [class]=\"isAdmin ? 'col-6-12' : 'col-12-12'\">\n      <div class=\"row\">\n        <label>Project Name:\n          <input #pnInput type=\"text\" [(ngModel)]=\"projectSettings.project_name\">\n        </label>\n      </div>\n\n      <div class=\"row\" *ngIf=\"isAdmin\">\n        <label>Maximum Content Cache Time (in milliseconds)\n          <input #pmcInput type=\"number\" [(ngModel)]=\"projectSettings.max_cache_age\">ms\n        </label>\n      </div>\n\n      <div class=\"row\" *ngIf=\"isAdmin\">\n        <label>Allowed Update Origins:\n          <textarea [(ngModel)]=\"projectSettings.update_origins\"></textarea>\n        </label>\n      </div>\n\n      <div class=\"row\" *ngIf=\"isAdmin\">\n        <label>Allowed Read Origins:\n          <textarea [(ngModel)]=\"projectSettings.read_origins\"></textarea>\n        </label>\n      </div>\n    </div>\n\n    <div class=\"col-6-12\" *ngIf=\"isAdmin\">\n      <div class=\"row\">\n        <label>Custom Content Editor CSS\n          <textarea\n            #cssInput\n            class=\"customCss\"\n            [(ngModel)]=\"projectSettings.custom_css\">\n          </textarea>\n        </label>\n      </div>\n    </div>\n  </div>\n\n  <div class=\"row\">\n    <div [class]=\"isAdmin ? 'col-6-12' : 'col-12-12'\">\n      <app-collaborators\n        [projectSettings]=\"projectSettings\"\n        (collaboratorsUpdated)=\"updateSettings()\"></app-collaborators>\n    </div>\n    <div class=\"col-6-12\" *ngIf=\"isAdmin\">\n      <app-access-levels\n        [projectSettings]=\"projectSettings\"\n        (accessLevelsUpdated)=\"updateSettings()\"></app-access-levels>\n    </div>\n  </div>\n\n  <div class=\"row\" *ngIf=\"isAdmin\">\n    <h3>Delete Project</h3>\n    <div class=\"row\" >\n        <label>Project Name:\n          <input #pName type=\"text\">\n        </label>\n        <button (click)=\"deleteProject(pName.value)\">Confirm Delete (can't undo)</button>\n    </div>\n  </div>\n</div>"
+module.exports = "<h2>Project Settings</h2>\n<button (click)=\"saveAllProjectSettings()\">Save All</button>\n<button (click)=\"resetAllProjectSettings()\">Reset All</button>\n\n<div *ngIf=\"projectSettings != null\">\n  <div class=\"row\">\n    <h3>General</h3>\n\n    <div [class]=\"isAdmin ? 'col-6-12' : 'col-12-12'\">\n      <div class=\"row\">\n        <label>Project Name:\n          <input #pnInput type=\"text\" [(ngModel)]=\"projectSettings.project_name\">\n        </label>\n      </div>\n\n      <div class=\"row\" *ngIf=\"isAdmin\">\n        <label>Maximum Content Cache Time (in milliseconds)\n          <input #pmcInput type=\"number\" [(ngModel)]=\"projectSettings.max_cache_age\">ms\n        </label>\n      </div>\n\n      <div class=\"row\" *ngIf=\"isAdmin\">\n        <label>Allowed Update Origins:\n          <textarea [(ngModel)]=\"projectSettings.update_origins\"></textarea>\n        </label>\n        <strong>Public Auth Token:</strong> {{projectSettings.public_auth_token}}\n      </div>\n\n      <div class=\"row\" *ngIf=\"isAdmin\">\n        <label>Allowed Read Origins:\n          <textarea [(ngModel)]=\"projectSettings.read_origins\"></textarea>\n        </label>\n      </div>\n    </div>\n\n    <div class=\"col-6-12\" *ngIf=\"isAdmin\">\n      <div class=\"row\">\n        <label>Custom Content Editor CSS\n          <textarea\n            #cssInput\n            class=\"customCss\"\n            [(ngModel)]=\"projectSettings.custom_css\">\n          </textarea>\n        </label>\n      </div>\n    </div>\n  </div>\n\n  <div class=\"row\">\n    <div [class]=\"isAdmin ? 'col-6-12' : 'col-12-12'\">\n      <app-collaborators\n        [projectSettings]=\"projectSettings\"\n        (collaboratorsUpdated)=\"updateSettings()\"></app-collaborators>\n    </div>\n    <div class=\"col-6-12\" *ngIf=\"isAdmin\">\n      <app-access-levels\n        [projectSettings]=\"projectSettings\"\n        (accessLevelsUpdated)=\"updateSettings()\"></app-access-levels>\n    </div>\n  </div>\n\n  <div class=\"row\" *ngIf=\"isAdmin\">\n    <h3>Delete Project</h3>\n    <div class=\"row\" >\n        <label>Project Name:\n          <input #pName type=\"text\">\n        </label>\n        <button (click)=\"deleteProject(pName.value)\">Confirm Delete (can't undo)</button>\n    </div>\n    <h3>Generate New Public Auth Token</h3>\n    <div class=\"row\">\n        <label>Current Auth Token:\n          <input #aToken type=\"text\">\n        </label>\n        <button (click)=\"generateNewPublicAuthToken(aToken)\">Generate New Token (can't undo)</button>\n    </div>\n  </div>\n</div>"
 
 /***/ }),
 

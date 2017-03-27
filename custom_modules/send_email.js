@@ -10,7 +10,7 @@ var transporter = nodemailer.createTransport({
 });
 
 function sendEmail(to, subject, htmlBody){
-    if(process.env.DEBUG){
+    if(process.env.DEBUG == "true"){
         console.log(htmlBody);
     } else {
         var mailOptions = {
