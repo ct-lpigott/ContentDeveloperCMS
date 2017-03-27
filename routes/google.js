@@ -88,7 +88,7 @@ router.get("/oauthRedirectURL", function(req, res, next){
     if(req.userAuthToken != null){
         // Redirecting this user to the admin panel, using their userID as a 
         req.session.user_auth_token = req.userAuthToken.toString();
-        res.redirect("/angular/");
+        res.redirect("/cms/");
     } else {
         console.log("No user was found");
         res.send("Unable to login");
