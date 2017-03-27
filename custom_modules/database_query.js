@@ -376,6 +376,8 @@ function combineColVals(cols=[], vals=[], method, split=", ", sanitise=true){
                     value = vals[i];
                 } else if(cols[i] == "custom_css"){
                     value = validation.sanitise(vals[i], true);
+                } else if(cols[i] == "read_origins" || cols[i] == "update_origins"){
+                    value = validation.sanitise(vals[i], false, true);
                 } else {
                     value = validation.sanitise(vals[i]);
                 }
