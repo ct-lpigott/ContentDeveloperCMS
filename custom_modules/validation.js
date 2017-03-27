@@ -30,6 +30,21 @@ function checkIfPropertyMatchesAttributes(propertyName, propertyValue, structure
                     responseObject.errors.push(propertyName + " value does not match with the allowed options");
                     response.allowed = false;
                 }
+            } else if(attribute == "maxlength"){
+                 if(response.sanitisedContent.length > structureAttributes["maxlength"]){
+                     responseObject.errors.push(propertyName + "'s length exceeded the maximum length of " + structureAttributes["maxlength"]);
+                     response.allowed = false;
+                 }
+            } else if(attribute == "max"){
+                if(isNaN(response.sanitisedContent) == false && Number(response.sanitisedContent) > structureAttributes["max"]){
+                    responseObject.errors.push(propertyName + "'s length exceeded the maximum value of " + structureAttributes["max"]);
+                    response.allowed = false;
+                }
+            } else if(attribute == "min"){
+                if(isNaN(response.sanitisedContent) == false && Number(response.sanitisedContent) < structureAttributes["min"]){
+                    responseObject.errors.push(propertyName + "'s length was less than the minimum value of " + structureAttributes["min"]);
+                    response.allowed = false;
+                }
             } else if(attribute == "type"){
                 if(typeof response.sanitisedContent == "string" || isNaN(response.sanitisedContent) == false){
                     switch(structureAttributes["type"]){
@@ -231,7 +246,7 @@ function sanitise(data, cssAllowed=false, htmlAllowed=false){
 
 function checkAttributeAllowed(attributeName, feedsErrors){
     var allowed = true;
-    var allowedAttributes = ["class", "id", "type", "required", "options"];
+    var allowedAttributes = ["class", "id", "type", "required", "options", "maxlength", "max", "min", "alt"];
     if(allowedAttributes.indexOf(attributeName) < 0){
         allowed = false;
         feedsErrors.push("The '" + attributeName + "' attribute is not allowed and has been removed");
