@@ -256,7 +256,7 @@ function checkAttributeAllowed(attributeName, feedsErrors){
 
 function checkPropertyAllowed(propertyName, feedsErrors){
     var allowed = true;
-    var allowedProperties = ["attributes", "items", "input_type", "type"];
+    var allowedProperties = ["attributes", "items", "input_type", "type", "no_access"];
     if(allowedProperties.indexOf(propertyName) < 0){
         allowed = false;
         feedsErrors.push("The '" + propertyName + "' property is not allowed and has been removed");
