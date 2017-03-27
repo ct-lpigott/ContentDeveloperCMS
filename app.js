@@ -37,7 +37,7 @@ app.use("/", session({
 app.use(express.static("./public"));
 
 app.get("/", function(req, res, next){
-  res.redirect("/angular");
+  res.redirect("/cms");
 });
 
 // Intercepting all requests
