@@ -215,24 +215,11 @@ var ContentDeveloperServerService = (function () {
         return refreshProjectHistoryObservable;
     };
     ContentDeveloperServerService.prototype.getContentofCommit = function (commitHash, historyOf) {
-        var _this = this;
         var requestUrl = this._serverUrl + "/feeds/" + this._currentProjectId + "?action=previewCommit&commitHash=" + commitHash + "&historyOf=" + historyOf;
         var commitContentObservable = this._http
             .get(requestUrl, { headers: this._headers })
             .map(function (responseObject) { return responseObject.json(); })
-            .catch(function (error) { return __WEBPACK_IMPORTED_MODULE_2_rxjs_Observable__["Observable"].throw(error.json().error) || "Unknown error getting commit content"; })
-            .do(function (responseObject) {
-            switch (historyOf) {
-                case "structure": {
-                    _this._currentProjectContentStructureHistory.structure = responseObject;
-                    break;
-                }
-                case "content": {
-                    _this._currentProjectContentStructureHistory.content = responseObject;
-                    break;
-                }
-            }
-        });
+            .catch(function (error) { return __WEBPACK_IMPORTED_MODULE_2_rxjs_Observable__["Observable"].throw(error.json().error) || "Unknown error getting commit content"; });
         return commitContentObservable;
     };
     ContentDeveloperServerService.prototype.createNewProject = function (projectName, template) {
@@ -1004,6 +991,7 @@ var AdminComponent = (function () {
     };
     AdminComponent.prototype.viewRequestToSaveStructure = function (updatedStructure) {
         this.adminRequestToSaveStructure.emit(updatedStructure);
+        this.changeView("structure");
     };
     AdminComponent.prototype.viewRequestToResetStructure = function () {
         this.adminRequestToResetStructure.emit();
@@ -1011,6 +999,7 @@ var AdminComponent = (function () {
     AdminComponent.prototype.viewRequestToSaveContent = function (updatedContent) {
         if (updatedContent === void 0) { updatedContent = null; }
         this.adminRequestToSaveContent.emit(updatedContent);
+        this.changeView("content");
     };
     AdminComponent.prototype.viewRequestToResetContent = function () {
         this.adminRequestToResetContent.emit();
@@ -1275,6 +1264,10 @@ var EditorComponent = (function () {
     EditorComponent.prototype.changeView = function (toView) {
         this._view = toView;
     };
+    EditorComponent.prototype.previewCommit = function (previewData) {
+        this.projectContent = previewData.data;
+        this.changeView("content");
+    };
     __decorate([
         __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["w" /* Input */])(), 
         __metadata('design:type', Object)
@@ -1287,6 +1280,10 @@ var EditorComponent = (function () {
         __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["w" /* Input */])(), 
         __metadata('design:type', Object)
     ], EditorComponent.prototype, "projectSettings", void 0);
+    __decorate([
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["w" /* Input */])(), 
+        __metadata('design:type', Object)
+    ], EditorComponent.prototype, "projectContentHistory", void 0);
     __decorate([
         __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["w" /* Input */])(), 
         __metadata('design:type', Number)
@@ -2854,12 +2851,22 @@ var HistoryDisplayComponent = (function () {
         this._sPipe = _sPipe;
         this.showPreview = false;
         this.revertToCommit = new __WEBPACK_IMPORTED_MODULE_0__angular_core__["G" /* EventEmitter */]();
+        this.previewCommit = new __WEBPACK_IMPORTED_MODULE_0__angular_core__["G" /* EventEmitter */]();
     }
     HistoryDisplayComponent.prototype.preview = function (historyObject) {
         var _this = this;
         this._previewHistoryObject = this._cdService.getContentofCommit(historyObject.hash, this.historyOf).subscribe(function (responseObject) {
-            _this._previewHistoryObject = _this.historyOf == 'structure' ? responseObject.commit_structure : responseObject.commit_content;
-            _this._previewHistoryHash = historyObject.hash;
+            if (_this.showPreview) {
+                _this._previewHistoryObject = _this.historyOf == 'structure' ? responseObject.commit_structure : responseObject.commit_content;
+                _this._previewHistoryHash = historyObject.hash;
+            }
+            else {
+                var previewData = {
+                    data: _this.historyOf == 'structure' ? responseObject.commit_structure : responseObject.commit_content,
+                    hash: historyObject.hash
+                };
+                _this.previewCommit.emit(previewData);
+            }
         });
     };
     HistoryDisplayComponent.prototype.revert = function () {
@@ -2869,6 +2876,7 @@ var HistoryDisplayComponent = (function () {
             object: this._previewHistoryObject
         };
         this.revertToCommit.emit(revertData);
+        this.clear();
     };
     HistoryDisplayComponent.prototype.clear = function () {
         this._previewHistoryObject = null;
@@ -2890,16 +2898,20 @@ var HistoryDisplayComponent = (function () {
         __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["T" /* Output */])(), 
         __metadata('design:type', (typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_0__angular_core__["G" /* EventEmitter */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_0__angular_core__["G" /* EventEmitter */]) === 'function' && _a) || Object)
     ], HistoryDisplayComponent.prototype, "revertToCommit", void 0);
+    __decorate([
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["T" /* Output */])(), 
+        __metadata('design:type', (typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_0__angular_core__["G" /* EventEmitter */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_0__angular_core__["G" /* EventEmitter */]) === 'function' && _b) || Object)
+    ], HistoryDisplayComponent.prototype, "previewCommit", void 0);
     HistoryDisplayComponent = __decorate([
         __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["U" /* Component */])({
             selector: 'app-history-display',
             template: __webpack_require__(687),
             styles: [__webpack_require__(661)]
         }), 
-        __metadata('design:paramtypes', [(typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__["a" /* ContentDeveloperServerService */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__["a" /* ContentDeveloperServerService */]) === 'function' && _b) || Object, (typeof (_c = typeof __WEBPACK_IMPORTED_MODULE_2__pipes_shortener_pipe__["a" /* ShortenerPipe */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_2__pipes_shortener_pipe__["a" /* ShortenerPipe */]) === 'function' && _c) || Object])
+        __metadata('design:paramtypes', [(typeof (_c = typeof __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__["a" /* ContentDeveloperServerService */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__["a" /* ContentDeveloperServerService */]) === 'function' && _c) || Object, (typeof (_d = typeof __WEBPACK_IMPORTED_MODULE_2__pipes_shortener_pipe__["a" /* ShortenerPipe */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_2__pipes_shortener_pipe__["a" /* ShortenerPipe */]) === 'function' && _d) || Object])
     ], HistoryDisplayComponent);
     return HistoryDisplayComponent;
-    var _a, _b, _c;
+    var _a, _b, _c, _d;
 }());
 //# sourceMappingURL=C:/GitHub/ContentDeveloperCMS/ContentDeveloperCMS-AngularApp/src/history-display.component.js.map
 
@@ -3692,7 +3704,7 @@ module.exports = ""
 /***/ 652:
 /***/ (function(module, exports) {
 
-module.exports = "nav ul {\r\n    list-style: none;\r\n    margin: 0;\r\n    padding: 0;\r\n}\r\n\r\nnav ul li {\r\n    cursor: pointer;\r\n    box-sizing: border-box;\r\n    display: inline-block;\r\n    padding: 1%;\r\n    background-color: #000;\r\n    color: #fff;\r\n    text-align: center;\r\n}\r\n\r\nnav ul.admin li{\r\n    width: 24%;\r\n}\r\n\r\nnav ul.editor li{\r\n    width: 48%;\r\n}"
+module.exports = "nav ul {\r\n    list-style: none;\r\n    margin: 0;\r\n    padding: 0;\r\n}\r\n\r\nnav ul li {\r\n    cursor: pointer;\r\n    box-sizing: border-box;\r\n    display: inline-block;\r\n    padding: 1%;\r\n    background-color: #000;\r\n    color: #fff;\r\n    text-align: center;\r\n}\r\n\r\nnav ul.admin li{\r\n    width: 24%;\r\n}\r\n\r\nnav ul.editor li{\r\n    width: 32%;\r\n}"
 
 /***/ }),
 
@@ -3846,7 +3858,7 @@ module.exports = "<div class=\"col-6-12\">\r\n  <h2>Project Structure</h2>\r\n  
 /***/ 674:
 /***/ (function(module, exports) {
 
-module.exports = "<app-cms-navigation\r\n\t[userAccessLevel]=\"userAccessLevel\"\r\n\t(requestToChangeView)=\"changeView($event)\"></app-cms-navigation>\r\n<app-errors\r\n\t[errors]=\"errors\"\r\n\t(requestToDismissErrors)=\"requestToDismissErrors($event)\"></app-errors>\r\n<div class=\"row\">\r\n\t<app-content-view\r\n\t\t*ngIf=\"_view == 'content'\"\r\n\t\t[userAccessLevel]=\"userAccessLevel\"\r\n\t\t[customCss]=\"customCss\"\r\n\t\t[projectStructure]=\"projectStructure\"\r\n\t\t[(projectContent)]=\"projectContent\"\r\n\t\t(viewRequestToSaveContent)=\"viewRequestToSaveContent($event)\"\r\n\t\t(viewRequestToResetContent)=\"viewRequestToResetContent()\">\r\n\t</app-content-view>\r\n\r\n\t<app-settings-view\r\n\t\t*ngIf=\"_view == 'settings' && userAccessLevel == 2\"\r\n\t\t[(projectSettings)]=\"projectSettings\"\r\n\t\t(settingsUpdated)=\"viewRequestToRefreshSettings($event)\"\r\n\t\t(viewRequestToRefreshSettings)=\"viewRequestToRefreshSettings($event)\">\r\n\t</app-settings-view>\r\n</div>\r\n"
+module.exports = "<app-cms-navigation\r\n\t[userAccessLevel]=\"userAccessLevel\"\r\n\t(requestToChangeView)=\"changeView($event)\"></app-cms-navigation>\r\n<app-errors\r\n\t[errors]=\"errors\"\r\n\t(requestToDismissErrors)=\"requestToDismissErrors($event)\"></app-errors>\r\n<div class=\"row\">\r\n\t<app-content-view\r\n\t\t*ngIf=\"_view == 'content'\"\r\n\t\t[userAccessLevel]=\"userAccessLevel\"\r\n\t\t[customCss]=\"customCss\"\r\n\t\t[projectStructure]=\"projectStructure\"\r\n\t\t[(projectContent)]=\"projectContent\"\r\n\t\t(viewRequestToSaveContent)=\"viewRequestToSaveContent($event)\"\r\n\t\t(viewRequestToResetContent)=\"viewRequestToResetContent()\">\r\n\t</app-content-view>\r\n\t\r\n\t<app-history-display\r\n\t\t*ngIf=\"_view == 'history'\"\r\n\t\t[history]=\"projectContentHistory\"\r\n\t\t[historyOf]=\"'content'\"\r\n\t\t[showPreview]=\"false\"\r\n\t\t(revertToCommit)=\"revertToCommit($event)\"\r\n\t\t(previewCommit)=\"previewCommit($event)\">\r\n\t</app-history-display>\r\n\r\n\t<app-settings-view\r\n\t\t*ngIf=\"_view == 'settings' && userAccessLevel == 2\"\r\n\t\t[(projectSettings)]=\"projectSettings\"\r\n\t\t(settingsUpdated)=\"viewRequestToRefreshSettings($event)\"\r\n\t\t(viewRequestToRefreshSettings)=\"viewRequestToRefreshSettings($event)\">\r\n\t</app-settings-view>\r\n\t\r\n</div>\r\n"
 
 /***/ }),
 
@@ -3867,7 +3879,7 @@ module.exports = "<app-content-view\r\n  [userAccessLevel]=\"3\"\r\n  [projectCo
 /***/ 677:
 /***/ (function(module, exports) {
 
-module.exports = "<ng-container *ngIf=\"_projectId == null && _userAccessLevel == null\">\r\n    <app-user-projects\r\n        (viewProject)=\"viewProject($event)\"\r\n        (viewLoginRequired)=\"viewLoginRequired($event)\"></app-user-projects>\r\n</ng-container>\r\n\r\n<ng-container *ngIf=\"_projectId != null && _userAccessLevel != null\">\r\n    <button (click)=\"viewUserProjects()\">Back to all Projects</button>\r\n    <button (click)=\"refreshProject()\">Refresh from Server</button>\r\n    <app-cms-admin\r\n        *ngIf=\"_userAccessLevel == 1\"\r\n        [errors]=\"errors\"\r\n        [(projectStructure)]=\"projectStructure\"\r\n        [(projectContent)]=\"projectContent\"\r\n        [projectStructureHistory]=\"projectStructureHistory\"\r\n        [projectContentHistory]=\"projectContentHistory\"\r\n        [(projectSettings)]=\"projectSettings\"\r\n        (adminRequestToSaveStructure)=\"saveProjectStructure($event)\"\r\n        (adminRequestToResetStructure)=\"resetProjectStructure()\"\r\n        (adminRequestToSaveContent)=\"saveProjectContent($event)\"\r\n        (adminRequestToResetContent)=\"resetProjectContent()\"\r\n        (adminRequestToRefreshSettings)=\"loadProjectSettings()\"\r\n        (adminNotifyingOfProjectDeletion)=\"projectDeleted()\"\r\n        (adminRequestToDismissErrors)=\"dismissErrors()\">\r\n    </app-cms-admin>\r\n    <app-cms-editor\r\n        *ngIf=\"_userAccessLevel == 2 || _userAccessLevel > 3\"\r\n        [errors]=\"errors\"\r\n        [userAccessLevel]=\"_userAccessLevel\"\r\n        [(projectContent)]=\"projectContent\"\r\n        [projectStructure]=\"projectStructure\"\r\n        [(projectSettings)]=\"projectSettings\"\r\n        [customCss]=\"projectSettings != null ? projectSettings.custom_css : ''\"\r\n        (editorRequestToSaveContent)=\"saveProjectContent($event)\"\r\n        (editorRequestToResetContent)=\"resetProjectContent()\"\r\n        (editorRequestToRefreshSettings)=\"loadProjectSettings()\"\r\n        (editorRequestToDismissErrors)=\"dismissErrors()\">\r\n    </app-cms-editor>\r\n    <app-cms-view-only\r\n        *ngIf=\"_userAccessLevel == 3\"\r\n        [projectContent]=\"projectContent\"\r\n        [projectStructure]=\"projectStructure\"\r\n        [customCss]=\"projectSettings != null ? projectSettings.custom_css : ''\">\r\n    </app-cms-view-only>\r\n</ng-container>"
+module.exports = "<ng-container *ngIf=\"_projectId == null && _userAccessLevel == null\">\r\n    <app-user-projects\r\n        (viewProject)=\"viewProject($event)\"\r\n        (viewLoginRequired)=\"viewLoginRequired($event)\"></app-user-projects>\r\n</ng-container>\r\n\r\n<ng-container *ngIf=\"_projectId != null && _userAccessLevel != null\">\r\n    <button (click)=\"viewUserProjects()\">Back to all Projects</button>\r\n    <button (click)=\"refreshProject()\">Refresh from Server</button>\r\n    <app-cms-admin\r\n        *ngIf=\"_userAccessLevel == 1\"\r\n        [errors]=\"errors\"\r\n        [(projectStructure)]=\"projectStructure\"\r\n        [(projectContent)]=\"projectContent\"\r\n        [projectStructureHistory]=\"projectStructureHistory\"\r\n        [projectContentHistory]=\"projectContentHistory\"\r\n        [(projectSettings)]=\"projectSettings\"\r\n        (adminRequestToSaveStructure)=\"saveProjectStructure($event)\"\r\n        (adminRequestToResetStructure)=\"resetProjectStructure()\"\r\n        (adminRequestToSaveContent)=\"saveProjectContent($event)\"\r\n        (adminRequestToResetContent)=\"resetProjectContent()\"\r\n        (adminRequestToRefreshSettings)=\"loadProjectSettings()\"\r\n        (adminNotifyingOfProjectDeletion)=\"projectDeleted()\"\r\n        (adminRequestToDismissErrors)=\"dismissErrors()\">\r\n    </app-cms-admin>\r\n    <app-cms-editor\r\n        *ngIf=\"_userAccessLevel == 2 || _userAccessLevel > 3\"\r\n        [errors]=\"errors\"\r\n        [userAccessLevel]=\"_userAccessLevel\"\r\n        [(projectContent)]=\"projectContent\"\r\n        [projectStructure]=\"projectStructure\"\r\n        [(projectSettings)]=\"projectSettings\"\r\n        [projectContentHistory]=\"projectContentHistory\"\r\n        [customCss]=\"projectSettings != null ? projectSettings.custom_css : ''\"\r\n        (editorRequestToSaveContent)=\"saveProjectContent($event)\"\r\n        (editorRequestToResetContent)=\"resetProjectContent()\"\r\n        (editorRequestToRefreshSettings)=\"loadProjectSettings()\"\r\n        (editorRequestToDismissErrors)=\"dismissErrors()\">\r\n    </app-cms-editor>\r\n    <app-cms-view-only\r\n        *ngIf=\"_userAccessLevel == 3\"\r\n        [projectContent]=\"projectContent\"\r\n        [projectStructure]=\"projectStructure\"\r\n        [customCss]=\"projectSettings != null ? projectSettings.custom_css : ''\">\r\n    </app-cms-view-only>\r\n</ng-container>"
 
 /***/ }),
 
