@@ -1,22 +1,70 @@
 webpackJsonp([0,3],{
 
-/***/ 19:
+/***/ 139:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__angular_http__ = __webpack_require__(287);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return KeyValArrayPipe; });
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+
+var KeyValArrayPipe = (function () {
+    function KeyValArrayPipe() {
+    }
+    KeyValArrayPipe.prototype.transform = function (object, get) {
+        var result = [];
+        for (var key in object) {
+            if (get == null) {
+                result.push({});
+                result[result.length - 1][key] = object[key];
+            }
+            else if (get == "keys") {
+                result.push(key);
+            }
+            else if (get == "values") {
+                result.push(object[key]);
+            }
+        }
+        return result;
+    };
+    KeyValArrayPipe = __decorate([
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["p" /* Pipe */])({
+            name: 'keyValArray'
+        }), 
+        __metadata('design:paramtypes', [])
+    ], KeyValArrayPipe);
+    return KeyValArrayPipe;
+}());
+//# sourceMappingURL=C:/GitHub/ContentDeveloperCMS/ContentDeveloperCMS-AngularApp/src/key-val-array.pipe.js.map
+
+/***/ }),
+
+/***/ 18:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__angular_http__ = __webpack_require__(288);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_rxjs_Observable__ = __webpack_require__(23);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_rxjs_Observable___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_rxjs_Observable__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__pipes_clone_object_pipe__ = __webpack_require__(305);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_rxjs_add_operator_catch__ = __webpack_require__(700);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_rxjs_add_operator_catch___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4_rxjs_add_operator_catch__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_rxjs_add_operator_do__ = __webpack_require__(701);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_rxjs_add_operator_do___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_5_rxjs_add_operator_do__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_rxjs_add_operator_map__ = __webpack_require__(702);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_rxjs_add_operator_map___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_6_rxjs_add_operator_map__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7_rxjs_add_observable_throw__ = __webpack_require__(699);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7_rxjs_add_observable_throw___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_7_rxjs_add_observable_throw__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__pipes_clone_object_pipe__ = __webpack_require__(306);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__pipes_key_val_array_pipe__ = __webpack_require__(139);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_rxjs_add_operator_catch__ = __webpack_require__(700);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_rxjs_add_operator_catch___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_5_rxjs_add_operator_catch__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_rxjs_add_operator_do__ = __webpack_require__(701);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_rxjs_add_operator_do___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_6_rxjs_add_operator_do__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7_rxjs_add_operator_map__ = __webpack_require__(702);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7_rxjs_add_operator_map___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_7_rxjs_add_operator_map__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8_rxjs_add_observable_throw__ = __webpack_require__(699);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8_rxjs_add_observable_throw___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_8_rxjs_add_observable_throw__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return ContentDeveloperServerService; });
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -35,15 +83,29 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 
 
 
+
 var ContentDeveloperServerService = (function () {
-    function ContentDeveloperServerService(_http, _coPipe) {
+    function ContentDeveloperServerService(_http, _coPipe, _kvaPipe) {
         this._http = _http;
         this._coPipe = _coPipe;
+        this._kvaPipe = _kvaPipe;
         this._serverUrl = "./..";
-        this.submitContentAllowed = true;
+        this._contentErrors = {};
         this._headers = new __WEBPACK_IMPORTED_MODULE_1__angular_http__["b" /* Headers */]();
         this._headers.append("Content-Type", "application/json");
     }
+    ContentDeveloperServerService.prototype.getContentErrors = function () {
+        return this._coPipe.transform(this._contentErrors);
+    };
+    ContentDeveloperServerService.prototype.updateContentError = function (propertyName, value) {
+        this._contentErrors[propertyName] = value;
+    };
+    ContentDeveloperServerService.prototype.deleteContentError = function (propertyName) {
+        delete this._contentErrors[propertyName];
+    };
+    ContentDeveloperServerService.prototype.clearContentErrors = function () {
+        this._contentErrors = {};
+    };
     ContentDeveloperServerService.prototype.getLoginUrl = function () {
         var requestUrl = this._serverUrl + "/admin/loginUrl";
         var getLoginUrlObservable = this._http
@@ -179,7 +241,7 @@ var ContentDeveloperServerService = (function () {
         var _this = this;
         if (commitMessage === void 0) { commitMessage = null; }
         if (encapsulationPath === void 0) { encapsulationPath = ""; }
-        if (this.submitContentAllowed) {
+        if (this._kvaPipe.transform(this._contentErrors, "values").length == 0) {
             console.log(projectContent);
             var requestUrl = this._serverUrl + "/feeds/" + this._currentProjectId + "/" + encapsulationPath;
             var contentUpdateObservable = this._http
@@ -400,16 +462,16 @@ var ContentDeveloperServerService = (function () {
     };
     ContentDeveloperServerService = __decorate([
         __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["c" /* Injectable */])(), 
-        __metadata('design:paramtypes', [(typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_1__angular_http__["c" /* Http */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_1__angular_http__["c" /* Http */]) === 'function' && _a) || Object, (typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_3__pipes_clone_object_pipe__["a" /* CloneObjectPipe */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_3__pipes_clone_object_pipe__["a" /* CloneObjectPipe */]) === 'function' && _b) || Object])
+        __metadata('design:paramtypes', [(typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_1__angular_http__["c" /* Http */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_1__angular_http__["c" /* Http */]) === 'function' && _a) || Object, (typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_3__pipes_clone_object_pipe__["a" /* CloneObjectPipe */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_3__pipes_clone_object_pipe__["a" /* CloneObjectPipe */]) === 'function' && _b) || Object, (typeof (_c = typeof __WEBPACK_IMPORTED_MODULE_4__pipes_key_val_array_pipe__["a" /* KeyValArrayPipe */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_4__pipes_key_val_array_pipe__["a" /* KeyValArrayPipe */]) === 'function' && _c) || Object])
     ], ContentDeveloperServerService);
     return ContentDeveloperServerService;
-    var _a, _b;
+    var _a, _b, _c;
 }());
 //# sourceMappingURL=C:/GitHub/ContentDeveloperCMS/ContentDeveloperCMS-AngularApp/src/content-developer-server.service.js.map
 
 /***/ }),
 
-/***/ 201:
+/***/ 202:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -457,7 +519,7 @@ var CustomJsonPipe = (function () {
 
 /***/ }),
 
-/***/ 305:
+/***/ 306:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -493,7 +555,7 @@ var CloneObjectPipe = (function () {
 
 /***/ }),
 
-/***/ 306:
+/***/ 307:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -525,53 +587,6 @@ var DoubleDigitPipe = (function () {
     return DoubleDigitPipe;
 }());
 //# sourceMappingURL=C:/GitHub/ContentDeveloperCMS/ContentDeveloperCMS-AngularApp/src/double-digit.pipe.js.map
-
-/***/ }),
-
-/***/ 307:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return KeyValArrayPipe; });
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-
-var KeyValArrayPipe = (function () {
-    function KeyValArrayPipe() {
-    }
-    KeyValArrayPipe.prototype.transform = function (object, get) {
-        var result = [];
-        for (var key in object) {
-            if (get == null) {
-                result.push({});
-                result[result.length - 1][key] = object[key];
-            }
-            else if (get == "keys") {
-                result.push(key);
-            }
-            else if (get == "values") {
-                result.push(object[key]);
-            }
-        }
-        return result;
-    };
-    KeyValArrayPipe = __decorate([
-        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["p" /* Pipe */])({
-            name: 'keyValArray'
-        }), 
-        __metadata('design:paramtypes', [])
-    ], KeyValArrayPipe);
-    return KeyValArrayPipe;
-}());
-//# sourceMappingURL=C:/GitHub/ContentDeveloperCMS/ContentDeveloperCMS-AngularApp/src/key-val-array.pipe.js.map
 
 /***/ }),
 
@@ -614,6 +629,50 @@ var ShortenerPipe = (function () {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__upper_camel_case_pipe__ = __webpack_require__(311);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__underscore_to_space_pipe__ = __webpack_require__(310);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return TitlePipe; });
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+
+
+
+var TitlePipe = (function () {
+    function TitlePipe(_utsPipe, _uccPipe) {
+        this._utsPipe = _utsPipe;
+        this._uccPipe = _uccPipe;
+    }
+    TitlePipe.prototype.transform = function (stringVal) {
+        stringVal += "";
+        var underscoresRemoved = this._utsPipe.transform(stringVal);
+        var allWordsToUppercase = this._uccPipe.transform(underscoresRemoved);
+        return allWordsToUppercase;
+    };
+    TitlePipe = __decorate([
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["p" /* Pipe */])({
+            name: 'title'
+        }), 
+        __metadata('design:paramtypes', [(typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_2__underscore_to_space_pipe__["a" /* UnderscoreToSpacePipe */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_2__underscore_to_space_pipe__["a" /* UnderscoreToSpacePipe */]) === 'function' && _a) || Object, (typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_1__upper_camel_case_pipe__["a" /* UpperCamelCasePipe */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_1__upper_camel_case_pipe__["a" /* UpperCamelCasePipe */]) === 'function' && _b) || Object])
+    ], TitlePipe);
+    return TitlePipe;
+    var _a, _b;
+}());
+//# sourceMappingURL=C:/GitHub/ContentDeveloperCMS/ContentDeveloperCMS-AngularApp/src/title.pipe.js.map
+
+/***/ }),
+
+/***/ 310:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return UnderscoreToSpacePipe; });
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -645,7 +704,7 @@ var UnderscoreToSpacePipe = (function () {
 
 /***/ }),
 
-/***/ 310:
+/***/ 311:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -687,7 +746,7 @@ var UpperCamelCasePipe = (function () {
 
 /***/ }),
 
-/***/ 352:
+/***/ 353:
 /***/ (function(module, exports) {
 
 function webpackEmptyContext(req) {
@@ -696,21 +755,21 @@ function webpackEmptyContext(req) {
 webpackEmptyContext.keys = function() { return []; };
 webpackEmptyContext.resolve = webpackEmptyContext;
 module.exports = webpackEmptyContext;
-webpackEmptyContext.id = 352;
+webpackEmptyContext.id = 353;
 
 
 /***/ }),
 
-/***/ 353:
+/***/ 354:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__polyfills_ts__ = __webpack_require__(491);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__angular_platform_browser_dynamic__ = __webpack_require__(439);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__angular_platform_browser_dynamic__ = __webpack_require__(440);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__angular_core__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__environments_environment__ = __webpack_require__(490);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__app_app_module__ = __webpack_require__(460);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__app_app_module__ = __webpack_require__(461);
 
 
 
@@ -724,12 +783,12 @@ __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__angular_platform_browser_dyna
 
 /***/ }),
 
-/***/ 459:
+/***/ 460:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__ = __webpack_require__(18);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return AppComponent; });
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -790,52 +849,52 @@ var AppComponent = (function () {
 
 /***/ }),
 
-/***/ 460:
+/***/ 461:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_platform_browser__ = __webpack_require__(193);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_platform_browser__ = __webpack_require__(194);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__angular_core__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__angular_forms__ = __webpack_require__(430);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__angular_http__ = __webpack_require__(287);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__pipes_key_val_array_pipe__ = __webpack_require__(307);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__pipes_custom_json_pipe__ = __webpack_require__(201);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__pipes_clone_object_pipe__ = __webpack_require__(305);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__pipes_upper_camel_case_pipe__ = __webpack_require__(310);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__pipes_underscore_to_space_pipe__ = __webpack_require__(309);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__pipes_title_pipe__ = __webpack_require__(489);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__angular_forms__ = __webpack_require__(431);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__angular_http__ = __webpack_require__(288);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__pipes_key_val_array_pipe__ = __webpack_require__(139);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__pipes_custom_json_pipe__ = __webpack_require__(202);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__pipes_clone_object_pipe__ = __webpack_require__(306);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__pipes_upper_camel_case_pipe__ = __webpack_require__(311);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__pipes_underscore_to_space_pipe__ = __webpack_require__(310);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__pipes_title_pipe__ = __webpack_require__(309);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__pipes_shortener_pipe__ = __webpack_require__(308);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__pipes_custom_date_pipe__ = __webpack_require__(488);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__pipes_double_digit_pipe__ = __webpack_require__(306);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__services_content_developer_server_content_developer_server_service__ = __webpack_require__(19);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__app_component__ = __webpack_require__(459);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__cms_cms_component__ = __webpack_require__(467);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_16__cms_cms_admin_admin_component__ = __webpack_require__(461);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_17__cms_cms_editor_editor_component__ = __webpack_require__(464);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_18__general_header_header_component__ = __webpack_require__(486);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_19__general_footer_footer_component__ = __webpack_require__(485);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_20__cms_reusable_content_content_editor_content_editor_component__ = __webpack_require__(472);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_21__cms_reusable_content_collection_collection_component__ = __webpack_require__(471);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_22__cms_reusable_content_collection_item_collection_item_component__ = __webpack_require__(470);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_23__cms_cms_admin_structure_view_structure_view_component__ = __webpack_require__(463);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_24__cms_reusable_content_content_view_content_view_component__ = __webpack_require__(473);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_25__cms_cms_admin_history_view_history_view_component__ = __webpack_require__(462);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_26__cms_reusable_settings_settings_view_settings_view_component__ = __webpack_require__(484);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_27__cms_reusable_history_history_display_history_display_component__ = __webpack_require__(479);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_28__cms_cms_user_projects_user_projects_component__ = __webpack_require__(465);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_29__login_login_component__ = __webpack_require__(487);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_30__cms_reusable_media_items_media_item_gallery_media_item_gallery_component__ = __webpack_require__(480);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_31__cms_reusable_media_items_media_item_media_item_component__ = __webpack_require__(481);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_32__cms_reusable_draggable_container_draggable_container_directive__ = __webpack_require__(477);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_33__cms_reusable_code_editor_code_editor_component__ = __webpack_require__(469);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_34__cms_cms_view_only_view_only_component__ = __webpack_require__(466);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_35__cms_reusable_settings_collaborators_collaborators_component__ = __webpack_require__(483);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_36__cms_reusable_settings_access_levels_access_levels_component__ = __webpack_require__(482);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_37__cms_reusable_cms_navigation_navigation_component__ = __webpack_require__(468);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_38__cms_reusable_content_wysiwyg_html_wysiwyg_html_component__ = __webpack_require__(476);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_39__cms_reusable_content_file_upload_file_upload_component__ = __webpack_require__(474);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_40__cms_reusable_content_form_control_form_control_directive__ = __webpack_require__(475);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_41__cms_reusable_errors_errors_component__ = __webpack_require__(478);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__pipes_custom_date_pipe__ = __webpack_require__(489);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__pipes_double_digit_pipe__ = __webpack_require__(307);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__services_content_developer_server_content_developer_server_service__ = __webpack_require__(18);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__app_component__ = __webpack_require__(460);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__cms_cms_component__ = __webpack_require__(468);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_16__cms_cms_admin_admin_component__ = __webpack_require__(462);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_17__cms_cms_editor_editor_component__ = __webpack_require__(465);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_18__general_header_header_component__ = __webpack_require__(487);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_19__general_footer_footer_component__ = __webpack_require__(486);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_20__cms_reusable_content_content_editor_content_editor_component__ = __webpack_require__(473);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_21__cms_reusable_content_collection_collection_component__ = __webpack_require__(472);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_22__cms_reusable_content_collection_item_collection_item_component__ = __webpack_require__(471);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_23__cms_cms_admin_structure_view_structure_view_component__ = __webpack_require__(464);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_24__cms_reusable_content_content_view_content_view_component__ = __webpack_require__(474);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_25__cms_cms_admin_history_view_history_view_component__ = __webpack_require__(463);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_26__cms_reusable_settings_settings_view_settings_view_component__ = __webpack_require__(485);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_27__cms_reusable_history_history_display_history_display_component__ = __webpack_require__(480);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_28__cms_cms_user_projects_user_projects_component__ = __webpack_require__(466);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_29__login_login_component__ = __webpack_require__(488);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_30__cms_reusable_media_items_media_item_gallery_media_item_gallery_component__ = __webpack_require__(481);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_31__cms_reusable_media_items_media_item_media_item_component__ = __webpack_require__(482);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_32__cms_reusable_draggable_container_draggable_container_directive__ = __webpack_require__(478);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_33__cms_reusable_code_editor_code_editor_component__ = __webpack_require__(470);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_34__cms_cms_view_only_view_only_component__ = __webpack_require__(467);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_35__cms_reusable_settings_collaborators_collaborators_component__ = __webpack_require__(484);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_36__cms_reusable_settings_access_levels_access_levels_component__ = __webpack_require__(483);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_37__cms_reusable_cms_navigation_navigation_component__ = __webpack_require__(469);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_38__cms_reusable_content_wysiwyg_html_wysiwyg_html_component__ = __webpack_require__(477);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_39__cms_reusable_content_file_upload_file_upload_component__ = __webpack_require__(475);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_40__cms_reusable_content_form_control_form_control_directive__ = __webpack_require__(476);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_41__cms_reusable_errors_errors_component__ = __webpack_require__(479);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return AppModule; });
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -959,12 +1018,12 @@ var AppModule = (function () {
 
 /***/ }),
 
-/***/ 461:
+/***/ 462:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__ = __webpack_require__(18);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return AdminComponent; });
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -1086,7 +1145,7 @@ var AdminComponent = (function () {
 
 /***/ }),
 
-/***/ 462:
+/***/ 463:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1153,12 +1212,12 @@ var HistoryViewComponent = (function () {
 
 /***/ }),
 
-/***/ 463:
+/***/ 464:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__pipes_custom_json_pipe__ = __webpack_require__(201);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__pipes_custom_json_pipe__ = __webpack_require__(202);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return StructureViewComponent; });
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -1230,7 +1289,7 @@ var StructureViewComponent = (function () {
 
 /***/ }),
 
-/***/ 464:
+/***/ 465:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1333,12 +1392,12 @@ var EditorComponent = (function () {
 
 /***/ }),
 
-/***/ 465:
+/***/ 466:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__ = __webpack_require__(18);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return UserProjectsComponent; });
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -1412,7 +1471,7 @@ var UserProjectsComponent = (function () {
 
 /***/ }),
 
-/***/ 466:
+/***/ 467:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1457,12 +1516,12 @@ var ViewOnlyComponent = (function () {
 
 /***/ }),
 
-/***/ 467:
+/***/ 468:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__ = __webpack_require__(18);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return CmsComponent; });
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -1625,7 +1684,7 @@ var CmsComponent = (function () {
 
 /***/ }),
 
-/***/ 468:
+/***/ 469:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1671,12 +1730,12 @@ var NavigationComponent = (function () {
 
 /***/ }),
 
-/***/ 469:
+/***/ 470:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__pipes_custom_json_pipe__ = __webpack_require__(201);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__pipes_custom_json_pipe__ = __webpack_require__(202);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return CodeEditorComponent; });
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -1759,7 +1818,7 @@ var CodeEditorComponent = (function () {
             }
             else if (deletePrevChar) {
                 var prevChar = this.codeJson.slice(this._cursorPosition - 1, this._cursorPosition);
-                if (prevChar != null && prevChar.replace(/\s/g, "").length == 0) {
+                if (prevChar.replace(/\s/g, "").length == 0) {
                     this.codeJson = this.codeJson.slice(0, this._cursorPosition - 1) + this.codeJson.slice(this._cursorPosition);
                 }
                 this._cursorPosition = this._cursorPosition > 1 ? this._cursorPosition - 1 : this._cursorPosition;
@@ -1824,7 +1883,7 @@ var CodeEditorComponent = (function () {
 
 /***/ }),
 
-/***/ 470:
+/***/ 471:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1841,10 +1900,22 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 
 var CollectionItemComponent = (function () {
-    function CollectionItemComponent() {
+    function CollectionItemComponent(_el) {
+        this._el = _el;
         this.viewOnly = false;
         this.itemContentChanged = new __WEBPACK_IMPORTED_MODULE_0__angular_core__["G" /* EventEmitter */]();
     }
+    CollectionItemComponent.prototype.ngAfterViewInit = function () {
+        this._contentInputElement = this._el.nativeElement.getElementsByClassName("contentInput")[0];
+    };
+    CollectionItemComponent.prototype.ngDoCheck = function () {
+        if (this._contentInputElement != null && this._contentInputElement.hasAttribute("data-error")) {
+            this._contentError = this._contentInputElement.getAttribute("data-error");
+        }
+        else {
+            this._contentError = null;
+        }
+    };
     CollectionItemComponent.prototype.contentChanged = function (updatedContent) {
         if (updatedContent === void 0) { updatedContent = null; }
         if (updatedContent != null && updatedContent.constructor.name.toLowerCase() != "event") {
@@ -1888,16 +1959,16 @@ var CollectionItemComponent = (function () {
             template: __webpack_require__(680),
             styles: [__webpack_require__(654)]
         }), 
-        __metadata('design:paramtypes', [])
+        __metadata('design:paramtypes', [(typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_0__angular_core__["C" /* ElementRef */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_0__angular_core__["C" /* ElementRef */]) === 'function' && _b) || Object])
     ], CollectionItemComponent);
     return CollectionItemComponent;
-    var _a;
+    var _a, _b;
 }());
 //# sourceMappingURL=C:/GitHub/ContentDeveloperCMS/ContentDeveloperCMS-AngularApp/src/collection-item.component.js.map
 
 /***/ }),
 
-/***/ 471:
+/***/ 472:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2029,11 +2100,13 @@ var CollectionComponent = (function () {
 
 /***/ }),
 
-/***/ 472:
+/***/ 473:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__ = __webpack_require__(18);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__pipes_key_val_array_pipe__ = __webpack_require__(139);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return ContentEditorComponent; });
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -2045,8 +2118,12 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 
+
+
 var ContentEditorComponent = (function () {
-    function ContentEditorComponent() {
+    function ContentEditorComponent(_kvaPipe, _cdService) {
+        this._kvaPipe = _kvaPipe;
+        this._cdService = _cdService;
         this.viewOnly = false;
         this.viewContent = true;
         this.requestToSaveProjectContent = new __WEBPACK_IMPORTED_MODULE_0__angular_core__["G" /* EventEmitter */]();
@@ -2064,6 +2141,12 @@ var ContentEditorComponent = (function () {
             }
         }
     };
+    ContentEditorComponent.prototype.ngDoCheck = function () {
+        this._updateErrors();
+    };
+    ContentEditorComponent.prototype.requestToDismissErrors = function () {
+        this._contentErrors = null;
+    };
     ContentEditorComponent.prototype.viewCollection = function (collection) {
         this.currentCollectionName = collection;
     };
@@ -2071,6 +2154,7 @@ var ContentEditorComponent = (function () {
         this.updateProjectContent(this.projectContent, contentData);
     };
     ContentEditorComponent.prototype.saveProjectContent = function () {
+        this._updateErrors(true);
         var contentData = {
             commit_message: "Update to content of '" + this.currentCollectionName + "'"
         };
@@ -2106,6 +2190,15 @@ var ContentEditorComponent = (function () {
             for (var collection in this.projectStructure) {
                 this.viewCollection(collection);
                 break;
+            }
+        }
+    };
+    ContentEditorComponent.prototype._updateErrors = function (forceView) {
+        if (forceView === void 0) { forceView = false; }
+        if (this.viewContent && this.viewOnly == false && (forceView || this._contentErrors != null)) {
+            this._contentErrors = this._cdService.getContentErrors();
+            if (this._kvaPipe.transform(this._contentErrors, "values").length == 0) {
+                this._contentErrors = null;
             }
         }
     };
@@ -2147,16 +2240,16 @@ var ContentEditorComponent = (function () {
             template: __webpack_require__(682),
             styles: [__webpack_require__(656)]
         }), 
-        __metadata('design:paramtypes', [])
+        __metadata('design:paramtypes', [(typeof (_d = typeof __WEBPACK_IMPORTED_MODULE_2__pipes_key_val_array_pipe__["a" /* KeyValArrayPipe */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_2__pipes_key_val_array_pipe__["a" /* KeyValArrayPipe */]) === 'function' && _d) || Object, (typeof (_e = typeof __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__["a" /* ContentDeveloperServerService */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__["a" /* ContentDeveloperServerService */]) === 'function' && _e) || Object])
     ], ContentEditorComponent);
     return ContentEditorComponent;
-    var _a, _b, _c;
+    var _a, _b, _c, _d, _e;
 }());
 //# sourceMappingURL=C:/GitHub/ContentDeveloperCMS/ContentDeveloperCMS-AngularApp/src/content-editor.component.js.map
 
 /***/ }),
 
-/***/ 473:
+/***/ 474:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2238,12 +2331,12 @@ var ContentViewComponent = (function () {
 
 /***/ }),
 
-/***/ 474:
+/***/ 475:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__ = __webpack_require__(18);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return FileUploadComponent; });
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -2257,13 +2350,34 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 
 
 var FileUploadComponent = (function () {
-    function FileUploadComponent(_cdService) {
+    function FileUploadComponent(_el, _cdService) {
+        this._el = _el;
         this._cdService = _cdService;
         this.viewContent = true;
         this.viewOnly = false;
         this.fileChanged = new __WEBPACK_IMPORTED_MODULE_0__angular_core__["G" /* EventEmitter */]();
         this._mediaItemGalleryVisible = false;
     }
+    FileUploadComponent.prototype.ngAfterViewInit = function () {
+        this._fileInputElement = this._el.nativeElement.getElementsByClassName("fileInput")[0];
+    };
+    FileUploadComponent.prototype.ngDoCheck = function () {
+        if (this._fileInputElement != null) {
+            if (this.itemContent != null) {
+                this._fileInputElement.setAttribute("data-url", this.itemContent);
+                this._contentError = null;
+            }
+            else {
+                this._fileInputElement.removeAttribute("data-url");
+            }
+            if (this._fileInputElement.hasAttribute("data-error")) {
+                this._contentError = this._fileInputElement.getAttribute("data-error");
+            }
+            else {
+                this._contentError = null;
+            }
+        }
+    };
     FileUploadComponent.prototype.showMediaItemGallery = function () {
         this._mediaItemGalleryVisible = true;
     };
@@ -2271,6 +2385,8 @@ var FileUploadComponent = (function () {
         this._mediaItemGalleryVisible = false;
     };
     FileUploadComponent.prototype.mediaItemSelected = function (mediaItemUrl) {
+        this._fileInputElement.setAttribute("data-url", this.itemContent);
+        this._warning = this._contentError = null;
         this.itemContent = mediaItemUrl;
         this.fileChanged.emit(mediaItemUrl);
         this.hideMediaItemGallery();
@@ -2283,7 +2399,8 @@ var FileUploadComponent = (function () {
                 if (responseObject.fileUrl != null) {
                     _this.itemContent = responseObject.fileUrl;
                     _this.fileChanged.emit(responseObject.fileUrl);
-                    _this._warning = null;
+                    _this._fileInputElement.setAttribute("data-url", _this.itemContent);
+                    _this._warning = _this._contentError = null;
                 }
             });
         }
@@ -2305,6 +2422,10 @@ var FileUploadComponent = (function () {
         __metadata('design:type', Object)
     ], FileUploadComponent.prototype, "itemAttributes", void 0);
     __decorate([
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["w" /* Input */])(), 
+        __metadata('design:type', String)
+    ], FileUploadComponent.prototype, "encapsulationPath", void 0);
+    __decorate([
         __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["T" /* Output */])(), 
         __metadata('design:type', (typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_0__angular_core__["G" /* EventEmitter */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_0__angular_core__["G" /* EventEmitter */]) === 'function' && _a) || Object)
     ], FileUploadComponent.prototype, "fileChanged", void 0);
@@ -2314,21 +2435,22 @@ var FileUploadComponent = (function () {
             template: __webpack_require__(684),
             styles: [__webpack_require__(658)]
         }), 
-        __metadata('design:paramtypes', [(typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__["a" /* ContentDeveloperServerService */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__["a" /* ContentDeveloperServerService */]) === 'function' && _b) || Object])
+        __metadata('design:paramtypes', [(typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_0__angular_core__["C" /* ElementRef */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_0__angular_core__["C" /* ElementRef */]) === 'function' && _b) || Object, (typeof (_c = typeof __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__["a" /* ContentDeveloperServerService */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__["a" /* ContentDeveloperServerService */]) === 'function' && _c) || Object])
     ], FileUploadComponent);
     return FileUploadComponent;
-    var _a, _b;
+    var _a, _b, _c;
 }());
 //# sourceMappingURL=C:/GitHub/ContentDeveloperCMS/ContentDeveloperCMS-AngularApp/src/file-upload.component.js.map
 
 /***/ }),
 
-/***/ 475:
+/***/ 476:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__ = __webpack_require__(18);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__pipes_title_pipe__ = __webpack_require__(309);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return FormControlDirective; });
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -2341,9 +2463,11 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 
 
+
 var FormControlDirective = (function () {
-    function FormControlDirective(_el, _cdService) {
+    function FormControlDirective(_el, _tPipe, _cdService) {
         this._el = _el;
+        this._tPipe = _tPipe;
         this._cdService = _cdService;
     }
     FormControlDirective.prototype.ngAfterViewInit = function () {
@@ -2351,17 +2475,48 @@ var FormControlDirective = (function () {
     };
     FormControlDirective.prototype.ngDoCheck = function () {
         if (this._formElement != null) {
-            if (this._formElement.hasAttribute("required")) {
-                if (this._formElement.value == null || this._formElement.value.length == 0) {
-                    //this._cdService.submitContentAllowed = false;
-                    console.log("Value required for this input");
-                }
+            var error;
+            var inputName = this._tPipe.transform(this._formElement.getAttribute("data-name").replace(/\//g, " > "));
+            if (this._formElement.hasAttribute("required") && this._formElement.validity.valueMissing) {
+                error = "this is a required field";
+            }
+            else if (this._formElement.hasAttribute("max") && this._formElement.validity.rangeOverflow) {
+                error = "this exceeds the maximum value of " + this._formElement.getAttribute("max");
+            }
+            else if (this._formElement.hasAttribute("min") && this._formElement.validity.rangeUnderflow) {
+                error = "this is less than the minimum value of " + this._formElement.getAttribute("min");
+            }
+            else if (this._formElement.hasAttribute("maxlength") && this._formElement.validity.tooLong) {
+                error = "this exceeds the maximum length of " + this._formElement.getAttribute("maxlength");
             }
             else if (this._formElement.getAttribute("data-required") == "true") {
-                if (this._formElement.innerHTML == null || this._formElement.innerHTML.length == 0) {
-                    //this._cdService.submitContentAllowed = false;
-                    console.log("Value required for this input");
+                switch (this._formElement.tagName.toLowerCase()) {
+                    case "div": {
+                        if (this._formElement.innerHTML == null || this._formElement.innerHTML.length == 0) {
+                            error = "this is a required field";
+                        }
+                        break;
+                    }
+                    case "input": {
+                        if (this._formElement.getAttribute("data-url") == null || this._formElement.getAttribute("data-url").length == 0) {
+                            error = "this is a required field";
+                        }
+                        break;
+                    }
                 }
+            }
+            else if (this._formElement.getAttribute("data-maxlength") == "true") {
+                if (this._formElement.innerHTML == null || this._formElement.innerHTML.length > this._formElement.getAttribute("maxlength")) {
+                    error = "this exceeds the maximum length of " + this._formElement.getAttribute("maxlength");
+                }
+            }
+            if (error != null) {
+                this._cdService.updateContentError(inputName, error.replace("this", "'" + inputName + "' "));
+                this._formElement.setAttribute("data-error", error);
+            }
+            else {
+                this._cdService.deleteContentError(inputName);
+                this._formElement.removeAttribute("data-error");
             }
         }
     };
@@ -2369,16 +2524,16 @@ var FormControlDirective = (function () {
         __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["v" /* Directive */])({
             selector: '[appFormControl]'
         }), 
-        __metadata('design:paramtypes', [(typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_0__angular_core__["C" /* ElementRef */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_0__angular_core__["C" /* ElementRef */]) === 'function' && _a) || Object, (typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__["a" /* ContentDeveloperServerService */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__["a" /* ContentDeveloperServerService */]) === 'function' && _b) || Object])
+        __metadata('design:paramtypes', [(typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_0__angular_core__["C" /* ElementRef */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_0__angular_core__["C" /* ElementRef */]) === 'function' && _a) || Object, (typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_2__pipes_title_pipe__["a" /* TitlePipe */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_2__pipes_title_pipe__["a" /* TitlePipe */]) === 'function' && _b) || Object, (typeof (_c = typeof __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__["a" /* ContentDeveloperServerService */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__["a" /* ContentDeveloperServerService */]) === 'function' && _c) || Object])
     ], FormControlDirective);
     return FormControlDirective;
-    var _a, _b;
+    var _a, _b, _c;
 }());
 //# sourceMappingURL=C:/GitHub/ContentDeveloperCMS/ContentDeveloperCMS-AngularApp/src/form-control.directive.js.map
 
 /***/ }),
 
-/***/ 476:
+/***/ 477:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2395,7 +2550,8 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 
 var WysiwygHtmlComponent = (function () {
-    function WysiwygHtmlComponent() {
+    function WysiwygHtmlComponent(_el) {
+        this._el = _el;
         this.wysiwygRequestToViewMediaItems = new __WEBPACK_IMPORTED_MODULE_0__angular_core__["G" /* EventEmitter */]();
         this.wysiwygContentChanged = new __WEBPACK_IMPORTED_MODULE_0__angular_core__["G" /* EventEmitter */]();
     }
@@ -2406,6 +2562,14 @@ var WysiwygHtmlComponent = (function () {
     WysiwygHtmlComponent.prototype.ngOnChanges = function (changes) {
         if (changes.itemContent) {
             this.updateTextAreaToItemContent();
+        }
+    };
+    WysiwygHtmlComponent.prototype.ngDoCheck = function () {
+        if (this._textareaElement != null && this._textareaElement.hasAttribute("data-error")) {
+            this._contentError = this._textareaElement.getAttribute("data-error");
+        }
+        else {
+            this._contentError = null;
         }
     };
     WysiwygHtmlComponent.prototype.updateTextAreaToItemContent = function () {
@@ -2554,6 +2718,10 @@ var WysiwygHtmlComponent = (function () {
         __metadata('design:type', Object)
     ], WysiwygHtmlComponent.prototype, "itemAttributes", void 0);
     __decorate([
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["w" /* Input */])(), 
+        __metadata('design:type', Object)
+    ], WysiwygHtmlComponent.prototype, "encapsulationPath", void 0);
+    __decorate([
         __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["T" /* Output */])(), 
         __metadata('design:type', (typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_0__angular_core__["G" /* EventEmitter */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_0__angular_core__["G" /* EventEmitter */]) === 'function' && _a) || Object)
     ], WysiwygHtmlComponent.prototype, "wysiwygRequestToViewMediaItems", void 0);
@@ -2567,21 +2735,21 @@ var WysiwygHtmlComponent = (function () {
             template: __webpack_require__(685),
             styles: [__webpack_require__(659)]
         }), 
-        __metadata('design:paramtypes', [])
+        __metadata('design:paramtypes', [(typeof (_c = typeof __WEBPACK_IMPORTED_MODULE_0__angular_core__["C" /* ElementRef */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_0__angular_core__["C" /* ElementRef */]) === 'function' && _c) || Object])
     ], WysiwygHtmlComponent);
     return WysiwygHtmlComponent;
-    var _a, _b;
+    var _a, _b, _c;
 }());
 //# sourceMappingURL=C:/GitHub/ContentDeveloperCMS/ContentDeveloperCMS-AngularApp/src/wysiwyg-html.component.js.map
 
 /***/ }),
 
-/***/ 477:
+/***/ 478:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__pipes_key_val_array_pipe__ = __webpack_require__(307);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__pipes_key_val_array_pipe__ = __webpack_require__(139);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return DraggableContainerDirective; });
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -2785,7 +2953,7 @@ var DraggableContainerDirective = (function () {
 
 /***/ }),
 
-/***/ 478:
+/***/ 479:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2831,12 +2999,12 @@ var ErrorsComponent = (function () {
 
 /***/ }),
 
-/***/ 479:
+/***/ 480:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__ = __webpack_require__(18);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__pipes_shortener_pipe__ = __webpack_require__(308);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return HistoryDisplayComponent; });
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
@@ -2923,12 +3091,12 @@ var HistoryDisplayComponent = (function () {
 
 /***/ }),
 
-/***/ 480:
+/***/ 481:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__ = __webpack_require__(18);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return MediaItemGalleryComponent; });
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -3007,7 +3175,7 @@ var MediaItemGalleryComponent = (function () {
 
 /***/ }),
 
-/***/ 481:
+/***/ 482:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3057,12 +3225,12 @@ var MediaItemComponent = (function () {
 
 /***/ }),
 
-/***/ 482:
+/***/ 483:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__ = __webpack_require__(18);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return AccessLevelsComponent; });
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -3131,12 +3299,12 @@ var AccessLevelsComponent = (function () {
 
 /***/ }),
 
-/***/ 483:
+/***/ 484:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__ = __webpack_require__(18);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return CollaboratorsComponent; });
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -3198,12 +3366,12 @@ var CollaboratorsComponent = (function () {
 
 /***/ }),
 
-/***/ 484:
+/***/ 485:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__ = __webpack_require__(18);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return SettingsViewComponent; });
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -3354,7 +3522,7 @@ var SettingsViewComponent = (function () {
 
 /***/ }),
 
-/***/ 485:
+/***/ 486:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3389,7 +3557,7 @@ var FooterComponent = (function () {
 
 /***/ }),
 
-/***/ 486:
+/***/ 487:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3439,12 +3607,12 @@ var HeaderComponent = (function () {
 
 /***/ }),
 
-/***/ 487:
+/***/ 488:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__ = __webpack_require__(18);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return LoginComponent; });
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -3480,12 +3648,12 @@ var LoginComponent = (function () {
 
 /***/ }),
 
-/***/ 488:
+/***/ 489:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__double_digit_pipe__ = __webpack_require__(306);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__double_digit_pipe__ = __webpack_require__(307);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return CustomDatePipe; });
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -3532,50 +3700,6 @@ var CustomDatePipe = (function () {
     var _a;
 }());
 //# sourceMappingURL=C:/GitHub/ContentDeveloperCMS/ContentDeveloperCMS-AngularApp/src/custom-date.pipe.js.map
-
-/***/ }),
-
-/***/ 489:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__upper_camel_case_pipe__ = __webpack_require__(310);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__underscore_to_space_pipe__ = __webpack_require__(309);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return TitlePipe; });
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-
-
-
-var TitlePipe = (function () {
-    function TitlePipe(_utsPipe, _uccPipe) {
-        this._utsPipe = _utsPipe;
-        this._uccPipe = _uccPipe;
-    }
-    TitlePipe.prototype.transform = function (stringVal) {
-        stringVal += "";
-        var underscoresRemoved = this._utsPipe.transform(stringVal);
-        var allWordsToUppercase = this._uccPipe.transform(underscoresRemoved);
-        return allWordsToUppercase;
-    };
-    TitlePipe = __decorate([
-        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["p" /* Pipe */])({
-            name: 'title'
-        }), 
-        __metadata('design:paramtypes', [(typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_2__underscore_to_space_pipe__["a" /* UnderscoreToSpacePipe */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_2__underscore_to_space_pipe__["a" /* UnderscoreToSpacePipe */]) === 'function' && _a) || Object, (typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_1__upper_camel_case_pipe__["a" /* UpperCamelCasePipe */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_1__upper_camel_case_pipe__["a" /* UpperCamelCasePipe */]) === 'function' && _b) || Object])
-    ], TitlePipe);
-    return TitlePipe;
-    var _a, _b;
-}());
-//# sourceMappingURL=C:/GitHub/ContentDeveloperCMS/ContentDeveloperCMS-AngularApp/src/title.pipe.js.map
 
 /***/ }),
 
@@ -3906,7 +4030,7 @@ module.exports = "<textarea\n  [(ngModel)]=\"codeJson\">\n</textarea>\n<button (
 /***/ 680:
 /***/ (function(module, exports) {
 
-module.exports = "<ng-container *ngIf=\"itemStructure.attributes != null\">\r\n  <br *ngIf=\"itemStructure.input_type == 'textarea'\">\r\n  <label>{{itemName | title}} {{itemStructure.attributes.required == \"required\" ? '*' : ''}}\r\n    <ng-container *ngIf=\"itemStructure.type != 'html'\">\r\n      <input\r\n        *ngIf=\"(itemStructure.input_type == null || itemStructure.input_type == 'input') && itemStructure.attributes.type != 'file'\"\r\n        [type]=\"itemStructure.attributes.type != null ? itemStructure.attributes.type : 'text'\"\r\n        [(ngModel)]=\"itemContent\"\r\n        (change)=\"contentChanged($event)\"\r\n        [disabled]=\"viewOnly\"\r\n        [id]=\"itemStructure.attributes.id != null ? itemStructure.attributes.id : ''\"\r\n        [class]=\"itemStructure.attributes.class != null ? itemStructure.attributes.class : ''\"\r\n        [required]=\"itemStructure.attributes.required != null && itemStructure.attributes.required\"\r\n        appFormControl>\r\n\r\n      <textarea\r\n        *ngIf=\"itemStructure.input_type == 'textarea'\"\r\n        [(ngModel)]=\"itemContent\"\r\n        (change)=\"contentChanged($event)\"\r\n        [disabled]=\"viewOnly\"\r\n        [id]=\"itemStructure.attributes.id != null ? itemStructure.attributes.id : ''\"\r\n        [class]=\"itemStructure.attributes.class != null ? itemStructure.attributes.class : ''\"\r\n        [required]=\"itemStructure.attributes.required != null && itemStructure.attributes.required\"\r\n        appFormControl>\r\n      </textarea>\r\n\r\n      <ng-container *ngIf=\"itemStructure.input_type != null && itemStructure.input_type == 'select'\">\r\n        <select\r\n          *ngIf=\"viewOnly == false\"\r\n          [(ngModel)]=\"itemContent\"\r\n          (change)=\"contentChanged($event)\"\r\n          [id]=\"itemStructure.attributes.id != null ? itemStructure.attributes.id : ''\"\r\n          [class]=\"itemStructure.attributes.class != null ? itemStructure.attributes.class : ''\"\r\n          [required]=\"itemStructure.attributes.required != null && itemStructure.attributes.required\"\r\n          appFormControl>\r\n          <ng-container *ngIf=\"itemStructure.attributes != null && itemStructure.attributes.options != null\">\r\n            <option\r\n              *ngFor=\"let option of itemStructure.attributes.options\"\r\n              [value]=\"option\"\r\n              [selected]=\"itemContent != null && viewContent != false && option == itemContent\">\r\n              {{option | title}}\r\n            </option>\r\n          </ng-container>\r\n        </select>\r\n        <input\r\n          *ngIf=\"viewOnly\"\r\n          [value]=\"itemContent\"\r\n          disabled=\"true\">\r\n      </ng-container>\r\n    </ng-container>\r\n  </label>\r\n  \r\n  <app-wysiwyg-html\r\n    *ngIf=\"itemStructure.type == 'html'\"\r\n    [viewContent]=\"viewContent\"\r\n    [viewOnly]=\"viewOnly\"\r\n    [itemContent]=\"itemContent\"\r\n    [itemAttributes]=\"itemStructure.attributes\"\r\n    (wysiwygContentChanged)=\"contentChanged($event)\"></app-wysiwyg-html>\r\n  <app-file-upload\r\n    *ngIf=\"itemStructure.attributes.type == 'file'\"\r\n    [viewOnly]=\"viewOnly\"\r\n    [viewContent]=\"viewContent\"\r\n    [(itemContent)]=\"itemContent\"\r\n    [itemAttributes]=\"itemStructure.attributes\"\r\n    (fileChanged)=\"contentChanged($event)\">\r\n  </app-file-upload>\r\n</ng-container>"
+module.exports = "<ng-container *ngIf=\"itemStructure != null && itemStructure.attributes != null\">\r\n  <br *ngIf=\"itemStructure.input_type == 'textarea'\">\r\n  <label>{{itemName | title}} {{itemStructure.attributes.required == \"required\" ? '*' : ''}}\r\n    <ng-container *ngIf=\"itemStructure.type != 'html'\">\r\n      <input\r\n        *ngIf=\"(itemStructure.input_type == null || itemStructure.input_type == 'input') && itemStructure.attributes.type != 'file'\"\r\n        [type]=\"itemStructure.attributes.type != null ? itemStructure.attributes.type : 'text'\"\r\n        [(ngModel)]=\"itemContent\"\r\n        (change)=\"contentChanged($event)\"\r\n        [disabled]=\"viewOnly\"\r\n        [id]=\"itemStructure.attributes.id != null ? itemStructure.attributes.id : ''\"\r\n        [class]=\"'contentInput' + (itemStructure.attributes.class != null ? ' ' + itemStructure.attributes.class : '')\"\r\n        [required]=\"itemStructure.attributes.required != null && itemStructure.attributes.required\"\r\n        [max]=\"itemStructure.attributes.max != null ? itemStructure.attributes.max : ''\"\r\n        [min]=\"itemStructure.attributes.min != null ? itemStructure.attributes.min : ''\"\r\n        [maxlength]=\"itemStructure.attributes.maxlength != null ? itemStructure.attributes.maxlength : ''\"\r\n        [attr.data-name]=\"encapsulationPath\"\r\n        appFormControl>\r\n\r\n      <textarea\r\n        *ngIf=\"itemStructure.input_type == 'textarea'\"\r\n        [(ngModel)]=\"itemContent\"\r\n        (change)=\"contentChanged($event)\"\r\n        [disabled]=\"viewOnly\"\r\n        [id]=\"itemStructure.attributes.id != null ? itemStructure.attributes.id : ''\"\r\n        [class]=\"'contentInput' + (itemStructure.attributes.class != null ? ' ' + itemStructure.attributes.class : '')\"\r\n        [required]=\"itemStructure.attributes.required != null && itemStructure.attributes.required\"\r\n        [attr.data-name]=\"encapsulationPath\"\r\n        appFormControl>\r\n      </textarea>\r\n\r\n      <ng-container *ngIf=\"itemStructure.input_type != null && itemStructure.input_type == 'select'\">\r\n        <select\r\n          *ngIf=\"viewOnly == false\"\r\n          [(ngModel)]=\"itemContent\"\r\n          (change)=\"contentChanged($event)\"\r\n          [id]=\"itemStructure.attributes.id != null ? itemStructure.attributes.id : ''\"\r\n          [class]=\"'contentInput' + (itemStructure.attributes.class != null ? ' ' + itemStructure.attributes.class : '')\"\r\n          [required]=\"itemStructure.attributes.required != null && itemStructure.attributes.required\"\r\n          [attr.data-name]=\"encapsulationPath\"\r\n          appFormControl>\r\n          <ng-container *ngIf=\"itemStructure.attributes != null && itemStructure.attributes.options != null\">\r\n            <option\r\n              *ngFor=\"let option of itemStructure.attributes.options\"\r\n              [value]=\"option\"\r\n              [selected]=\"itemContent != null && viewContent != false && option == itemContent\">\r\n              {{option | title}}\r\n            </option>\r\n          </ng-container>\r\n        </select>\r\n        <input\r\n          *ngIf=\"viewOnly\"\r\n          [value]=\"itemContent\"\r\n          disabled=\"true\">\r\n      </ng-container>\r\n    </ng-container>\r\n  </label>\r\n  \r\n<span *ngIf=\"_contentError != null && _contentError.length > 0\" class=\"error\">\r\n  {{_contentError}}\r\n</span>\r\n\r\n  <app-wysiwyg-html\r\n    *ngIf=\"itemStructure.type == 'html'\"\r\n    [viewContent]=\"viewContent\"\r\n    [viewOnly]=\"viewOnly\"\r\n    [itemContent]=\"itemContent\"\r\n    [itemAttributes]=\"itemStructure.attributes\"\r\n    [encapsulationPath]=\"encapsulationPath\"\r\n    (wysiwygContentChanged)=\"contentChanged($event)\"></app-wysiwyg-html>\r\n  <app-file-upload\r\n    *ngIf=\"itemStructure.attributes.type == 'file'\"\r\n    [viewOnly]=\"viewOnly\"\r\n    [viewContent]=\"viewContent\"\r\n    [(itemContent)]=\"itemContent\"\r\n    [itemAttributes]=\"itemStructure.attributes\"\r\n    [encapsulationPath]=\"encapsulationPath\"\r\n    (fileChanged)=\"contentChanged($event)\">\r\n  </app-file-upload>\r\n</ng-container>"
 
 /***/ }),
 
@@ -3920,7 +4044,7 @@ module.exports = "<h3 *ngIf=\"subCollection\">{{collection | title}}</h3>\r\n<br
 /***/ 682:
 /***/ (function(module, exports) {
 
-module.exports = "<div *ngIf=\"projectStructure != null\">\r\n  <div *ngIf=\"viewContent && viewOnly == false\" class=\"row\">\r\n    <button (click)=\"saveProjectContent()\">Save</button>\r\n    <button (click)=\"resetProjectContent()\">Reset</button>\r\n  </div>\r\n\r\n  <div class=\"row\">\r\n    <div class=\"col-2-12\">\r\n        <div *ngIf=\"projectStructure != null\">\r\n          <app-draggable-container\r\n            [content]=\"projectStructure\"\r\n            [contentEncapsulationPath]=\"\"\r\n            [contentType]=\"object\"\r\n            (contentReordered)=\"collectionTabsReordered($event)\">\r\n            <ng-container *ngFor=\"let collection of projectStructure | keyValArray : 'keys'\">\r\n              <div *ngIf=\"userAccessLevel <= 2 || projectStructure[collection].no_access == null || (projectStructure[collection].no_access != null && projectStructure[collection].no_access.indexOf(userAccessLevel) < 0)\"\r\n                [draggable]=\"viewContent == false\"\r\n                [attr.data-key]=\"collection\"\r\n                (click)=\"viewCollection(collection)\"\r\n                [class]=\"(collection === currentCollectionName ? 'active ' : '')  + 'collectionTab'\">{{collection | title}}\r\n              </div>\r\n            </ng-container>\r\n          </app-draggable-container>\r\n        </div>\r\n    </div>\r\n    <div class=\"col-10-12\">\r\n      <ng-container *ngIf=\"currentCollectionName != null && (userAccessLevel <= 2 || projectStructure[currentCollectionName].no_access == null || (projectStructure[currentCollectionName].no_access != null && projectStructure[currentCollectionName].no_access.indexOf(userAccessLevel) < 0))\">\r\n        <h2>{{currentCollectionName | title}}</h2>\r\n        <app-collection\r\n          [userAccessLevel]=\"userAccessLevel\"\r\n          [topLevelCollection]=\"true\"\r\n          [encapsulationPath]=\"currentCollectionName\"\r\n          [collection]=\"currentCollectionName\"\r\n          [projectContent]=\"projectContent\"\r\n          [projectStructure]=\"projectStructure\"\r\n          [viewContent]=\"viewContent\"\r\n          [viewOnly]=\"viewOnly\"\r\n          (contentChanged)=\"projectContentChanged($event)\">\r\n        </app-collection>\r\n      </ng-container>\r\n    </div>\r\n  </div>\r\n</div>\r\n"
+module.exports = "<div *ngIf=\"projectStructure != null\">\r\n  <div *ngIf=\"viewContent && viewOnly == false\" class=\"row\">\r\n    <button (click)=\"saveProjectContent()\">Save</button>\r\n    <button (click)=\"resetProjectContent()\">Reset</button>\r\n  </div>\r\n<app-errors\r\n\t[errors]=\"_contentErrors | keyValArray : 'values'\"\r\n\t(requestToDismissErrors)=\"requestToDismissErrors($event)\"></app-errors>\r\n  <div class=\"row\">\r\n    <div class=\"col-2-12\">\r\n        <div *ngIf=\"projectStructure != null\">\r\n          <app-draggable-container\r\n            [content]=\"projectStructure\"\r\n            [contentEncapsulationPath]=\"\"\r\n            [contentType]=\"object\"\r\n            (contentReordered)=\"collectionTabsReordered($event)\">\r\n            <ng-container *ngFor=\"let collection of projectStructure | keyValArray : 'keys'\">\r\n              <div *ngIf=\"userAccessLevel <= 2 || projectStructure[collection].no_access == null || (projectStructure[collection].no_access != null && projectStructure[collection].no_access.indexOf(userAccessLevel) < 0)\"\r\n                [draggable]=\"viewContent == false\"\r\n                [attr.data-key]=\"collection\"\r\n                (click)=\"viewCollection(collection)\"\r\n                [class]=\"(collection === currentCollectionName ? 'active ' : '')  + 'collectionTab'\">{{collection | title}}\r\n              </div>\r\n            </ng-container>\r\n          </app-draggable-container>\r\n        </div>\r\n    </div>\r\n    <div class=\"col-10-12\">\r\n      <ng-container *ngIf=\"currentCollectionName != null && (userAccessLevel <= 2 || projectStructure[currentCollectionName].no_access == null || (projectStructure[currentCollectionName].no_access != null && projectStructure[currentCollectionName].no_access.indexOf(userAccessLevel) < 0))\">\r\n        <h2>{{currentCollectionName | title}}</h2>\r\n        <form>\r\n          <app-collection\r\n            [userAccessLevel]=\"userAccessLevel\"\r\n            [topLevelCollection]=\"true\"\r\n            [encapsulationPath]=\"currentCollectionName\"\r\n            [collection]=\"currentCollectionName\"\r\n            [projectContent]=\"projectContent\"\r\n            [projectStructure]=\"projectStructure\"\r\n            [viewContent]=\"viewContent\"\r\n            [viewOnly]=\"viewOnly\"\r\n            (contentChanged)=\"projectContentChanged($event)\">\r\n          </app-collection>\r\n        </form>\r\n      </ng-container>\r\n    </div>\r\n  </div>\r\n</div>\r\n"
 
 /***/ }),
 
@@ -3934,14 +4058,14 @@ module.exports = "<div class=\"row\">\r\n  <div class=\"col-12-12\">\r\n    <h2>
 /***/ 684:
 /***/ (function(module, exports) {
 
-module.exports = "<div\n  *ngIf=\"_warning != null\">{{_warning}}</div>\n<input\n  *ngIf=\"viewOnly == false\"\n  #fileInput\n  type=\"file\"\n  [id]=\"itemAttributes != null && itemAttributes.id != null ? itemAttributes.id : ''\"\n  [class]=\"itemAttributes != null && itemAttributes.class != null ? itemAttributes.attributes.class : ''\"\n  (change)=\"fileInputChanged(fileInput)\"\n  [required]=\"itemAttributes != null && itemAttributes.required != null && itemAttributes.required ? true : false\"\n  appFormControl>\n<button\n  *ngIf=\"viewOnly == false\" \n  (click)=\"showMediaItemGallery()\">Select Image</button>\n<img\n  *ngIf=\"viewContent && itemContent != null\"\n  [src]=\"itemContent\">\n\n<app-media-item-gallery\n    *ngIf=\"_mediaItemGalleryVisible\"\n    [numItemsPerPage]=9\n    [numItemsPerRow]=3\n    (closeButtonClicked)=\"hideMediaItemGallery()\"\n    (mediaItemSelected)=\"mediaItemSelected($event)\">\n</app-media-item-gallery>"
+module.exports = "<div\n  *ngIf=\"_warning != null\">{{_warning}}</div>\n<span *ngIf=\"_contentError != null && _contentError.length > 0\" class=\"error\">\n  {{_contentError}}\n</span>\n<input\n  *ngIf=\"viewOnly == false\"\n  #fileInput\n  type=\"file\"\n  [id]=\"itemAttributes != null && itemAttributes.id != null ? itemAttributes.id : ''\"\n  [class]=\"'fileInput' + (itemAttributes != null && itemAttributes.class != null ? ' ' + itemAttributes.attributes.class : '')\"\n  (change)=\"fileInputChanged(fileInput)\"\n  [attr.data-required]=\"itemAttributes != null && itemAttributes.required != null && itemAttributes.required ? true : false\"\n  [attr.data-name]=\"encapsulationPath\"\n  appFormControl>\n<button\n  *ngIf=\"viewOnly == false\" \n  (click)=\"showMediaItemGallery()\">Select Image</button>\n<img\n  *ngIf=\"viewContent && itemContent != null\"\n  [src]=\"itemContent\">\n\n<app-media-item-gallery\n    *ngIf=\"_mediaItemGalleryVisible\"\n    [numItemsPerPage]=9\n    [numItemsPerRow]=3\n    (closeButtonClicked)=\"hideMediaItemGallery()\"\n    (mediaItemSelected)=\"mediaItemSelected($event)\">\n</app-media-item-gallery>"
 
 /***/ }),
 
 /***/ 685:
 /***/ (function(module, exports) {
 
-module.exports = "<div *ngIf=\"viewOnly == false\">\n  <button (click)=\"addImage()\">Image</button>\n  <button (click)=\"addHeading('h1')\">H1</button>\n  <button (click)=\"addHeading('h2')\">H2</button>\n  <button (click)=\"addHeading('h3')\">H3</button>\n  <button (click)=\"addLink()\">Hyperlink</button>\n  <button (click)=\"undoLastChange()\" [disabled]=\"_lastChange == null\">Undo</button>\n  <button (click)=\"clearAllContent()\">Clear All</button>\n</div>\n\n<div *ngIf=\"viewContent && viewOnly == false\">\n  <div *ngIf=\"_insertType == 'image'\">\n    <div class=\"row\">\n      <h3>Image</h3>\n    </div>\n    <div class=\"row\">\n      <label>Alt Text:\n        <input #altTextInput type=\"text\">\n      </label>\n    </div>\n    <div class=\"row\">\n      <app-file-upload\n        [viewContent]=\"viewContent\"\n        (fileChanged)=\"imageSelected($event)\"></app-file-upload>\n    </div>\n    <div class=\"row\">\n      <button (click)=\"insertImage(altTextInput)\">Insert</button>\n      <button (click)=\"cancel()\">Cancel</button>\n    </div>\n  </div>\n\n  <div *ngIf=\"_insertType == 'heading'\">\n    <div class=\"row\">\n      <h3>Heading {{_headingType}}</h3>\n    </div>\n    <div class=\"row\">\n      <label>Heading Text\n        <input #hTextInput type=\"text\">\n      </label>\n    </div>\n    <div class=\"row\">\n      <button (click)=\"insertHeading(hTextInput)\">Insert</button>\n      <button (click)=\"cancel()\">Cancel</button>\n    </div>\n  </div>\n\n  <div *ngIf=\"_insertType == 'link'\">\n    <div class=\"row\">\n      <h3>Hyperlink</h3>\n    </div>\n    <div class=\"row\">\n      <label>Link Text\n        <input #linkTextInput type=\"text\">\n      </label>\n      <label>Link To\n        <input #linkHrefInput type=\"text\">\n      </label>\n    </div>\n    <div class=\"row\">\n      <button (click)=\"insertLink(linkTextInput, linkHrefInput)\">Insert</button>\n      <button (click)=\"cancel()\">Cancel</button>\n    </div>\n  </div>\n</div>\n\n<div\n  *ngIf=\"viewContent && viewOnly == false\"\n  #textareaInput\n  contenteditable=\"true\"\n  (click)=\"updateCursorPosition()\"\n  (change)=\"updateCursorPosition()\"\n  (keyup)=\"updateCursorPosition()\"\n  id=\"wysiwyg-input\"\n  [class]=\"'input' + (itemAttributes != null && itemAttributes.class != null ? ' ' + itemAttributes.attributes.class : '')\"\n  [attr.data-required]=\"itemAttributes.required != null && itemAttributes.required ? true : false\"\n  appFormControl>\n</div>\n\n<div\n  *ngIf=\"viewContent == false || viewOnly\"\n  class=\"input\"\n  id=\"wysiwyg-input\">\n</div>"
+module.exports = "<div *ngIf=\"viewOnly == false\">\n  <button (click)=\"addImage()\">Image</button>\n  <button (click)=\"addHeading('h1')\">H1</button>\n  <button (click)=\"addHeading('h2')\">H2</button>\n  <button (click)=\"addHeading('h3')\">H3</button>\n  <button (click)=\"addLink()\">Hyperlink</button>\n  <button (click)=\"undoLastChange()\" [disabled]=\"_lastChange == null\">Undo</button>\n  <button (click)=\"clearAllContent()\">Clear All</button>\n</div>\n\n<div *ngIf=\"viewContent && viewOnly == false\">\n  <div *ngIf=\"_insertType == 'image'\">\n    <div class=\"row\">\n      <h3>Image</h3>\n    </div>\n    <div class=\"row\">\n      <label>Alt Text:\n        <input #altTextInput type=\"text\">\n      </label>\n    </div>\n    <div class=\"row\">\n      <app-file-upload\n        [viewContent]=\"viewContent\"\n        (fileChanged)=\"imageSelected($event)\"></app-file-upload>\n    </div>\n    <div class=\"row\">\n      <button (click)=\"insertImage(altTextInput)\">Insert</button>\n      <button (click)=\"cancel()\">Cancel</button>\n    </div>\n  </div>\n\n  <div *ngIf=\"_insertType == 'heading'\">\n    <div class=\"row\">\n      <h3>Heading {{_headingType}}</h3>\n    </div>\n    <div class=\"row\">\n      <label>Heading Text\n        <input #hTextInput type=\"text\">\n      </label>\n    </div>\n    <div class=\"row\">\n      <button (click)=\"insertHeading(hTextInput)\">Insert</button>\n      <button (click)=\"cancel()\">Cancel</button>\n    </div>\n  </div>\n\n  <div *ngIf=\"_insertType == 'link'\">\n    <div class=\"row\">\n      <h3>Hyperlink</h3>\n    </div>\n    <div class=\"row\">\n      <label>Link Text\n        <input #linkTextInput type=\"text\">\n      </label>\n      <label>Link To\n        <input #linkHrefInput type=\"text\">\n      </label>\n    </div>\n    <div class=\"row\">\n      <button (click)=\"insertLink(linkTextInput, linkHrefInput)\">Insert</button>\n      <button (click)=\"cancel()\">Cancel</button>\n    </div>\n  </div>\n</div>\n\n<span *ngIf=\"_contentError != null && _contentError.length > 0\" class=\"error\">\n  {{_contentError}}\n</span>\n\n<div\n  *ngIf=\"viewContent && viewOnly == false\"\n  #textareaInput\n  contenteditable=\"true\"\n  (click)=\"updateCursorPosition()\"\n  (change)=\"updateCursorPosition()\"\n  (keyup)=\"updateCursorPosition()\"\n  id=\"wysiwyg-input\"\n  [class]=\"'input' + (itemAttributes != null && itemAttributes.class != null ? ' ' + itemAttributes.attributes.class : '')\"\n  [attr.data-required]=\"itemAttributes.required != null && itemAttributes.required ? true : false\"\n  [attr.data-maxlength]=\"itemAttributes.maxlength != null ? itemAttributes.maxlength : ''\"\n  [attr.data-name]=\"encapsulationPath\"\n  appFormControl>\n</div>\n\n<div\n  *ngIf=\"viewContent == false || viewOnly\"\n  class=\"input\"\n  id=\"wysiwyg-input\">\n</div>"
 
 /***/ }),
 
@@ -4018,7 +4142,7 @@ module.exports = "<ng-container *ngIf=\"_loginUrl != null\">\n  <a [href]=\"_log
 /***/ 721:
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(353);
+module.exports = __webpack_require__(354);
 
 
 /***/ })
