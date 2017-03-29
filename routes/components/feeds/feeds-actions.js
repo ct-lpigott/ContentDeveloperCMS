@@ -7,6 +7,10 @@ var router = require('express').Router();
 // to the file system of the server i.e. to be able to create, open, edit 
 // and save project files to the /projects directory
 var fs = require("fs");
+
+// Including the dbQuery module, which contains prepared queries to the 
+// database, which ensure that all data used within them is sanitised and
+// escaped before being included in a statement
 var dbQuery = require("../../../custom_modules/database_query");
 var gitRepo = require("../../../custom_modules/git_repo");
 var googleOAuth = require("../../../custom_modules/google_oauth");

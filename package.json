@@ -5,6 +5,9 @@
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
+    // Creating custom scripts, to reduce time for testing and debugging.
+    //  - frisby-**** refer to BDD tests for the server
+    //  - build-doc refers to the build process used to recompile the API documentation to JSON and HTML
     "frisby-test-create-p": "jasmine-node server-tests/tests/create-project --junitreport --output server-tests/reports",
     "frisby-test-create-s": "jasmine-node server-tests/tests/create-structure --junitreport --output server-tests/reports",
     "frisby-test-create-c": "jasmine-node server-tests/tests/create-content --junitreport --output server-tests/reports",
@@ -13,6 +16,8 @@
     "build-doc": "apidoc -i routes/components/feeds -o public/documentation/ -t documentation/template"
   },
   "apidoc": {
+    // Settings specific the API doc, used to determine the heading etc for the documentation.
+    // The version number etc will all be determined from the rest of the package.json file
     "name": "Content Developer CMS",
     "title": "Content Developer CMS - API Documentation",
     "url": "https://contentdevelopercms.eu"
@@ -43,6 +48,8 @@
     "simple-git": "^1.65.0"
   },
   "devDependencies": {
+    // Each of these dependancies need to be installed globally in order
+    // for their respective processes to work
     "apidoc": "^0.17.5",
     "frisby": "^0.8.5",
     "jasmine-node": "^1.14.5"

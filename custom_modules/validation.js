@@ -506,6 +506,9 @@ function validateContentAgainstStructure(content, structure, accessLevel){
     return responseObject;
 }
 
+// Setting the module exports to be an object, with all of the functions
+// that will be used outside of this module (some functions will remain
+// private and will not be included)
 module.exports = {
     validateNewStructure: validateNewStructure,
     validateNewContent: validateNewContent,

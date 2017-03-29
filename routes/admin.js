@@ -7,6 +7,9 @@ var router = require('express').Router();
 // a method to generate a new oauth url.
 var googleOAuth = require("../custom_modules/google_oauth");
 
+// Including the dbQuery module, which contains prepared queries to the 
+// database, which ensure that all data used within them is sanitised and
+// escaped before being included in a statement
 var dbQuery = require("./../custom_modules/database_query");
 
 var projectFiles = require("./../custom_modules/project_files");

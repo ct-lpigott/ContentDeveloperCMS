@@ -1,9 +1,7 @@
 // Including the modules which make up the basis of the application.
 // Using express to manage the routing of requests to the server.
-// Using pug to create the templates for the various pages on the site.
 var express = require("express");
 var fs = require("fs");
-var pug = require("pug");
 var http = require("http");
 var https = require("https");
 var redirectHttps = require("redirect-https");
@@ -12,15 +10,33 @@ var bodyParser = require('body-parser');
 var checkDirectories = require("./custom_modules/check_directories");
 var session = require("express-session");
 
+// Checking if the env_config file exists, which 
+// contains a self invoking function, to set up all
+// configuration variables for the app
 if(fs.existsSync("./env_config.js")){
+  // Requiring the env_config file, so that it can invoke
+  // its module exports to set up the env vars
   require("./env_config.js");
 }
 
+// Checking that all required directories exist (and creating
+// them if they dont)
 checkDirectories();
 
 // Generating a new app using the express module
 var app = express();
 
+// Setting up the sessions for the server. Using the 
+// session key from the env vars, setting resave to false (so
+// that sessions that have no change will not be resaved).
+// Setting save uninitialised to false, so that sessions
+// that have no properties added to them are discarded.
+// Setting the session cookie to be secure, if not in
+// debug mode (as it will not work without HTTPS), and
+// the max age to 15 minutes. Finally, setting the session
+// cookie to "rolling", so that any interaction with the 
+// server will reset the cookies 15 minute lifespan (otherwise
+// the 15 minutes expires 15 mins after login)
 app.use("/", session({
     secret: process.env.SESSION_KEY,
     resave: false,
@@ -36,11 +52,18 @@ app.use("/", session({
 // with all requests for static elements of the site, such as JavaScript, CSS etc.
 app.use(express.static("./public"));
 
+// Redirecting all get requests for the route of the server to /cms i.e. the
+// Angular app. This app required its own directory, as the API documentation
+// also exists at the route, and both overwrite each other when ng build is run
+// for the Angular app, or apidoc is used to generate the documentation
 app.get("/", function(req, res, next){
   res.redirect("/cms");
 });
 
-// Intercepting all requests
+// Intercepting all requests. Checking for cross origin requests, and dealing
+// with preflight requests. Checking for authentication. If requests fail
+// in either of these routes, an error will be returned to the user, and they
+// will not be allowed to pass any furhter into the server
 app.use("/", require("./routes/cross-origin.js"));
 app.use("/", require("./routes/authentication.js"));
 
@@ -49,18 +72,27 @@ app.use("/", require("./routes/authentication.js"));
 // "application/json"
 app.use(bodyParser.json()); 
 
+// Creating a multer upload method, to detal with requests to upload
+// files to the server i.e. decide their destination and filename
 var multerUpload = multer({
   storage: multer.diskStorage({
     destination: function (req, file, cb) {
-      var uploadDirectory = "./uploads";
-
-      cb(null, uploadDirectory);
+      // Setting the directory to upload files to the "./uploads" directory.
+      // Files will only be stored here temporarily, while they are being 
+      // uploaded to the relevant project's Google Drive folder, after which
+      // they will be deleted from the server
+      cb(null, "./uploads");
     },
     filename: function (req, file, cb) {
+      // Prepending the filename with the current timestamp, so as to avoid 
+      // naming conflicts on the server
       cb(null, Date.now() + "_" + file.originalname);
     }
   })
 });
+
+// Setting the app to pass all upload requests, to the feeds route, with an
+// input name of "file" to the multer upload module above.
 app.use("/feeds", multerUpload.single("file"));
 
 // Setting up the routing structure of the app. Sending requests to a different
@@ -76,14 +108,11 @@ app.use("/feeds", require("./routes/feeds.js"));
 app.use(["/feeds", "/admin"], require("./routes/error-routes/feeds-errors.js"));
 app.use(require("./routes/error-routes/general-errors.js"));
 
-// Setting the view engine (or tempate engine) that the app will use to be "pug"
-// (previously know as Jade). Setting the views directory (where these templates)
-// will be stored to be "/views".
-app.set("view engine", "pug");
-app.set("views", "./views");
-
+// Checking if the app is running in debug mode, as only a http server will work
+// locally, while a https server is required remotely
 if(process.env.DEBUG == null || process.env.DEBUG == "false"){
-
+  // Creating a HTTPS options object, with the relative paths to the SSL certificate
+  // private key and full chain cert file (on the GoDaddy server)
   var httpsOptions = {
     key: fs.readFileSync("./../../../../etc/letsencrypt/live/contentdevelopercms.eu/privkey.pem"),
     cert: fs.readFileSync("./../../../../etc/letsencrypt/live/contentdevelopercms.eu/fullchain.pem")
