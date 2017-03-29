@@ -37,84 +37,88 @@ function getGitRepoDirectory(projectId, cb){
 
 function createNewRepo(projectId, userId, projectName, cb){
     // Getting the git repo directory for this project
-    var newGitRepoDir = getGitRepoDirectory(projectId);
-    if(newGitRepoDir != null){
-        // Initialising the repository
-        newGitRepoDir.init();
+    getGitRepoDirectory(projectId, function(newGitRepoDir){
+        if(newGitRepoDir != null){
+            // Initialising the repository
+            newGitRepoDir.init();
 
-        // Creating the initial commit message
-        var commitMessage = "'" + projectName + "' project files created";
+            // Creating the initial commit message
+            var commitMessage = "'" + projectName + "' project files created";
 
-        // Commiting all files to the repository
-        commitToRepo(projectId, userId, "./*", commitMessage, function(err, success){
-            cb(err, success);
-        }); 
-    } else {
-        cb("Dir does not exist", false);
-    } 
+            // Commiting all files to the repository
+            commitToRepo(projectId, userId, "./*", commitMessage, function(err, success){
+                cb(err, success);
+            }); 
+        } else {
+            cb("Dir does not exist", false);
+        } 
+    });
 }
 
 function commitToRepo(projectId, userId, filesToAdd, commitMessage, cb){
     // Getting the git repo directory for this project
-    var gitRepoDir = getGitRepoDirectory(projectId);
-    if(gitRepoDir != null){
+    getGitRepoDirectory(projectId, function(gitRepoDir){
+        if(gitRepoDir != null){
 
-        // Getting the users details, so that their name and email can be
-        // used as the credentials for the commit
-        getUserDetails(userId, function(err, userDetails){
-            if(err){ console.log(err); }
-            gitRepoDir
-                .addConfig("user.name", userDetails.displayName)
-                .addConfig("user.email", userDetails.emailAddress)
-                .add(filesToAdd)
-                .commit(commitMessage, function(){
-                    cb(err, true);
-                }); 
-        });
-    } else {
-        cb("Dir does not exist", false);
-    }
+            // Getting the users details, so that their name and email can be
+            // used as the credentials for the commit
+            getUserDetails(userId, function(err, userDetails){
+                if(err){ console.log(err); }
+                gitRepoDir
+                    .addConfig("user.name", userDetails.displayName)
+                    .addConfig("user.email", userDetails.emailAddress)
+                    .add(filesToAdd)
+                    .commit(commitMessage, function(){
+                        cb(err, true);
+                    }); 
+            });
+        } else {
+            cb("Dir does not exist", false);
+        }
+    });
 }
 
 function getCommitContent(projectId, historyOf, commitHash, cb){
     // Getting the git repo directory for this project
-    var gitRepoDir = getGitRepoDirectory(projectId);
-    if(gitRepoDir != null){
-        // Determining the file to be accessed, based on the history required
-        var filePath = historyOf == "content" ? "content.json" : "admin.json";
+    getGitRepoDirectory(projectId, function(gitRepoDir){
+        if(gitRepoDir != null){
+            // Determining the file to be accessed, based on the history required
+            var filePath = historyOf == "content" ? "content.json" : "admin.json";
 
-        // Getting the content of the relevant file, as it was at the specified
-        // point in time (i.e. based on the commit hash provided)
-        gitRepoDir.show([commitHash + ":" + filePath], function(err, commitData){
-            if(err){
-                cb(err, null);
-            } else {
-                // Parsing the data back to an object, and returning it to the caller
-                var commitDataObject = JSON.parse(commitData);
-                cb(null, commitDataObject);
-            }
-        });
-    } else {
-        cb("Dir does not exist", false);
-    }
+            // Getting the content of the relevant file, as it was at the specified
+            // point in time (i.e. based on the commit hash provided)
+            gitRepoDir.show([commitHash + ":" + filePath], function(err, commitData){
+                if(err){
+                    cb(err, null);
+                } else {
+                    // Parsing the data back to an object, and returning it to the caller
+                    var commitDataObject = JSON.parse(commitData);
+                    cb(null, commitDataObject);
+                }
+            });
+        } else {
+            cb("Dir does not exist", false);
+        }
+    });
 }
 
 function getMostRecentCommit(projectId, cb){
     // Getting the git repo directory for this project
-    var gitRepoDir = getGitRepoDirectory(projectId);
-    if(gitRepoDir != null){
-        // Logging only the most recent commit from the git repo
-        gitRepoDir.log([-1], function(err, singleCommit){
-            if(singleCommit != null){
-                // Returning the latest commit to the caller
-                cb(err, singleCommit.latest);
-            } else {
-                cb(err, null);
-            }   
-        });
-    } else {
-        cb("Dir does not exist", false);
-    }
+    getGitRepoDirectory(projectId, function(gitRepoDir){
+        if(gitRepoDir != null){
+            // Logging only the most recent commit from the git repo
+            gitRepoDir.log([-1], function(err, singleCommit){
+                if(singleCommit != null){
+                    // Returning the latest commit to the caller
+                    cb(err, singleCommit.latest);
+                } else {
+                    cb(err, null);
+                }   
+            });
+        } else {
+            cb("Dir does not exist", false);
+        }
+    });
 }
 
 function appendMostRecentCommitData(userProjects=[], cb){
@@ -149,29 +153,30 @@ function appendMostRecentCommitData(userProjects=[], cb){
 
 function logFromRepo(projectId, historyOf, cb){
     // Getting the git repo directory for this project
-    var gitRepoDir = getGitRepoDirectory(projectId);
-    if(gitRepoDir != null){
-        // Determining the file to be accessed, based on the history required
-        var filePath = historyOf == "content" ? "content.json" : "admin.json";
+    getGitRepoDirectory(projectId, function(gitRepoDir){
+        if(gitRepoDir != null){
+            // Determining the file to be accessed, based on the history required
+            var filePath = historyOf == "content" ? "content.json" : "admin.json";
 
-        // Logging all commits relating to this file from the git repo
-        gitRepoDir.log([filePath], function(err, gitLog){
-            if(err){
-                cb(err, null);
-            } else {
-                if(gitLog.total > 0 && gitLog.all != null){
-                    // If there are commits for this project, returning
-                    // the "all" array to the caller i.e. an array of all
-                    // the commits
-                    cb(null, gitLog.all);
+            // Logging all commits relating to this file from the git repo
+            gitRepoDir.log([filePath], function(err, gitLog){
+                if(err){
+                    cb(err, null);
                 } else {
-                    cb(null, null);
-                }             
-            }
-        });
-    } else {
-        cb("Dir does not exist", false);
-    }
+                    if(gitLog.total > 0 && gitLog.all != null){
+                        // If there are commits for this project, returning
+                        // the "all" array to the caller i.e. an array of all
+                        // the commits
+                        cb(null, gitLog.all);
+                    } else {
+                        cb(null, null);
+                    }             
+                }
+            });
+        } else {
+            cb("Dir does not exist", false);
+        }
+    });
 }
 
 function getUserDetails(userId, cb){
