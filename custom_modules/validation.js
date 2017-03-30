@@ -40,7 +40,7 @@ function checkIfPropertyMatchesAttributes(propertyName, propertyValue, structure
             if(attribute == "options"){
                 // Checking that the value provided matches one of the "options" in the structure
                 if(enumMatch(response.sanitisedContent, structureAttributes["options"]) == false){
-                    responseObject.errors.push(propertyName + " value does not match with the allowed options");
+                    responseObject.errors.push(propertyName + " value does not match with the allowed options - '" + structureAttributes["options"].join(", ") + "'");
                     response.allowed = false;
                 }
             } else if(attribute == "maxlength"){
@@ -509,17 +509,17 @@ function validateNewContent(content, structure, accessLevel){
                 }
             }
         } else {
-            // Looping through all properties of the structure
-            for(var property in structure){
-                // Checking that the conten
-                if(content[property] != null){
+            if(typeof content != "string"){
+                // Looping through all properties of the structure
+                for(var property in structure){ 
                     // Checking that this property has either "items" or "attriubtes"
                     if(structure[property].items != null || structure[property].attributes != null){
                         // Checking that the content matches the structure
-                        var itemsValidation = validateContentAgainstStructure(content[property], structure[property], accessLevel);
+                        var itemsValidation = validateContentAgainstStructure(content[property], structure[property], accessLevel, property);
                         if(itemsValidation.allowed){
                             responseObject.sanitisedContent[property] = itemsValidation.sanitisedContent;
                         } else {
+                            responseObject.allowed = false;
                             delete responseObject.sanitisedContent[property];
                         }
                         // Looping through any errors returned from the validation, and storing them on the
@@ -535,18 +535,11 @@ function validateNewContent(content, structure, accessLevel){
                         responseObject.sanitisedContent[property] = "";
                         responseObject.allowed = false;
                     } 
-                } else {
-                    // Since there is no content provided for this property, checking that it wasn't a required
-                    // property, by passing it to the attriubte check
-                    var attributeCheck = checkIfPropertyMatchesAttributes(property, content[property], structure[property].attributes, structure[property].type, responseObject);
-                    // Checking if the content is allowed
-                    if(attributeCheck.allowed){
-                        responseObject.sanitisedContent[property] = attributeCheck.sanitisedContent;
-                    } else {
-                        delete responseObject.sanitisedContent[property];
-                    }
-                }   
-            }
+                }                
+            } else {
+                responseObject.errors.push(property + " contained unexpected content");
+                responseObject.allowed = false;
+            } 
         }
     } else {
         // Since there appears to be no valid structure for this content, it cannot
@@ -560,7 +553,7 @@ function validateNewContent(content, structure, accessLevel){
     return responseObject;
 }
 
-function validateContentAgainstStructure(content, structure, accessLevel){
+function validateContentAgainstStructure(content, structure, accessLevel, contentName=null){
     // Creating a response object, to contain the sanitised content,
     // any errors that occured, and if this content is allowed. Generally,
     // the content will be allowed (as all suspicious or not allowed values
@@ -586,7 +579,7 @@ function validateContentAgainstStructure(content, structure, accessLevel){
     if(checkAccessLevelAllowedUpdate(structure, accessLevel, responseObject)){
         if(structure.attributes != null){
             // Checking if the content matches the attriubtes
-            var attributeCheck = checkIfPropertyMatchesAttributes(null, content, structure.attributes, structure.type, responseObject);
+            var attributeCheck = checkIfPropertyMatchesAttributes(contentName, content, structure.attributes, structure.type, responseObject);
             if(attributeCheck.allowed){
                 responseObject.sanitisedContent = attributeCheck.sanitisedContent;
             } else {
@@ -624,7 +617,7 @@ function validateContentAgainstStructure(content, structure, accessLevel){
                                 // If the properties in the items have items themselves, then
                                 // calling this function on itself, as these will need to be checked
                                 // seperatley       
-                                var contentValidation = validateContentAgainstStructure(content[i][property], structure["items"][property], accessLevel);
+                                var contentValidation = validateContentAgainstStructure(content[i][property], structure["items"][property], accessLevel, property);
                                 if(contentValidation.allowed){
                                     responseObject.sanitisedContent[i][property] = contentValidation.sanitisedContent;
                                 } else {
@@ -676,7 +669,7 @@ function validateContentAgainstStructure(content, structure, accessLevel){
                                 // If the properties in the items have items themselves, then
                                 // calling this function on itself, as these will need to be checked
                                 // seperatley 
-                                var contentValidation = validateContentAgainstStructure(content[property], structure["items"][property], accessLevel);
+                                var contentValidation = validateContentAgainstStructure(content[property], structure["items"][property], accessLevel, property);
                                 if(contentValidation.allowed){
                                     responseObject.sanitisedContent[property] = contentValidation.sanitisedContent;
                                 } else {
@@ -705,47 +698,11 @@ function validateContentAgainstStructure(content, structure, accessLevel){
                     break;
                 }
             }
-
-        } else {
-            // Since this contents structure does not have "items" or "attributes", this may
-            // be a value for a property
-            switch(content.constructor.name.toLowerCase()){
-                case "object":
-                case "array": {
-                    // Checking for properties that are not defined
-                    for(var key in content){
-                        var structureExists = checkIfPropertyHasStructure(key, structure, structure.type, responseObject);       
-                        if(structureExists == false){
-                            // If no structure exists for this key in the content, then
-                            // deleting it
-                            delete responseObject.sanitisedContent[key];
-                        }                
-                    }
-                    // Checking for properties that are defined
-                    for(var property in structure){
-                        if(structure[property]["attributes"] != null){
-                            // Checking if the value matches the attriubtes
-                            var attributeCheck = checkIfPropertyMatchesAttributes(property, content[property], structure[property]["attributes"], null, responseObject);
-                            if(attributeCheck.allowed){
-                                responseObject.sanitisedContent[property] = attributeCheck.sanitisedContent;
-                            } else {
-                                responseObject.sanitisedContent[property] = "";
-                            }
-                        } else {
-                            // Since this items structure had neither "item" nor "attributes", 
-                            // this content cannot be created/updated
-                            delete responseObject.sanitisedContent[property];
-                            responseObject.errors.push(property + " has no structure");
-                        }   
-                    }                     
-                    break;
-                }
-                default: {
-                    responseObject.errors.push("Content contained unexpected data");
-                    responseObject.allowed = false;
-                    break;
-                }                
-            }
+        }  else {
+            // Since this items structure doesnt have "attributes" or "items", it cannot be
+            // updated or created
+            responseObject.errors.push("This content does not have a structure defined");
+            responseObject.allowed = false;
         }
     } else {
         // Since this user does not have the appropriate access level to update this
