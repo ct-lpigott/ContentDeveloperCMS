@@ -8,7 +8,12 @@ var router = require('express').Router();
 // and save project files to the /projects directory
 var fs = require("fs");
 
+// Including the gitRep module, which handles all request to initialise, 
+// commit and log from a projects git repo
 var gitRepo = require("../../../custom_modules/git_repo");
+
+// Requiring the validation module, which is used for sanitising 
+// and validation data
 var validation = require("../../../custom_modules/validation");
 
 router.use(function(req, res, next){

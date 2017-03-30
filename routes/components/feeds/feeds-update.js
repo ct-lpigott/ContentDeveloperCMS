@@ -3,6 +3,8 @@
 // which this route will accept.
 var router = require('express').Router();
 
+// Requiring the validation module, which is used for sanitising 
+// and validation data
 var validation = require("../../../custom_modules/validation");
 
 /**
@@ -65,9 +67,6 @@ router.put("/:projectID", function(req, res, next){
                 // can be updated
                 next();
             } else {
-                // Logging this error to the console
-                console.log(err);
-
                 // No structure or content were included in the request. Adding this as an 
                 // error to the feedsErrors array.
                 req.feedsErrors.push("No project content or structure included in the request");

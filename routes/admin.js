@@ -100,10 +100,15 @@ router.put("/settings/:projectID", function(req, res, next){
 });
 
 router.put("/settings/:projectID/publicAuthToken", function(req, res, next){
+    // Checking that a public auth token has been include in the request
+    // as this will be used to verify that this user has permission
+    // to change this
     if(req.body.public_auth_token != null){
         dbQuery.update_UserProject_PublicAuthToken(req.userID, req.params.projectID, req.body.public_auth_token, function(err, newPublicAuthToken){
             res.send({success: newPublicAuthToken != null, public_auth_token: newPublicAuthToken});
         })
+    } else {
+        res.send({success: false});
     }
         
 });
@@ -114,6 +119,9 @@ router.delete("/:projectID", function(req, res, next){
     // it will not be possible to confirm that the user inteneded on 
     // deleting this project
     if(req.query.projectName != null){
+        // Deleting the project, which will in turn delete all the
+        // user relationships associated with it, and email each
+        // of these collaborators to notify them of the deletion
         dbQuery.delete_Project(req.userID, req.params.projectID, req.query.projectName, function(err, success){
             if(success){
                 // Deleting the projects files on the server

@@ -104,7 +104,7 @@ app.use("/feeds", require("./routes/feeds.js"));
 
 // Setting up the error route for the app. Since all interactions with the 
 // server will be through API, sending all errors as json
-app.use(require("./routes/error-routes/feeds-errors.js"));
+app.use(require("./routes/components/error-routes/feeds-errors.js"));
 
 // Checking if the app is running in debug mode, as only a http server will work
 // locally, while a https server is required remotely

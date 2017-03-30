@@ -3,7 +3,8 @@
 // which this route will accept.
 var router = require('express').Router();
 
-var accessLevels = require("../../../custom_modules/access_levels");
+// Requiring the validation module, which is used for sanitising 
+// and validation data
 var validation = require("../../../custom_modules/validation");
 
 /**
@@ -103,12 +104,17 @@ router.post("/:projectID/*", function(req, res, next){
                                     req.feedsErrors.push(itemName + " already exists in " + parentName + ". Please use PUT to update it.");
                                     return;
                                 } else {
-                                    // Adding this as a new property on the parents attributes object
+                                    // Validating this structure, and if it is allowed, adding this 
+                                    // as a new property on the parents attributes object
                                     var structureValidation = validation.validateNewStructure(itemName, newItem);
                                     if(structureValidation.allowed){
                                         structureFileData[parentName]["attributes"][itemName] = structureValidation.sanitisedStructure;
                                         req.gitCommitMessage = "New attribute structure added to " + parentName + ": '" + itemName + "'";
                                     }
+                                    // Looping through any errors that occurred in the validation.
+                                    // Some of these may have been resolved through sanitising or 
+                                    // removal of properties, but still returning them to the user
+                                    // as the structure may have changed as a result
                                     for(var i=0; i<structureValidation.errors.length; i++){
                                         req.feedsErrors.push(structureValidation.errors[i]);
                                     }
@@ -123,12 +129,17 @@ router.post("/:projectID/*", function(req, res, next){
                                     req.feedsErrors.push(itemName + " already exists in " + parentName + ".");
                                     return;
                                 } else {
-                                    // Adding this as a new property on the parents items object
+                                    // Validating this structure, and if it is allowed, adding this 
+                                    // as a new property on the parents items object
                                     var structureValidation = validation.validateNewStructure(itemName, newItem);
                                     if(structureValidation.allowed){
                                         structureFileData[parentName]["items"][itemName] = structureValidation.sanitisedStructure;
                                         req.gitCommitMessage = "New item structure added to " + parentName + ": '" + itemName + "'";
                                     }
+                                    // Looping through any errors that occurred in the validation.
+                                    // Some of these may have been resolved through sanitising or 
+                                    // removal of properties, but still returning them to the user
+                                    // as the structure may have changed as a result
                                     for(var i=0; i<structureValidation.errors.length; i++){
                                         req.feedsErrors.push(structureValidation.errors[i]);
                                     }
@@ -149,6 +160,10 @@ router.post("/:projectID/*", function(req, res, next){
                                         structureFileData[parentName][itemName] = structureValidation.sanitisedStructure;
                                         req.gitCommitMessage = "New structure added to " + parentName + ": '" + itemName + "'";
                                     }
+                                    // Looping through any errors that occurred in the validation.
+                                    // Some of these may have been resolved through sanitising or 
+                                    // removal of properties, but still returning them to the user
+                                    // as the structure may have changed as a result
                                     for(var i=0; i<structureValidation.errors.length; i++){
                                         req.feedsErrors.push(structureValidation.errors[i]);
                                     }
@@ -186,6 +201,10 @@ router.post("/:projectID/*", function(req, res, next){
                                         structureFileData["attributes"][itemName] = structureValidation.sanitisedStructure;
                                         req.gitCommitMessage = parentName != null ? "New structure attribute added to " + parentName + ": " + itemName : "New structure attribute added to global object: '" + itemName + "'";
                                     }
+                                    // Looping through any errors that occurred in the validation.
+                                    // Some of these may have been resolved through sanitising or 
+                                    // removal of properties, but still returning them to the user
+                                    // as the structure may have changed as a result
                                     for(var i=0; i<structureValidation.errors.length; i++){
                                         req.feedsErrors.push(structureValidation.errors[i]);
                                     }
@@ -217,6 +236,10 @@ router.post("/:projectID/*", function(req, res, next){
                                         structureFileData["items"][itemName] = structureValidation.sanitisedStructure;
                                         req.gitCommitMessage = parentName != null ? "New structure item added to " + parentName + ": " + itemName :"New structure item added to global object: '" + itemName + "'";
                                     }
+                                    // Looping through any errors that occurred in the validation.
+                                    // Some of these may have been resolved through sanitising or 
+                                    // removal of properties, but still returning them to the user
+                                    // as the structure may have changed as a result
                                     for(var i=0; i<structureValidation.errors.length; i++){
                                         req.feedsErrors.push(structureValidation.errors[i]);
                                     }
@@ -251,6 +274,10 @@ router.post("/:projectID/*", function(req, res, next){
                                         structureFileData[itemName] = structureValidation.sanitisedStructure;
                                         req.gitCommitMessage = parentName != null ? "New structure added to " + parentName + ": " + itemName : "New structure added to global object: '" + itemName + "'";
                                     }
+                                    // Looping through any errors that occurred in the validation.
+                                    // Some of these may have been resolved through sanitising or 
+                                    // removal of properties, but still returning them to the user
+                                    // as the structure may have changed as a result
                                     for(var i=0; i<structureValidation.errors.length; i++){
                                         req.feedsErrors.push(structureValidation.errors[i]);
                                     }
@@ -443,8 +470,10 @@ router.post("/:projectID/*", function(req, res, next){
                                                 return;
                                             } else {
                                                 var contentValidation = validation.validateNewContent(newItem, structureFileData[parentName]["items"], req.user_access_level);   
-                                                // Looping through any errors that were returned from the content validation,
-                                                // and adding them to the req.feedsErrors array
+                                                // Looping through any errors that occurred in the validation.
+                                                // Some of these may have been resolved through sanitising or 
+                                                // removal of properties, but still returning them to the user
+                                                // as the content may have changed as a result
                                                 for(var i=0; i<contentValidation.errors.length; i++){
                                                     req.feedsErrors.push(contentValidation.errors[i]);
                                                 }
@@ -476,8 +505,10 @@ router.post("/:projectID/*", function(req, res, next){
                                                 return;
                                             } else {
                                                 var contentValidation = validation.validateNewContent(newItem, structureFileData[parentName]["items"][itemName], req.user_access_level);   
-                                                // Looping through any errors that were returned from the content validation,
-                                                // and adding them to the req.feedsErrors array
+                                                // Looping through any errors that occurred in the validation.
+                                                // Some of these may have been resolved through sanitising or 
+                                                // removal of properties, but still returning them to the user
+                                                // as the content may have changed as a result
                                                 for(var i=0; i<contentValidation.errors.length; i++){
                                                     req.feedsErrors.push(contentValidation.errors[i]);
                                                 }
@@ -533,8 +564,10 @@ router.post("/:projectID/*", function(req, res, next){
                                     switch(structureFileData[itemName]["type"].toLowerCase()){
                                         case "array": {
                                             var contentValidation = validation.validateNewContent(newItem, structureFileData[itemName]["items"], req.user_access_level);   
-                                            // Looping through any errors that were returned from the content validation,
-                                            // and adding them to the req.feedsErrors array
+                                            // Looping through any errors that occurred in the validation.
+                                            // Some of these may have been resolved through sanitising or 
+                                            // removal of properties, but still returning them to the user
+                                            // as the content may have changed as a result
                                             for(var i=0; i<contentValidation.errors.length; i++){
                                                 req.feedsErrors.push(contentValidation.errors[i]);
                                             }
@@ -564,8 +597,10 @@ router.post("/:projectID/*", function(req, res, next){
                                     }
                                 } else {
                                     var contentValidation = validation.validateNewContent(newItem, structureFileData[itemName], req.user_access_level);   
-                                    // Looping through any errors that were returned from the content validation,
-                                    // and adding them to the req.feedsErrors array
+                                    // Looping through any errors that occurred in the validation.
+                                    // Some of these may have been resolved through sanitising or 
+                                    // removal of properties, but still returning them to the user
+                                    // as the content may have changed as a result
                                     for(var i=0; i<contentValidation.errors.length; i++){
                                         req.feedsErrors.push(contentValidation.errors[i]);
                                     }

@@ -12,8 +12,17 @@ var fs = require("fs");
 // database, which ensure that all data used within them is sanitised and
 // escaped before being included in a statement
 var dbQuery = require("../../../custom_modules/database_query");
+
+// Including the gitRep module, which handles all request to initialise, 
+// commit and log from a projects git repo
 var gitRepo = require("../../../custom_modules/git_repo");
+
+// Including the googleOAuth module, which is used for handling
+// all requests to the Google API
 var googleOAuth = require("../../../custom_modules/google_oauth");
+
+// Including the accessLevels module, which is used for create, getting
+// names of and defaults for project access levels
 var accessLevels = require("../../../custom_modules/access_levels");
 
 /**
@@ -24,6 +33,10 @@ var accessLevels = require("../../../custom_modules/access_levels");
  * @apiGroup Project Details
  */
 router.get("/:projectID", function(req, res, next){
+    // If the query string contains an allSettings parameter, then this
+    // request will pass through multiple routes below. This will be achieved
+    // by updating the action parameter as it passes through each relevant route
+    // to GET all the relevant settings
     if(req.query.allSettings != null){
         req.query.action = "collaborators";
     }
@@ -41,6 +54,10 @@ router.get("/:projectID", function(req, res, next){
  * @apiGroup Project Details
  */
 router.put("/:projectID", function(req, res, next){
+    // If the query string contains an allSettings parameter, then this
+    // request will pass through multiple routes below. This will be achieved
+    // by updating the action parameter as it passes through each relevant route
+    // to UPDATE all the relevant settings
     if(req.query.allSettings != null){
         req.query.action = "projectName";
     }
@@ -48,7 +65,10 @@ router.put("/:projectID", function(req, res, next){
 });
 
 router.all("/", function(req, res, next){
+    // Checking that the query string contains an action, as this
+    // route only deals with actions
     if(req.query.action != null){
+        // Checking that the user has been authenticated
         if(req.userID != null){
             next();
         } else {
@@ -56,6 +76,8 @@ router.all("/", function(req, res, next){
             next(new Error("loginRequired"));
         }        
     } else {
+        // Since no action was specified, passing this request 
+        // onto the next route
         next("route");
     }
 });
@@ -72,20 +94,25 @@ router.get("/", function(req, res, next){
 
         // Checking that a userID has been provided within the request
         if(req.userID != null){
-            // Querying the database, to find the projects that this user has access to, by joining
-            // the user table to the user_projects table. Returning only the columns needed for the 
-            // reponse to the user
+            // Getting the details for each of this users projects
             dbQuery.get_UserProjects_forUser("user_id, project_id, project_name, access_level_int", req.userID, function(err, rows){
                 if(rows){
+                    // Appending all access level names to each of the users
+                    // project relationships (as currently only an int will be available)
                     accessLevels.appendAllAccessLevelNames(rows, null, function(userProjects_withAccessLevelDetails){
-                        
+                        // Appending the most recent commit data for each project, i.e.
+                        // last modified by and on
                         gitRepo.appendMostRecentCommitData(userProjects_withAccessLevelDetails, function(userProjects_withRecentCommits){
+                            // Sending the list of projects this user is a collaborator on,
+                            // with the access level names appended, as well as the most recent
+                            // commit data
                             res.send(userProjects_withRecentCommits);
                         });
                     });
                 } else {
                     // This user has no projects
-                    res.send("[]");
+                    req.feedsErrors.push("This user has no projects");
+                    res.send({});
                 }
             });
         } else {
@@ -109,11 +136,11 @@ router.post("/", function(req, res, next){
 
         // Checking that a project name has been included in the request body
         if(req.body.project_name != null){
-
+            // Creating a new Google Drive folder for this proejct
             googleOAuth.createNewProjectFolder(req.body.project_name, req.userID, function(newGoogleFolderId, userPermissionId){
-                console.log(newGoogleFolderId);
                 // Creating a new project in the database, using the project name provided 
-                // in the request body
+                // in the request body, the default access levels, and the new Google Drive
+                // folder id
                 dbQuery.create_Project(req.body.project_name, accessLevels.getDefaultAccessLevelsJson(), newGoogleFolderId, userPermissionId, req.userID, function(err, newProjectId){
                     if(err || newProjectId == null){
                         // Logging the error to the console
@@ -258,21 +285,30 @@ router.post("/", function(req, res, next){
  */
 router.get("/:projectID", function(req, res, next){
     if(req.query.action == "previewCommit"){
+        // Checking that a commit has and history of value have been included in the request
         if(req.query.commitHash != null && req.query.historyOf != null){
+            // Getting the content of the relevant file at the requested point in time
             gitRepo.getCommitContent(req.params.projectID, req.query.historyOf, req.query.commitHash, function(err, commitDataObject){
                 if(err){
+                    req.feedsErrors.push("Unable to get the content of this commit");
                     res.send({});
                 } else {
+                    // Adding the commit hash to the response object
                     req.responseObject.hash = req.query.commitHash;
+
+                    // Checking which history the user requested, to determine which 
+                    // property to use on the response object
                     if(req.query.historyOf == "content"){
                         req.responseObject.commit_content = commitDataObject;
                     } else if(req.query.historyOf == "structure"){
                         req.responseObject.commit_structure = commitDataObject.project_structure;
                     }
+                    // Sending the response to the user
                     res.send(req.responseObject);
                 }
             });
         } else {
+            req.feedsErrors.push("Missing commit has or history of details");
             res.send({});
         }
     } else {
@@ -294,8 +330,11 @@ router.post("/:projectID", function(req, res, next){
         // Checking if an access level property was provided in the request, and that the
         // value of that property is greater than 0
         if(req.body.accessLevelInt != null && req.body.email != null && req.body.email.length > 0){
+            // Checking that the user exists, and if not, then creating them
             dbQuery.check_User(req.body.email, function(err, collaboratorId){
                 if(collaboratorId){
+                    // Checking if the user already has a relationship with this project, and if not,
+                    // then creating it
                     dbQuery.check_UserProject(req.userID, collaboratorId, req.params.projectID, req.body.accessLevelInt, function(err, changed){
                         if(err || changed == null){
                             // Logging the error to the console
@@ -310,6 +349,9 @@ router.post("/:projectID", function(req, res, next){
                             // accessible from the feedsErrors array).
                             next(new Error());
                         } else {
+                            // Ideally, would prefer to redirect all request to get the updated list of 
+                            // collaborators, but due to restrictions with cross origin requests, redirects
+                            // are not currently supported, so just sending them an empty response
                             if(req.headers.origin != null){
                                 res.send({});
                             } else {
@@ -348,8 +390,14 @@ router.post("/:projectID", function(req, res, next){
  */
 router.put("/:projectID", function(req, res, next){
     if(req.query.action == "collaborators"){
+        // Checking that a collaborator id and access level have been included in the request
         if(req.body.collaboratorID != null && req.body.accessLevelInt != null){
+            // Checking if this user already has a relationship with this project, and if not,
+            // then creating it
             dbQuery.check_UserProject(req.userID, req.body.collaboratorID, req.params.projectID, req.body.accessLevelInt, function(err, success){
+                // Ideally, would prefer to redirect all request to get the updated list of 
+                // collaborators, but due to restrictions with cross origin requests, redirects
+                // are not currently supported, so just sending them an empty response
                 if(req.headers.origin != null){
                     res.send({});
                 } else {
@@ -371,21 +419,28 @@ router.put("/:projectID", function(req, res, next){
  */
 router.get("/:projectID", function(req, res, next){
     if(req.query.action == "collaborators"){
-        // Querying the database, to get all collaborators for this project
+        // Getting the details of all collaborators for this project
         dbQuery.get_UserProjects_forProject("u.display_name, up.user_id, up.access_level_int", req.params.projectID, function(err, rows){
             if(err){console.log(err);}
             if(rows){
+                // Appending the names of all access levels to the rows returned, as currently
+                // they only contain the access level int
                 accessLevels.appendAllAccessLevelNames(rows, req.params.projectID, function(fullAccessLevelDetails){
                     if(req.query.allSettings != null){
+                        // If this is a request for all settings, adding the 
+                        // full details for this projects users to the response object, 
+                        //  and then passing the request onto the next relevant route
                         req.responseObject.collaborators = fullAccessLevelDetails;
                         req.query.action = "accessLevels";
                         next();
                     } else {
+                        // Sending the response to the user
                         res.send(fullAccessLevelDetails);
                     }
                 });
             } else {
-                res.send("[]");
+                req.feedsErrors.push("This project has no collaborators");
+                res.send({});
             }
         });
     } else {
@@ -403,27 +458,32 @@ router.get("/:projectID", function(req, res, next){
  */
 router.delete("/:projectID", function(req, res, next){
     if(req.query.action == "collaborators"){
+        // Allowing the collaborator id to be included in the body or query string
+        // for this request only, as the Angular http API doesnt allow request
+        // bodies to be added to delete requests (but still want to maintain the normal
+        // structure for the rest of the API)
         var collaboratorID = req.body.collaboratorID || req.query.collaboratorID;
         if(collaboratorID != null){
+            // Users are not allowed to delete themselves
             if(collaboratorID != req.userID){
-                dbQuery.get_UserProject_Project("p.media_folder_id, up.media_folder_permission_id", collaboratorID, req.params.projectID, function(err, row){
-                    if(row){
-                        dbQuery.delete_UserProject(req.userID, collaboratorID, req.params.projectID, function(err, success){
-                            if(req.headers.origin != null){
-                                res.send({});
-                            } else {
-                                res.redirect(303, "/feeds/" + req.params.projectID + "?action=collaborators");
-                            }
-                        });
+                // Deleting the users relationship with this project
+                dbQuery.delete_UserProject(req.userID, collaboratorID, req.params.projectID, function(err, success){
+                    // Ideally, would prefer to redirect all request to get the updated list of 
+                    // collaborators, but due to restrictions with cross origin requests, redirects
+                    // are not currently supported, so just sending them an empty response
+                    if(req.headers.origin != null){
+                        res.send({});
                     } else {
-                        res.send();
+                        res.redirect(303, "/feeds/" + req.params.projectID + "?action=collaborators");
                     }
                 });
             } else {
-                res.send();
+                req.feedsErrors.push("You cannot delete yourself from a project");
+                res.send({});
             }            
         } else {
-            // Error - no collaborator specified
+            req.feedsErrors.push("No collaborator id included in the request");
+            res.send({});
         }
         
     } else {
@@ -442,21 +502,28 @@ router.delete("/:projectID", function(req, res, next){
 router.post("/:projectID", function(req, res, next){
     if(req.query.action == "mediaItems"){
         console.log("Uploading file");
+        // Checking that a file has been included in the request
         if(req.file != null){
+            // Getting the media folder if for this proejct
             dbQuery.get_UserProject_Project("p.media_folder_id", req.userID, req.params.projectID, function(err, row){
                 if(err || row == null){
                     console.log(err);
                 } else {
+                    // Uploading the media item to the projects Google Drive folder,
+                    // which will in turn delete the media item from the servers
+                    // file system upon successful upload
                     googleOAuth.uploadMediaItem(req.file, row.media_folder_id, req.userID, req.params.projectID, function(fileUrl){
                         console.log("FILE UPLOAD");
+                        // Sending the file URL for the new media item to the caller, by 
+                        // prepending the id with the appropriate google drive url
                         req.responseObject.fileUrl = "https://drive.google.com/uc?id=" + fileUrl;
                         res.send(req.responseObject);
                     });
                 }                
             });
         } else {
-            console.log("No file");
-            res.send();
+            req.feedsErrors.push("No file included in the request");
+            res.send({});
         }
     } else {
         next();
@@ -472,9 +539,14 @@ router.post("/:projectID", function(req, res, next){
  */
 router.get("/:projectID", function(req, res, next){
     if(req.query.action == "accessLevels"){
+        // Getting the access levels for this project
         accessLevels.getProjectAccessLevels(req.params.projectID, function(projectAccessLevels){
+            // Appending the names of the access levels to those returned
             accessLevels.appendAccessLevelsInUse(req.params.projectID, projectAccessLevels, function(updatedProjectAccessLevels){
                 if(req.query.allSettings != null){
+                    // If this is a request for all settings, adding the 
+                    // full details for this projects users to the response object, 
+                    //  and then passing the request onto the next relevant route
                     req.responseObject.access_levels = projectAccessLevels;
                     req.query.action = "projectName";
                     next();
@@ -498,8 +570,15 @@ router.get("/:projectID", function(req, res, next){
  */
 router.post("/:projectID", function(req, res, next){
     if(req.query.action == "accessLevels"){
+        // Making sure a name has been included for this new access level
         if(req.body.access_level_name != null){
+            // Creating a new access level for the project. Allowing the
+            // access_level_int from the request to be included, even if it
+            // is null, as a default access level will be supplied if it is
             accessLevels.createNewAccessLevel(req.userID, req.params.projectID, req.body.access_level_name, req.body.access_level_int, function(){
+                // Ideally, would prefer to redirect all request to get the updated list of 
+                // access levels, but due to restrictions with cross origin requests, redirects
+                // are not currently supported, so just sending them an empty response
                 if(req.headers.origin != null){
                     res.send({});
                 } else {
@@ -507,7 +586,8 @@ router.post("/:projectID", function(req, res, next){
                 }
             });
         } else {
-            console.log("Not enough info supplied");
+            req.feedsErrors.push("No access level name included in the request");
+            send({});
         }
     } else {
         next();
@@ -524,9 +604,17 @@ router.post("/:projectID", function(req, res, next){
  */
 router.delete("/:projectID", function(req, res, next){
     if(req.query.action == "accessLevels"){
+        // Allowing the access level int to be included in the body or query string
+        // for this request only, as the Angular http API doesnt allow request
+        // bodies to be added to delete requests (but still want to maintain the normal
+        // structure for the rest of the API)
         var accessLevelInt = req.body.access_level_int || req.query.access_level_int;
         if(accessLevelInt != null){
+            // Deleting this access level from the project
             accessLevels.removeAccessLevel(req.userID, req.params.projectID, accessLevelInt, function(){
+                // Ideally, would prefer to redirect all request to get the updated list of 
+                // access levels, but due to restrictions with cross origin requests, redirects
+                // are not currently supported, so just sending them an empty response
                 if(req.headers.origin != null){
                     res.send({});
                 } else {
@@ -534,7 +622,8 @@ router.delete("/:projectID", function(req, res, next){
                 }
             });
         } else {
-            console.log("Not enough info supplied");
+            req.feedsErrors.push("No access level int included in the request");
+            res.send({});
         }
     } else {
         next();
@@ -552,8 +641,13 @@ router.delete("/:projectID", function(req, res, next){
  */
 router.put("/:projectID", function(req, res, next){
     if(req.query.action == "accessLevels"){
+        // Checking that an access level int and name have been included in the request
         if(req.body.access_level_int != null && req.body.access_level_name != null){
+            // Updating this access level name for the project
             accessLevels.updateAccessLevelName(req.userID, req.params.projectID, req.body.access_level_int, req.body.access_level_name, function(){
+                // Ideally, would prefer to redirect all request to get the updated list of 
+                // access levels, but due to restrictions with cross origin requests, redirects
+                // are not currently supported, so just sending them an empty response
                 if(req.headers.origin != null){
                     res.send({});
                 } else {
@@ -561,7 +655,8 @@ router.put("/:projectID", function(req, res, next){
                 }
             });
         } else {
-            console.log("Not enough info supplied");
+            req.feedsErrors.push("No access level name or int included in the request");
+            res.send({});
         }
     } else {
         next();
@@ -577,13 +672,16 @@ router.put("/:projectID", function(req, res, next){
  */
 router.get("/:projectID", function(req, res, next){
     if(req.query.action == "mediaItems"){
+        // Getting the media folder id for this proejct
         dbQuery.get_UserProject_Project("media_folder_id", req.userID, req.params.projectID, function(err, row){
             if(row && row.media_folder_id != null){
+                // Getting all images belonging to this media item folder
                 googleOAuth.getAllProjectImages(req.params.projectID, row.media_folder_id, req.userID, req.query.numFiles, req.query.nextPageToken, function(results){
                     res.send(results);
                 });
             } else {
-                res.send(null);
+                req.feedsErrors.push("No media item folder found for this project, or you do not have permission to access it");
+                res.send({});
             }
         });
     } else {
@@ -600,9 +698,13 @@ router.get("/:projectID", function(req, res, next){
  */
 router.get("/:projectID", function(req, res, next){
     if(req.query.action == "projectName"){
+        // Getting the name for this project
         dbQuery.get_Project("project_name", req.params.projectID, function(err, row){
             var project_name = row.project_name || null;
             if(req.query.allSettings != null){
+                // If this is a request for all settings, adding the 
+                // project name for this project to the response object,
+                // and then passing the request onto the next relevant route
                 req.responseObject.project_name = project_name;
                 req.query.action = "cache";
                 next();
@@ -625,9 +727,16 @@ router.get("/:projectID", function(req, res, next){
  */
 router.put("/:projectID", function(req, res, next){
     if(req.query.action == "projectName"){
+        // Checking that a new name has been included in the request
         if(req.body.project_name != null){
+            // Updating this projects name in the database (not updating the name
+            // of the Google Drive folder, as the user may have already given
+            // this a custom name, so wouldn't want to overwrite that)
             dbQuery.update_Project(["project_name"],[req.body.project_name], req.userID, req.params.projectID, function(err, success){
                 if(req.query.allSettings != null){
+                    // If this is a request to update all settings, adding the 
+                    // project name for this project to the response object,
+                    // and then passing the request onto the next relevant route
                     req.responseObject.project_name = req.body.project_name;
                     req.query.action = "cache";
                     next();
@@ -635,13 +744,15 @@ router.put("/:projectID", function(req, res, next){
                     if(success){
                         res.send(req.body.project_name);
                     } else {
-                        res.send("{}");
+                        res.send({});
                     }
                     
                 }    
             });
         } else {
             if(req.query.allSettings != null){
+                // If this is a request to update all settings, passing the request
+                // onto the next relevant route
                 req.query.action = "cache";
                 next();
             } else {
@@ -663,8 +774,12 @@ router.put("/:projectID", function(req, res, next){
  */
 router.get("/:projectID", function(req, res, next){
     if(req.query.action == "cache"){
+        // Getting the max cache age for this project
         dbQuery.get_Project("max_cache_age", req.params.projectID, function(err, row){
             if(req.query.allSettings != null){
+                // If this is a request for all settings, adding the 
+                // maximum cache age for this project to the response object, 
+                // and then passing the request onto the next relevant route
                 req.responseObject.max_cache_age = row.max_cache_age || null;
                 req.query.action = "css";
                 next();
@@ -687,9 +802,14 @@ router.get("/:projectID", function(req, res, next){
  */
 router.put("/:projectID", function(req, res, next){
     if(req.query.action == "cache"){
-        if(req.body.max_cache_age != null){
+        // Checking that a new max cache age has been included in the request
+        if(req.body.max_cache_age != null && isNaN(req.body.max_cache_age) == false){
+            // Updating this projects maximum cache age
             dbQuery.update_Project(["max_cache_age"], [req.body.max_cache_age], req.userID, req.params.projectID, function(err, success){
                 if(req.query.allSettings != null){
+                    // If this is a request to update all settings, adding the 
+                    // maximum cache age for this project to the response object, 
+                    // and then passing the request onto the next relevant route
                     req.responseObject.max_cache_age = req.body.max_cache_age || null;
                     req.query.action = "css";
                     next();
@@ -699,10 +819,12 @@ router.put("/:projectID", function(req, res, next){
             });
         } else {
             if(req.query.allSettings != null){
+                // If this is a request to update all settings, passing the request
+                // onto the next relevant route
                 req.query.action = "css";
                 next();
             } else {
-                req.feedsErrors.push("No maximum cache age included in the request");
+                req.feedsErrors.push("No valid maximum cache age included in the request");
                 next(new Error());
             }            
         }        
@@ -720,8 +842,12 @@ router.put("/:projectID", function(req, res, next){
  */
 router.get("/:projectID", function(req, res, next){
     if(req.query.action == "css"){
+        // Getting the custom css for this project
         dbQuery.get_Project("custom_css", req.params.projectID, function(err, row){
             if(req.query.allSettings != null){
+                // If this is a request for all settings, adding the 
+                // custom css for this project to the response object, 
+                // and then passing the request onto the next relevant route
                 req.responseObject.custom_css = row.custom_css || null;
                 next();
             } else {
@@ -743,8 +869,11 @@ router.get("/:projectID", function(req, res, next){
  */
 router.post("/:projectID", function(req, res, next){
     if(req.query.action == "css"){
+        // Checking that custom css has been included in the request
         if(req.body.custom_css != null){
             dbQuery.get_Project("custom_css", req.params.projectID, function(err, row){
+                // If css already exists for this project, then appending the new 
+                // css to it. 
                 if(row){
                     req.custom_css = row.custom_css + " " + req.body.custom_css;
                     next();
@@ -755,6 +884,8 @@ router.post("/:projectID", function(req, res, next){
             });
         } else {
             if(req.query.allSettings != null){
+                // If this is a request to update all settings, passing the request
+                // onto the next relevant route
                 next();
             } else {
                 req.feedsErrors.push("No custom css included in the request");
@@ -776,11 +907,14 @@ router.post("/:projectID", function(req, res, next){
  */
 router.put("/:projectID", function(req, res, next){
     if(req.query.action == "css"){
+        // Checking that css has been included in the request
         if(req.body.custom_css != null){
             req.custom_css = req.body.custom_css;
             next();
         } else {
             if(req.query.allSettings != null){
+                // If this is a request to update all settings, passing the request
+                // onto the next relevant route
                 next();
             } else {
                 req.feedsErrors.push("No custom css included in the request");
@@ -795,12 +929,21 @@ router.put("/:projectID", function(req, res, next){
 // No API Documentation necessary (part of a route)
 router.all("/:projectID", function(req, res, next){
     if(req.query.action == "css"){
+        // Checking that custom css has been added to the request object 
+        // (either through a POST or PUT request above)
         if(req.custom_css != null){
+            // Updating this projects css
             dbQuery.update_Project(["custom_css"], [req.custom_css], req.userID, req.params.projectID, function(err, success){
                 if(req.query.allSettings != null){
+                    // If this is a request for all settings, adding the 
+                    // maximum cache age for this project to the response object, 
+                    // and then passing the request onto the next end of the route
                     req.responseObject.custom_css = req.custom_css;
                     next();
                 } else {
+                    // Ideally, would prefer to redirect all request to get the updated
+                    // css, but due to restrictions with cross origin requests, redirects
+                    // are not currently supported, so just sending them an empty response
                     if(req.headers.origin != null){
                         res.send({});
                     } else {
@@ -810,6 +953,8 @@ router.all("/:projectID", function(req, res, next){
             });
         } else {
             if(req.query.allSettings != null){
+                // If this is a request to update all settings, passing the request
+                // onto the end of the route
                 next();
             } else {
                 req.feedsErrors.push("No custom css included in the request");
@@ -823,8 +968,12 @@ router.all("/:projectID", function(req, res, next){
 
 router.all("/:projectID", function(req, res, next){
     if(req.query.allSettings != null){
+        // Sending the response object to the user, with all of the relevant
+        // settings updated
         res.send(req.responseObject);
     } else {
+        // Since the appropriate router was not found in this route, 
+        // passing this request onto the next route
         next();
     }
 });

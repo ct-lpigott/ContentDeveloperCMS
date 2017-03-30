@@ -3,6 +3,8 @@
 // which this route will accept.
 var router = require('express').Router();
 
+// Including the gitRep module, which handles all request to initialise, 
+// commit and log from a projects git repo
 var gitRepo = require("../../../custom_modules/git_repo");
 
 /**
@@ -31,6 +33,7 @@ var gitRepo = require("../../../custom_modules/git_repo");
  */
 router.get("/:projectID", function(req, res, next){
     if(req.fileData.admin != null){
+        // Checking if the user only wants some pieces of data include in the response
         if(req.query.include != null){
             if(req.query.include.indexOf("structure") > -1){
                 // Adding the value of the project structure property of the project admin file, 
@@ -44,11 +47,13 @@ router.get("/:projectID", function(req, res, next){
                 req.responseObject.content = req.fileData.content;
             }
             if(req.query.include.indexOf("history") > -1){
+                // Getting the history of this projects content
                 gitRepo.logFromRepo(req.params.projectID, "content", function(err, contentGitLog){
                     if(contentGitLog != null){
                         req.responseObject.content_history = contentGitLog;
                     }
                     
+                    // Getting the history of this projects structure
                     gitRepo.logFromRepo(req.params.projectID, "structure", function(err, structureGitLog){
                         if(structureGitLog != null){
                             req.responseObject.structure_history = structureGitLog;
@@ -69,6 +74,8 @@ router.get("/:projectID", function(req, res, next){
             res.send(req.responseObject);
         }        
     } else {
+        // If this project has maximum cache age, including this as a header
+        // on the response
         if(req.max_cache_age != null && req.max_cache_age > 0){
             res.setHeader("Cache-control", "public; max-age=" + req.max_cache_age);
         } else {
@@ -99,13 +106,26 @@ router.get("/:projectID", function(req, res, next){
  * @apiParam {int} :projectID Projects unique ID
  * @apiParam {string} :itemPath Encapsulation path to item within the project
  * @apiParam {string="structure", "content"} [include] To include the structure and content of the item
+ * @apiParam {int} [startAt] Index position to start at (if content is array)
+ * @apiParam {int} [numItems] Number of items to return (if content is array)
  * @apiName Get Item Content
  * @apiGroup Project Content
  */
 router.get("/:projectID/*", function(req, res, next){
+    // Creating temporary variables, to hold the content and structure
+    // data that was loaded from the projects directory. The structure
+    // data can appear in two forms:
+    // - req.fileData.admin.project_structure if this is an admin, that will
+    //   be allowed to request the contents of the projects structure
+    // - req.projectStructure if this is a user that does not have permission
+    //   to view the projects structure, but it will be required in order
+    //   to validate the content
     var contentData = req.fileData.content;
     var structureData = req.fileData.admin != null ? req.fileData.admin.project_structure : req.projectStructure;
 
+    // Getting the encapsulation data of the requested item, by slicing the first
+    // parameter from the array of all params (as set up in the preload file data
+    // route) as this will be the project id, which we no longer need
     var encapsulationData = req.allParams.slice(1);
 
     // Looping through the encapsulationData array (i.e. parameters passed to the
@@ -148,17 +168,26 @@ router.get("/:projectID/*", function(req, res, next){
         
     }
 
+    // If this content is an array, checking if the user included an index to start at,
+    // or a number of items to include in the response
     if(contentData.constructor.name.toLowerCase() == "array" && (req.query.startAt != null || req.query.numItems != null)){
-        var startAt = req.query.startAt != null ? req.query.startAt : 0;
-        var endAt = req.query.numItems != null ? parseInt(req.query.numItems) + parseInt(startAt) : contentData.length;
+        // Checking if a startAt value was supplied, and if not, starting at index 0
+        var startAt = req.query.startAt != null && isNaN(req.query.startAt) == false ? parseInt(req.query.startAt) : 0;
+        
+        // Checking if a numItems value was supplied, and if not, ending at the length of the content data
+        var endAt = req.query.numItems != null && isNaN(req.query.numItems) == false ? parseInt(req.query.numItems) + parseInt(startAt) : contentData.length;
 
-        if(contentData.length > startAt){
+        // ensuring that the endAt value has ended up being a larger
+        // number than the start at value
+        if(endAt > startAt){
+            // Setting the content data to be equal to the shortened array
             contentData = contentData.slice(startAt, endAt);
         }            
     }
 
     // Checking if admin data has been read from the projects admin.json file
     if(req.fileData.admin != null){
+        // Allowing admins to specify the content they would like in the request
         if(req.query.include != null){
             if(req.query.include.indexOf("structure") > -1){
                 req.responseObject.structure = structureData;
@@ -167,9 +196,13 @@ router.get("/:projectID/*", function(req, res, next){
                 req.responseObject.content = contentData;
             }
         } else {
+            // If no include specified, just returning the content
             req.responseObject = contentData;
         }    
     } else {
+        // Checking for maximum cache age. If this content item has its own
+        // specific cache age, this gets priority, otherwise the projects Setting
+        // would get priority.
         if(structureData.max_cache_age != null && structureData.max_cache_age > 0){
             res.setHeader("Cache-control", "public; max-age=" + structureData.max_cache_age);
         } else if(req.max_cache_age != null && req.max_cache_age > 0){
