@@ -5,10 +5,10 @@
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
-    "forever-start": "forever start app.js",
+    "forever-start": "forever start --minUptime 1000 --spinSleepTime 1000 app.js ",
     "forever-stop": "forever stopall",
     "forever-restart": "forever restartall",
-    "forever-log": "cat ./../../../../.forever/ENVa.log",
+    "forever-logs": "cd ./../../../../root/.forever",
     "forever-list": "forever list",
     "frisby-test-create-p": "jasmine-node server-tests/tests/create-project --junitreport --output server-tests/reports",
     "frisby-test-create-s": "jasmine-node server-tests/tests/create-structure --junitreport --output server-tests/reports",
