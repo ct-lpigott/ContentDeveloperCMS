@@ -7,7 +7,8 @@ var fs = require("fs");
 // exist in a remote location by default
 var requiredDirectories = [
     "./uploads",
-    "./projects"
+    "./projects",
+    "./forever"
 ];
 
 // Creating a function to check if a directory exists, and creating it
