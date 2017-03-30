@@ -35,11 +35,24 @@ var accessLevels = require("../../../custom_modules/access_levels");
  *      <strong>REQUEST HEADER:</strong> { public_auth_token: 6bb3dfbb7d41c20bdb622e6a2541490879693355 } <br>
  * @apiSuccessExample {json} Success-Response:
  * {
- *      collaborators: {Array},
- *      access_levels: {Array},
- *      project_name: {string},
- *      max_cache_age: {int},
- *      custom_css: {string}
+ *      collaborators: [
+ *          {
+ *              display_name: {string},
+ *              user_id: {int},
+ *              access_level_int: {int},
+ *              access_level_name: {string}
+ *          }
+ *      ],
+ *      access_levels: [
+ *          { 
+ *              access_level_name: "Administrator",
+ *              access_level_int: 1,
+ *              in_use: true
+ *          }
+ *      ],
+ *      project_name: "My Project",
+ *      max_cache_age: 250000,
+ *      custom_css: "h2:{color:red;}"
  * }
  * @apiName Get Project Settings
  * @apiGroup Project Details
@@ -151,7 +164,7 @@ router.get("/", function(req, res, next){
  *      <strong>REQUEST BODY:</strong> { project_name: "My New Project" }
  * @apiSuccessExample {json} Success-Response:
  * {
- *      new_project_id: {int}
+ *      new_project_id: 652
  * }
  * @apiName Create Project
  * @apiGroup Project Details
@@ -471,7 +484,7 @@ router.put("/:projectID", function(req, res, next){
  *      <strong>EXAMPLE REQUEST:</strong> https://contentdevelopercms.eu/feeds/198729?action=collaborators <br>
  *      <strong>REQUEST HEADER:</strong> { public_auth_token: 6bb3dfbb7d41c20bdb622e6a2541490879693355 } <br>
  * @apiSuccessExample {json} Success-Response:
- * [
+ * collaborators: [
  *      {
  *          display_name: {string},
  *          user_id: {int},
@@ -500,12 +513,12 @@ router.get("/:projectID", function(req, res, next){
                         next();
                     } else {
                         // Sending the response to the user
-                        res.send(fullAccessLevelDetails);
+                        res.send({collaborators: fullAccessLevelDetails});
                     }
                 });
             } else {
                 req.feedsErrors.push("This project has no collaborators");
-                res.send([]);
+                res.send({collaborators: []});
             }
         });
     } else {
