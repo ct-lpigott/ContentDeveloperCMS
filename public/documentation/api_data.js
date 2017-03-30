@@ -526,7 +526,7 @@ define({ "api": [
   {
     "version": "1.0.0",
     "type": "get",
-    "url": "/feeds/:projectID?action=mediaItems",
+    "url": "/feeds/:projectID?action=mediaItems&nextPageToken=***",
     "title": "Get all media items for a project",
     "parameter": {
       "fields": {
@@ -537,6 +537,13 @@ define({ "api": [
             "optional": false,
             "field": ":projectID",
             "description": "<p>Projects unique ID</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "string",
+            "optional": true,
+            "field": "nextPageToken",
+            "description": "<p>Next page token (if one was returned in a previous request)</p>"
           },
           {
             "group": "Parameter",
@@ -553,7 +560,7 @@ define({ "api": [
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "{\n     media_items: [\n         {\n             id: \"0Bzkz0DzYRLAuUHRzVmFXZFF3dDQ\",\n             name: \"thumb.jpg\",\n             mimeType: \"image/jpeg\",\n             url: \"https://drive.google.com/uc?id=0Bzkz0DzYRLAuUHRzVmFXZFF3dDQ\"\n         }\n     ]\n     \n}",
+          "content": "{\n     media_items: [\n         {\n             id: \"0Bzkz0DzYRLAuUHRzVmFXZFF3dDQ\",\n             name: \"thumb.jpg\",\n             mimeType: \"image/jpeg\",\n             url: \"https://drive.google.com/uc?id=0Bzkz0DzYRLAuUHRzVmFXZFF3dDQ\"\n         }\n     ],\n     next_page_token: \"V1*3|0|CdfsiWEkjfslkWERulsdknlkcslERjlskdnKdfjiwEKJCklsidjr\"\n     \n}",
           "type": "json"
         }
       ]
@@ -634,6 +641,13 @@ define({ "api": [
           },
           {
             "group": "Parameter",
+            "type": "string",
+            "optional": false,
+            "field": "public_auth_token",
+            "description": "<p>Public authentication token for the project (unique to all collaborators)</p>"
+          },
+          {
+            "group": "Parameter",
             "type": "any",
             "optional": false,
             "field": "content",
@@ -641,6 +655,16 @@ define({ "api": [
           }
         ]
       }
+    },
+    "description": "<p><strong>EXAMPLE REQUEST:</strong> https://contentdevelopercms.eu/feeds/198729/books <br> <strong>REQUEST HEADER:</strong> { public_auth_token: 6bb3dfbb7d41c20bdb622e6a2541490879693355 } <br> <strong>REQUEST BODY:</strong> { &quot;content&quot;: [ { &quot;title&quot;: &quot;A Walk to Remember&quot;} ] }</p>",
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "{\n     content: {\n         books: [\n             {\n                 title: \"A Walk to Remember\"\n             }\n         ]\n     },\n     errors:[] \n}",
+          "type": "json"
+        }
+      ]
     },
     "name": "Create_New_Item_Content",
     "group": "Project_Content",
@@ -668,9 +692,26 @@ define({ "api": [
             "optional": false,
             "field": ":itemPath",
             "description": "<p>Encapsulation path to item within the project</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "string",
+            "optional": false,
+            "field": "public_auth_token",
+            "description": "<p>Public authentication token for the project (unique to all collaborators)</p>"
           }
         ]
       }
+    },
+    "description": "<p><strong>EXAMPLE REQUEST:</strong> https://contentdevelopercms.eu/feeds/198729/books <br> <strong>REQUEST HEADER:</strong> { public_auth_token: 6bb3dfbb7d41c20bdb622e6a2541490879693355 }</p>",
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "{\n     content: {},\n     errors:[] \n}",
+          "type": "json"
+        }
+      ]
     },
     "name": "Delete_Content_Item",
     "group": "Project_Content",
@@ -723,9 +764,26 @@ define({ "api": [
             "optional": true,
             "field": "numItems",
             "description": "<p>Number of items to return (if content is array)</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "string",
+            "optional": false,
+            "field": "public_auth_token",
+            "description": "<p>Public authentication token for the project (unique to all collaborators)</p>"
           }
         ]
       }
+    },
+    "description": "<p><strong>EXAMPLE REQUEST:</strong> https://contentdevelopercms.eu/feeds/198729/books?startAt=0&amp;numItems=1 <br> <strong>REQUEST HEADER:</strong> { public_auth_token: 6bb3dfbb7d41c20bdb622e6a2541490879693355 }</p>",
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "{\n     content: [\n         {\n             title: \"A Walk to Remember\"\n         }\n     ]\n}",
+          "type": "json"
+        }
+      ]
     },
     "name": "Get_Item_Content",
     "group": "Project_Content",
@@ -758,9 +816,26 @@ define({ "api": [
             "optional": true,
             "field": "include",
             "description": "<p>To include the structure, content and commit history of the project</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "string",
+            "optional": false,
+            "field": "public_auth_token",
+            "description": "<p>Public authentication token for the project (unique to all collaborators)</p>"
           }
         ]
       }
+    },
+    "description": "<p><strong>EXAMPLE REQUEST:</strong> https://contentdevelopercms.eu/feeds/198729?include=content <br> <strong>REQUEST HEADER:</strong> { public_auth_token: 6bb3dfbb7d41c20bdb622e6a2541490879693355 }</p>",
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "{\n     content: {\n         books: [\n             {\n                 title: \"A Walk to Remember\"\n             }\n         ]\n     }\n}",
+          "type": "json"
+        }
+      ]
     },
     "name": "Get_Project_Content",
     "group": "Project_Content",
@@ -791,6 +866,13 @@ define({ "api": [
           },
           {
             "group": "Parameter",
+            "type": "string",
+            "optional": false,
+            "field": "public_auth_token",
+            "description": "<p>Public authentication token for the project (unique to all collaborators)</p>"
+          },
+          {
+            "group": "Parameter",
             "type": "any",
             "optional": false,
             "field": "content",
@@ -798,6 +880,16 @@ define({ "api": [
           }
         ]
       }
+    },
+    "description": "<p><strong>EXAMPLE REQUEST:</strong> https://contentdevelopercms.eu/feeds/198729/albums/0/artist <br> <strong>REQUEST HEADER:</strong> { public_auth_token: 6bb3dfbb7d41c20bdb622e6a2541490879693355 } <br> <strong>REQUEST BODY:</strong> { &quot;content&quot;: &quot;One Direction&quot; }</p>",
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "{\n     content: {\n         0: {\n             artist: \"One Direction\"\n         }\n     },\n     errors: []\n}",
+          "type": "json"
+        }
+      ]
     },
     "name": "Update_Encapsulated_Content",
     "group": "Project_Content",
@@ -821,13 +913,37 @@ define({ "api": [
           },
           {
             "group": "Parameter",
+            "type": "string",
+            "optional": false,
+            "field": "public_auth_token",
+            "description": "<p>Public authentication token for the project (unique to all collaborators)</p>"
+          },
+          {
+            "group": "Parameter",
             "type": "any",
             "optional": false,
             "field": "content",
             "description": "<p>Content to be added to the project (datatype depends on project structure)</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "string",
+            "optional": true,
+            "field": "commit_message",
+            "description": "<p>Custom commit message to be used when saving this update</p>"
           }
         ]
       }
+    },
+    "description": "<p><strong>EXAMPLE REQUEST:</strong> https://contentdevelopercms.eu/feeds/198729 <br> <strong>REQUEST HEADER:</strong> { public_auth_token: 6bb3dfbb7d41c20bdb622e6a2541490879693355 } <br> <strong>REQUEST BODY:</strong> { &quot;content&quot;: { &quot;albums&quot;: [ { &quot;artist&quot;: &quot;Walking on Cars&quot;} ] }, &quot;commit_message&quot;: &quot;Changing to albums instead of books&quot; }</p>",
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "{\n     content: {\n         albums: [\n             {\n                 artist: \"Walking on Cars\"\n             }\n         ]\n     },\n     errors:[] \n}",
+          "type": "json"
+        }
+      ]
     },
     "name": "Update_Project_Content",
     "group": "Project_Content",
@@ -977,7 +1093,7 @@ define({ "api": [
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "{\n     collaborators: [\n         {\n             display_name: {string},\n             user_id: {int},\n             access_level_int: {int},\n             access_level_name: {string}\n         }\n     ],\n     access_levels: [\n         { \n             access_level_name: \"Administrator\",\n             access_level_int: 1,\n             in_use: true\n         }\n     ],\n     project_name: \"My Project\",\n     max_cache_age: 250000,\n     custom_css: \"h2:{color:red;}\"\n}",
+          "content": "{\n     collaborators: [\n         {\n             display_name: \"Laura Pigott\",\n             user_id: 65742,\n             access_level_int: 1,\n             access_level_name: \"Administrator\"\n         }\n     ],\n     access_levels: [\n         { \n             access_level_name: \"Administrator\",\n             access_level_int: 1,\n             in_use: true\n         }\n     ],\n     project_name: \"My Project\",\n     max_cache_age: 250000,\n     custom_css: \"h2:{color:red;}\"\n}",
           "type": "json"
         }
       ]
@@ -1168,9 +1284,26 @@ define({ "api": [
             "optional": true,
             "field": "include",
             "description": "<p>To include the structure, content and commit history of the project</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "string",
+            "optional": false,
+            "field": "public_auth_token",
+            "description": "<p>Public authentication token for the project (unique to all collaborators)</p>"
           }
         ]
       }
+    },
+    "description": "<p><strong>EXAMPLE REQUEST:</strong> https://contentdevelopercms.eu/feeds/198729?include=history <br> <strong>REQUEST HEADER:</strong> { public_auth_token: 6bb3dfbb7d41c20bdb622e6a2541490879693355 }</p>",
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "{\n     content_history: [\n         {\n             hash: \"8766afd68634ea56541b975dece1afcb77795cd8\",\n             date\":\"2017-03-30 22:03:43 +0100\",\n             message\":\"Content removed: albums\",\n             author_name: \"Laura Pigott\",\n             author_email: \"pigottlaura@gmail.com\"\n         }\n     ]\n}",
+          "type": "json"
+        }
+      ]
     },
     "name": "Get_Project_Commit_History",
     "group": "Project_History",
@@ -1225,7 +1358,7 @@ define({ "api": [
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "{\n     commit_structure: {object}\n}",
+          "content": "{\n     commit_structure: {\n         books: {\n             type: \"array\",\n             items: {\n                 title: {\n                     attributes: {\n                         required: \"required\"\n                     }\n                 }\n             }\n         }\n     }\n}",
           "type": "json"
         }
       ]
@@ -1259,6 +1392,13 @@ define({ "api": [
           },
           {
             "group": "Parameter",
+            "type": "string",
+            "optional": false,
+            "field": "public_auth_token",
+            "description": "<p>Public authentication token for the project (unique to all collaborators)</p>"
+          },
+          {
+            "group": "Parameter",
             "type": "json",
             "optional": false,
             "field": "structure",
@@ -1266,6 +1406,16 @@ define({ "api": [
           }
         ]
       }
+    },
+    "description": "<p><strong>EXAMPLE REQUEST:</strong> https://contentdevelopercms.eu/feeds/198729/books <br> <strong>REQUEST HEADER:</strong> { public_auth_token: 6bb3dfbb7d41c20bdb622e6a2541490879693355 } <br> <strong>REQUEST BODY:</strong> { &quot;structure&quot;: { &quot;type&quot;: &quot;array&quot;, &quot;items&quot;: { &quot;title&quot;: { &quot;attributes&quot;: { &quot;required&quot;: &quot;required&quot; } } } } }</p>",
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "{\n     structure: {\n         books: {\n             type: \"array\",\n             items: {\n                 title: {\n                     attributes: {\n                         required: \"required\"\n                     }\n                 }\n             }\n         }\n     }\n}",
+          "type": "json"
+        }
+      ]
     },
     "name": "Create_New_Item_Structure",
     "group": "Project_Structure",
@@ -1304,9 +1454,26 @@ define({ "api": [
             "optional": true,
             "field": "include",
             "description": "<p>To include the structure and content of the item</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "string",
+            "optional": false,
+            "field": "public_auth_token",
+            "description": "<p>Public authentication token for the project (unique to all collaborators)</p>"
           }
         ]
       }
+    },
+    "description": "<p><strong>EXAMPLE REQUEST:</strong> https://contentdevelopercms.eu/feeds/198729/books?include=structure <br> <strong>REQUEST HEADER:</strong> { public_auth_token: 6bb3dfbb7d41c20bdb622e6a2541490879693355 }</p>",
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "{\n     structure: {\n         type: \"array\",\n         items: {\n             title: {\n                 attributes: {\n                     required: \"required\"\n                 }\n             }\n         }\n     }\n}",
+          "type": "json"
+        }
+      ]
     },
     "name": "Get_Item_Structure",
     "group": "Project_Structure",
@@ -1339,9 +1506,26 @@ define({ "api": [
             "optional": true,
             "field": "include",
             "description": "<p>To include the structure, content and commit history of the project</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "string",
+            "optional": false,
+            "field": "public_auth_token",
+            "description": "<p>Public authentication token for the project (unique to all collaborators)</p>"
           }
         ]
       }
+    },
+    "description": "<p><strong>EXAMPLE REQUEST:</strong> https://contentdevelopercms.eu/feeds/198729?include=structure <br> <strong>REQUEST HEADER:</strong> { public_auth_token: 6bb3dfbb7d41c20bdb622e6a2541490879693355 }</p>",
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "{\n     structure: {\n         \"books\": {\n             type: \"array\",\n             items: {\n                 title: {\n                     attributes: {\n                         required: \"required\"\n                     }\n                 }\n             }\n         }\n     }\n}",
+          "type": "json"
+        }
+      ]
     },
     "name": "Get_Project_Structure",
     "group": "Project_Structure",
@@ -1365,13 +1549,37 @@ define({ "api": [
           },
           {
             "group": "Parameter",
+            "type": "string",
+            "optional": false,
+            "field": "public_auth_token",
+            "description": "<p>Public authentication token for the project (unique to all collaborators)</p>"
+          },
+          {
+            "group": "Parameter",
             "type": "json",
             "optional": false,
             "field": "structure",
             "description": "<p>JSON to update the projects structure</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "string",
+            "optional": true,
+            "field": "commit_message",
+            "description": "<p>Custom commit message to be used when saving this update</p>"
           }
         ]
       }
+    },
+    "description": "<p><strong>EXAMPLE REQUEST:</strong> https://contentdevelopercms.eu/feeds/198729 <br> <strong>REQUEST HEADER:</strong> { public_auth_token: 6bb3dfbb7d41c20bdb622e6a2541490879693355 } <br> <strong>REQUEST BODY:</strong> { &quot;structure&quot;: { &quot;albums&quot;: { &quot;type&quot;: &quot;array&quot;, &quot;items&quot;: { &quot;artist&quot;: { &quot;attributes&quot;: { &quot;required&quot;: &quot;required&quot; } } } } }, &quot;commit_message&quot;: &quot;Changing to albums instead of books&quot; }</p>",
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "{\n     structure: {\n         albums: {\n             type: \"array\",\n             items: {\n                 artist: {\n                     attributes: {\n                         required: \"required\"\n                     }\n                 }\n             }\n         }\n     }\n}",
+          "type": "json"
+        }
+      ]
     },
     "name": "Update_Project_Structure",
     "group": "Project_Structure",

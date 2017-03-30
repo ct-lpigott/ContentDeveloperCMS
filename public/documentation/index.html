@@ -18,8 +18,10 @@
 		<li>
 			<a href="#basics">Basics</a>
 			<ul class="subNav">
+				<li><a href="#how-it-works">How it Works</a></li>
 				<li><a href="#rules">Rules</a></li>
 				<li><a href="#defaults">Defaults</a></li>
+				<li><a href="#api-access">API Access</a></li>
 			</ul>
 		</li>
 		<li><a href="#examples">Examples</a></li>
@@ -31,11 +33,29 @@
     <section id="basics">
       <h1>Basics</h1>
     </section>
+		<section id="how-it-works">
+			<h2>How it Works</h2>
+			<img class="fullSize" src="./img/how-it-works.jpg" alt="Content Developer CMS - How it Works">
+			<ul>
+				<li><strong>You write the JSON</strong> that defines the structure for a project</li>
+				<li>HTML inputs are generated in the Content Management System, to allow <strong>users to add/update content</strong>, as per the structure you defined</li>
+				<li>The output of this content is a <strong>JSON object</strong>, that can be accessed through a HTTPS URL request</li>
+				<li>The content created through this Content Management System is <strong>not specifc to any platform</strong>. The HTML-like references when defining a projects structure (such as input types, and keywords such as maxlength etc) is purely so that you don't have to learn a whole new range of terminology</li>
+				<li><strong>All input types are supported</strong>, such as "text", "number", "tel", "color", "date", "time" etc. (Note - not all input types are guaranteed to work across all browsers, so if in doubt, stick to the basics)</li>
+				<li>When you create a new project, a <strong>Google Drive folder</strong> is automatically created. This is where any image you upload to the project will be stored</li>
+				<li>Every time you make a change to the structure or content of a project, a commit is made to the projects local <strong>Git repository</strong></li>
+				<li>You can roll back to a previous commit at any time</li>
+				<li>Every project has three <strong>default access levels</strong>: Administrator (can update structure and content), Content Editor (can update content) and View Only (can only view content)</li>
+				<li><strong>Custom access levels</strong> can be created, each with a unique number (or int, as it is referred to in the API), to allow more restricted access to some users. By default, all custom access levels are granted Content Editor permissions</li>
+				<li>By defining a <strong>"no_access" property</strong>, with an array of access level ints, on any object in the projects structure, you can prevent a user with this access level from being able to edit this content. In fact, they wont even be able to see it when they log in to edit the project</li>
+				<li>The Content Management System is built on top of a <strong>REST API</strong>, and so content can be dynamically added/updated/deleted through calls to the endpoints defined in the <a href="api.html">API Documentation</a></li>
+			</ul>
+		</section>
 	 <section id="rules">
       <h2>Rules</h2>
       <ul>
         <li>
-          All object in a projects structure must contain either an <strong>items</strong> property or an <strong>attributes</strong> property
+          All objects in a projects structure must contain either an <strong>items</strong> property or an <strong>attributes</strong> property
           <pre>
 {
 	"books":{
@@ -47,7 +67,7 @@
 }
           </pre> 
         </li>
-        <li>All properties within an items property must have an <strong>items</strong> property or an <strong>attributes</strong> property</li>
+        <li>All properties within an items object must have an <strong>items</strong> property or an <strong>attributes</strong> property</li>
         <pre>
 {
 	"books":{
@@ -94,7 +114,7 @@
 	}
 }
 		</pre>
-		  <li>All property names in the project structure should use <strong>underscores</strong> in place of spaces. These will be replaced in the CMS view i.e "my_books" will be displayed as "My Books"</li>
+		  <li>All property names in the project structure should be <strong>lowercase</strong> and use <strong>underscores</strong> in place of spaces. These will be replaced in the CMS view i.e "my_books" will be displayed as "My Books"</li>
         <pre>
 {
 	"my_books":{
@@ -110,7 +130,33 @@
 	}
 }
 			</pre>
-			<li>The only attributes allowed on an item are "class", "id", "type", "required" and "options" (for use with "select" input types)</li>
+			<li>The <strong>only attributes allowed</strong> are "class", "id", "type", "required", "maxlength", "max", "min", "alt" and "options" (for use with "select" input types)</li>
+				<pre>
+{
+	"username":{
+		"attributes":{
+			"class": "myusernameinput red",
+			"type": "text",
+			"maxlength": 15
+		}
+	},
+	"category":{
+		"attributes":{
+			"required": "required",
+			"options": [ "fiction", "non-fiction", "other" ]
+		}
+	}
+}
+				</pre>
+			<li>The <strong>only properties allowed</strong> on a structure object are "attributes", "items", "input_type", "type", "no_access" (where no_access defines an array of access levels that are not allowed to edit certain levels of content)</li>
+				<pre>
+{
+	"username":{
+		"attributes":{},
+		"no_access": [ 5, 6, 8]
+	}
+}
+				</pre>
       </ul>
 	 </section>
 	 <section id="defaults">
@@ -119,146 +165,29 @@
         <li>Any item that does not have an <strong>attributes</strong> property will not have a HTML input associated with it</li>
         <li>Any item that has an <strong>attributes</strong> property, but does not have a <strong>input_type</strong> property, will default to a HTML input</li>
         <li>Any item that has an <strong>attributes</strong> property which does not contain a <strong>type</strong> property, will default to type "text"</li>
+				<li>Any item that does not have a <strong>no_access</strong> property will be editable by all collaborators (except for access level 3, which have View Only access)</li>
+				<li>By default, all <strong>custom access levels</strong> are granted Content Editor permissions</li>
+				<li>By default, all origins are allowed <strong>read access</strong>, while no origins are allowed <strong>update access</strong></li>
       </ul>
-    </section>
-    <section id="examples">
+  </section>
+	<section id="api-access">
+			<h2>API Access</h2>
+			<ul>
+				<li>To use the API, you must first source your <strong>public_auth_token</strong> from the settings panel of the relevant project</li>
+				<li>This token will be <strong>unique</strong> to your relationship with that project, and so cannot be reused across projects (or collaborators)</li>
+				<li>To limit the "read" access of a project, enter a comma seperated list of origins in the <strong>read_origins</strong> option on the settings page</li>
+				<li>To limit the "update" access of a project, enter a comma seperated list of origins in the <strong>update_origins</strong> option on the settings page</li>
+				<li>By default, all origins are allowed read access, while no origins are allowed update access</li>
+				<li>Once you have your <strong>public_auth_token</strong> and have given the origin the <strong>appropriate access</strong>, you're ready to start making requests to the API</li>
+				<li>Now you just need to figure out which endpoint you want to make the request to, by looking at the <a href="api.html">API Documentation</a> to see what properties/parameters it requires</li>
+				<li>When creating your HTTPS request, in whatever language or platform you choose, make sure to add the <strong>public_auth_token</strong> as a header on the request before sending it</li>
+				<li>That's it! You're all set up and ready to make requests to the API</li>
+				<li>If at any time you feel that your <strong>public_auth_token</strong> has become compromised, or you just want to revoke access for all existing connections using it, you can regenerate a new token at any time in the settings panel of the project (Note - this cannot be undone)</li>
+			</ul>
+	</section>
+	<section id="examples">
       <h1>Examples</h1>
-		<pre>
-{
-	"home": {
-		"type": "object",
-		"items": {
-			"main_content": {
-				"type": "html",
-				"attributes": {}
-			}
-		}
-	},
-	"about_us": {
-		"type": "object",
-		"items": {
-			"history": {
-				"type": "html",
-				"attributes": {}
-			},
-			"board_of_directors": {
-				"type": "array",
-				"items": {
-					"name": {
-						"attributes": {}
-					}
-				}
-			}
-		}
-	},
-	"contact_details": {
-		"type": "object",
-		"items": {
-			"google_map_url": {
-				"attributes": {}
-			},
-			"phone": {
-				"attributes": {
-					"type": "tel"
-				}
-			},
-			"address": {
-				"input_type": "textarea",
-				"attributes": {}
-			}
-		}
-	},
-"special_offers": {
-	"type": "array",
-	"items": {
-		"offer_name": {
-			"attributes": {}
-		},
-		"start_date": {
-			"attributes": {
-				"type": "date"
-			}
-		},
-		"end_date": {
-			"attributes": {
-				"type": "date"
-			}
-		},
-		"details": {
-			"type": "html",
-			"attributes": {}
-		}
-	}
-},
-"header": {
-	"type": "object",
-	"items": {
-		"logo": {
-			"attributes": {
-			"type": "file"
-			}
-		},
-		"navigation": {
-			"type": "array",
-				"items": {
-					"title": {
-						"attributes": {
-							"required": "required"
-						}
-					},
-					"link": {
-						"type": "link",
-						"attributes": {
-							"required": "required"
-						}
-					}
-				}
-			}
-		}
-	},
-	"footer": {
-		"type": "object",
-			"items": {
-				"copyright": {
-					"attributes": {}
-					},
-				"locations": {
-					"type": "array",
-					"items": {
-						"title": {
-							"attributes": {
-								"required": "required"
-							}
-						},
-						"link": {
-							"type": "link",
-							"attributes": {
-								"required": "required"
-						}
-					}
-				}
-			},
-			"further_information": {
-				"type": "array",
-				"items": {
-						"title": {
-							"attributes": {
-								"required": "required"
-							}
-						},
-						"link": {
-							"type": "link",
-							"attributes": {
-								"required": "required"
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-		</pre>
-    </section>
+	</section>
   </div>
   <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
 </body>

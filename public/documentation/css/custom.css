@@ -63,3 +63,7 @@
 pre {
     tab-size: 3;
 }
+
+.fullSize {
+    width: 100%;
+}
