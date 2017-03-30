@@ -29,6 +29,18 @@ var accessLevels = require("../../../custom_modules/access_levels");
  * @apiVersion 1.0.0
  * @api {get} /feeds/:projectID?allSettings Get all settings for a project
  * @apiParam {int} :projectID Projects unique ID
+ * @apiParam {string} public_auth_token Public authentication token for the project (unique to all collaborators)
+ * @apiDescription
+ *      <strong>EXAMPLE REQUEST:</strong> https://contentdevelopercms.eu/feeds/198729?allSettings <br>
+ *      <strong>REQUEST HEADER:</strong> { public_auth_token: 6bb3dfbb7d41c20bdb622e6a2541490879693355 } <br>
+ * @apiSuccessExample {json} Success-Response:
+ * {
+ *      collaborators: {Array},
+ *      access_levels: {Array},
+ *      project_name: {string},
+ *      max_cache_age: {int},
+ *      custom_css: {string}
+ * }
  * @apiName Get Project Settings
  * @apiGroup Project Details
  */
@@ -47,9 +59,20 @@ router.get("/:projectID", function(req, res, next){
  * @apiVersion 1.0.0
  * @api {put} /feeds/:projectID?allSettings Update all settings for a project
  * @apiParam {int} :projectID Projects unique ID
+ * @apiParam {string} public_auth_token Public authentication token for the project (unique to all collaborators)
  * @apiParam {string} [project_name]
  * @apiParam {int} [max_cache_age]
  * @apiParam {string} [custom_css]
+ * @apiDescription
+ *      <strong>EXAMPLE REQUEST:</strong> https://contentdevelopercms.eu/feeds/19456?allSettings <br>
+ *      <strong>REQUEST HEADER:</strong> { public_auth_token: 6bb3dfbb7d41c20bdb622e6a2541490879693355 } <br>
+ *      <strong>REQUEST BODY:</strong> { project_name: "My New Project Name", max_cache_age: 250000, custom_css: "h2:{color:red;}" }
+ * @apiSuccessExample {json} Success-Response:
+ * {
+ *      project_name: true,
+ *      max_cache_age: true,
+ *      custom_css: true
+ * }
  * @apiName Update Project Settings
  * @apiGroup Project Details
  */
@@ -82,12 +105,7 @@ router.all("/", function(req, res, next){
     }
 });
 
-/**
- * @apiVersion 1.0.0
- * @api {get} /feeds?action=collaborators Get projects that current user is a collaborator on
- * @apiName Get User Projects
- * @apiGroup Collaborators
- */
+// No API documentation required - users wouldn't be able to access outside of CMS
 router.get("/", function(req, res, next){
     if(req.query.action == "collaborators"){
         console.log("GET request from " + req.userID + " to view all projects");  
@@ -112,7 +130,7 @@ router.get("/", function(req, res, next){
                 } else {
                     // This user has no projects
                     req.feedsErrors.push("This user has no projects");
-                    res.send({});
+                    res.send([]);
                 }
             });
         } else {
@@ -126,7 +144,15 @@ router.get("/", function(req, res, next){
 /**
  * @apiVersion 1.0.0
  * @api {post} /feeds?action=createProject Create a new project
- * @apiParam {string} project_name Name for the new proejct
+ * @apiParam {string} project_name Name for the new project
+ * @apiDescription
+ *      <strong>EXAMPLE REQUEST:</strong> https://contentdevelopercms.eu/feeds?action=createProject <br>
+ *      <strong>REQUEST HEADER:</strong> { public_auth_token: 6bb3dfbb7d41c20bdb622e6a2541490879693355 } <br>
+ *      <strong>REQUEST BODY:</strong> { project_name: "My New Project" }
+ * @apiSuccessExample {json} Success-Response:
+ * {
+ *      new_project_id: {int}
+ * }
  * @apiName Create Project
  * @apiGroup Project Details
  */
@@ -276,10 +302,18 @@ router.post("/", function(req, res, next){
 
 /**
  * @apiVersion 1.0.0
- * @api {post} /feeds/:projectID?action=previewCommit&historyOf=structure&commitHash=*** Preview contents of a file at a specific commit
+ * @api {get} /feeds/:projectID?action=previewCommit&historyOf=structure&commitHash=*** Preview contents of a file at a specific commit
  * @apiParam {int} :projectID Projects unique ID
  * @apiParam {string="structure", "content"} historyOf To get the contents for the history of the content or structure
  * @apiParam {string} commitHash The hash of the commit to be accessed
+ * @apiParam {string} public_auth_token Public authentication token for the project (unique to all collaborators)
+ * @apiDescription
+ *      <strong>EXAMPLE REQUEST:</strong> https://contentdevelopercms.eu/feeds/198729?action=previewCommit&historyOf=structure&commitHash=ca82a6dff817ec66f44342007202690a93763949 <br>
+ *      <strong>REQUEST HEADER:</strong> { public_auth_token: 6bb3dfbb7d41c20bdb622e6a2541490879693355 } <br>
+ * @apiSuccessExample {json} Success-Response:
+ * {
+ *      commit_structure: {object}
+ * }
  * @apiName Preview Commit Content
  * @apiGroup Project History
  */
@@ -291,7 +325,7 @@ router.get("/:projectID", function(req, res, next){
             gitRepo.getCommitContent(req.params.projectID, req.query.historyOf, req.query.commitHash, function(err, commitDataObject){
                 if(err){
                     req.feedsErrors.push("Unable to get the content of this commit");
-                    res.send({});
+                    res.send({commit_content: null, commit_structure: null});
                 } else {
                     // Adding the commit hash to the response object
                     req.responseObject.hash = req.query.commitHash;
@@ -308,8 +342,8 @@ router.get("/:projectID", function(req, res, next){
                 }
             });
         } else {
-            req.feedsErrors.push("Missing commit has or history of details");
-            res.send({});
+            req.feedsErrors.push("Missing commit hash or history of details");
+            next(new Error());
         }
     } else {
         next();
@@ -320,8 +354,17 @@ router.get("/:projectID", function(req, res, next){
  * @apiVersion 1.0.0
  * @api {post} /feeds/:projectID?action=collaborators Add a collaborator to a project
  * @apiParam {int} :projectID Projects unique ID
+ * @apiParam {string} public_auth_token Public authentication token for the project (unique to all collaborators)
  * @apiParam {string} email Email address of the collaborator to be added
- * @apiParam {int} accessLevelInt Requested access level
+ * @apiParam {int} access_level_int Requested access level
+ * @apiDescription
+ *      <strong>EXAMPLE REQUEST:</strong> https://contentdevelopercms.eu/feeds/198729?action=collaborators <br>
+ *      <strong>REQUEST HEADER:</strong> { public_auth_token: 6bb3dfbb7d41c20bdb622e6a2541490879693355 } <br>
+ *      <strong>REQUEST BODY:</strong> { email: "pigottlaura@gmail.com", access_level_int: 2 }
+ * @apiSuccessExample {json} Success-Response:
+ * {
+ *      success: true
+ * }
  * @apiName Add Collaborator
  * @apiGroup Collaborators
  */
@@ -329,13 +372,13 @@ router.post("/:projectID", function(req, res, next){
     if(req.query.action == "collaborators"){
         // Checking if an access level property was provided in the request, and that the
         // value of that property is greater than 0
-        if(req.body.accessLevelInt != null && req.body.email != null && req.body.email.length > 0){
+        if(req.body.access_level_int != null && req.body.email != null && req.body.email.length > 0){
             // Checking that the user exists, and if not, then creating them
             dbQuery.check_User(req.body.email, function(err, collaboratorId){
                 if(collaboratorId){
                     // Checking if the user already has a relationship with this project, and if not,
                     // then creating it
-                    dbQuery.check_UserProject(req.userID, collaboratorId, req.params.projectID, req.body.accessLevelInt, function(err, changed){
+                    dbQuery.check_UserProject(req.userID, collaboratorId, req.params.projectID, req.body.access_level_int, function(err, changed){
                         if(err || changed == null){
                             // Logging the error to the console
                             console.log("Error checking if user is already a contributor to project " + err);
@@ -351,9 +394,9 @@ router.post("/:projectID", function(req, res, next){
                         } else {
                             // Ideally, would prefer to redirect all request to get the updated list of 
                             // collaborators, but due to restrictions with cross origin requests, redirects
-                            // are not currently supported, so just sending them an empty response
-                            if(req.headers.origin != null){
-                                res.send({});
+                            // are not currently supported, so just sending them an boolean response
+                            if(req.headers.origin != process.env.SITE_URL){
+                                res.send({success: true});
                             } else {
                                 res.redirect(303, "/feeds/" + req.params.projectID + "?action=collaborators");
                             }
@@ -383,23 +426,32 @@ router.post("/:projectID", function(req, res, next){
  * @apiVersion 1.0.0
  * @api {put} /feeds/:projectID?action=collaborators Update a collaborators access level to a project
  * @apiParam {int} :projectID Projects unique ID
- * @apiParam {string} collaboratorID User id of the collaborator to be updated
- * @apiParam {int} accessLevelInt  Requested access level
+ * @apiParam {string} public_auth_token Public authentication token for the project (unique to all collaborators)
+ * @apiParam {string} collaborator_id User id of the collaborator to be updated
+ * @apiParam {int} access_level_int  Requested access level
+ * @apiDescription
+ *      <strong>EXAMPLE REQUEST:</strong> https://contentdevelopercms.eu/feeds/198729?action=collaborators <br>
+ *      <strong>REQUEST HEADER:</strong> { public_auth_token: 6bb3dfbb7d41c20bdb622e6a2541490879693355 } <br>
+ *      <strong>REQUEST BODY:</strong> { collaborator_id: 305, access_level_int: 3 }
+ * @apiSuccessExample {json} Success-Response:
+ * {
+ *      success: true
+ * }
  * @apiName Update Collaborator
  * @apiGroup Collaborators
  */
 router.put("/:projectID", function(req, res, next){
     if(req.query.action == "collaborators"){
         // Checking that a collaborator id and access level have been included in the request
-        if(req.body.collaboratorID != null && req.body.accessLevelInt != null){
+        if(req.body.collaborator_id != null && req.body.access_level_int != null){
             // Checking if this user already has a relationship with this project, and if not,
             // then creating it
-            dbQuery.check_UserProject(req.userID, req.body.collaboratorID, req.params.projectID, req.body.accessLevelInt, function(err, success){
+            dbQuery.check_UserProject(req.userID, req.body.collaborator_id, req.params.projectID, req.body.access_level_int, function(err, success){
                 // Ideally, would prefer to redirect all request to get the updated list of 
                 // collaborators, but due to restrictions with cross origin requests, redirects
-                // are not currently supported, so just sending them an empty response
-                if(req.headers.origin != null){
-                    res.send({});
+                // are not currently supported, so just sending them a boolean response
+                if(req.headers.origin != process.env.SITE_URL){
+                    res.send({success: success});
                 } else {
                     res.redirect(303, "/feeds/" + req.params.projectID + "?action=collaborators");
                 } 
@@ -414,6 +466,19 @@ router.put("/:projectID", function(req, res, next){
  * @apiVersion 1.0.0
  * @api {get} /feeds/:projectID?action=collaborators Get all collaborators for a project
  * @apiParam {int} :projectID Projects unique ID
+ * @apiParam {string} public_auth_token Public authentication token for the project (unique to all collaborators)
+ * @apiDescription 
+ *      <strong>EXAMPLE REQUEST:</strong> https://contentdevelopercms.eu/feeds/198729?action=collaborators <br>
+ *      <strong>REQUEST HEADER:</strong> { public_auth_token: 6bb3dfbb7d41c20bdb622e6a2541490879693355 } <br>
+ * @apiSuccessExample {json} Success-Response:
+ * [
+ *      {
+ *          display_name: {string},
+ *          user_id: {int},
+ *          access_level_int: {int},
+ *          access_level_name: {string}
+ *      }
+ * ]
  * @apiName Get Collaborators
  * @apiGroup Collaborators
  */
@@ -440,7 +505,7 @@ router.get("/:projectID", function(req, res, next){
                 });
             } else {
                 req.feedsErrors.push("This project has no collaborators");
-                res.send({});
+                res.send([]);
             }
         });
     } else {
@@ -452,7 +517,16 @@ router.get("/:projectID", function(req, res, next){
  * @apiVersion 1.0.0
  * @api {delete} /feeds/:projectID?action=collaborators Remove a collaborator from a project
  * @apiParam {int} :projectID Projects unique ID
- * @apiParam {int} collaboratorID ID of the collaborator to be removed
+ * @apiParam {string} public_auth_token Public authentication token for the project (unique to all collaborators)
+ * @apiParam {int} collaborator_id ID of the collaborator to be removed
+ * @apiDescription 
+ *      <strong>EXAMPLE REQUEST:</strong> https://contentdevelopercms.eu/feeds/198729?action=collaborators <br>
+ *      <strong>REQUEST HEADER:</strong> { public_auth_token: 6bb3dfbb7d41c20bdb622e6a2541490879693355 } <br>
+ *      <strong>REQUEST BODY:</strong> { collaborator_id: 305 }
+ * @apiSuccessExample {json} Success-Response:
+ * {
+ *      success: true
+ * }
  * @apiName Delete Collaborator
  * @apiGroup Collaborators
  */
@@ -462,7 +536,7 @@ router.delete("/:projectID", function(req, res, next){
         // for this request only, as the Angular http API doesnt allow request
         // bodies to be added to delete requests (but still want to maintain the normal
         // structure for the rest of the API)
-        var collaboratorID = req.body.collaboratorID || req.query.collaboratorID;
+        var collaboratorID = req.body.collaborator_id || req.query.collaborator_id;
         if(collaboratorID != null){
             // Users are not allowed to delete themselves
             if(collaboratorID != req.userID){
@@ -470,20 +544,20 @@ router.delete("/:projectID", function(req, res, next){
                 dbQuery.delete_UserProject(req.userID, collaboratorID, req.params.projectID, function(err, success){
                     // Ideally, would prefer to redirect all request to get the updated list of 
                     // collaborators, but due to restrictions with cross origin requests, redirects
-                    // are not currently supported, so just sending them an empty response
-                    if(req.headers.origin != null){
-                        res.send({});
+                    // are not currently supported, so just sending them a boolean response
+                    if(req.headers.origin != process.env.SITE_URL){
+                        res.send({success: success});
                     } else {
                         res.redirect(303, "/feeds/" + req.params.projectID + "?action=collaborators");
                     }
                 });
             } else {
                 req.feedsErrors.push("You cannot delete yourself from a project");
-                res.send({});
+                res.send({success: false});
             }            
         } else {
             req.feedsErrors.push("No collaborator id included in the request");
-            res.send({});
+            res.send({success: false});
         }
         
     } else {
@@ -495,7 +569,16 @@ router.delete("/:projectID", function(req, res, next){
  * @apiVersion 1.0.0
  * @api {post} /feeds/:projectID?action=mediaItems Upload a media item
  * @apiParam {int} :projectID Projects unique ID
+ * @apiParam {string} public_auth_token Public authentication token for the project (unique to all collaborators)
  * @apiParam {file} file Media item file to be uploaded
+ * @apiDescription 
+ *      <strong>EXAMPLE REQUEST:</strong> https://contentdevelopercms.eu/feeds/198729?action=mediaItems <br>
+ *      <strong>REQUEST HEADER:</strong> { public_auth_token: 6bb3dfbb7d41c20bdb622e6a2541490879693355 } <br>
+ *      <strong>REQUEST BODY:</strong> { file: {file} }
+ * @apiSuccessExample {json} Success-Response:
+ * {
+ *      media_item_url: https://drive.google.com/uc?id=0Bzkz0DzYRLAuUHRzVmFXZFF3dDQ
+ * }
  * @apiName Upload Media Item
  * @apiGroup Media Items
  */
@@ -516,14 +599,14 @@ router.post("/:projectID", function(req, res, next){
                         console.log("FILE UPLOAD");
                         // Sending the file URL for the new media item to the caller, by 
                         // prepending the id with the appropriate google drive url
-                        req.responseObject.fileUrl = "https://drive.google.com/uc?id=" + fileUrl;
-                        res.send(req.responseObject);
+                        var fileUrl = "https://drive.google.com/uc?id=" + fileUrl;
+                        res.send({media_item_url: fileUrl});
                     });
                 }                
             });
         } else {
             req.feedsErrors.push("No file included in the request");
-            res.send({});
+            next(new Error());
         }
     } else {
         next();
@@ -534,6 +617,20 @@ router.post("/:projectID", function(req, res, next){
  * @apiVersion 1.0.0
  * @api {get} /feeds/:projectID?action=accessLevels Get project access levels
  * @apiParam {int} :projectID Projects unique ID
+ * @apiParam {string} public_auth_token Public authentication token for the project (unique to all collaborators)
+ * @apiDescription 
+ *      <strong>EXAMPLE REQUEST:</strong> https://contentdevelopercms.eu/feeds/198729?action=accessLevels <br>
+ *      <strong>REQUEST HEADER:</strong> { public_auth_token: 6bb3dfbb7d41c20bdb622e6a2541490879693355 } <br>
+ * @apiSuccessExample {json} Success-Response:
+ * {
+ *      access_levels: [
+ *          { 
+ *              access_level_name: "Administrator",
+ *              access_level_int: 1,
+ *              in_use: true
+ *          }
+ *      ]
+ * }
  * @apiName Get Access Levels
  * @apiGroup Access Levels
  */
@@ -551,7 +648,7 @@ router.get("/:projectID", function(req, res, next){
                     req.query.action = "projectName";
                     next();
                 } else {
-                    res.send(projectAccessLevels);
+                    res.send({access_levels: projectAccessLevels});
                 }
             });
         });
@@ -564,7 +661,17 @@ router.get("/:projectID", function(req, res, next){
  * @apiVersion 1.0.0
  * @api {post} /feeds/:projectID?action=accessLevels Create a new access level
  * @apiParam {int} :projectID Projects unique ID
+ * @apiParam {string} public_auth_token Public authentication token for the project (unique to all collaborators)
  * @apiParam {string} access_level_name Name for the new access level
+ * @apiParam {int} [access_level_int] Int value for the new access level (needs to be unique to the project)
+ * @apiDescription 
+ *      <strong>EXAMPLE REQUEST:</strong> https://contentdevelopercms.eu/feeds/198729?action=accessLevels  <br>
+ *      <strong>REQUEST HEADER:</strong> { public_auth_token: 6bb3dfbb7d41c20bdb622e6a2541490879693355 } <br>
+ *      <strong>REQUEST BODY:</strong> { access_level_name: "Photographer", access_level_int: 5 }
+ * @apiSuccessExample {json} Success-Response:
+ * {
+ *      success: true
+ * }
  * @apiName Create Access Level
  * @apiGroup Access Levels
  */
@@ -575,19 +682,19 @@ router.post("/:projectID", function(req, res, next){
             // Creating a new access level for the project. Allowing the
             // access_level_int from the request to be included, even if it
             // is null, as a default access level will be supplied if it is
-            accessLevels.createNewAccessLevel(req.userID, req.params.projectID, req.body.access_level_name, req.body.access_level_int, function(){
+            accessLevels.createNewAccessLevel(req.userID, req.params.projectID, req.body.access_level_name, req.body.access_level_int, function(success){
                 // Ideally, would prefer to redirect all request to get the updated list of 
                 // access levels, but due to restrictions with cross origin requests, redirects
-                // are not currently supported, so just sending them an empty response
-                if(req.headers.origin != null){
-                    res.send({});
+                // are not currently supported, so just sending them a boolean response
+                if(req.headers.origin != process.env.SITE_URL){
+                    res.send({success: success});
                 } else {
                     res.redirect(303, "/feeds/" + req.params.projectID + "?action=accessLevels");
                 }
             });
         } else {
             req.feedsErrors.push("No access level name included in the request");
-            send({});
+            next(new Error());
         }
     } else {
         next();
@@ -598,7 +705,16 @@ router.post("/:projectID", function(req, res, next){
  * @apiVersion 1.0.0
  * @api {delete} /feeds/:projectID?action=accessLevels Delete access level
  * @apiParam {int} :projectID Projects unique ID
+ * @apiParam {string} public_auth_token Public authentication token for the project (unique to all collaborators)
  * @apiParam {int} access_level_int Number of the access level to be deleted
+ * @apiDescription 
+ *      <strong>EXAMPLE REQUEST:</strong> https://contentdevelopercms.eu/feeds/198729?action=accessLevels <br>
+ *      <strong>REQUEST HEADER:</strong> { public_auth_token: 6bb3dfbb7d41c20bdb622e6a2541490879693355 } <br>
+ *      <strong>REQUEST BODY:</strong> { access_level_int: 5 }
+ * @apiSuccessExample {json} Success-Response:
+ * {
+ *      success: true
+ * }
  * @apiName Delete Access Level
  * @apiGroup Access Levels
  */
@@ -611,19 +727,19 @@ router.delete("/:projectID", function(req, res, next){
         var accessLevelInt = req.body.access_level_int || req.query.access_level_int;
         if(accessLevelInt != null){
             // Deleting this access level from the project
-            accessLevels.removeAccessLevel(req.userID, req.params.projectID, accessLevelInt, function(){
+            accessLevels.removeAccessLevel(req.userID, req.params.projectID, accessLevelInt, function(success){
                 // Ideally, would prefer to redirect all request to get the updated list of 
                 // access levels, but due to restrictions with cross origin requests, redirects
-                // are not currently supported, so just sending them an empty response
-                if(req.headers.origin != null){
-                    res.send({});
+                // are not currently supported, so just sending them a boolean response
+                if(req.headers.origin != process.env.SITE_URL){
+                    res.send({success: success});
                 } else {
                     res.redirect(303, "/feeds/" + req.params.projectID + "?action=accessLevels");
                 }
             });
         } else {
             req.feedsErrors.push("No access level int included in the request");
-            res.send({});
+            next(new Error());
         }
     } else {
         next();
@@ -634,8 +750,17 @@ router.delete("/:projectID", function(req, res, next){
  * @apiVersion 1.0.0
  * @api {put} /feeds/:projectID?action=accessLevels Update access level name
  * @apiParam {int} :projectID Projects unique ID
+ * @apiParam {string} public_auth_token Public authentication token for the project (unique to all collaborators)
  * @apiParam {int} access_level_int Number of the access level to be updated
  * @apiParam {string} access_level_name New name for the access level
+ * @apiDescription 
+ *      <strong>EXAMPLE REQUEST:</strong> https://contentdevelopercms.eu/feeds/198729?action=accessLevels <br>
+ *      <strong>REQUEST HEADER:</strong> { public_auth_token: 6bb3dfbb7d41c20bdb622e6a2541490879693355 } <br>
+ *      <strong>REQUEST BODY:</strong> { access_level_int: 5, access_level_name: "Shop Assistant" }
+ * @apiSuccessExample {json} Success-Response:
+ * {
+ *      success: true
+ * }
  * @apiName Update Access Level Name
  * @apiGroup Access Levels
  */
@@ -644,19 +769,19 @@ router.put("/:projectID", function(req, res, next){
         // Checking that an access level int and name have been included in the request
         if(req.body.access_level_int != null && req.body.access_level_name != null){
             // Updating this access level name for the project
-            accessLevels.updateAccessLevelName(req.userID, req.params.projectID, req.body.access_level_int, req.body.access_level_name, function(){
+            accessLevels.updateAccessLevelName(req.userID, req.params.projectID, req.body.access_level_int, req.body.access_level_name, function(success){
                 // Ideally, would prefer to redirect all request to get the updated list of 
                 // access levels, but due to restrictions with cross origin requests, redirects
-                // are not currently supported, so just sending them an empty response
-                if(req.headers.origin != null){
-                    res.send({});
+                // are not currently supported, so just sending them a boolean response
+                if(req.headers.origin != process.env.SITE_URL){
+                    res.send({success: success});
                 } else {
                     res.redirect(303, "/feeds/" + req.params.projectID + "?action=accessLevels");
                 }
             });
         } else {
             req.feedsErrors.push("No access level name or int included in the request");
-            res.send({});
+            next(new Error());
         }
     } else {
         next();
@@ -667,6 +792,22 @@ router.put("/:projectID", function(req, res, next){
  * @apiVersion 1.0.0
  * @api {get} /feeds/:projectID?action=mediaItems Get all media items for a project
  * @apiParam {int} :projectID Projects unique ID
+ * @apiParam {string} public_auth_token Public authentication token for the project (unique to all collaborators)
+ * @apiDescription 
+ *      <strong>EXAMPLE REQUEST:</strong> https://contentdevelopercms.eu/feeds/198729?action=mediaItems <br>
+ *      <strong>REQUEST HEADER:</strong> { public_auth_token: 6bb3dfbb7d41c20bdb622e6a2541490879693355 } <br>
+ * @apiSuccessExample {json} Success-Response:
+ * {
+ *      media_items: [
+ *          {
+ *              id: "0Bzkz0DzYRLAuUHRzVmFXZFF3dDQ",
+ *              name: "thumb.jpg",
+ *              mimeType: "image/jpeg",
+ *              url: "https://drive.google.com/uc?id=0Bzkz0DzYRLAuUHRzVmFXZFF3dDQ"
+ *          }
+ *      ]
+ *      
+ * }
  * @apiName Get Media Items
  * @apiGroup Media Items
  */
@@ -676,12 +817,12 @@ router.get("/:projectID", function(req, res, next){
         dbQuery.get_UserProject_Project("media_folder_id", req.userID, req.params.projectID, function(err, row){
             if(row && row.media_folder_id != null){
                 // Getting all images belonging to this media item folder
-                googleOAuth.getAllProjectImages(req.params.projectID, row.media_folder_id, req.userID, req.query.numFiles, req.query.nextPageToken, function(results){
-                    res.send(results);
+                googleOAuth.getAllProjectImages(req.params.projectID, row.media_folder_id, req.userID, req.query.numFiles, req.query.nextPageToken, function(files){
+                    res.send({media_items: files});
                 });
             } else {
                 req.feedsErrors.push("No media item folder found for this project, or you do not have permission to access it");
-                res.send({});
+                next(new Error());
             }
         });
     } else {
@@ -693,6 +834,14 @@ router.get("/:projectID", function(req, res, next){
  * @apiVersion 1.0.0
  * @api {get} /feeds/:projectID?action=projectName Get projects name
  * @apiParam {int} :projectID Projects unique ID
+ * @apiParam {string} public_auth_token Public authentication token for the project (unique to all collaborators)
+ * @apiDescription 
+ *      <strong>EXAMPLE REQUEST:</strong> https://contentdevelopercms.eu/feeds/198729?action=projectName <br>
+ *      <strong>REQUEST HEADER:</strong> { public_auth_token: 6bb3dfbb7d41c20bdb622e6a2541490879693355 } <br>
+ * @apiSuccessExample {json} Success-Response:
+ * {
+ *      project_name: "My New Project"  
+ * }
  * @apiName Get Project Name
  * @apiGroup Project Details
  */
@@ -721,7 +870,16 @@ router.get("/:projectID", function(req, res, next){
  * @apiVersion 1.0.0
  * @api {put} /feeds/:projectID?action=projectName Update projects name
  * @apiParam {int} :projectID Projects unique ID
+ * @apiParam {string} public_auth_token Public authentication token for the project (unique to all collaborators)
  * @apiParam {string} project_name New name for the project
+ * @apiDescription 
+ *      <strong>EXAMPLE REQUEST:</strong> https://contentdevelopercms.eu/feeds/198729?action=projectName <br>
+ *      <strong>REQUEST HEADER:</strong> { public_auth_token: 6bb3dfbb7d41c20bdb622e6a2541490879693355 } <br>
+ *      <strong>REQUEST BODY:</strong> { project_name: "My Updated Project Name" }
+ * @apiSuccessExample {json} Success-Response:
+ * {
+ *      success: true
+ * }
  * @apiName Update Project Name
  * @apiGroup Project Details
  */
@@ -737,14 +895,14 @@ router.put("/:projectID", function(req, res, next){
                     // If this is a request to update all settings, adding the 
                     // project name for this project to the response object,
                     // and then passing the request onto the next relevant route
-                    req.responseObject.project_name = req.body.project_name;
+                    req.responseObject.project_name = success;
                     req.query.action = "cache";
                     next();
                 } else {
                     if(success){
-                        res.send(req.body.project_name);
+                        res.send({success: success});
                     } else {
-                        res.send({});
+                        res.send({success: success});
                     }
                     
                 }    
@@ -769,6 +927,14 @@ router.put("/:projectID", function(req, res, next){
  * @apiVersion 1.0.0
  * @api {get} /feeds/:projectID?action=cache Get maximum cache age
  * @apiParam {int} :projectID Projects unique ID
+ * @apiParam {string} public_auth_token Public authentication token for the project (unique to all collaborators)
+ * @apiDescription 
+ *      <strong>EXAMPLE REQUEST:</strong> https://contentdevelopercms.eu/feeds/198729?action=cache <br>
+ *      <strong>REQUEST HEADER:</strong> { public_auth_token: 6bb3dfbb7d41c20bdb622e6a2541490879693355 } <br>
+ * @apiSuccessExample {json} Success-Response:
+ * {
+ *      max_cache_age: 25000
+ * }
  * @apiName Get Maximum Cache Age
  * @apiGroup Project Details
  */
@@ -796,7 +962,16 @@ router.get("/:projectID", function(req, res, next){
  * @apiVersion 1.0.0
  * @api {put} /feeds/:projectID?action=cache Update maximum cache age
  * @apiParam {int} :projectID Projects unique ID
+ * @apiParam {string} public_auth_token Public authentication token for the project (unique to all collaborators)
  * @apiParam {int} max_cache_age Time in milliseconds
+ * @apiDescription 
+ *      <strong>EXAMPLE REQUEST:</strong> https://contentdevelopercms.eu/feeds/198729?action=cache <br>
+ *      <strong>REQUEST HEADER:</strong> { public_auth_token: 6bb3dfbb7d41c20bdb622e6a2541490879693355 } <br>
+ *      <strong>REQUEST BODY:</strong> { max_cache_age: 25000 }
+ * @apiSuccessExample {json} Success-Response:
+ * {
+ *      success: true  
+ * }
  * @apiName Update Maximum CacheAge
  * @apiGroup Project Details
  */
@@ -810,11 +985,11 @@ router.put("/:projectID", function(req, res, next){
                     // If this is a request to update all settings, adding the 
                     // maximum cache age for this project to the response object, 
                     // and then passing the request onto the next relevant route
-                    req.responseObject.max_cache_age = req.body.max_cache_age || null;
+                    req.responseObject.max_cache_age = success;
                     req.query.action = "css";
                     next();
                 } else {
-                    res.send(req.body.max_cache_age || null);
+                    res.send({success: success});
                 }
             });
         } else {
@@ -837,6 +1012,14 @@ router.put("/:projectID", function(req, res, next){
  * @apiVersion 1.0.0
  * @api {get} /feeds/:projectID?action=css Get custom css
  * @apiParam {int} :projectID Projects unique ID
+ * @apiParam {string} public_auth_token Public authentication token for the project (unique to all collaborators)
+ * @apiDescription 
+ *      <strong>EXAMPLE REQUEST:</strong> https://contentdevelopercms.eu/feeds/198729?action=css <br>
+ *      <strong>REQUEST HEADER:</strong> { public_auth_token: 6bb3dfbb7d41c20bdb622e6a2541490879693355 } <br>
+ * @apiSuccessExample {json} Success-Response:
+ * {
+ *      custom_css: "h2{color:red;}"  
+ * }
  * @apiName Get Custom Css
  * @apiGroup Custom CSS
  */
@@ -863,7 +1046,16 @@ router.get("/:projectID", function(req, res, next){
  * @apiVersion 1.0.0
  * @api {post} /feeds/:projectID?action=css Create or append to custom css
  * @apiParam {int} :projectID Projects unique ID
+ * @apiParam {string} public_auth_token Public authentication token for the project (unique to all collaborators)
  * @apiParam {string} custom_css Custom css rules to be added
+ * @apiDescription 
+ *      <strong>EXAMPLE REQUEST:</strong> https://contentdevelopercms.eu/feeds/198729?action=css <br>
+ *      <strong>REQUEST HEADER:</strong> { public_auth_token: 6bb3dfbb7d41c20bdb622e6a2541490879693355 } <br>
+ *      <strong>REQUEST BODY:</strong> { custom_css: "h2:{color:red;}" }
+ * @apiSuccessExample {json} Success-Response:
+ * {
+ *      success: true
+ * }
  * @apiName Create CustomCss
  * @apiGroup Custom CSS
  */
@@ -901,7 +1093,16 @@ router.post("/:projectID", function(req, res, next){
  * @apiVersion 1.0.0
  * @api {put} /feeds/:projectID?action=css Update custom content css
  * @apiParam {int} :projectID Projects unique ID
+ * @apiParam {string} public_auth_token Public authentication token for the project (unique to all collaborators)
  * @apiParam {string} custom_css Custom css rules to be added
+ * @apiDescription 
+ *      <strong>EXAMPLE REQUEST:</strong> https://contentdevelopercms.eu/feeds/198729?action=css <br>
+ *      <strong>REQUEST HEADER:</strong> { public_auth_token: 6bb3dfbb7d41c20bdb622e6a2541490879693355 } <br>
+ *      <strong>REQUEST BODY:</strong> { custom_css: "h2:{color:red;}"}
+ * @apiSuccessExample {json} Success-Response:
+ * {
+ *      success: true 
+ * }
  * @apiName Update Custom Css
  * @apiGroup Custom CSS
  */
@@ -938,14 +1139,14 @@ router.all("/:projectID", function(req, res, next){
                     // If this is a request for all settings, adding the 
                     // maximum cache age for this project to the response object, 
                     // and then passing the request onto the next end of the route
-                    req.responseObject.custom_css = req.custom_css;
+                    req.responseObject.custom_css = success;
                     next();
                 } else {
                     // Ideally, would prefer to redirect all request to get the updated
                     // css, but due to restrictions with cross origin requests, redirects
-                    // are not currently supported, so just sending them an empty response
-                    if(req.headers.origin != null){
-                        res.send({});
+                    // are not currently supported, so just sending them a boolean response
+                    if(req.headers.origin != process.env.SITE_URL){
+                        res.send({success: success});
                     } else {
                         res.redirect(303, "/feeds/" + req.params.projectID + "?action=css");
                     }
