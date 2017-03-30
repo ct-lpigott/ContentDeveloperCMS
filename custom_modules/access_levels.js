@@ -55,7 +55,7 @@ function getProjectAccessLevels(projectId, cb){
 // Function to update all access levels for a project
 function updateProjectAccessLevels(adminUserId, projectId, updatedProjectAccessLevels, cb){
     dbQuery.update_Project(["access_levels"], [JSON.stringify(updatedProjectAccessLevels)], adminUserId, projectId, function(err, success){
-        cb();
+        cb(success);
     });
 }
 
@@ -189,12 +189,12 @@ function createNewAccessLevel(adminUserId, projectId, accessLevelName, accessLev
 
             // Updating this projects access levels (which will save the updated 
             // access levels to the database)
-            updateProjectAccessLevels(adminUserId, projectId, currentAccessLevels, function(){
-                cb();
+            updateProjectAccessLevels(adminUserId, projectId, currentAccessLevels, function(success){
+                cb(success);
             });
         } else {
             console.log("No access levels exist");
-            cb();
+            cb(false);
         }            
     });
 }
@@ -218,16 +218,16 @@ function removeAccessLevel(adminUserId, projectId, accessLevelInt, cb){
                     }
                     // Updating this projects access levels (which will save the updated 
                     // access levels to the database)
-                    updateProjectAccessLevels(adminUserId, projectId, currentAccessLevels, function(){
-                        cb();
+                    updateProjectAccessLevels(adminUserId, projectId, currentAccessLevels, function(success){
+                        cb(success);
                     });
                 } else {
                     console.log("This access level does not exist");
-                    cb();
+                    cb(false);
                 }
             } else {
                 console.log("This project does not have any access levels");
-                cb();
+                cb(false);
             }
         });
     } else {
@@ -252,17 +252,17 @@ function updateAccessLevelName(userId, projectId, accessLevelInt, newName, cb){
                 }
                 // Updating this projects access levels (which will save the updated 
                 // access levels to the database)
-                updateProjectAccessLevels(userId, projectId, currentAccessLevels, function(){
-                    cb();
+                updateProjectAccessLevels(userId, projectId, currentAccessLevels, function(success){
+                    cb(success);
                 });
             } else {
                 console.log("This project does not have any access levels");
-                cb();
+                cb(false);
             }
         });
     } else {
         console.log("No name provided. Cannot create access level");
-        cb();
+        cb(false);
     }
 }
 

@@ -334,7 +334,7 @@ function getAllProjectImages(projectID, mediaFolderId, currentUserID, numFiles=1
         }
         // Returning all results to the caller, including the array of
         // files, and the nextPageToken (if one is present)
-        cb(results);
+        cb(results.files);
       } else {
         cb(null);
       }

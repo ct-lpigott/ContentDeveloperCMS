@@ -71,6 +71,7 @@ router.use(function(req, res, next){
 			if(req.headers.origin == process.env.SITE_URL){
 				// This server will always have full access to the server
 				res = setAccessControlHeaders(req, res, "crud");
+				next();
 			} else {
 				// Assuming that we wont be rejecting the request
 				var rejectRequest = false;
@@ -151,6 +152,8 @@ router.use(function(req, res, next){
 					next();
 				}
 			}
+		} else {
+			next();
 		}
     }
 });

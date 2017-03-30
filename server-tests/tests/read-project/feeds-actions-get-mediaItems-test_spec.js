@@ -9,9 +9,9 @@ frisby.create("Feeds - Actions - Get Project Media Items")
   .expectStatus(200)
   .expectHeaderContains("Content-Type", "application/json")
   .expectJSONTypes({
-    files: Array
+    media_items: Array
   })
-  .expectJSONTypes("files.*", {
+  .expectJSONTypes("media_items.*", {
     id: String,
     name: String,
     mimeType: String,
