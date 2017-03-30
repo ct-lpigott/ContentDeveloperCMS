@@ -803,8 +803,9 @@ router.put("/:projectID", function(req, res, next){
 
 /**
  * @apiVersion 1.0.0
- * @api {get} /feeds/:projectID?action=mediaItems Get all media items for a project
+ * @api {get} /feeds/:projectID?action=mediaItems&nextPageToken=*** Get all media items for a project
  * @apiParam {int} :projectID Projects unique ID
+ * @apiParam {string} [nextPageToken] Next page token (if one was returned in a previous request)
  * @apiParam {string} public_auth_token Public authentication token for the project (unique to all collaborators)
  * @apiDescription 
  *      <strong>EXAMPLE REQUEST:</strong> https://contentdevelopercms.eu/feeds/198729?action=mediaItems <br>
@@ -818,7 +819,8 @@ router.put("/:projectID", function(req, res, next){
  *              mimeType: "image/jpeg",
  *              url: "https://drive.google.com/uc?id=0Bzkz0DzYRLAuUHRzVmFXZFF3dDQ"
  *          }
- *      ]
+ *      ],
+ *      next_page_token: "V1*3|0|CdfsiWEkjfslkWERulsdknlkcslERjlskdnKdfjiwEKJCklsidjr"
  *      
  * }
  * @apiName Get Media Items
@@ -830,8 +832,8 @@ router.get("/:projectID", function(req, res, next){
         dbQuery.get_UserProject_Project("media_folder_id", req.userID, req.params.projectID, function(err, row){
             if(row && row.media_folder_id != null){
                 // Getting all images belonging to this media item folder
-                googleOAuth.getAllProjectImages(req.params.projectID, row.media_folder_id, req.userID, req.query.numFiles, req.query.nextPageToken, function(files){
-                    res.send({media_items: files});
+                googleOAuth.getAllProjectImages(req.params.projectID, row.media_folder_id, req.userID, req.query.numFiles, req.query.nextPageToken, function(results){
+                    res.send({media_items: results.files, next_page_token: results.nextPageToken});
                 });
             } else {
                 req.feedsErrors.push("No media item folder found for this project, or you do not have permission to access it");

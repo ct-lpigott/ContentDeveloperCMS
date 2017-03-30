@@ -2396,11 +2396,12 @@ var FileUploadComponent = (function () {
         if (fileInput.files != null && fileInput.files.length > 0) {
             this._warning = "Uploading...";
             this._cdService.uploadMediaItem(fileInput.files[0]).subscribe(function (responseObject) {
-                if (responseObject.fileUrl != null) {
-                    _this.itemContent = responseObject.fileUrl;
-                    _this.fileChanged.emit(responseObject.fileUrl);
+                if (responseObject.media_item_url != null) {
+                    _this.itemContent = responseObject.media_item_url;
+                    _this.fileChanged.emit(responseObject.media_item_url);
                     _this._fileInputElement.setAttribute("data-url", _this.itemContent);
                     _this._warning = _this._contentError = null;
+                    _this.hideMediaItemGallery();
                 }
             });
         }
@@ -3128,9 +3129,10 @@ var MediaItemGalleryComponent = (function () {
         if (useNextPageToken === void 0) { useNextPageToken = true; }
         var nextPageToken = useNextPageToken ? this._mediaItemNextPageToken : null;
         this._cdService.loadProjectMediaItems(this.numItemsPerPage, nextPageToken).subscribe(function (responseObject) {
-            _this._mediaItemNextPageToken = responseObject.nextPageToken;
-            if (responseObject.files != null) {
-                _this._mediaItems = responseObject.files;
+            console.log(responseObject);
+            _this._mediaItemNextPageToken = responseObject.next_page_token;
+            if (responseObject.media_items != null) {
+                _this._mediaItems = responseObject.media_items;
             }
         });
     };
