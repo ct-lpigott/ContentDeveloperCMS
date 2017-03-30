@@ -9,16 +9,15 @@ var router = require('express').Router();
 var dbQuery = require("../custom_modules/database_query");
 
 router.use(function(req, res, next){
-	
 
 	if(req.headers.public_auth_token != null){
-		dbQuery.getWhere_UserProject("user_id", ["public_auth_token"], [req.headers.public_auth_token], function(err, row){
+		dbQuery.getWhere_UserProject("user_id", ["public_auth_token", "project_id"], [req.headers.public_auth_token, req.projectID], function(err, row){
 			if(row){
 				req.userID = row.user_id;
 				//console.log("Successful Auth");
 				next();
 			} else {
-				req.preRequestErrors.push("Invalid public authentication token");
+				req.preRequestErrors.push("Invalid public authentication token for this project");
 				next(new Error());
 			}
 		});

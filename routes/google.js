@@ -21,6 +21,8 @@ var googleOAuth = require("../custom_modules/google_oauth");
 // Request from the Google API, returning the user from a successful login to
 // their Google account
 router.get("/oauthRedirectURL", function(req, res, next){
+    req.loginErrors = [];
+    
     // Temporarily storing the auth code, included in the request, as this will be used
     // request the access token from the Google API i.e. it proves that the user has 
     // authorised us to do so
@@ -34,6 +36,7 @@ router.get("/oauthRedirectURL", function(req, res, next){
         oauth2Client.getToken(authCode, function(err, token) {
             if(err) {
                 console.log("Error while trying to retrieve access token " + err);
+                next();
             } else {
                 // Accessing the Google Plus API, through the google apis module
                 var plus = google.plus('v1');
@@ -51,31 +54,41 @@ router.get("/oauthRedirectURL", function(req, res, next){
                 }, function (err, user) {
                     if(err){
                         console.log("Unable to get user - " + err);
+                        next();
                     } else {
                         // Temporarily storing the link to the users profile image (with
                         // the size specification removed - as by default it is set to 50px)
                         var userProfileImageURL = user.image.url.replace("?sz=50", "");
 
-                        // Temporarily storing the users access token in a JSON string
+                        // Temporarily storing the users access token in a JSON string.
+                        // Storing the refresh token seperate from the access token, as this
+                        // will only be contained on the access token at first login, and would
+                        // get overwritten in future logins
                         var accessToken = JSON.stringify(token);
                         var refreshToken = token.refresh_token;
 
+                        // Checking if the user exists, and if not, then creating them
                         dbQuery.check_User(user.emails[0].value, function(err, userId){
+                            // Getting the details of this user (either new or existing)
                             dbQuery.get_User("cd_user_auth_token", userId, function(err, row){
-                                req.userAuthToken = row.cd_user_auth_token;
+                                if(row){
+                                    req.userAuthToken = row.cd_user_auth_token.toString();
 
-                                if(refreshToken != null){
-                                    dbQuery.update_User(["display_name", "google_profile_image_url", "google_profile_id", "google_access_token", "google_refresh_token"], [user.displayName, userProfileImageURL, user.id, accessToken, refreshToken], userId, function(err, success){
-                                        // Passing this request on to the next stage of this route
-                                        next();
-                                    });
+                                    // If no refresh token was supplied, then no need to update its value
+                                    if(refreshToken != null){
+                                        dbQuery.update_User(["display_name", "google_profile_image_url", "google_profile_id", "google_access_token", "google_refresh_token"], [user.displayName, userProfileImageURL, user.id, accessToken, refreshToken], userId, function(err, success){
+                                            // Passing this request on to the next stage of this route
+                                            next();
+                                        });
+                                    } else {
+                                        dbQuery.update_User(["display_name", "google_profile_image_url", "google_profile_id", "google_access_token"], [user.displayName, userProfileImageURL, user.id, accessToken], userId, function(err, success){
+                                            // Passing this request on to the next stage of this route
+                                            next();
+                                        });
+                                    }
                                 } else {
-                                    dbQuery.update_User(["display_name", "google_profile_image_url", "google_profile_id", "google_access_token"], [user.displayName, userProfileImageURL, user.id, accessToken], userId, function(err, success){
-                                        // Passing this request on to the next stage of this route
-                                        next();
-                                    });
-                                }
-                                
+                                    next();
+                                }                                
                             });
                         });
                     }
@@ -94,7 +107,8 @@ router.get("/oauthRedirectURL", function(req, res, next){
         res.redirect("/cms/");
     } else {
         console.log("No user was found");
-        res.send("Unable to login");
+        req.loginErrors.push("No user was found - unable to login");
+        next(new Error());
     }
 });
 

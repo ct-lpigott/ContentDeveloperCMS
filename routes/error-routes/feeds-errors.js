@@ -7,14 +7,22 @@ module.exports = function (err, req, res, next) {
     // setting it to 500 - Internal Server Error).
     if(err.message != "notify" && err.message != "loginRequired" && req.feedsErrors != null){
         res.status(err.status || 500);
-    }    
-    //console.log(err);
+    }
 
+    // Creating the errors array on the response object
     req.responseObject.errors = [];
+
+    if(req.loginErrors != null){
+        // Adding any errors that occurred within the login route, so that they
+        // can be passed back to the user.
+        for(var i=0; i<req.loginErrors.length; i++){
+            req.responseObject.errors.push(req.loginErrors[i]);
+        }
+        
+    }
     
     if(req.feedsErrors != null){
-        // Creating an errors array on the response object, and setting it to be
-        // equal to any errors that occurred within the feeds route, so that they
+        // Adding any errors that occurred within the feeds route, so that they
         // can be passed back to the user.
         for(var i=0; i<req.feedsErrors.length; i++){
             req.responseObject.errors.push(req.feedsErrors[i]);
@@ -22,22 +30,22 @@ module.exports = function (err, req, res, next) {
         
     }
     if(req.adminErrors != null){
-        // Creating an errors array on the response object, and setting it to be
-        // equal to any errors that occurred within the admin route, so that they
+        // Adding any errors that occurred within the admin route, so that they
         // can be passed back to the user.
         for(var i=0; i<req.adminErrors.length; i++){
             req.responseObject.errors.push(req.adminErrors[i]);
         }
     }
     if(req.preRequestErrors != null){
-        // Creating an errors array on the response object, and setting it to be
-        // equal to any errors that occurred within the admin route, so that they
+        // Adding any errors that occurred within the pre request routes, so that they
         // can be passed back to the user.
         for(var i=0; i<req.preRequestErrors.length; i++){
             req.responseObject.errors.push(req.preRequestErrors[i]);
         } 
     }   
 
+    // If a login is required, adding a loginRequired property to the response
+    // to notify the user and/or CMS
     if(err.message == "loginRequired"){
         req.responseObject.loginRequired = true;
     }

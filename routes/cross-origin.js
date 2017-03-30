@@ -31,6 +31,7 @@ function setAccessControlHeaders(req, res, controlLevel){
 }
 
 router.use(["/feeds/:projectID", "/admin/*/:projectID"], function(req, res, next){
+	req.projectID = req.params.projectID;
 	dbQuery.get_Project("update_origins, read_origins", req.params.projectID, function(err, row){
 		req.allowedOrigins = {};
 		if(row && (row.update_origins != null || row.read_origins != null)){
@@ -102,11 +103,13 @@ router.use(function(req, res, next){
 					} else {
 						rejectRequest = true;
 					}	
+				} else {
+					rejectRequest = true;
 				}
 			}
 
             if(rejectRequest){
-				req.preRequestErrors.push("Origin not authorised");
+				req.preRequestErrors.push("Origin not authorised - " + req.headers.origin);
                 next(new Error());
             } else {
                 next();

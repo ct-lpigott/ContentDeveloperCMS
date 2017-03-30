@@ -35,7 +35,8 @@ router.get("/loginUrl", function(req, res, next){
     });  
 });
 
-router.use(function(req, res, next){    
+router.use(function(req, res, next){  
+    // Checking that this user has been authenticated  
     if(req.userID != null){
         next();
     } else {
@@ -45,9 +46,11 @@ router.use(function(req, res, next){
 
 
 router.get("/user", function(req, res, next){
+    // Getting the user details required for the CMS
     dbQuery.get_User("display_name, google_profile_image_url", req.userID, function(err, row){
         if(err){ console.log(err); }
         if(row){
+            // Creating a user object to return to the caller
             var user = {
                 displayName: row.display_name,
                 profileImage: row.google_profile_image_url,
@@ -61,16 +64,21 @@ router.get("/user", function(req, res, next){
 });
 
 router.get("/logout", function(req, res, next){
+    // Destroying the users session and id, and sending
+    // a response which will contain a loginRequired property
+    // (using the feeds errors route)
     req.session.destroy();
     req.userID = null;
-    res.send();
+    next(new Error("loginRequired"));
 });
 
 
 router.get("/settings/:projectID", function(req, res, next){
+    // Getting the projects admin settings
     dbQuery.get_UserProject_Project("p.update_origins, p.read_origins, up.public_auth_token", req.userID, req.params.projectID, function(err, row){
         if(err){ console.log(err); }
         if(row){
+            // creating a project admin settings object to return to the caller
             var adminSettings = {
                 update_origins: row.update_origins,
                 read_origins: row.read_origins,
@@ -84,6 +92,7 @@ router.get("/settings/:projectID", function(req, res, next){
 });
 
 router.put("/settings/:projectID", function(req, res, next){ 
+    // Updating the project settings
     dbQuery.update_Project(["update_origins", "read_origins"], [req.body.update_origins, req.body.read_origins], req.userID, req.params.projectID, function(err, success){
         if(err){ console.log(err); }
         res.send({success: success});
@@ -101,9 +110,13 @@ router.put("/settings/:projectID/publicAuthToken", function(req, res, next){
 
 // Request to delete a project
 router.delete("/:projectID", function(req, res, next){
+    // The request will have to contain a project name, otherwise
+    // it will not be possible to confirm that the user inteneded on 
+    // deleting this project
     if(req.query.projectName != null){
         dbQuery.delete_Project(req.userID, req.params.projectID, req.query.projectName, function(err, success){
             if(success){
+                // Deleting the projects files on the server
                 projectFiles.deleteProject(req.params.projectID, function(err, success){
                     res.send({success: success});
                 });
