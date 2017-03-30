@@ -12,6 +12,25 @@ var gitRepo = require("../../../custom_modules/git_repo");
  * @api {get} /feeds/:projectID?include=structure,content,history Get entire project structure
  * @apiParam {int} :projectID Projects unique ID
  * @apiParam {string="structure", "content", "history"}  [include] To include the structure, content and commit history of the project
+ * @apiParam {string} public_auth_token Public authentication token for the project (unique to all collaborators)
+ * @apiDescription 
+ *      <strong>EXAMPLE REQUEST:</strong> https://contentdevelopercms.eu/feeds/198729?include=structure <br>
+ *      <strong>REQUEST HEADER:</strong> { public_auth_token: 6bb3dfbb7d41c20bdb622e6a2541490879693355 }
+ * @apiSuccessExample {json} Success-Response:
+ * {
+ *      structure: {
+ *          "books": {
+ *              type: "array",
+ *              items: {
+ *                  title: {
+ *                      attributes: {
+ *                          required: "required"
+ *                      }
+ *                  }
+ *              }
+ *          }
+ *      }
+ * }
  * @apiName Get Project Structure
  * @apiGroup Project Structure
  */
@@ -20,6 +39,20 @@ var gitRepo = require("../../../custom_modules/git_repo");
  * @api {get} /feeds/:projectID Get entire project content
  * @apiParam {int} :projectID Projects unique ID
  * @apiParam {string="structure", "content", "history"}  [include] To include the structure, content and commit history of the project
+ * @apiParam {string} public_auth_token Public authentication token for the project (unique to all collaborators)
+ * @apiDescription 
+ *      <strong>EXAMPLE REQUEST:</strong> https://contentdevelopercms.eu/feeds/198729?include=content <br>
+ *      <strong>REQUEST HEADER:</strong> { public_auth_token: 6bb3dfbb7d41c20bdb622e6a2541490879693355 }
+ * @apiSuccessExample {json} Success-Response:
+ * {
+ *      content: {
+ *          books: [
+ *              {
+ *                  title: "A Walk to Remember"
+ *              }
+ *          ]
+ *      }
+ * }
  * @apiName Get Project Content
  * @apiGroup Project Content
  */
@@ -28,6 +61,22 @@ var gitRepo = require("../../../custom_modules/git_repo");
  * @api {get} /feeds/:projectID?include=history Get commit history of project
  * @apiParam {int} :projectID Projects unique ID
  * @apiParam {string="structure", "content", "history"}  [include] To include the structure, content and commit history of the project
+ * @apiParam {string} public_auth_token Public authentication token for the project (unique to all collaborators)
+ * @apiDescription 
+ *      <strong>EXAMPLE REQUEST:</strong> https://contentdevelopercms.eu/feeds/198729?include=history <br>
+ *      <strong>REQUEST HEADER:</strong> { public_auth_token: 6bb3dfbb7d41c20bdb622e6a2541490879693355 }
+ * @apiSuccessExample {json} Success-Response:
+ * {
+ *      content_history: [
+ *          {
+ *              hash: "8766afd68634ea56541b975dece1afcb77795cd8",
+ *              date":"2017-03-30 22:03:43 +0100",
+ *              message":"Content removed: albums",
+ *              author_name: "Laura Pigott",
+ *              author_email: "pigottlaura@gmail.com"
+ *          }
+ *      ]
+ * }
  * @apiName Get Project Commit History
  * @apiGroup Project History
  */
@@ -97,6 +146,23 @@ router.get("/:projectID", function(req, res, next){
  * @apiParam {int} :projectID Projects unique ID
  * @apiParam {string} :itemPath Encapsulation path to item within the project
  * @apiParam {string="structure", "content"} [include] To include the structure and content of the item
+ * @apiParam {string} public_auth_token Public authentication token for the project (unique to all collaborators)
+ * @apiDescription 
+ *      <strong>EXAMPLE REQUEST:</strong> https://contentdevelopercms.eu/feeds/198729/books?include=structure <br>
+ *      <strong>REQUEST HEADER:</strong> { public_auth_token: 6bb3dfbb7d41c20bdb622e6a2541490879693355 }
+ * @apiSuccessExample {json} Success-Response:
+ * {
+ *      structure: {
+ *          type: "array",
+ *          items: {
+ *              title: {
+ *                  attributes: {
+ *                      required: "required"
+ *                  }
+ *              }
+ *          }
+ *      }
+ * }
  * @apiName Get Item Structure
  * @apiGroup Project Structure
  */
@@ -108,6 +174,18 @@ router.get("/:projectID", function(req, res, next){
  * @apiParam {string="structure", "content"} [include] To include the structure and content of the item
  * @apiParam {int} [startAt] Index position to start at (if content is array)
  * @apiParam {int} [numItems] Number of items to return (if content is array)
+ * @apiParam {string} public_auth_token Public authentication token for the project (unique to all collaborators)
+ * @apiDescription 
+ *      <strong>EXAMPLE REQUEST:</strong> https://contentdevelopercms.eu/feeds/198729/books?startAt=0&numItems=1 <br>
+ *      <strong>REQUEST HEADER:</strong> { public_auth_token: 6bb3dfbb7d41c20bdb622e6a2541490879693355 }
+ * @apiSuccessExample {json} Success-Response:
+ * {
+ *      content: [
+ *          {
+ *              title: "A Walk to Remember"
+ *          }
+ *      ]
+ * }
  * @apiName Get Item Content
  * @apiGroup Project Content
  */

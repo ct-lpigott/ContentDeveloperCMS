@@ -567,7 +567,7 @@ function validateContentAgainstStructure(content, structure, accessLevel, conten
 
     // Checking if the content type matches that of the structure (apart from "html"
     // or "link" types, as this will just be strings)
-    if(structure.type != null && structure.type != "html" && structure.type != "link"){
+    if(content != null && structure.type != null && structure.type != "html" && structure.type != "link"){
         if(content.constructor.name.toLowerCase() != structure.type){
             responseObject.errors.push("Incorrect content type provided in request. Expected " + structure.type);
             responseObject.allowed = false;

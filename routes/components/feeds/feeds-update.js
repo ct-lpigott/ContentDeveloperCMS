@@ -11,7 +11,28 @@ var validation = require("../../../custom_modules/validation");
  * @apiVersion 1.0.0
  * @api {put} /feeds/:projectID Update entire project structure
  * @apiParam {int} :projectID Projects unique ID
+ * @apiParam {string} public_auth_token Public authentication token for the project (unique to all collaborators)
  * @apiParam {json} structure JSON to update the projects structure
+ * @apiParam {string} [commit_message] Custom commit message to be used when saving this update
+ * @apiDescription 
+ *      <strong>EXAMPLE REQUEST:</strong> https://contentdevelopercms.eu/feeds/198729 <br>
+ *      <strong>REQUEST HEADER:</strong> { public_auth_token: 6bb3dfbb7d41c20bdb622e6a2541490879693355 } <br>
+ *      <strong>REQUEST BODY:</strong> { "structure": { "albums": { "type": "array", "items": { "artist": { "attributes": { "required": "required" } } } } }, "commit_message": "Changing to albums instead of books" }
+ * @apiSuccessExample {json} Success-Response:
+ * {
+ *      structure: {
+ *          albums: {
+ *              type: "array",
+ *              items: {
+ *                  artist: {
+ *                      attributes: {
+ *                          required: "required"
+ *                      }
+ *                  }
+ *              }
+ *          }
+ *      }
+ * }
  * @apiName Update Project Structure
  * @apiGroup Project Structure
  */
@@ -106,7 +127,24 @@ router.put("/:projectID", function(req, res, next){
  * @apiVersion 1.0.0
  * @api {put} /feeds/:projectID Update entire project content
  * @apiParam {int} :projectID Projects unique ID
+ * @apiParam {string} public_auth_token Public authentication token for the project (unique to all collaborators)
  * @apiParam {any} content Content to be added to the project (datatype depends on project structure)
+ * @apiParam {string} [commit_message] Custom commit message to be used when saving this update
+ * @apiDescription 
+ *      <strong>EXAMPLE REQUEST:</strong> https://contentdevelopercms.eu/feeds/198729 <br>
+ *      <strong>REQUEST HEADER:</strong> { public_auth_token: 6bb3dfbb7d41c20bdb622e6a2541490879693355 } <br>
+ *      <strong>REQUEST BODY:</strong> { "content": { "albums": [ { "artist": "Walking on Cars"} ] }, "commit_message": "Changing to albums instead of books" }
+ * @apiSuccessExample {json} Success-Response:
+ * {
+ *      content: {
+ *          albums: [
+ *              {
+ *                  artist: "Walking on Cars"
+ *              }
+ *          ]
+ *      },
+ *      errors:[] 
+ * }
  * @apiName Update Project Content
  * @apiGroup Project Content
  */
@@ -158,7 +196,21 @@ router.put("/:projectID", function(req, res, next){
  * @api {put} /feeds/:projectID/:itemPath Update encapsulated project content
  * @apiParam {int} :projectID Projects unique ID
  * @apiParam {string} :itemPath Encapsulation path to item within the project
+ * @apiParam {string} public_auth_token Public authentication token for the project (unique to all collaborators)
  * @apiParam {any} content Content to be added to the project (datatype depends on project structure)
+ * @apiDescription 
+ *      <strong>EXAMPLE REQUEST:</strong> https://contentdevelopercms.eu/feeds/198729/albums/0/artist <br>
+ *      <strong>REQUEST HEADER:</strong> { public_auth_token: 6bb3dfbb7d41c20bdb622e6a2541490879693355 } <br>
+ *      <strong>REQUEST BODY:</strong> { "content": "One Direction" }
+ * @apiSuccessExample {json} Success-Response:
+ * {
+ *      content: {
+ *          0: {
+ *              artist: "One Direction"
+ *          }
+ *      },
+ *      errors: []
+ * }
  * @apiName Update Encapsulated Content
  * @apiGroup Project Content
  */

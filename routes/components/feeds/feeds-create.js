@@ -12,7 +12,27 @@ var validation = require("../../../custom_modules/validation");
  * @api {post} /feeds/:projectID/:itemPath Create a new item structure
  * @apiParam {int} :projectID Projects unique ID
  * @apiParam {string} :itemPath Encapsulation path to item within the project
+ * @apiParam {string} public_auth_token Public authentication token for the project (unique to all collaborators)
  * @apiParam {json} structure JSON to be added to to the projects structure
+ * @apiDescription 
+ *      <strong>EXAMPLE REQUEST:</strong> https://contentdevelopercms.eu/feeds/198729/books <br>
+ *      <strong>REQUEST HEADER:</strong> { public_auth_token: 6bb3dfbb7d41c20bdb622e6a2541490879693355 } <br>
+ *      <strong>REQUEST BODY:</strong> { "structure": { "type": "array", "items": { "title": { "attributes": { "required": "required" } } } } }
+ * @apiSuccessExample {json} Success-Response:
+ * {
+ *      structure: {
+ *          books: {
+ *              type: "array",
+ *              items: {
+ *                  title: {
+ *                      attributes: {
+ *                          required: "required"
+ *                      }
+ *                  }
+ *              }
+ *          }
+ *      }
+ * }
  * @apiName Create New Item Structure
  * @apiGroup Project Structure
  */
@@ -360,7 +380,23 @@ router.post("/:projectID/*", function(req, res, next){
  * @api {post} /feeds/:projectID/:itemPath Create a new content item
  * @apiParam {int} :projectID Projects unique ID
  * @apiParam {string} :itemPath Encapsulation path to item within the project
+ * @apiParam {string} public_auth_token Public authentication token for the project (unique to all collaborators)
  * @apiParam {any} content Content to be added to the project (datatype depends on project structure)
+ * @apiDescription 
+ *      <strong>EXAMPLE REQUEST:</strong> https://contentdevelopercms.eu/feeds/198729/books <br>
+ *      <strong>REQUEST HEADER:</strong> { public_auth_token: 6bb3dfbb7d41c20bdb622e6a2541490879693355 } <br>
+ *      <strong>REQUEST BODY:</strong> { "content": [ { "title": "A Walk to Remember"} ] }
+ * @apiSuccessExample {json} Success-Response:
+ * {
+ *      content: {
+ *          books: [
+ *              {
+ *                  title: "A Walk to Remember"
+ *              }
+ *          ]
+ *      },
+ *      errors:[] 
+ * }
  * @apiName Create New Item Content
  * @apiGroup Project Content
  */

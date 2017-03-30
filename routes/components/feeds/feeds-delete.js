@@ -8,6 +8,15 @@ var router = require('express').Router();
  * @api {delete} /feeds/:projectID/:itemPath Delete a content item
  * @apiParam {int} :projectID Projects unique ID
  * @apiParam {string} :itemPath Encapsulation path to item within the project
+ * @apiParam {string} public_auth_token Public authentication token for the project (unique to all collaborators)
+ * @apiDescription 
+ *      <strong>EXAMPLE REQUEST:</strong> https://contentdevelopercms.eu/feeds/198729/books <br>
+ *      <strong>REQUEST HEADER:</strong> { public_auth_token: 6bb3dfbb7d41c20bdb622e6a2541490879693355 }
+ * @apiSuccessExample {json} Success-Response:
+ * {
+ *      content: {},
+ *      errors:[] 
+ * }
  * @apiName Delete Content Item
  * @apiGroup Project Content
  */

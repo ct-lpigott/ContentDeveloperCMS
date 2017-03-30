@@ -37,10 +37,10 @@ var accessLevels = require("../../../custom_modules/access_levels");
  * {
  *      collaborators: [
  *          {
- *              display_name: {string},
- *              user_id: {int},
- *              access_level_int: {int},
- *              access_level_name: {string}
+ *              display_name: "Laura Pigott",
+ *              user_id: 65742,
+ *              access_level_int: 1,
+ *              access_level_name: "Administrator"
  *          }
  *      ],
  *      access_levels: [
@@ -325,7 +325,18 @@ router.post("/", function(req, res, next){
  *      <strong>REQUEST HEADER:</strong> { public_auth_token: 6bb3dfbb7d41c20bdb622e6a2541490879693355 } <br>
  * @apiSuccessExample {json} Success-Response:
  * {
- *      commit_structure: {object}
+ *      commit_structure: {
+ *          books: {
+ *              type: "array",
+ *              items: {
+ *                  title: {
+ *                      attributes: {
+ *                          required: "required"
+ *                      }
+ *                  }
+ *              }
+ *          }
+ *      }
  * }
  * @apiName Preview Commit Content
  * @apiGroup Project History
