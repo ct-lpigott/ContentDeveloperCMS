@@ -44,6 +44,7 @@
     "pug": "^2.0.0-beta6",
     "redirect-https": "^1.1.1",
     "rimraf": "^2.6.1",
+    "session-file-store": "^1.0.0",
     "simple-git": "^1.65.0"
   },
   "devDependencies": {

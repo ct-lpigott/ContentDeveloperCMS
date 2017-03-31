@@ -9,6 +9,7 @@ var multer = require("multer");
 var bodyParser = require('body-parser');
 var checkDirectories = require("./custom_modules/check_directories");
 var session = require("express-session");
+var SessionFileStore = require('session-file-store')(session);
 
 // Checking if the env_config file exists, which 
 // contains a self invoking function, to set up all
@@ -45,7 +46,10 @@ app.use("/", session({
       secure: process.env.DEBUG != "true",
       maxAge: 1000 * 60 * 15 // 15 minutes
     },
-    rolling: true
+    rolling: true,
+    store: new SessionFileStore({
+      path: "./sessions"
+    })
 }));
 
 // Setting the route for all static request to be "/public" i.e. this will deal

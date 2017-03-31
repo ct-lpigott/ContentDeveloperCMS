@@ -8,7 +8,8 @@ var fs = require("fs");
 var requiredDirectories = [
     "./uploads",
     "./projects",
-    "./forever"
+    "./forever",
+    "./sessions"
 ];
 
 // Creating a function to check if a directory exists, and creating it

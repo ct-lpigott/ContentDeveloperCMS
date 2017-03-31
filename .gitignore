@@ -10,3 +10,4 @@ ContentDeveloperCMS-AngularApp
 env_config.js
 server-tests/reports
 documentation/template/api_*
+sessions
