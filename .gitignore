@@ -3,6 +3,7 @@ node_modules
 letsencrypt
 *.sql
 projects/*
+forever
 public/uploads
 !projects/project_template.json
 ContentDeveloperCMS-AngularApp
