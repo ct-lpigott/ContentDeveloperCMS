@@ -420,6 +420,9 @@ var ContentDeveloperServerService = (function () {
     ContentDeveloperServerService.prototype.getCurrentUser = function () {
         return this._currentUser;
     };
+    ContentDeveloperServerService.prototype.getCurrentProjectId = function () {
+        return this._currentProjectId;
+    };
     ContentDeveloperServerService.prototype.getCurrentProjectContent = function () {
         var result = null;
         if (this._currentProjectContentStructureHistory.content != null) {
@@ -2563,6 +2566,7 @@ var WysiwygHtmlComponent = (function () {
     WysiwygHtmlComponent.prototype.ngOnChanges = function (changes) {
         if (changes.itemContent) {
             this.updateTextAreaToItemContent();
+            console.log(this._cursorPosition);
         }
     };
     WysiwygHtmlComponent.prototype.ngDoCheck = function () {
@@ -2574,8 +2578,9 @@ var WysiwygHtmlComponent = (function () {
         }
     };
     WysiwygHtmlComponent.prototype.updateTextAreaToItemContent = function () {
-        if (this._textareaElement != undefined) {
+        if (this._textareaElement != undefined && this._textareaElement.innerHTML.replace(/\"/g, "'") != this.itemContent) {
             this._textareaElement.innerHTML = this.itemContent;
+            this._textareaElement.selectionStart = this._textareaElement.selectionEnd = this._cursorPosition;
         }
     };
     WysiwygHtmlComponent.prototype.undoLastChange = function () {
@@ -2591,6 +2596,7 @@ var WysiwygHtmlComponent = (function () {
     };
     WysiwygHtmlComponent.prototype.updateContent = function () {
         this.itemContent = this._textareaElement.innerHTML.toString().replace(/\"/g, "'");
+        this._textareaElement.selectionStart = this._textareaElement.selectionEnd = this._cursorPosition;
         this.wysiwygContentChanged.emit(this.itemContent);
     };
     WysiwygHtmlComponent.prototype.addImage = function () {
@@ -3394,6 +3400,9 @@ var SettingsViewComponent = (function () {
         this.viewRequestToRefreshSettings = new __WEBPACK_IMPORTED_MODULE_0__angular_core__["G" /* EventEmitter */]();
         this.viewNotifyingOfProjectDeletion = new __WEBPACK_IMPORTED_MODULE_0__angular_core__["G" /* EventEmitter */]();
     }
+    SettingsViewComponent.prototype.ngOnInit = function () {
+        this._projectId = this._cdService.getCurrentProjectId();
+    };
     SettingsViewComponent.prototype.deleteProject = function (projectName) {
         var _this = this;
         if (this.isAdmin && projectName == this.projectSettings.project_name) {
@@ -3407,7 +3416,7 @@ var SettingsViewComponent = (function () {
     };
     SettingsViewComponent.prototype.generateNewPublicAuthToken = function (currentAuthTokenInput) {
         var _this = this;
-        if (currentAuthTokenInput.value != null) {
+        if (this.isAdmin && currentAuthTokenInput.value == this.projectSettings.public_auth_token) {
             this._cdService.generateNewPublicAuthToken(currentAuthTokenInput.value).subscribe(function (responseObject) {
                 if (responseObject.public_auth_token != null) {
                     currentAuthTokenInput.value = "";
@@ -3829,7 +3838,7 @@ module.exports = ""
 /***/ 651:
 /***/ (function(module, exports) {
 
-module.exports = ""
+module.exports = "a {\r\n    text-decoration: none;\r\n    color: initial;\r\n}"
 
 /***/ }),
 
@@ -4011,7 +4020,7 @@ module.exports = "<app-content-view\r\n  [userAccessLevel]=\"3\"\r\n  [projectCo
 /***/ 677:
 /***/ (function(module, exports) {
 
-module.exports = "<ng-container *ngIf=\"_projectId == null && _userAccessLevel == null\">\r\n    <app-user-projects\r\n        (viewProject)=\"viewProject($event)\"\r\n        (viewLoginRequired)=\"viewLoginRequired($event)\"></app-user-projects>\r\n</ng-container>\r\n\r\n<ng-container *ngIf=\"_projectId != null && _userAccessLevel != null\">\r\n    <button (click)=\"viewUserProjects()\">Back to all Projects</button>\r\n    <button (click)=\"refreshProject()\">Refresh from Server</button>\r\n    <app-cms-admin\r\n        *ngIf=\"_userAccessLevel == 1\"\r\n        [errors]=\"errors\"\r\n        [(projectStructure)]=\"projectStructure\"\r\n        [(projectContent)]=\"projectContent\"\r\n        [projectStructureHistory]=\"projectStructureHistory\"\r\n        [projectContentHistory]=\"projectContentHistory\"\r\n        [(projectSettings)]=\"projectSettings\"\r\n        (adminRequestToSaveStructure)=\"saveProjectStructure($event)\"\r\n        (adminRequestToResetStructure)=\"resetProjectStructure()\"\r\n        (adminRequestToSaveContent)=\"saveProjectContent($event)\"\r\n        (adminRequestToResetContent)=\"resetProjectContent()\"\r\n        (adminRequestToRefreshSettings)=\"loadProjectSettings()\"\r\n        (adminNotifyingOfProjectDeletion)=\"projectDeleted()\"\r\n        (adminRequestToDismissErrors)=\"dismissErrors()\">\r\n    </app-cms-admin>\r\n    <app-cms-editor\r\n        *ngIf=\"_userAccessLevel == 2 || _userAccessLevel > 3\"\r\n        [errors]=\"errors\"\r\n        [userAccessLevel]=\"_userAccessLevel\"\r\n        [(projectContent)]=\"projectContent\"\r\n        [projectStructure]=\"projectStructure\"\r\n        [(projectSettings)]=\"projectSettings\"\r\n        [projectContentHistory]=\"projectContentHistory\"\r\n        [customCss]=\"projectSettings != null ? projectSettings.custom_css : ''\"\r\n        (editorRequestToSaveContent)=\"saveProjectContent($event)\"\r\n        (editorRequestToResetContent)=\"resetProjectContent()\"\r\n        (editorRequestToRefreshSettings)=\"loadProjectSettings()\"\r\n        (editorRequestToDismissErrors)=\"dismissErrors()\">\r\n    </app-cms-editor>\r\n    <app-cms-view-only\r\n        *ngIf=\"_userAccessLevel == 3\"\r\n        [projectContent]=\"projectContent\"\r\n        [projectStructure]=\"projectStructure\"\r\n        [customCss]=\"projectSettings != null ? projectSettings.custom_css : ''\">\r\n    </app-cms-view-only>\r\n</ng-container>"
+module.exports = "<ng-container *ngIf=\"_projectId == null && _userAccessLevel == null\">\r\n    <app-user-projects\r\n        (viewProject)=\"viewProject($event)\"\r\n        (viewLoginRequired)=\"viewLoginRequired($event)\"></app-user-projects>\r\n</ng-container>\r\n\r\n<ng-container *ngIf=\"_projectId != null && _userAccessLevel != null\">\r\n    <button (click)=\"refreshProject()\">Refresh from Server</button>\r\n    <button (click)=\"viewUserProjects()\">Back to all Projects</button>\r\n    <button *ngIf=\"_userAccessLevel == 1\"><a [href]=\"'./../feeds/' + _projectId\" target=\"_blank\">View JSON</a></button>\r\n    <app-cms-admin\r\n        *ngIf=\"_userAccessLevel == 1\"\r\n        [errors]=\"errors\"\r\n        [(projectStructure)]=\"projectStructure\"\r\n        [(projectContent)]=\"projectContent\"\r\n        [projectStructureHistory]=\"projectStructureHistory\"\r\n        [projectContentHistory]=\"projectContentHistory\"\r\n        [(projectSettings)]=\"projectSettings\"\r\n        (adminRequestToSaveStructure)=\"saveProjectStructure($event)\"\r\n        (adminRequestToResetStructure)=\"resetProjectStructure()\"\r\n        (adminRequestToSaveContent)=\"saveProjectContent($event)\"\r\n        (adminRequestToResetContent)=\"resetProjectContent()\"\r\n        (adminRequestToRefreshSettings)=\"loadProjectSettings()\"\r\n        (adminNotifyingOfProjectDeletion)=\"projectDeleted()\"\r\n        (adminRequestToDismissErrors)=\"dismissErrors()\">\r\n    </app-cms-admin>\r\n    <app-cms-editor\r\n        *ngIf=\"_userAccessLevel == 2 || _userAccessLevel > 3\"\r\n        [errors]=\"errors\"\r\n        [userAccessLevel]=\"_userAccessLevel\"\r\n        [(projectContent)]=\"projectContent\"\r\n        [projectStructure]=\"projectStructure\"\r\n        [(projectSettings)]=\"projectSettings\"\r\n        [projectContentHistory]=\"projectContentHistory\"\r\n        [customCss]=\"projectSettings != null ? projectSettings.custom_css : ''\"\r\n        (editorRequestToSaveContent)=\"saveProjectContent($event)\"\r\n        (editorRequestToResetContent)=\"resetProjectContent()\"\r\n        (editorRequestToRefreshSettings)=\"loadProjectSettings()\"\r\n        (editorRequestToDismissErrors)=\"dismissErrors()\">\r\n    </app-cms-editor>\r\n    <app-cms-view-only\r\n        *ngIf=\"_userAccessLevel == 3\"\r\n        [projectContent]=\"projectContent\"\r\n        [projectStructure]=\"projectStructure\"\r\n        [customCss]=\"projectSettings != null ? projectSettings.custom_css : ''\">\r\n    </app-cms-view-only>\r\n</ng-container>"
 
 /***/ }),
 
@@ -4116,7 +4125,7 @@ module.exports = "<h3>Collaborators</h3>\n<div class=\"row\">\n  <h4>Add Collabo
 /***/ 692:
 /***/ (function(module, exports) {
 
-module.exports = "<h2>Project Settings</h2>\n<button (click)=\"saveAllProjectSettings()\">Save All</button>\n<button (click)=\"resetAllProjectSettings()\">Reset All</button>\n\n<div *ngIf=\"projectSettings != null\">\n  <div class=\"row\">\n    <div class=\"col-12-12\">\n      <h3>General</h3>\n\n      <div [class]=\"isAdmin ? 'col-6-12' : 'col-12-12'\">\n        <div class=\"row\">\n          <label>Project Name:\n            <input #pnInput type=\"text\" [(ngModel)]=\"projectSettings.project_name\">\n          </label>\n        </div>\n\n        <div class=\"row\" *ngIf=\"isAdmin\">\n          <label>Maximum Content Cache Time (in milliseconds)\n            <input #pmcInput type=\"number\" [(ngModel)]=\"projectSettings.max_cache_age\">ms\n          </label>\n        </div>\n\n        <div class=\"row\" *ngIf=\"isAdmin\">\n          <label>Allowed Update Origins:\n            <textarea [(ngModel)]=\"projectSettings.update_origins\"></textarea>\n          </label>\n          <strong>Public Auth Token:</strong> {{projectSettings.public_auth_token}}\n        </div>\n\n        <div class=\"row\" *ngIf=\"isAdmin\">\n          <label>Allowed Read Origins:\n            <textarea [(ngModel)]=\"projectSettings.read_origins\"></textarea>\n          </label>\n        </div>\n      </div>\n\n      <div class=\"col-6-12\" *ngIf=\"isAdmin\">\n        <div class=\"row\">\n          <label>Custom Content Editor CSS\n            <textarea\n              #cssInput\n              class=\"customCss\"\n              [(ngModel)]=\"projectSettings.custom_css\">\n            </textarea>\n          </label>\n        </div>\n      </div>\n    </div>\n  </div>\n\n  <div class=\"row\">\n    <div [class]=\"isAdmin ? 'col-6-12' : 'col-12-12'\">\n      <app-collaborators\n        [projectSettings]=\"projectSettings\"\n        (collaboratorsUpdated)=\"updateSettings()\"></app-collaborators>\n    </div>\n    <div class=\"col-6-12\" *ngIf=\"isAdmin\">\n      <app-access-levels\n        [projectSettings]=\"projectSettings\"\n        (accessLevelsUpdated)=\"updateSettings()\"></app-access-levels>\n    </div>\n  </div>\n\n  <div class=\"row\" *ngIf=\"isAdmin\">\n    <h3>Delete Project</h3>\n    <div class=\"row\" >\n        <label>Project Name:\n          <input #pName type=\"text\">\n        </label>\n        <button (click)=\"deleteProject(pName.value)\">Confirm Delete (can't undo)</button>\n    </div>\n    <h3>Generate New Public Auth Token</h3>\n    <div class=\"row\">\n        <label>Current Auth Token:\n          <input #aToken type=\"text\">\n        </label>\n        <button (click)=\"generateNewPublicAuthToken(aToken)\">Generate New Token (can't undo)</button>\n    </div>\n  </div>\n</div>"
+module.exports = "<h2>Project Settings</h2>\n<button (click)=\"saveAllProjectSettings()\">Save All</button>\n<button (click)=\"resetAllProjectSettings()\">Reset All</button>\n\n<div *ngIf=\"projectSettings != null\">\n  <div class=\"row\">\n    <div class=\"col-12-12\">\n      <h3>General</h3>\n\n      <div [class]=\"isAdmin ? 'col-6-12' : 'col-12-12'\">\n        <div class=\"row\">\n          <label>Project Name:\n            <input #pnInput type=\"text\" [(ngModel)]=\"projectSettings.project_name\">\n          </label>\n        </div>\n\n        <div class=\"row\" *ngIf=\"isAdmin\">\n          <label>Maximum Content Cache Time (in milliseconds)\n            <input #pmcInput type=\"number\" [(ngModel)]=\"projectSettings.max_cache_age\">ms\n          </label>\n        </div>\n\n        <div class=\"row\" *ngIf=\"isAdmin\">\n          <label>Allowed Update Origins:\n            <textarea [(ngModel)]=\"projectSettings.update_origins\"></textarea>\n          </label>\n        </div>\n\n        <div class=\"row\" *ngIf=\"isAdmin\">\n          <label>Allowed Read Origins:\n            <textarea [(ngModel)]=\"projectSettings.read_origins\"></textarea>\n          </label>\n        </div>\n      </div>\n\n      <div class=\"col-6-12\" *ngIf=\"isAdmin\">\n        <div class=\"row\">\n          <label>Custom Content Editor CSS\n            <textarea\n              #cssInput\n              class=\"customCss\"\n              [(ngModel)]=\"projectSettings.custom_css\">\n            </textarea>\n          </label>\n        </div>\n      </div>\n    </div>\n  </div>\n\n  <div class=\"row\" *ngIf=\"isAdmin\">\n    <h3>Project Credentials</h3>\n    <div class=\"row\" >\n        <strong>Project ID:</strong> {{_projectId}}<br>\n        <strong>Public Auth Token:</strong> {{projectSettings.public_auth_token}}\n    </div>\n  </div>\n\n  <div class=\"row\">\n    <div [class]=\"isAdmin ? 'col-6-12' : 'col-12-12'\">\n      <app-collaborators\n        [projectSettings]=\"projectSettings\"\n        (collaboratorsUpdated)=\"updateSettings()\"></app-collaborators>\n    </div>\n    <div class=\"col-6-12\" *ngIf=\"isAdmin\">\n      <app-access-levels\n        [projectSettings]=\"projectSettings\"\n        (accessLevelsUpdated)=\"updateSettings()\"></app-access-levels>\n    </div>\n  </div>\n\n  <div class=\"row\" *ngIf=\"isAdmin\">\n    <h3>Danger Zone</h3>\n    <h4>Delete Project</h4>\n    <div class=\"row\" >\n        <label>Project Name:\n          <input #pName type=\"text\">\n        </label>\n        <button (click)=\"deleteProject(pName.value)\">Confirm Delete (can't undo)</button>\n    </div>\n    <h4>Generate New Public Auth Token</h4>\n    <div class=\"row\">\n        <label>Current Auth Token:\n          <input #aToken type=\"text\">\n        </label>\n        <button (click)=\"generateNewPublicAuthToken(aToken)\">Generate New Token (can't undo)</button>\n    </div>\n  </div>\n</div>"
 
 /***/ }),
 
