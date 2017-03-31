@@ -69,6 +69,7 @@ router.get("/logout", function(req, res, next){
     // (using the feeds errors route)
     req.session.destroy();
     req.userID = null;
+    res.clearCookie("connect.sid");
     next(new Error("loginRequired"));
 });
 

@@ -38,7 +38,7 @@ router.get("/oauthRedirectURL", function(req, res, next){
         // from the users login to their Google account
         oauth2Client.getToken(authCode, function(err, token) {
             console.log("Got token - " + token);
-            if(err) {
+            if(err || token == null) {
                 console.log("Error while trying to retrieve access token " + err);
                 next();
             } else {
@@ -74,9 +74,14 @@ router.get("/oauthRedirectURL", function(req, res, next){
                         var refreshToken = token.refresh_token;
 
                         console.log("Got user - " + user.displayName);
+                        if(user.emails != null && user.emails.length > 0){
+                            console.log("User email - " + user.emails[0].value);
+                        }
 
                         // Checking if the user exists, and if not, then creating them
                         dbQuery.check_User(user.emails[0].value, function(err, userId){
+                            console.log("Found user - " + userId);
+                            console.log(err);
                             // Getting the details of this user (either new or existing)
                             dbQuery.get_User("cd_user_auth_token", userId, function(err, row){
                                 if(row != null && row.cd_user_auth_token != null){

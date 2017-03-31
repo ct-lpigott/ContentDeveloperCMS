@@ -49,7 +49,8 @@ app.use("/", session({
     rolling: true,
     store: new SessionFileStore({
       path: "./sessions",
-      secret: process.env.SESSION_STORE_KEY
+      secret: process.env.SESSION_STORE_KEY,
+      retries: 1
     })
 }));
 
