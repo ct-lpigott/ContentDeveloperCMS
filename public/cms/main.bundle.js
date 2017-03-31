@@ -1253,10 +1253,11 @@ var StructureViewComponent = (function () {
     StructureViewComponent.prototype.resetProjectStructure = function () {
         this.viewRequestToResetStructure.emit();
     };
-    StructureViewComponent.prototype.saveProjectStructure = function () {
+    StructureViewComponent.prototype.saveProjectStructure = function (commitMessage) {
         if (this.projectStructure != null) {
             var structureData = {
-                structure: this.projectStructure
+                structure: this.projectStructure,
+                commit_message: commitMessage != null ? commitMessage : "Update to entire structure of project"
             };
             this.viewRequestToSaveStructure.emit(structureData);
         }
@@ -1631,6 +1632,7 @@ var CmsComponent = (function () {
     CmsComponent.prototype.refreshProject = function () {
         console.log("REFRESH");
         this.loadProjectContentAndStructure();
+        this.loadProjectSettings();
     };
     CmsComponent.prototype.resetProjectContent = function () {
         this.projectContent = this._cdService.getCurrentProjectContent();
@@ -1764,6 +1766,9 @@ var CodeEditorComponent = (function () {
         if (this._textarea != null && this._textarea.selectionStart == this.codeJson.length) {
             this._textarea.setSelectionRange(this._cursorPosition, this._cursorPosition);
         }
+        if (this.codeJson != null && this.codeJson instanceof Array) {
+            this.codeJson = this.codeJson.join();
+        }
     };
     CodeEditorComponent.prototype.formatJsonClicked = function () {
         this._formatJson = true;
@@ -1774,8 +1779,9 @@ var CodeEditorComponent = (function () {
         this._updateFromStructure = true;
     };
     CodeEditorComponent.prototype.saveProjectStructureClicked = function () {
-        this.requestToSaveProjectStructure.emit();
+        this.requestToSaveProjectStructure.emit(this._commitMessage);
         this._updateFromStructure = true;
+        this._commitMessage = null;
     };
     CodeEditorComponent.prototype.onKeyUp = function (e) {
         this._formatStructureJson(e);
@@ -1845,7 +1851,7 @@ var CodeEditorComponent = (function () {
     };
     __decorate([
         __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["w" /* Input */])(), 
-        __metadata('design:type', String)
+        __metadata('design:type', Object)
     ], CodeEditorComponent.prototype, "codeJson", void 0);
     __decorate([
         __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["T" /* Output */])(), 
@@ -2159,9 +2165,10 @@ var ContentEditorComponent = (function () {
     ContentEditorComponent.prototype.saveProjectContent = function () {
         this._updateErrors(true);
         var contentData = {
-            commit_message: "Update to content of '" + this.currentCollectionName + "'"
+            commit_message: this._commitMessage != null ? this._commitMessage : "Update to content of '" + this.currentCollectionName + "'"
         };
         this.requestToSaveProjectContent.emit(contentData);
+        this._commitMessage = null;
     };
     ContentEditorComponent.prototype.resetProjectContent = function () {
         this.requestToResetProjectContent.emit();
@@ -3992,7 +3999,7 @@ module.exports = "<div class=\"row\">\n  <app-history-display\n    [history]=\"p
 /***/ 673:
 /***/ (function(module, exports) {
 
-module.exports = "<div class=\"col-6-12\">\r\n  <h2>Project Structure</h2>\r\n  <app-code-editor\r\n    [codeJson]=\"projectStructureJson\"\r\n    (codeUpdated)=\"codeUpdated($event)\"\r\n    (requestToResetProjectStructure)=\"resetProjectStructure()\"\r\n    (requestToSaveProjectStructure)=\"saveProjectStructure()\">\r\n  </app-code-editor>\r\n</div>\r\n<div class=\"col-6-12\">\r\n  <h2>Input Preview</h2>\r\n  <div *ngIf=\"projectStructure != null\">\r\n    <app-content-editor\r\n      [viewContent]=\"false\"\r\n      [viewOnly]=\"false\"\r\n      [projectStructure]=\"projectStructure\"\r\n      (structureCollectionTabsReordered)=\"structureCollectionTabsReordered($event)\">\r\n    </app-content-editor>\r\n  </div>\r\n</div>"
+module.exports = "<div class=\"col-6-12\">\r\n  <h2>Project Structure</h2>\r\n  <app-code-editor\r\n    [codeJson]=\"projectStructureJson\"\r\n    (codeUpdated)=\"codeUpdated($event)\"\r\n    (requestToResetProjectStructure)=\"resetProjectStructure()\"\r\n    (requestToSaveProjectStructure)=\"saveProjectStructure($event)\">\r\n  </app-code-editor>\r\n</div>\r\n<div class=\"col-6-12\">\r\n  <h2>Input Preview</h2>\r\n  <div *ngIf=\"projectStructure != null\">\r\n    <app-content-editor\r\n      [viewContent]=\"false\"\r\n      [viewOnly]=\"false\"\r\n      [projectStructure]=\"projectStructure\"\r\n      (structureCollectionTabsReordered)=\"structureCollectionTabsReordered($event)\">\r\n    </app-content-editor>\r\n  </div>\r\n</div>"
 
 /***/ }),
 
@@ -4034,7 +4041,7 @@ module.exports = "<div class=\"row\">\n\t<nav>\n\t\t<ul [class]=\"userAccessLeve
 /***/ 679:
 /***/ (function(module, exports) {
 
-module.exports = "<textarea\n  [(ngModel)]=\"codeJson\">\n</textarea>\n<button (click)=\"formatJsonClicked()\">Format JSON</button>\n<button (click)=\"resetProjectStructureClicked()\">Reset</button>\n<button (click)=\"saveProjectStructureClicked()\">Save</button>"
+module.exports = "<div class=\"row\">\n  <button (click)=\"formatJsonClicked()\">Format JSON</button>\n  <button (click)=\"resetProjectStructureClicked()\">Reset</button>\n  <button (click)=\"saveProjectStructureClicked()\">Save</button>\n  <label>Commit Message:\n    <input\n      type=\"text\"\n      [(ngModel)]=\"_commitMessage\">\n  </label>\n<textarea\n  [(ngModel)]=\"codeJson\">\n</textarea>\n"
 
 /***/ }),
 
@@ -4055,7 +4062,7 @@ module.exports = "<h3 *ngIf=\"subCollection\">{{collection | title}}</h3>\r\n<br
 /***/ 682:
 /***/ (function(module, exports) {
 
-module.exports = "<div *ngIf=\"projectStructure != null\">\r\n  <div *ngIf=\"viewContent && viewOnly == false\" class=\"row\">\r\n    <button (click)=\"saveProjectContent()\">Save</button>\r\n    <button (click)=\"resetProjectContent()\">Reset</button>\r\n  </div>\r\n<app-errors\r\n\t[errors]=\"_contentErrors | keyValArray : 'values'\"\r\n\t(requestToDismissErrors)=\"requestToDismissErrors($event)\"></app-errors>\r\n  <div class=\"row\">\r\n    <div class=\"col-2-12\">\r\n        <div *ngIf=\"projectStructure != null\">\r\n          <app-draggable-container\r\n            [content]=\"projectStructure\"\r\n            [contentEncapsulationPath]=\"\"\r\n            [contentType]=\"object\"\r\n            (contentReordered)=\"collectionTabsReordered($event)\">\r\n            <ng-container *ngFor=\"let collection of projectStructure | keyValArray : 'keys'\">\r\n              <div *ngIf=\"userAccessLevel <= 2 || projectStructure[collection].no_access == null || (projectStructure[collection].no_access != null && projectStructure[collection].no_access.indexOf(userAccessLevel) < 0)\"\r\n                [draggable]=\"viewContent == false\"\r\n                [attr.data-key]=\"collection\"\r\n                (click)=\"viewCollection(collection)\"\r\n                [class]=\"(collection === currentCollectionName ? 'active ' : '')  + 'collectionTab'\">{{collection | title}}\r\n              </div>\r\n            </ng-container>\r\n          </app-draggable-container>\r\n        </div>\r\n    </div>\r\n    <div class=\"col-10-12\">\r\n      <ng-container *ngIf=\"currentCollectionName != null && (userAccessLevel <= 2 || projectStructure[currentCollectionName].no_access == null || (projectStructure[currentCollectionName].no_access != null && projectStructure[currentCollectionName].no_access.indexOf(userAccessLevel) < 0))\">\r\n        <h2>{{currentCollectionName | title}}</h2>\r\n        <form>\r\n          <app-collection\r\n            [userAccessLevel]=\"userAccessLevel\"\r\n            [topLevelCollection]=\"true\"\r\n            [encapsulationPath]=\"currentCollectionName\"\r\n            [collection]=\"currentCollectionName\"\r\n            [projectContent]=\"projectContent\"\r\n            [projectStructure]=\"projectStructure\"\r\n            [viewContent]=\"viewContent\"\r\n            [viewOnly]=\"viewOnly\"\r\n            (contentChanged)=\"projectContentChanged($event)\">\r\n          </app-collection>\r\n        </form>\r\n      </ng-container>\r\n    </div>\r\n  </div>\r\n</div>\r\n"
+module.exports = "<div *ngIf=\"projectStructure != null\">\r\n  <ng-container *ngIf=\"viewContent && viewOnly == false\">\r\n    <div class=\"row\">\r\n      <button (click)=\"resetProjectContent()\">Reset</button>\r\n      <button (click)=\"saveProjectContent()\">Save</button>\r\n      <label>Commit Message:\r\n        <input\r\n          type=\"text\"\r\n          [(ngModel)]=\"_commitMessage\">\r\n      </label>\r\n    </div>\r\n  </ng-container>\r\n<app-errors\r\n\t[errors]=\"_contentErrors | keyValArray : 'values'\"\r\n\t(requestToDismissErrors)=\"requestToDismissErrors($event)\"></app-errors>\r\n  <div class=\"row\">\r\n    <div class=\"col-2-12\">\r\n        <div *ngIf=\"projectStructure != null\">\r\n          <app-draggable-container\r\n            [content]=\"projectStructure\"\r\n            [contentEncapsulationPath]=\"\"\r\n            [contentType]=\"object\"\r\n            (contentReordered)=\"collectionTabsReordered($event)\">\r\n            <ng-container *ngFor=\"let collection of projectStructure | keyValArray : 'keys'\">\r\n              <div *ngIf=\"userAccessLevel <= 2 || projectStructure[collection].no_access == null || (projectStructure[collection].no_access != null && projectStructure[collection].no_access.indexOf(userAccessLevel) < 0)\"\r\n                [draggable]=\"viewContent == false\"\r\n                [attr.data-key]=\"collection\"\r\n                (click)=\"viewCollection(collection)\"\r\n                [class]=\"(collection === currentCollectionName ? 'active ' : '')  + 'collectionTab'\">{{collection | title}}\r\n              </div>\r\n            </ng-container>\r\n          </app-draggable-container>\r\n        </div>\r\n    </div>\r\n    <div class=\"col-10-12\">\r\n      <ng-container *ngIf=\"currentCollectionName != null && (userAccessLevel <= 2 || projectStructure[currentCollectionName].no_access == null || (projectStructure[currentCollectionName].no_access != null && projectStructure[currentCollectionName].no_access.indexOf(userAccessLevel) < 0))\">\r\n        <h2>{{currentCollectionName | title}}</h2>\r\n        <form>\r\n          <app-collection\r\n            [userAccessLevel]=\"userAccessLevel\"\r\n            [topLevelCollection]=\"true\"\r\n            [encapsulationPath]=\"currentCollectionName\"\r\n            [collection]=\"currentCollectionName\"\r\n            [projectContent]=\"projectContent\"\r\n            [projectStructure]=\"projectStructure\"\r\n            [viewContent]=\"viewContent\"\r\n            [viewOnly]=\"viewOnly\"\r\n            (contentChanged)=\"projectContentChanged($event)\">\r\n          </app-collection>\r\n        </form>\r\n      </ng-container>\r\n    </div>\r\n  </div>\r\n</div>\r\n"
 
 /***/ }),
 
