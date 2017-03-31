@@ -68,7 +68,7 @@ function commitToRepo(projectId, userId, filesToAdd, commitMessage, cb){
                     .addConfig("user.name", userDetails.displayName)
                     .addConfig("user.email", userDetails.emailAddress)
                     .add(filesToAdd)
-                    .commit(commitMessage, function(){
+                    .commit(commitMessage, function(err){
                         cb(err, true);
                     }); 
             });
