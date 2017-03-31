@@ -209,18 +209,33 @@ function removeAccessLevel(adminUserId, projectId, accessLevelInt, cb){
             if(currentAccessLevels != null){
                 // Checking that the access level exists, before trying to delete it
                 if(accessLevelExists(accessLevelInt, currentAccessLevels)){
-                    // Looping through the projects access levels to find the index
-                    // of the one to delete, and splicing it from the access levels array
-                    for(var i=0; i<currentAccessLevels.length; i++){
-                        if(currentAccessLevels[i].access_level_int == accessLevelInt){
-                            currentAccessLevels.splice(i, 1);
+                    // Appending the "in_use" property to all access levels (as you cant delete
+                    // an access level that is in use)
+                    appendAccessLevelsInUse(projectId, currentAccessLevels, function(currentAccessLevels){
+                        var accessLevelRemoved = false;
+                        // Looping through the projects access levels to find the index
+                        // of the one to delete, and splicing it from the access levels array
+                        for(var i=0; i<currentAccessLevels.length; i++){
+                            if(currentAccessLevels[i].access_level_int == accessLevelInt){
+                                if(!currentAccessLevels[i].in_use){
+                                    currentAccessLevels.splice(i, 1);
+                                    accessLevelRemoved = true;
+                                }
+                            }
                         }
-                    }
-                    // Updating this projects access levels (which will save the updated 
-                    // access levels to the database)
-                    updateProjectAccessLevels(adminUserId, projectId, currentAccessLevels, function(success){
-                        cb(success);
+
+                        if(accessLevelRemoved){
+                            // Updating this projects access levels (which will save the updated 
+                            // access levels to the database)
+                            updateProjectAccessLevels(adminUserId, projectId, currentAccessLevels, function(success){
+                                cb(success);
+                            });
+                        } else {
+                            cb(false);
+                        }
+                        
                     });
+                    
                 } else {
                     console.log("This access level does not exist");
                     cb(false);
