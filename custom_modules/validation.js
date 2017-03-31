@@ -577,132 +577,134 @@ function validateContentAgainstStructure(content, structure, accessLevel, conten
 
     // Checking that the user has to appropriate access level to update this content
     if(checkAccessLevelAllowedUpdate(structure, accessLevel, responseObject)){
-        if(structure.attributes != null){
-            // Checking if the content matches the attriubtes
-            var attributeCheck = checkIfPropertyMatchesAttributes(contentName, content, structure.attributes, structure.type, responseObject);
-            if(attributeCheck.allowed){
-                responseObject.sanitisedContent = attributeCheck.sanitisedContent;
-            } else {
-                responseObject.allowed = false;
-            }
-        } else if(structure.items != null){
-            // Determing whether these items are to be stored in an array or an object
-            // based on whether or not a structure type has been defined (no type = object)
-            switch(structure.type){
-                case "array": {
-                    // Looping through the content array
-                    for(var i=0; i<content.length; i++){
-                        
-                        // Checking for properties that are not defined
-                        for(var itemProperty in content[i]){
-                            var structureExists = checkIfPropertyHasStructure(itemProperty, structure["items"], structure.type, responseObject);
-                            if(structureExists == false){
-                                // Removing any properties that do not have a structure
-                                delete responseObject.sanitisedContent[i][itemProperty];
-                            }
-                        }
-                        
-                        // Checking for properties that are defined
-                        for(var property in structure["items"]){
-                            if(structure["items"][property]["attributes"] != null){
-                                // If the properties in the items have attriubtes, then checking 
-                                // if the value matches the attriubtes
-                                var attributeCheck = checkIfPropertyMatchesAttributes(property, content[i][property], structure["items"][property]["attributes"], structure["items"][property].type, responseObject);
-                                if(attributeCheck.allowed){
-                                    responseObject.sanitisedContent[i][property] = attributeCheck.sanitisedContent;
-                                } else {
-                                    responseObject.sanitisedContent[i][property] = "";
+        if(content != null){
+            if(structure.attributes != null){
+                // Checking if the content matches the attriubtes
+                var attributeCheck = checkIfPropertyMatchesAttributes(contentName, content, structure.attributes, structure.type, responseObject);
+                if(attributeCheck.allowed){
+                    responseObject.sanitisedContent = attributeCheck.sanitisedContent;
+                } else {
+                    responseObject.allowed = false;
+                }
+            } else if(structure.items != null){
+                // Determing whether these items are to be stored in an array or an object
+                // based on whether or not a structure type has been defined (no type = object)
+                switch(structure.type){
+                    case "array": {
+                        // Looping through the content array
+                        for(var i=0; i<content.length; i++){
+                            
+                            // Checking for properties that are not defined
+                            for(var itemProperty in content[i]){
+                                var structureExists = checkIfPropertyHasStructure(itemProperty, structure["items"], structure.type, responseObject);
+                                if(structureExists == false){
+                                    // Removing any properties that do not have a structure
+                                    delete responseObject.sanitisedContent[i][itemProperty];
                                 }
-                            } else if(structure["items"][property]["items"] != null){  
-                                // If the properties in the items have items themselves, then
-                                // calling this function on itself, as these will need to be checked
-                                // seperatley       
-                                var contentValidation = validateContentAgainstStructure(content[i][property], structure["items"][property], accessLevel, property);
-                                if(contentValidation.allowed){
-                                    responseObject.sanitisedContent[i][property] = contentValidation.sanitisedContent;
+                            }
+                            
+                            // Checking for properties that are defined
+                            for(var property in structure["items"]){
+                                if(structure["items"][property]["attributes"] != null){
+                                    // If the properties in the items have attriubtes, then checking 
+                                    // if the value matches the attriubtes
+                                    var attributeCheck = checkIfPropertyMatchesAttributes(property, content[i][property], structure["items"][property]["attributes"], structure["items"][property].type, responseObject);
+                                    if(attributeCheck.allowed){
+                                        responseObject.sanitisedContent[i][property] = attributeCheck.sanitisedContent;
+                                    } else {
+                                        responseObject.sanitisedContent[i][property] = "";
+                                    }
+                                } else if(structure["items"][property]["items"] != null){  
+                                    // If the properties in the items have items themselves, then
+                                    // calling this function on itself, as these will need to be checked
+                                    // seperatley       
+                                    var contentValidation = validateContentAgainstStructure(content[i][property], structure["items"][property], accessLevel, property);
+                                    if(contentValidation.allowed){
+                                        responseObject.sanitisedContent[i][property] = contentValidation.sanitisedContent;
+                                    } else {
+                                        // Deleting any properties from the array items that are not allowed
+                                        delete responseObject.sanitisedContent[i][property];
+                                    }
+                                    // Looping through any errors returned from the validation, and storing them on the
+                                    // response object (to be sent back to the user in the response). Some of these
+                                    // errors may have been resolved (values removed/sanitised etc) but still
+                                    // want to notify them, as the content may have changed to reflect these
+                                    for(var i=0; i<contentValidation.errors.length; i++){
+                                        responseObject.errors.push(contentValidation.errors[i]);
+                                    }
                                 } else {
-                                    // Deleting any properties from the array items that are not allowed
+                                    // Since this items structure had neither "item" nor "attributes", 
+                                    // this content cannot be created/updated
+                                    responseObject.errors(property + " does not have a structure defined");
                                     delete responseObject.sanitisedContent[i][property];
                                 }
-                                // Looping through any errors returned from the validation, and storing them on the
-                                // response object (to be sent back to the user in the response). Some of these
-                                // errors may have been resolved (values removed/sanitised etc) but still
-                                // want to notify them, as the content may have changed to reflect these
-                                for(var i=0; i<contentValidation.errors.length; i++){
-                                    responseObject.errors.push(contentValidation.errors[i]);
-                                }
-                            } else {
-                                // Since this items structure had neither "item" nor "attributes", 
-                                // this content cannot be created/updated
-                                responseObject.errors(property + " does not have a structure defined");
-                                delete responseObject.sanitisedContent[i][property];
                             }
+                            
                         }
-                        
+                        break;
                     }
-                    break;
-                }
-                default: {
-                    // Checking for properties that are not defined
-                    for(var key in content){
-                        var structureExists = checkIfPropertyHasStructure(key, structure["items"], structure.type, responseObject);
-                        if(structureExists == false){
-                            // Removing any properties that do not have a structure defined
-                            delete responseObject.sanitisedContent[key];
-                        }                     
-                    }
-                    // Checking for properties that are defined
-                    for(var property in structure["items"]){
-                        // Checking that the user has the appropriate access level to update
-                        // the next level of content
-                        if(checkAccessLevelAllowedUpdate(structure["items"][property], accessLevel, responseObject)){
-                            if(structure["items"][property]["attributes"] != null){
-                                // If the property in the items has attriubtes, then checking if the content
-                                // matches the attriubtes
-                                var attributeCheck = checkIfPropertyMatchesAttributes(property, content[property], structure["items"][property]["attributes"], structure["items"][property].type, responseObject);
-                                if(attributeCheck.allowed){
-                                    responseObject.sanitisedContent[property] = attributeCheck.sanitisedContent;
+                    default: {
+                        // Checking for properties that are not defined
+                        for(var key in content){
+                            var structureExists = checkIfPropertyHasStructure(key, structure["items"], structure.type, responseObject);
+                            if(structureExists == false){
+                                // Removing any properties that do not have a structure defined
+                                delete responseObject.sanitisedContent[key];
+                            }                     
+                        }
+                        // Checking for properties that are defined
+                        for(var property in structure["items"]){
+                            // Checking that the user has the appropriate access level to update
+                            // the next level of content
+                            if(checkAccessLevelAllowedUpdate(structure["items"][property], accessLevel, responseObject)){
+                                if(structure["items"][property]["attributes"] != null){
+                                    // If the property in the items has attriubtes, then checking if the content
+                                    // matches the attriubtes
+                                    var attributeCheck = checkIfPropertyMatchesAttributes(property, content[property], structure["items"][property]["attributes"], structure["items"][property].type, responseObject);
+                                    if(attributeCheck.allowed){
+                                        responseObject.sanitisedContent[property] = attributeCheck.sanitisedContent;
+                                    } else {
+                                        responseObject.sanitisedContent[property] = "";
+                                    }
+                                } else if(structure["items"][property]["items"] != null){
+                                    // If the properties in the items have items themselves, then
+                                    // calling this function on itself, as these will need to be checked
+                                    // seperatley 
+                                    var contentValidation = validateContentAgainstStructure(content[property], structure["items"][property], accessLevel, property);
+                                    if(contentValidation.allowed){
+                                        responseObject.sanitisedContent[property] = contentValidation.sanitisedContent;
+                                    } else {
+                                        // Deleting this property from the content, as it is not allowed
+                                        delete responseObject.sanitisedContent[property];
+                                    }
+                                    // Looping through any errors returned from the validation, and storing them on the
+                                    // response object (to be sent back to the user in the response). Some of these
+                                    // errors may have been resolved (values removed/sanitised etc) but still
+                                    // want to notify them, as the content may have changed to reflect these
+                                    for(var i=0; i<contentValidation.errors.length; i++){
+                                        responseObject.errors.push(contentValidation.errors[i]);
+                                    }
                                 } else {
-                                    responseObject.sanitisedContent[property] = "";
-                                }
-                            } else if(structure["items"][property]["items"] != null){
-                                // If the properties in the items have items themselves, then
-                                // calling this function on itself, as these will need to be checked
-                                // seperatley 
-                                var contentValidation = validateContentAgainstStructure(content[property], structure["items"][property], accessLevel, property);
-                                if(contentValidation.allowed){
-                                    responseObject.sanitisedContent[property] = contentValidation.sanitisedContent;
-                                } else {
-                                    // Deleting this property from the content, as it is not allowed
+                                    // Since this items structure had neither "item" nor "attributes", 
+                                    // this content cannot be created/updated
                                     delete responseObject.sanitisedContent[property];
-                                }
-                                // Looping through any errors returned from the validation, and storing them on the
-                                // response object (to be sent back to the user in the response). Some of these
-                                // errors may have been resolved (values removed/sanitised etc) but still
-                                // want to notify them, as the content may have changed to reflect these
-                                for(var i=0; i<contentValidation.errors.length; i++){
-                                    responseObject.errors.push(contentValidation.errors[i]);
+                                    responseObject.errors.push(property + " does not have a structure defined and has been removed");
                                 }
                             } else {
-                                // Since this items structure had neither "item" nor "attributes", 
-                                // this content cannot be created/updated
-                                delete responseObject.sanitisedContent[property];
-                                responseObject.errors.push(property + " does not have a structure defined and has been removed");
+                                // This user did not have permission to update/create this content
+                                // An error will already have been added to the response object
+                                delete content[property];
                             }
-                        } else {
-                            // This user did not have permission to update/create this content
-                            // An error will already have been added to the response object
-                            delete content[property];
                         }
+                        break;
                     }
-                    break;
                 }
+            }  else {
+                // Since this items structure doesnt have "attributes" or "items", it cannot be
+                // updated or created
+                responseObject.errors.push("This content does not have a structure defined");
+                responseObject.allowed = false;
             }
-        }  else {
-            // Since this items structure doesnt have "attributes" or "items", it cannot be
-            // updated or created
-            responseObject.errors.push("This content does not have a structure defined");
-            responseObject.allowed = false;
         }
     } else {
         // Since this user does not have the appropriate access level to update this
