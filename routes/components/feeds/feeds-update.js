@@ -38,87 +38,62 @@ var validation = require("../../../custom_modules/validation");
  */
 router.put("/:projectID", function(req, res, next){
     // Determining the level of access this user has to this project
-    switch(req.user_access_level){
-        case 1: {
-            if(req.body.structure != null){
-                // Transforming the project structure within the request body to lowercase,
-                // as the project structure should not contain uppercase characters
-                if(typeof req.body.structure != "string"){
-                    if(validation.objectToJson(req.body.structure)){
-                        req.body.structure = JSON.stringify(req.body.structure);
-                    } else {
-                        next(new Error("Invalid structure"));
-                    }
-                }
-                req.body.structure = req.body.structure.toLowerCase();                   
-
-                if(validation.jsonToObject(req.body.structure)){
-                    var structureValidation = validation.validateNewStructure(null, JSON.parse(req.body.structure));
-                    if(structureValidation.allowed){
-                        req.fileData.admin.project_structure = structureValidation.sanitisedStructure;
-
-                        console.log("Entire contents of project structure updated");
-                        if(req.body.short_commit_id != null){
-                            req.gitCommitMessage = "Project structure rolled back to commit id: " + req.body.short_commit_id;
-                        } else if(req.body.commit_message != null){
-                            req.gitCommitMessage = req.body.commit_message;
-                        } else {
-                            req.gitCommitMessage = "Update to entire structure of project";
-                        }
-                        req.updateFile = "structure";
-                    }
-                    for(var i=0; i<structureValidation.errors.length; i++){
-                        req.feedsErrors.push(structureValidation.errors[i]);
-                    }
-                    next();
-                } else {
-                    // This is not a valid JSON object. Adding this as an 
-                    // error to the feedsErrors array.
-                    req.feedsErrors.push("This is not valid JSON. Cannot update the project structure");
-
-                    // Since this is a significant issue, passing this request to the feeds-errors
-                    // route, by calling the next method with an empty error (as all errors will be
-                    // accessible from the feedsErrors array).
-                    next(new Error());
-                }
-
-                
-            } else if(req.body.content != null){
-                // Passing this request to the next stage of the router, so that the content
-                // can be updated
-                next();
+    if(req.body.structure != null){
+        // Transforming the project structure within the request body to lowercase,
+        // as the project structure should not contain uppercase characters
+        if(typeof req.body.structure != "string"){
+            if(validation.objectToJson(req.body.structure)){
+                req.body.structure = JSON.stringify(req.body.structure);
             } else {
-                // No structure or content were included in the request. Adding this as an 
-                // error to the feedsErrors array.
-                req.feedsErrors.push("No project content or structure included in the request");
-
-                // Since this is a significant issue, passing this request to the feeds-errors
-                // route, by calling the next method with an empty error (as all errors will be
-                // accessible from the feedsErrors array).
-                next(new Error());
+                next(new Error("Invalid structure"));
             }
-            break;
         }
-        default: {
-            // Checking if the user has included content in the request body
-            if(req.body.content != null){
-                // Passing this request to the next stage of the router, so that the content
-                // can be updated
-                next();
-            } else {
-                // Logging this error to the console
-                console.log(err);
+        req.body.structure = req.body.structure.toLowerCase();                   
 
-                // No content were included in the request. Adding this as an error to the 
-                // feedsErrors array.
-                req.feedsErrors.push("No project content included in the request");
+        if(validation.jsonToObject(req.body.structure)){
+            var structureValidation = validation.validateNewStructure(null, JSON.parse(req.body.structure));
+            if(structureValidation.allowed){
+                req.fileData.admin.project_structure = structureValidation.sanitisedStructure;
 
-                // Since this is a significant issue, passing this request to the feeds-errors
-                // route, by calling the next method with an empty error (as all errors will be
-                // accessible from the feedsErrors array).
-                next(new Error());
+                console.log("Entire contents of project structure updated");
+                if(req.body.short_commit_id != null){
+                    req.gitCommitMessage = "Project structure rolled back to commit id: " + req.body.short_commit_id;
+                } else if(req.body.commit_message != null){
+                    req.gitCommitMessage = req.body.commit_message;
+                } else {
+                    req.gitCommitMessage = "Update to entire structure of project";
+                }
+                req.updateFile = "structure";
             }
-            break;
+            for(var i=0; i<structureValidation.errors.length; i++){
+                req.feedsErrors.push(structureValidation.errors[i]);
+            }
+            next();
+        } else {
+            // This is not a valid JSON object. Adding this as an 
+            // error to the feedsErrors array.
+            req.feedsErrors.push("This is not valid JSON. Cannot update the project structure");
+
+            // Since this is a significant issue, passing this request to the feeds-errors
+            // route, by calling the next method with an empty error (as all errors will be
+            // accessible from the feedsErrors array).
+            next(new Error());
+        }
+    } else {
+        // Checking if the user has included content in the request body
+        if(req.body.content != null){
+            // Passing this request to the next stage of the router, so that the content
+            // can be updated
+            next();
+        } else {
+            // No structure or content were included in the request. Adding this as an 
+            // error to the feedsErrors array.
+            req.feedsErrors.push("No project content or structure included in the request");
+
+            // Since this is a significant issue, passing this request to the feeds-errors
+            // route, by calling the next method with an empty error (as all errors will be
+            // accessible from the feedsErrors array).
+            next(new Error()); 
         }
     }
 });
@@ -149,7 +124,7 @@ router.put("/:projectID", function(req, res, next){
  * @apiGroup Project Content
  */
 router.put("/:projectID", function(req, res, next){
-    if(req.body.content != null){
+    if(req.body.structure == null && req.body.content != null){
         if(typeof req.body.content != "string"){
             req.body.content = JSON.stringify(req.body.content);
         }

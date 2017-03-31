@@ -356,12 +356,9 @@ router.post("/:projectID/*", function(req, res, next){
                 // the next stage of the router to see if there was content included
                 next();
             } else {
-                // As no structure has been included in the request, unable to create this item. 
-                // Adding this as an error to the feeds errors array, incase an error gets thrown
-                // later on in the route, but allowing the request to continue on, incase it was
-                // a request to update the projects content.
-                req.feedsErrors.push("No structure provied in the request");
-                return;
+                // As no structure or content has been included in the request, unable to create this item. 
+                req.feedsErrors.push("No data provied in the request");
+                next(new Error());
             }            
         }
     } else {
@@ -405,7 +402,7 @@ router.post("/:projectID/*", function(req, res, next){
     if(req.allParams.length > 1){
         // Checking that the body of the request contains content i.e. the content
         // of the new item we are about to create
-        if(req.body.content != null){
+        if(req.body.structure == null && req.body.content != null){
             // Checking that the fileData (i.e. the current content of the project) has
             // been loaded in the preload-filedata route, and that the project's structure
             // has aswell, as it will be required in order to validate this new content
@@ -703,13 +700,9 @@ router.post("/:projectID/*", function(req, res, next){
                 return next(new Error());
             }   
         } else {
-            if(req.body.structure == null){
-                // As no content has been included in the request, unable to update the
-                // collection. Adding this as an error to the feeds errors array.
-                req.feedsErrors.push("No content provied in the request");
-            } else {
-                next();
-            }
+            // As no structure or content has been included in the request, unable to create this item. 
+            req.feedsErrors.push("No data provied in the request");
+            next(new Error());
         }
     } else {
         // Adding this as an error to the feeds errors array.
