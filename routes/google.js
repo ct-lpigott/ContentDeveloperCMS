@@ -28,12 +28,16 @@ router.get("/oauthRedirectURL", function(req, res, next){
     // authorised us to do so
     var authCode = req.query.code;
 
+    console.log("User auth code received - " + authCode);
+
     // Creating a new OAuth2Client, using the generateOAuth2Client() method of the custom
     // googleOAuth module
     googleOAuth.generateOAuth2Client(null, function(oauth2Client){
+        console.log("OAuth2Client created");
         // Requesting an access token from the Google API, using the access token returned
         // from the users login to their Google account
         oauth2Client.getToken(authCode, function(err, token) {
+            console.log("Got token - " + token);
             if(err) {
                 console.log("Error while trying to retrieve access token " + err);
                 next();
@@ -44,6 +48,8 @@ router.get("/oauthRedirectURL", function(req, res, next){
                 // Setting the credentials of the OAuth2Client to be equal to
                 // the token returned from the request
                 oauth2Client.credentials = token;
+
+                console.log("Token added to OAuth2Client - " + token);
     
                 // Making a request to the Google Plus API, to get the profile information
                 // relating to this user. Passing the oauth2Client created above as the
@@ -67,11 +73,13 @@ router.get("/oauthRedirectURL", function(req, res, next){
                         var accessToken = JSON.stringify(token);
                         var refreshToken = token.refresh_token;
 
+                        console.log("Got user - " + user.displayName);
+
                         // Checking if the user exists, and if not, then creating them
                         dbQuery.check_User(user.emails[0].value, function(err, userId){
                             // Getting the details of this user (either new or existing)
                             dbQuery.get_User("cd_user_auth_token", userId, function(err, row){
-                                if(row){
+                                if(row != null && row.cd_user_auth_token != null){
                                     req.userAuthToken = row.cd_user_auth_token.toString();
 
                                     // If no refresh token was supplied, then no need to update its value
@@ -100,16 +108,16 @@ router.get("/oauthRedirectURL", function(req, res, next){
 // Continued - Request from the Google API, returning the user from a successful login to
 // their Google account
 router.get("/oauthRedirectURL", function(req, res, next){
+    console.log("About to redirect");
     // Checking that a userID exists on the request object
     if(req.userAuthToken != null){
         // Redirecting this user to the admin panel, using their userID as a 
         req.session.user_auth_token = req.userAuthToken.toString();
-        res.redirect("/cms/");
+        console.log("User auth token added to session - " + req.session.user_auth_token);
     } else {
         console.log("No user was found");
-        req.loginErrors.push("No user was found - unable to login");
-        next(new Error());
     }
+    res.redirect("/cms/");
 });
 
 // Exporting the router that was set up in this file, so that it can be included
