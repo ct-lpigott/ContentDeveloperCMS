@@ -50,12 +50,17 @@ router.put("/:projectID", function(req, res, next){
         }
         req.body.structure = req.body.structure.toLowerCase();                   
 
+        // Ensuring that the structure provided can be parse to a valid object
         if(validation.jsonToObject(req.body.structure)){
+            // Validating this structure, and if it is allowed, adding this 
+            // as the structure on the admin file data
             var structureValidation = validation.validateNewStructure(null, JSON.parse(req.body.structure));
             if(structureValidation.allowed){
                 req.fileData.admin.project_structure = structureValidation.sanitisedStructure;
 
                 console.log("Entire contents of project structure updated");
+
+                // Determing the commit message, based on the data provided in the request
                 if(req.body.short_commit_id != null){
                     req.gitCommitMessage = "Project structure rolled back to commit id: " + req.body.short_commit_id;
                 } else if(req.body.commit_message != null){
@@ -65,6 +70,10 @@ router.put("/:projectID", function(req, res, next){
                 }
                 req.updateFile = "structure";
             }
+            // Looping through any errors that occurred in the validation.
+            // Some of these may have been resolved through sanitising or 
+            // removal of properties, but still returning them to the user
+            // as the structure may have changed as a result
             for(var i=0; i<structureValidation.errors.length; i++){
                 req.feedsErrors.push(structureValidation.errors[i]);
             }
@@ -124,6 +133,8 @@ router.put("/:projectID", function(req, res, next){
  * @apiGroup Project Content
  */
 router.put("/:projectID", function(req, res, next){
+    // Checking that project structure is null, as it is not possible to 
+    // update both content and structure in the one request
     if(req.body.structure == null && req.body.content != null){
         if(typeof req.body.content != "string"){
             req.body.content = JSON.stringify(req.body.content);
