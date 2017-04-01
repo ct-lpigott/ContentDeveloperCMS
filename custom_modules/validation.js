@@ -10,7 +10,7 @@ function checkIfPropertyMatchesAttributes(propertyName, propertyValue, structure
     };
 
     // Sanitising the content, based on the type
-    if((structureType != null && (structureType == "html" || structureType == "link")) || (structureAttributes != null && structureAttributes.type == "file")){
+    if((structureType != null && structureType == "html") || (structureAttributes != null && (structureAttributes.type == "file" || structureAttributes.type == "link" ))){
         // Allowing HTML characters
         response.sanitisedContent = removeSuspiciousContent(propertyValue, true);
     } else {
