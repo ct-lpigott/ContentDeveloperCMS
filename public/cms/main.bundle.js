@@ -57,13 +57,13 @@ var KeyValArrayPipe = (function () {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_rxjs_Observable___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_rxjs_Observable__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__pipes_clone_object_pipe__ = __webpack_require__(306);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__pipes_key_val_array_pipe__ = __webpack_require__(139);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_rxjs_add_operator_catch__ = __webpack_require__(700);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_rxjs_add_operator_catch__ = __webpack_require__(697);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_rxjs_add_operator_catch___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_5_rxjs_add_operator_catch__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_rxjs_add_operator_do__ = __webpack_require__(701);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_rxjs_add_operator_do__ = __webpack_require__(698);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_rxjs_add_operator_do___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_6_rxjs_add_operator_do__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7_rxjs_add_operator_map__ = __webpack_require__(702);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7_rxjs_add_operator_map__ = __webpack_require__(699);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7_rxjs_add_operator_map___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_7_rxjs_add_operator_map__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8_rxjs_add_observable_throw__ = __webpack_require__(699);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8_rxjs_add_observable_throw__ = __webpack_require__(696);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_8_rxjs_add_observable_throw___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_8_rxjs_add_observable_throw__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return ContentDeveloperServerService; });
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
@@ -768,10 +768,10 @@ webpackEmptyContext.id = 353;
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__polyfills_ts__ = __webpack_require__(491);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__polyfills_ts__ = __webpack_require__(490);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__angular_platform_browser_dynamic__ = __webpack_require__(440);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__angular_core__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__environments_environment__ = __webpack_require__(490);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__environments_environment__ = __webpack_require__(489);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__app_app_module__ = __webpack_require__(461);
 
 
@@ -840,8 +840,8 @@ var AppComponent = (function () {
     AppComponent = __decorate([
         __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["U" /* Component */])({
             selector: 'app-root',
-            template: __webpack_require__(670),
-            styles: [__webpack_require__(644)]
+            template: __webpack_require__(668),
+            styles: [__webpack_require__(643)]
         }), 
         __metadata('design:paramtypes', [(typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__["a" /* ContentDeveloperServerService */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__["a" /* ContentDeveloperServerService */]) === 'function' && _a) || Object])
     ], AppComponent);
@@ -867,7 +867,7 @@ var AppComponent = (function () {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__pipes_underscore_to_space_pipe__ = __webpack_require__(310);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__pipes_title_pipe__ = __webpack_require__(309);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__pipes_shortener_pipe__ = __webpack_require__(308);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__pipes_custom_date_pipe__ = __webpack_require__(489);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__pipes_custom_date_pipe__ = __webpack_require__(488);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__pipes_double_digit_pipe__ = __webpack_require__(307);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__services_content_developer_server_content_developer_server_service__ = __webpack_require__(18);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__app_component__ = __webpack_require__(460);
@@ -885,19 +885,18 @@ var AppComponent = (function () {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_26__cms_reusable_settings_settings_view_settings_view_component__ = __webpack_require__(485);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_27__cms_reusable_history_history_display_history_display_component__ = __webpack_require__(480);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_28__cms_cms_user_projects_user_projects_component__ = __webpack_require__(466);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_29__login_login_component__ = __webpack_require__(488);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_30__cms_reusable_media_items_media_item_gallery_media_item_gallery_component__ = __webpack_require__(481);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_31__cms_reusable_media_items_media_item_media_item_component__ = __webpack_require__(482);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_32__cms_reusable_draggable_container_draggable_container_directive__ = __webpack_require__(478);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_33__cms_reusable_code_editor_code_editor_component__ = __webpack_require__(470);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_34__cms_cms_view_only_view_only_component__ = __webpack_require__(467);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_35__cms_reusable_settings_collaborators_collaborators_component__ = __webpack_require__(484);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_36__cms_reusable_settings_access_levels_access_levels_component__ = __webpack_require__(483);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_37__cms_reusable_cms_navigation_navigation_component__ = __webpack_require__(469);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_38__cms_reusable_content_wysiwyg_html_wysiwyg_html_component__ = __webpack_require__(477);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_39__cms_reusable_content_file_upload_file_upload_component__ = __webpack_require__(475);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_40__cms_reusable_content_form_control_form_control_directive__ = __webpack_require__(476);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_41__cms_reusable_errors_errors_component__ = __webpack_require__(479);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_29__cms_reusable_media_items_media_item_gallery_media_item_gallery_component__ = __webpack_require__(481);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_30__cms_reusable_media_items_media_item_media_item_component__ = __webpack_require__(482);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_31__cms_reusable_draggable_container_draggable_container_directive__ = __webpack_require__(478);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_32__cms_reusable_code_editor_code_editor_component__ = __webpack_require__(470);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_33__cms_cms_view_only_view_only_component__ = __webpack_require__(467);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_34__cms_reusable_settings_collaborators_collaborators_component__ = __webpack_require__(484);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_35__cms_reusable_settings_access_levels_access_levels_component__ = __webpack_require__(483);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_36__cms_reusable_cms_navigation_navigation_component__ = __webpack_require__(469);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_37__cms_reusable_content_wysiwyg_html_wysiwyg_html_component__ = __webpack_require__(477);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_38__cms_reusable_content_file_upload_file_upload_component__ = __webpack_require__(475);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_39__cms_reusable_content_form_control_form_control_directive__ = __webpack_require__(476);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_40__cms_reusable_errors_errors_component__ = __webpack_require__(479);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return AppModule; });
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -908,7 +907,6 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-
 
 
 
@@ -980,19 +978,18 @@ var AppModule = (function () {
                 __WEBPACK_IMPORTED_MODULE_11__pipes_custom_date_pipe__["a" /* CustomDatePipe */],
                 __WEBPACK_IMPORTED_MODULE_12__pipes_double_digit_pipe__["a" /* DoubleDigitPipe */],
                 __WEBPACK_IMPORTED_MODULE_28__cms_cms_user_projects_user_projects_component__["a" /* UserProjectsComponent */],
-                __WEBPACK_IMPORTED_MODULE_29__login_login_component__["a" /* LoginComponent */],
-                __WEBPACK_IMPORTED_MODULE_30__cms_reusable_media_items_media_item_gallery_media_item_gallery_component__["a" /* MediaItemGalleryComponent */],
-                __WEBPACK_IMPORTED_MODULE_31__cms_reusable_media_items_media_item_media_item_component__["a" /* MediaItemComponent */],
-                __WEBPACK_IMPORTED_MODULE_32__cms_reusable_draggable_container_draggable_container_directive__["a" /* DraggableContainerDirective */],
-                __WEBPACK_IMPORTED_MODULE_33__cms_reusable_code_editor_code_editor_component__["a" /* CodeEditorComponent */],
-                __WEBPACK_IMPORTED_MODULE_34__cms_cms_view_only_view_only_component__["a" /* ViewOnlyComponent */],
-                __WEBPACK_IMPORTED_MODULE_35__cms_reusable_settings_collaborators_collaborators_component__["a" /* CollaboratorsComponent */],
-                __WEBPACK_IMPORTED_MODULE_36__cms_reusable_settings_access_levels_access_levels_component__["a" /* AccessLevelsComponent */],
-                __WEBPACK_IMPORTED_MODULE_37__cms_reusable_cms_navigation_navigation_component__["a" /* NavigationComponent */],
-                __WEBPACK_IMPORTED_MODULE_38__cms_reusable_content_wysiwyg_html_wysiwyg_html_component__["a" /* WysiwygHtmlComponent */],
-                __WEBPACK_IMPORTED_MODULE_39__cms_reusable_content_file_upload_file_upload_component__["a" /* FileUploadComponent */],
-                __WEBPACK_IMPORTED_MODULE_40__cms_reusable_content_form_control_form_control_directive__["a" /* FormControlDirective */],
-                __WEBPACK_IMPORTED_MODULE_41__cms_reusable_errors_errors_component__["a" /* ErrorsComponent */]
+                __WEBPACK_IMPORTED_MODULE_29__cms_reusable_media_items_media_item_gallery_media_item_gallery_component__["a" /* MediaItemGalleryComponent */],
+                __WEBPACK_IMPORTED_MODULE_30__cms_reusable_media_items_media_item_media_item_component__["a" /* MediaItemComponent */],
+                __WEBPACK_IMPORTED_MODULE_31__cms_reusable_draggable_container_draggable_container_directive__["a" /* DraggableContainerDirective */],
+                __WEBPACK_IMPORTED_MODULE_32__cms_reusable_code_editor_code_editor_component__["a" /* CodeEditorComponent */],
+                __WEBPACK_IMPORTED_MODULE_33__cms_cms_view_only_view_only_component__["a" /* ViewOnlyComponent */],
+                __WEBPACK_IMPORTED_MODULE_34__cms_reusable_settings_collaborators_collaborators_component__["a" /* CollaboratorsComponent */],
+                __WEBPACK_IMPORTED_MODULE_35__cms_reusable_settings_access_levels_access_levels_component__["a" /* AccessLevelsComponent */],
+                __WEBPACK_IMPORTED_MODULE_36__cms_reusable_cms_navigation_navigation_component__["a" /* NavigationComponent */],
+                __WEBPACK_IMPORTED_MODULE_37__cms_reusable_content_wysiwyg_html_wysiwyg_html_component__["a" /* WysiwygHtmlComponent */],
+                __WEBPACK_IMPORTED_MODULE_38__cms_reusable_content_file_upload_file_upload_component__["a" /* FileUploadComponent */],
+                __WEBPACK_IMPORTED_MODULE_39__cms_reusable_content_form_control_form_control_directive__["a" /* FormControlDirective */],
+                __WEBPACK_IMPORTED_MODULE_40__cms_reusable_errors_errors_component__["a" /* ErrorsComponent */]
             ],
             imports: [
                 __WEBPACK_IMPORTED_MODULE_0__angular_platform_browser__["a" /* BrowserModule */],
@@ -1136,8 +1133,8 @@ var AdminComponent = (function () {
     AdminComponent = __decorate([
         __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["U" /* Component */])({
             selector: 'app-cms-admin',
-            template: __webpack_require__(671),
-            styles: [__webpack_require__(645)]
+            template: __webpack_require__(669),
+            styles: [__webpack_require__(644)]
         }), 
         __metadata('design:paramtypes', [(typeof (_h = typeof __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__["a" /* ContentDeveloperServerService */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__["a" /* ContentDeveloperServerService */]) === 'function' && _h) || Object])
     ], AdminComponent);
@@ -1203,8 +1200,8 @@ var HistoryViewComponent = (function () {
     HistoryViewComponent = __decorate([
         __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["U" /* Component */])({
             selector: 'app-history-view',
-            template: __webpack_require__(672),
-            styles: [__webpack_require__(646)]
+            template: __webpack_require__(670),
+            styles: [__webpack_require__(645)]
         }), 
         __metadata('design:paramtypes', [])
     ], HistoryViewComponent);
@@ -1281,8 +1278,8 @@ var StructureViewComponent = (function () {
     StructureViewComponent = __decorate([
         __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["U" /* Component */])({
             selector: 'app-structure-view',
-            template: __webpack_require__(673),
-            styles: [__webpack_require__(647)]
+            template: __webpack_require__(671),
+            styles: [__webpack_require__(646)]
         }), 
         __metadata('design:paramtypes', [(typeof (_c = typeof __WEBPACK_IMPORTED_MODULE_1__pipes_custom_json_pipe__["a" /* CustomJsonPipe */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_1__pipes_custom_json_pipe__["a" /* CustomJsonPipe */]) === 'function' && _c) || Object])
     ], StructureViewComponent);
@@ -1384,8 +1381,8 @@ var EditorComponent = (function () {
     EditorComponent = __decorate([
         __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["U" /* Component */])({
             selector: 'app-cms-editor',
-            template: __webpack_require__(674),
-            styles: [__webpack_require__(648)]
+            template: __webpack_require__(672),
+            styles: [__webpack_require__(647)]
         }), 
         __metadata('design:paramtypes', [])
     ], EditorComponent);
@@ -1463,8 +1460,8 @@ var UserProjectsComponent = (function () {
     UserProjectsComponent = __decorate([
         __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["U" /* Component */])({
             selector: 'app-user-projects',
-            template: __webpack_require__(675),
-            styles: [__webpack_require__(649)]
+            template: __webpack_require__(673),
+            styles: [__webpack_require__(648)]
         }), 
         __metadata('design:paramtypes', [(typeof (_c = typeof __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__["a" /* ContentDeveloperServerService */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__["a" /* ContentDeveloperServerService */]) === 'function' && _c) || Object])
     ], UserProjectsComponent);
@@ -1509,8 +1506,8 @@ var ViewOnlyComponent = (function () {
     ViewOnlyComponent = __decorate([
         __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["U" /* Component */])({
             selector: 'app-cms-view-only',
-            template: __webpack_require__(676),
-            styles: [__webpack_require__(650)]
+            template: __webpack_require__(674),
+            styles: [__webpack_require__(649)]
         }), 
         __metadata('design:paramtypes', [])
     ], ViewOnlyComponent);
@@ -1677,8 +1674,8 @@ var CmsComponent = (function () {
     CmsComponent = __decorate([
         __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["U" /* Component */])({
             selector: 'app-cms',
-            template: __webpack_require__(677),
-            styles: [__webpack_require__(651)]
+            template: __webpack_require__(675),
+            styles: [__webpack_require__(650)]
         }), 
         __metadata('design:paramtypes', [(typeof (_c = typeof __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__["a" /* ContentDeveloperServerService */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__["a" /* ContentDeveloperServerService */]) === 'function' && _c) || Object])
     ], CmsComponent);
@@ -1723,8 +1720,8 @@ var NavigationComponent = (function () {
     NavigationComponent = __decorate([
         __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["U" /* Component */])({
             selector: 'app-cms-navigation',
-            template: __webpack_require__(678),
-            styles: [__webpack_require__(652)]
+            template: __webpack_require__(676),
+            styles: [__webpack_require__(651)]
         }), 
         __metadata('design:paramtypes', [])
     ], NavigationComponent);
@@ -1880,8 +1877,8 @@ var CodeEditorComponent = (function () {
     CodeEditorComponent = __decorate([
         __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["U" /* Component */])({
             selector: 'app-code-editor',
-            template: __webpack_require__(679),
-            styles: [__webpack_require__(653)]
+            template: __webpack_require__(677),
+            styles: [__webpack_require__(652)]
         }), 
         __metadata('design:paramtypes', [(typeof (_d = typeof __WEBPACK_IMPORTED_MODULE_1__pipes_custom_json_pipe__["a" /* CustomJsonPipe */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_1__pipes_custom_json_pipe__["a" /* CustomJsonPipe */]) === 'function' && _d) || Object])
     ], CodeEditorComponent);
@@ -1965,8 +1962,8 @@ var CollectionItemComponent = (function () {
     CollectionItemComponent = __decorate([
         __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["U" /* Component */])({
             selector: 'app-collection-item',
-            template: __webpack_require__(680),
-            styles: [__webpack_require__(654)]
+            template: __webpack_require__(678),
+            styles: [__webpack_require__(653)]
         }), 
         __metadata('design:paramtypes', [(typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_0__angular_core__["C" /* ElementRef */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_0__angular_core__["C" /* ElementRef */]) === 'function' && _b) || Object])
     ], CollectionItemComponent);
@@ -2097,8 +2094,8 @@ var CollectionComponent = (function () {
     CollectionComponent = __decorate([
         __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["U" /* Component */])({
             selector: 'app-collection',
-            template: __webpack_require__(681),
-            styles: [__webpack_require__(655)]
+            template: __webpack_require__(679),
+            styles: [__webpack_require__(654)]
         }), 
         __metadata('design:paramtypes', [])
     ], CollectionComponent);
@@ -2247,8 +2244,8 @@ var ContentEditorComponent = (function () {
     ContentEditorComponent = __decorate([
         __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["U" /* Component */])({
             selector: 'app-content-editor',
-            template: __webpack_require__(682),
-            styles: [__webpack_require__(656)]
+            template: __webpack_require__(680),
+            styles: [__webpack_require__(655)]
         }), 
         __metadata('design:paramtypes', [(typeof (_d = typeof __WEBPACK_IMPORTED_MODULE_2__pipes_key_val_array_pipe__["a" /* KeyValArrayPipe */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_2__pipes_key_val_array_pipe__["a" /* KeyValArrayPipe */]) === 'function' && _d) || Object, (typeof (_e = typeof __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__["a" /* ContentDeveloperServerService */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__["a" /* ContentDeveloperServerService */]) === 'function' && _e) || Object])
     ], ContentEditorComponent);
@@ -2329,8 +2326,8 @@ var ContentViewComponent = (function () {
     ContentViewComponent = __decorate([
         __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["U" /* Component */])({
             selector: 'app-content-view',
-            template: __webpack_require__(683),
-            styles: [__webpack_require__(657)]
+            template: __webpack_require__(681),
+            styles: [__webpack_require__(656)]
         }), 
         __metadata('design:paramtypes', [(typeof (_c = typeof __WEBPACK_IMPORTED_MODULE_0__angular_core__["C" /* ElementRef */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_0__angular_core__["C" /* ElementRef */]) === 'function' && _c) || Object])
     ], ContentViewComponent);
@@ -2443,8 +2440,8 @@ var FileUploadComponent = (function () {
     FileUploadComponent = __decorate([
         __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["U" /* Component */])({
             selector: 'app-file-upload',
-            template: __webpack_require__(684),
-            styles: [__webpack_require__(658)]
+            template: __webpack_require__(682),
+            styles: [__webpack_require__(657)]
         }), 
         __metadata('design:paramtypes', [(typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_0__angular_core__["C" /* ElementRef */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_0__angular_core__["C" /* ElementRef */]) === 'function' && _b) || Object, (typeof (_c = typeof __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__["a" /* ContentDeveloperServerService */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__["a" /* ContentDeveloperServerService */]) === 'function' && _c) || Object])
     ], FileUploadComponent);
@@ -2567,7 +2564,7 @@ var WysiwygHtmlComponent = (function () {
         this.wysiwygContentChanged = new __WEBPACK_IMPORTED_MODULE_0__angular_core__["G" /* EventEmitter */]();
     }
     WysiwygHtmlComponent.prototype.ngAfterViewInit = function () {
-        this._textareaElement = document.getElementById("wysiwyg-input");
+        this._textareaElement = document.getElementsByClassName("wysiwyg-input")[0];
         this.updateTextAreaToItemContent();
     };
     WysiwygHtmlComponent.prototype.ngOnChanges = function (changes) {
@@ -2746,8 +2743,8 @@ var WysiwygHtmlComponent = (function () {
     WysiwygHtmlComponent = __decorate([
         __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["U" /* Component */])({
             selector: 'app-wysiwyg-html',
-            template: __webpack_require__(685),
-            styles: [__webpack_require__(659)]
+            template: __webpack_require__(683),
+            styles: [__webpack_require__(658)]
         }), 
         __metadata('design:paramtypes', [(typeof (_c = typeof __WEBPACK_IMPORTED_MODULE_0__angular_core__["C" /* ElementRef */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_0__angular_core__["C" /* ElementRef */]) === 'function' && _c) || Object])
     ], WysiwygHtmlComponent);
@@ -3001,8 +2998,8 @@ var ErrorsComponent = (function () {
     ErrorsComponent = __decorate([
         __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["U" /* Component */])({
             selector: 'app-errors',
-            template: __webpack_require__(686),
-            styles: [__webpack_require__(660)]
+            template: __webpack_require__(684),
+            styles: [__webpack_require__(659)]
         }), 
         __metadata('design:paramtypes', [])
     ], ErrorsComponent);
@@ -3093,8 +3090,8 @@ var HistoryDisplayComponent = (function () {
     HistoryDisplayComponent = __decorate([
         __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["U" /* Component */])({
             selector: 'app-history-display',
-            template: __webpack_require__(687),
-            styles: [__webpack_require__(661)]
+            template: __webpack_require__(685),
+            styles: [__webpack_require__(660)]
         }), 
         __metadata('design:paramtypes', [(typeof (_c = typeof __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__["a" /* ContentDeveloperServerService */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__["a" /* ContentDeveloperServerService */]) === 'function' && _c) || Object, (typeof (_d = typeof __WEBPACK_IMPORTED_MODULE_2__pipes_shortener_pipe__["a" /* ShortenerPipe */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_2__pipes_shortener_pipe__["a" /* ShortenerPipe */]) === 'function' && _d) || Object])
     ], HistoryDisplayComponent);
@@ -3178,8 +3175,8 @@ var MediaItemGalleryComponent = (function () {
     MediaItemGalleryComponent = __decorate([
         __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["U" /* Component */])({
             selector: 'app-media-item-gallery',
-            template: __webpack_require__(688),
-            styles: [__webpack_require__(662)]
+            template: __webpack_require__(686),
+            styles: [__webpack_require__(661)]
         }), 
         __metadata('design:paramtypes', [(typeof (_c = typeof __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__["a" /* ContentDeveloperServerService */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__["a" /* ContentDeveloperServerService */]) === 'function' && _c) || Object])
     ], MediaItemGalleryComponent);
@@ -3228,8 +3225,8 @@ var MediaItemComponent = (function () {
     MediaItemComponent = __decorate([
         __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["U" /* Component */])({
             selector: 'app-media-item',
-            template: __webpack_require__(689),
-            styles: [__webpack_require__(663)]
+            template: __webpack_require__(687),
+            styles: [__webpack_require__(662)]
         }), 
         __metadata('design:paramtypes', [])
     ], MediaItemComponent);
@@ -3302,8 +3299,8 @@ var AccessLevelsComponent = (function () {
     AccessLevelsComponent = __decorate([
         __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["U" /* Component */])({
             selector: 'app-access-levels',
-            template: __webpack_require__(690),
-            styles: [__webpack_require__(664)]
+            template: __webpack_require__(688),
+            styles: [__webpack_require__(663)]
         }), 
         __metadata('design:paramtypes', [(typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__["a" /* ContentDeveloperServerService */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__["a" /* ContentDeveloperServerService */]) === 'function' && _b) || Object])
     ], AccessLevelsComponent);
@@ -3369,8 +3366,8 @@ var CollaboratorsComponent = (function () {
     CollaboratorsComponent = __decorate([
         __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["U" /* Component */])({
             selector: 'app-collaborators',
-            template: __webpack_require__(691),
-            styles: [__webpack_require__(665)]
+            template: __webpack_require__(689),
+            styles: [__webpack_require__(664)]
         }), 
         __metadata('design:paramtypes', [(typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__["a" /* ContentDeveloperServerService */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__["a" /* ContentDeveloperServerService */]) === 'function' && _b) || Object])
     ], CollaboratorsComponent);
@@ -3528,8 +3525,8 @@ var SettingsViewComponent = (function () {
     SettingsViewComponent = __decorate([
         __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["U" /* Component */])({
             selector: 'app-settings-view',
-            template: __webpack_require__(692),
-            styles: [__webpack_require__(666)]
+            template: __webpack_require__(690),
+            styles: [__webpack_require__(665)]
         }), 
         __metadata('design:paramtypes', [(typeof (_d = typeof __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__["a" /* ContentDeveloperServerService */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__["a" /* ContentDeveloperServerService */]) === 'function' && _d) || Object])
     ], SettingsViewComponent);
@@ -3560,12 +3557,13 @@ var FooterComponent = (function () {
     function FooterComponent() {
     }
     FooterComponent.prototype.ngOnInit = function () {
+        this._currentDate = new Date();
     };
     FooterComponent = __decorate([
         __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["U" /* Component */])({
             selector: 'app-footer',
-            template: __webpack_require__(693),
-            styles: [__webpack_require__(667)]
+            template: __webpack_require__(691),
+            styles: [__webpack_require__(666)]
         }), 
         __metadata('design:paramtypes', [])
     ], FooterComponent);
@@ -3580,6 +3578,7 @@ var FooterComponent = (function () {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__ = __webpack_require__(18);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return HeaderComponent; });
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -3591,10 +3590,16 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 
+
 var HeaderComponent = (function () {
-    function HeaderComponent() {
+    function HeaderComponent(_cdService) {
+        this._cdService = _cdService;
         this.requestToLogout = new __WEBPACK_IMPORTED_MODULE_0__angular_core__["G" /* EventEmitter */]();
     }
+    HeaderComponent.prototype.ngOnInit = function () {
+        var _this = this;
+        this._cdService.getLoginUrl().subscribe(function (responseObject) { return _this._loginUrl = responseObject.loginUrl; });
+    };
     HeaderComponent.prototype.logoutClicked = function () {
         this.requestToLogout.emit();
     };
@@ -3613,60 +3618,19 @@ var HeaderComponent = (function () {
     HeaderComponent = __decorate([
         __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["U" /* Component */])({
             selector: 'app-header',
-            template: __webpack_require__(694),
-            styles: [__webpack_require__(668)]
+            template: __webpack_require__(692),
+            styles: [__webpack_require__(667)]
         }), 
-        __metadata('design:paramtypes', [])
+        __metadata('design:paramtypes', [(typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__["a" /* ContentDeveloperServerService */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__["a" /* ContentDeveloperServerService */]) === 'function' && _b) || Object])
     ], HeaderComponent);
     return HeaderComponent;
-    var _a;
+    var _a, _b;
 }());
 //# sourceMappingURL=C:/GitHub/ContentDeveloperCMS/ContentDeveloperCMS-AngularApp/src/header.component.js.map
 
 /***/ }),
 
 /***/ 488:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__ = __webpack_require__(18);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return LoginComponent; });
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-
-
-var LoginComponent = (function () {
-    function LoginComponent(_cdService) {
-        this._cdService = _cdService;
-    }
-    LoginComponent.prototype.ngOnInit = function () {
-        var _this = this;
-        this._cdService.getLoginUrl().subscribe(function (responseObject) { return _this._loginUrl = responseObject.loginUrl; });
-    };
-    LoginComponent = __decorate([
-        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["U" /* Component */])({
-            selector: 'app-login',
-            template: __webpack_require__(695),
-            styles: [__webpack_require__(669)]
-        }), 
-        __metadata('design:paramtypes', [(typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__["a" /* ContentDeveloperServerService */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__["a" /* ContentDeveloperServerService */]) === 'function' && _a) || Object])
-    ], LoginComponent);
-    return LoginComponent;
-    var _a;
-}());
-//# sourceMappingURL=C:/GitHub/ContentDeveloperCMS/ContentDeveloperCMS-AngularApp/src/login.component.js.map
-
-/***/ }),
-
-/***/ 489:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3721,7 +3685,7 @@ var CustomDatePipe = (function () {
 
 /***/ }),
 
-/***/ 490:
+/***/ 489:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3737,41 +3701,41 @@ var environment = {
 
 /***/ }),
 
-/***/ 491:
+/***/ 490:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_core_js_es6_symbol__ = __webpack_require__(505);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_core_js_es6_symbol__ = __webpack_require__(504);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_core_js_es6_symbol___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_core_js_es6_symbol__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_core_js_es6_object__ = __webpack_require__(498);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_core_js_es6_object__ = __webpack_require__(497);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_core_js_es6_object___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_core_js_es6_object__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_core_js_es6_function__ = __webpack_require__(494);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_core_js_es6_function__ = __webpack_require__(493);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_core_js_es6_function___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_core_js_es6_function__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_core_js_es6_parse_int__ = __webpack_require__(500);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_core_js_es6_parse_int__ = __webpack_require__(499);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_core_js_es6_parse_int___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_core_js_es6_parse_int__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_core_js_es6_parse_float__ = __webpack_require__(499);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_core_js_es6_parse_float__ = __webpack_require__(498);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_core_js_es6_parse_float___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4_core_js_es6_parse_float__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_core_js_es6_number__ = __webpack_require__(497);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_core_js_es6_number__ = __webpack_require__(496);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_core_js_es6_number___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_5_core_js_es6_number__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_core_js_es6_math__ = __webpack_require__(496);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_core_js_es6_math__ = __webpack_require__(495);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_core_js_es6_math___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_6_core_js_es6_math__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7_core_js_es6_string__ = __webpack_require__(504);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7_core_js_es6_string__ = __webpack_require__(503);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7_core_js_es6_string___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_7_core_js_es6_string__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8_core_js_es6_date__ = __webpack_require__(493);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8_core_js_es6_date__ = __webpack_require__(492);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_8_core_js_es6_date___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_8_core_js_es6_date__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9_core_js_es6_array__ = __webpack_require__(492);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9_core_js_es6_array__ = __webpack_require__(491);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_9_core_js_es6_array___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_9_core_js_es6_array__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10_core_js_es6_regexp__ = __webpack_require__(502);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10_core_js_es6_regexp__ = __webpack_require__(501);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_10_core_js_es6_regexp___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_10_core_js_es6_regexp__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11_core_js_es6_map__ = __webpack_require__(495);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11_core_js_es6_map__ = __webpack_require__(494);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_11_core_js_es6_map___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_11_core_js_es6_map__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12_core_js_es6_set__ = __webpack_require__(503);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12_core_js_es6_set__ = __webpack_require__(502);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_12_core_js_es6_set___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_12_core_js_es6_set__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13_core_js_es6_reflect__ = __webpack_require__(501);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13_core_js_es6_reflect__ = __webpack_require__(500);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_13_core_js_es6_reflect___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_13_core_js_es6_reflect__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14_core_js_es7_reflect__ = __webpack_require__(506);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14_core_js_es7_reflect__ = __webpack_require__(505);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_14_core_js_es7_reflect___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_14_core_js_es7_reflect__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_15_zone_js_dist_zone__ = __webpack_require__(720);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_15_zone_js_dist_zone__ = __webpack_require__(718);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_15_zone_js_dist_zone___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_15_zone_js_dist_zone__);
 
 
@@ -3793,17 +3757,24 @@ var environment = {
 
 /***/ }),
 
-/***/ 644:
+/***/ 643:
 /***/ (function(module, exports) {
 
 module.exports = ""
 
 /***/ }),
 
-/***/ 645:
+/***/ 644:
 /***/ (function(module, exports) {
 
 module.exports = "textarea {\r\n    min-height: 200px;\r\n}"
+
+/***/ }),
+
+/***/ 645:
+/***/ (function(module, exports) {
+
+module.exports = ""
 
 /***/ }),
 
@@ -3824,112 +3795,112 @@ module.exports = ""
 /***/ 648:
 /***/ (function(module, exports) {
 
-module.exports = ""
+module.exports = "th:nth-child(1), td:nth-child(1) {width: 30%;}\r\nth:nth-child(2), td:nth-child(2) {width: 20%;}\r\nth:nth-child(3), td:nth-child(3) {width: 20%;}\r\nth:nth-child(4), td:nth-child(4) {width: 20%;}\r\nth:nth-child(5), td:nth-child(5) {width: 10%;}\r\n\r\nh3 {\r\n    display: inline-block;\r\n}\r\n\r\ntable {\r\n    background-color: white;\r\n}\r\n\r\n.button.template {\r\n    text-align: left;\r\n    background-color: #0a2f42;\r\n    color: #FFF;\r\n    padding: 3%;\r\n    width: 100%;\r\n    margin-bottom: 1%;\r\n}\r\n\r\n.head {\r\n    width: 98%;\r\n}\r\n\r\n.topOfTable {\r\n    margin-top: 3%;\r\n}\r\n\r\n.scrollable {\r\n    max-height: 400px;\r\n    max-height: 60vh;\r\n}\r\n\r\n.container-backgroud {\r\n    margin-top: 1%;\r\n}"
 
 /***/ }),
 
 /***/ 649:
 /***/ (function(module, exports) {
 
-module.exports = "th:nth-child(1), td:nth-child(1) {width: 30%;}\r\nth:nth-child(2), td:nth-child(2) {width: 20%;}\r\nth:nth-child(3), td:nth-child(3) {width: 20%;}\r\nth:nth-child(4), td:nth-child(4) {width: 20%;}\r\nth:nth-child(5), td:nth-child(5) {width: 10%;}\r\n\r\n.templates button {\r\n    cursor: pointer;\r\n    text-align: left;\r\n    background-color: #000;\r\n    color: #FFF;\r\n    padding: 3%;\r\n    display: block;\r\n    width: 100%;\r\n}\r\n\r\n.scrollable {\r\n    max-height: 400px;\r\n    max-height: 60vh;\r\n}"
+module.exports = ""
 
 /***/ }),
 
 /***/ 650:
 /***/ (function(module, exports) {
 
-module.exports = ""
+module.exports = ":host {\r\n    display: block;\r\n    background-color: #8fb7cc;\r\n    padding: 0 1% 2% 1%;\r\n}\r\na {\r\n    text-decoration: none;\r\n    color: initial;\r\n}"
 
 /***/ }),
 
 /***/ 651:
 /***/ (function(module, exports) {
 
-module.exports = "a {\r\n    text-decoration: none;\r\n    color: initial;\r\n}"
+module.exports = "nav ul {\r\n    list-style: none;\r\n    margin: 0;\r\n    padding: 0;\r\n}\r\n\r\nnav ul li {\r\n    cursor: pointer;\r\n    box-sizing: border-box;\r\n    display: inline-block;\r\n    padding: 1%;\r\n    background-color: #0a2f42;\r\n    color: #fff;\r\n    text-align: center;\r\n}\r\n\r\nnav ul.admin li{\r\n    width: 24%;\r\n}\r\n\r\nnav ul.editor li{\r\n    width: 32%;\r\n}"
 
 /***/ }),
 
 /***/ 652:
 /***/ (function(module, exports) {
 
-module.exports = "nav ul {\r\n    list-style: none;\r\n    margin: 0;\r\n    padding: 0;\r\n}\r\n\r\nnav ul li {\r\n    cursor: pointer;\r\n    box-sizing: border-box;\r\n    display: inline-block;\r\n    padding: 1%;\r\n    background-color: #000;\r\n    color: #fff;\r\n    text-align: center;\r\n}\r\n\r\nnav ul.admin li{\r\n    width: 24%;\r\n}\r\n\r\nnav ul.editor li{\r\n    width: 32%;\r\n}"
+module.exports = "textarea {\r\n    min-height: 250px;\r\n    width: 99%;\r\n    border: none;\r\n}\r\n.right {\r\n    float: right;\r\n}"
 
 /***/ }),
 
 /***/ 653:
 /***/ (function(module, exports) {
 
-module.exports = "textarea {\r\n    min-height: 250px;\r\n}"
+module.exports = "textarea {\r\n    width: 100%;\r\n}\r\ninput, textarea {\r\n    border: 1px solid #777;\r\n}\r\n\r\n[disabled] {\r\n    background-color: initial !important;\r\n    color: initial !important;\r\n}"
 
 /***/ }),
 
 /***/ 654:
 /***/ (function(module, exports) {
 
-module.exports = "textarea {\r\n    width: 100%;\r\n}\r\ninput, textarea {\r\n    border: 1px solid #777;\r\n}\r\n\r\n[disabled] {\r\n    background-color: initial !important;\r\n    color: initial !important;\r\n}"
+module.exports = ".collection, .subCollection{\r\n    display: block;\r\n}\r\n.subCollection{\r\n    margin-left: 4%;\r\n}"
 
 /***/ }),
 
 /***/ 655:
 /***/ (function(module, exports) {
 
-module.exports = ":host > div{\r\n    background-color: #FFFFFF;\r\n}\r\n.collection, .subCollection{\r\n    display: block;\r\n}\r\n.subCollection{\r\n    margin-left: 4%;\r\n}"
+module.exports = ".collectionTab {\r\n    padding: 7% 1%;\r\n    color: #0a2f42;\r\n    background-color: white;\r\n    text-align: left;\r\n    border: 1px solid #0a2f42;\r\n}\r\n.collectionTab.padding {\r\n    padding-left: 8%;\r\n}\r\n.collectionTab.active{\r\n    background-color: #0a2f42;\r\n    color: white;\r\n}\r\n.col-2-12 {\r\n    padding-left: 0;\r\n}\r\n\r\n"
 
 /***/ }),
 
 /***/ 656:
 /***/ (function(module, exports) {
 
-module.exports = ".collectionTab {\r\n    padding: 7% 1%;\r\n    color: white;\r\n    background-color: grey;\r\n    text-align: center;\r\n    border: 1px solid white;\r\n}\r\n\r\n"
+module.exports = ""
 
 /***/ }),
 
 /***/ 657:
 /***/ (function(module, exports) {
 
-module.exports = ""
+module.exports = "input[type=\"file\"]{\r\n    width: 86px;\r\n}\r\n\r\nimg {\r\n    width: 100px;\r\n    min-height: 80px;\r\n    height: auto;\r\n    vertical-align: top;\r\n    border: 1px solid black;\r\n}\r\nimg[src=\"null\"]{\r\n    display: none;\r\n}\r\n"
 
 /***/ }),
 
 /***/ 658:
 /***/ (function(module, exports) {
 
-module.exports = "input[type=\"file\"]{\r\n    width: 86px;\r\n}\r\n\r\nimg {\r\n    width: 100px;\r\n    min-height: 80px;\r\n    height: auto;\r\n    vertical-align: top;\r\n    border: 1px solid black;\r\n}\r\nimg[src=\"null\"]{\r\n    display: none;\r\n}\r\n\r\napp-media-item-gallery {\r\n    width: 50%;\r\n    height: 300px;\r\n    top: 0;\r\n    right: 0;\r\n    overflow-y: scroll;\r\n    position: absolute;    \r\n}\r\n"
+module.exports = "label {\r\n    display: block;\r\n}\r\n.wysiwyg-input {\r\n    min-height: 200px;\r\n    resize: vertical;\r\n    overflow-y: scroll;\r\n    border: 1px solid black;\r\n    background-color: white;\r\n}"
 
 /***/ }),
 
 /***/ 659:
 /***/ (function(module, exports) {
 
-module.exports = "label {\r\n    display: block;\r\n}\r\n#wysiwyg-input {\r\n    min-height: 200px;\r\n    resize: vertical;\r\n    overflow-y: scroll;\r\n    border: 1px solid black;\r\n}"
+module.exports = ""
 
 /***/ }),
 
 /***/ 660:
 /***/ (function(module, exports) {
 
-module.exports = ""
+module.exports = "th:nth-child(1), td:nth-child(1) {width: 10%;}\r\nth:nth-child(2), td:nth-child(2) {width: 20%;}\r\nth:nth-child(3), td:nth-child(3) {width: 40%;}\r\nth:nth-child(4), td:nth-child(4) {width: 20%;}\r\nth:nth-child(5), td:nth-child(5) {width: 10%;}\r\n\r\n.scrollable {\r\n    max-height: 200px;\r\n}\r\n\r\ntextarea {\r\n    min-height: 200px;\r\n}\r\n\r\ntable {\r\n    background-color: white;\r\n}"
 
 /***/ }),
 
 /***/ 661:
 /***/ (function(module, exports) {
 
-module.exports = "th:nth-child(1), td:nth-child(1) {width: 10%;}\r\nth:nth-child(2), td:nth-child(2) {width: 20%;}\r\nth:nth-child(3), td:nth-child(3) {width: 40%;}\r\nth:nth-child(4), td:nth-child(4) {width: 20%;}\r\nth:nth-child(5), td:nth-child(5) {width: 10%;}\r\n\r\n.scrollable {\r\n    max-height: 200px;\r\n}\r\n\r\ntextarea {\r\n    min-height: 200px;\r\n}"
+module.exports = ":host {\r\n    position: absolute;\r\n    background-color: white;\r\n    width: 100%;\r\n    height: 210px;\r\n    border: 1px solid #010a4f;\r\n    overflow-y: scroll;\r\n    display: block;\r\n}\r\n.button.cms.disabled {\r\n    opacity: 0.5;\r\n}"
 
 /***/ }),
 
 /***/ 662:
 /***/ (function(module, exports) {
 
-module.exports = ""
+module.exports = ":host {\r\n    display: inline-block;\r\n}\r\nimg {\r\n    box-sizing: border-box;\r\n    min-height: 100px;\r\n    width: 100%;\r\n    cursor: pointer;\r\n    border: 2px solid #000;\r\n}"
 
 /***/ }),
 
 /***/ 663:
 /***/ (function(module, exports) {
 
-module.exports = ":host {\r\n    display: inline-block;\r\n}\r\nimg {\r\n    box-sizing: border-box;\r\n    min-height: 100px;\r\n    width: 100%;\r\n    cursor: pointer;\r\n    border: 2px solid #000;\r\n}"
+module.exports = ""
 
 /***/ }),
 
@@ -3943,221 +3914,200 @@ module.exports = ""
 /***/ 665:
 /***/ (function(module, exports) {
 
-module.exports = ""
+module.exports = "textarea.customCss {\r\n    height: 160px;\r\n}\r\n:host > .row {\r\n    border-bottom: 2px solid #0a2f42;\r\n    padding-bottom: 3%;\r\n}\r\n.bottom-tabs {\r\n    border-bottom: 1px solid #010a4f !important;\r\n}"
 
 /***/ }),
 
 /***/ 666:
 /***/ (function(module, exports) {
 
-module.exports = "textarea.customCss {\r\n    height: 160px;\r\n}"
+module.exports = ":host > div {\r\n    text-align: center;\r\n    width: 100%;\r\n    background-color: #FFF;\r\n    margin: 0;\r\n    padding: 1%;\r\n}\r\n\r\n:host.loggedOut{\r\n    position: absolute;\r\n    bottom: 0;\r\n    width: 100%;\r\n}"
 
 /***/ }),
 
 /***/ 667:
 /***/ (function(module, exports) {
 
-module.exports = ":host > div {\r\n    text-align: center;\r\n}"
+module.exports = ":host > div {\r\n    background-color: #fff;\r\n    color: #0a2f42;\r\n}\r\n:host.loggedIn > div {\r\n    background-color: #fff;\r\n    color: #0a2f42;\r\n}\r\n\r\nh1 {\r\n    margin: 1% 0;\r\n}\r\nimg {\r\n    width: 50px;\r\n    vertical-align: bottom;\r\n    height: auto;\r\n}\r\n.button {\r\n    margin-top: 6px;\r\n    padding: 2% 4%;\r\n    color: #fff;\r\n    background-color: #1773a2;\r\n    text-shadow: black 1px 1px;\r\n    font-size: 1em;\r\n}\r\n.row {\r\n    margin: 0;\r\n}\r\n.right {\r\n    float: right;\r\n    padding-right: 0;\r\n}"
 
 /***/ }),
 
 /***/ 668:
 /***/ (function(module, exports) {
 
-module.exports = ":host > div {\r\n    background-color: black;\r\n    color: white;\r\n}\r\nh1 {\r\n    margin: 1% 0;\r\n}\r\nimg {\r\n    width: 50px;\r\n    vertical-align: bottom;\r\n    height: auto;\r\n}"
+module.exports = "<app-header\r\n    [user]=\"user\"\r\n    [pageTitle]=\"pageTitle\"\r\n    (requestToLogout)=\"logout()\"\r\n    [class]=\"user != null ? 'loggedIn' : 'loggedOut'\"></app-header>\r\n\r\n    <app-cms \r\n        *ngIf=\"user != null\"\r\n        (requestToUpdatePageTitle)=\"updatePageTitle($event)\"\r\n        (loginRequired)=\"loginRequired($event)\">\r\n    </app-cms>\r\n<app-footer\r\n    [class]=\"user != null ? 'loggedIn' : 'loggedOut'\"></app-footer>\r\n"
 
 /***/ }),
 
 /***/ 669:
 /***/ (function(module, exports) {
 
-module.exports = ""
+module.exports = "<app-cms-navigation\r\n\t[userAccessLevel]=\"1\"\r\n\t(requestToChangeView)=\"changeView($event)\"></app-cms-navigation>\r\n<app-errors\r\n\t[errors]=\"errors\"\r\n\t(requestToDismissErrors)=\"requestToDismissErrors($event)\"></app-errors>\r\n<div class=\"row container-background\">\r\n\t<app-structure-view\r\n\t\t*ngIf=\"_view == 'structure'\"\r\n\t\t[projectStructure]=\"projectStructure\"\r\n\t\t(viewRequestToSaveStructure)=\"viewRequestToSaveStructure($event)\"\r\n\t\t(viewRequestToResetStructure)=\"viewRequestToResetStructure()\">\r\n\t</app-structure-view>\r\n\r\n\t<app-content-view\r\n\t\t*ngIf=\"_view == 'content'\"\r\n\t\t[userAccessLevel]=\"1\"\r\n\t\t[customCss]=\"projectSettings.custom_css\"\r\n\t\t[projectStructure]=\"projectStructure\"\r\n\t\t[(projectContent)]=\"projectContent\"\r\n\t\t(viewRequestToSaveContent)=\"viewRequestToSaveContent($event)\"\r\n\t\t(viewRequestToResetContent)=\"viewRequestToResetContent()\">\r\n\t</app-content-view>\r\n\r\n\t<app-history-view\r\n\t\t*ngIf=\"_view == 'history'\"\r\n\t\t[projectStructureHistory]=\"projectStructureHistory\"\r\n\t\t[projectContentHistory]=\"projectContentHistory\"\r\n\t\t(viewRequestToSaveStructure)=\"viewRequestToSaveStructure($event)\"\r\n\t\t(viewRequestToSaveContent)=\"viewRequestToSaveContent($event)\">\r\n\t</app-history-view>\r\n\r\n\t<app-settings-view\r\n\t\t*ngIf=\"_view == 'settings'\"\r\n\t\t[isAdmin]=\"true\"\r\n\t\t[(projectSettings)]=\"projectSettings\"\r\n\t\t(settingsUpdated)=\"viewRequestToRefreshSettings($event)\"\r\n\t\t(viewRequestToRefreshSettings)=\"viewRequestToRefreshSettings($event)\"\r\n\t\t(viewNotifyingOfProjectDeletion)=\"viewNotifyingOfProjectDeletion($event)\">\r\n\t</app-settings-view>\r\n</div>"
 
 /***/ }),
 
 /***/ 670:
 /***/ (function(module, exports) {
 
-module.exports = "<app-header\r\n    [user]=\"user\"\r\n    [pageTitle]=\"pageTitle\"\r\n    (requestToLogout)=\"logout()\"></app-header>\r\n\r\n    <app-login\r\n        *ngIf=\"user == null\">\r\n    </app-login>\r\n\r\n    <app-cms \r\n        *ngIf=\"user != null\"\r\n        (requestToUpdatePageTitle)=\"updatePageTitle($event)\"\r\n        (loginRequired)=\"loginRequired($event)\">\r\n    </app-cms>\r\n<app-footer></app-footer>\r\n"
+module.exports = "<div class=\"row\">\n  <app-history-display\n    [history]=\"projectStructureHistory\"\n    [historyOf]=\"'structure'\"\n    [showPreview]=\"true\"\n    (revertToCommit)=\"revertToCommit($event)\">\n  </app-history-display>\n</div>\n\n<div class=\"row\">\n  <app-history-display\n    [history]=\"projectContentHistory\"\n    [historyOf]=\"'content'\"\n    [showPreview]=\"true\"\n    (revertToCommit)=\"revertToCommit($event)\">\n  </app-history-display>\n</div>"
 
 /***/ }),
 
 /***/ 671:
 /***/ (function(module, exports) {
 
-module.exports = "<app-cms-navigation\r\n\t[userAccessLevel]=\"1\"\r\n\t(requestToChangeView)=\"changeView($event)\"></app-cms-navigation>\r\n<app-errors\r\n\t[errors]=\"errors\"\r\n\t(requestToDismissErrors)=\"requestToDismissErrors($event)\"></app-errors>\r\n<div class=\"row\">\r\n\t<app-structure-view\r\n\t\t*ngIf=\"_view == 'structure'\"\r\n\t\t[projectStructure]=\"projectStructure\"\r\n\t\t(viewRequestToSaveStructure)=\"viewRequestToSaveStructure($event)\"\r\n\t\t(viewRequestToResetStructure)=\"viewRequestToResetStructure()\">\r\n\t</app-structure-view>\r\n\r\n\t<app-content-view\r\n\t\t*ngIf=\"_view == 'content'\"\r\n\t\t[userAccessLevel]=\"1\"\r\n\t\t[customCss]=\"projectSettings.custom_css\"\r\n\t\t[projectStructure]=\"projectStructure\"\r\n\t\t[(projectContent)]=\"projectContent\"\r\n\t\t(viewRequestToSaveContent)=\"viewRequestToSaveContent($event)\"\r\n\t\t(viewRequestToResetContent)=\"viewRequestToResetContent()\">\r\n\t</app-content-view>\r\n\r\n\t<app-history-view\r\n\t\t*ngIf=\"_view == 'history'\"\r\n\t\t[projectStructureHistory]=\"projectStructureHistory\"\r\n\t\t[projectContentHistory]=\"projectContentHistory\"\r\n\t\t(viewRequestToSaveStructure)=\"viewRequestToSaveStructure($event)\"\r\n\t\t(viewRequestToSaveContent)=\"viewRequestToSaveContent($event)\">\r\n\t</app-history-view>\r\n\r\n\t<app-settings-view\r\n\t\t*ngIf=\"_view == 'settings'\"\r\n\t\t[isAdmin]=\"true\"\r\n\t\t[(projectSettings)]=\"projectSettings\"\r\n\t\t(settingsUpdated)=\"viewRequestToRefreshSettings($event)\"\r\n\t\t(viewRequestToRefreshSettings)=\"viewRequestToRefreshSettings($event)\"\r\n\t\t(viewNotifyingOfProjectDeletion)=\"viewNotifyingOfProjectDeletion($event)\">\r\n\t</app-settings-view>\r\n</div>"
+module.exports = "<div class=\"col-6-12\">\r\n  <h2>Project Structure</h2>\r\n  <app-code-editor\r\n    [codeJson]=\"projectStructureJson\"\r\n    (codeUpdated)=\"codeUpdated($event)\"\r\n    (requestToResetProjectStructure)=\"resetProjectStructure()\"\r\n    (requestToSaveProjectStructure)=\"saveProjectStructure($event)\">\r\n  </app-code-editor>\r\n</div>\r\n<div class=\"col-6-12\">\r\n  <h2>Input Preview</h2>\r\n  <div *ngIf=\"projectStructure != null\">\r\n    <app-content-editor\r\n      [viewContent]=\"false\"\r\n      [viewOnly]=\"false\"\r\n      [projectStructure]=\"projectStructure\"\r\n      (structureCollectionTabsReordered)=\"structureCollectionTabsReordered($event)\">\r\n    </app-content-editor>\r\n  </div>\r\n</div>"
 
 /***/ }),
 
 /***/ 672:
 /***/ (function(module, exports) {
 
-module.exports = "<div class=\"row\">\n  <app-history-display\n    [history]=\"projectStructureHistory\"\n    [historyOf]=\"'structure'\"\n    [showPreview]=\"true\"\n    (revertToCommit)=\"revertToCommit($event)\">\n  </app-history-display>\n</div>\n\n<div class=\"row\">\n  <app-history-display\n    [history]=\"projectContentHistory\"\n    [historyOf]=\"'content'\"\n    [showPreview]=\"true\"\n    (revertToCommit)=\"revertToCommit($event)\">\n  </app-history-display>\n</div>"
+module.exports = "<app-cms-navigation\r\n\t[userAccessLevel]=\"userAccessLevel\"\r\n\t(requestToChangeView)=\"changeView($event)\"></app-cms-navigation>\r\n<app-errors\r\n\t[errors]=\"errors\"\r\n\t(requestToDismissErrors)=\"requestToDismissErrors($event)\"></app-errors>\r\n<div class=\"row\">\r\n\t<app-content-view\r\n\t\t*ngIf=\"_view == 'content'\"\r\n\t\t[userAccessLevel]=\"userAccessLevel\"\r\n\t\t[customCss]=\"customCss\"\r\n\t\t[projectStructure]=\"projectStructure\"\r\n\t\t[(projectContent)]=\"projectContent\"\r\n\t\t(viewRequestToSaveContent)=\"viewRequestToSaveContent($event)\"\r\n\t\t(viewRequestToResetContent)=\"viewRequestToResetContent()\">\r\n\t</app-content-view>\r\n\t\r\n\t<app-history-display\r\n\t\t*ngIf=\"_view == 'history'\"\r\n\t\t[history]=\"projectContentHistory\"\r\n\t\t[historyOf]=\"'content'\"\r\n\t\t[showPreview]=\"false\"\r\n\t\t(revertToCommit)=\"revertToCommit($event)\"\r\n\t\t(previewCommit)=\"previewCommit($event)\">\r\n\t</app-history-display>\r\n\r\n\t<app-settings-view\r\n\t\t*ngIf=\"_view == 'settings' && userAccessLevel == 2\"\r\n\t\t[(projectSettings)]=\"projectSettings\"\r\n\t\t(settingsUpdated)=\"viewRequestToRefreshSettings($event)\"\r\n\t\t(viewRequestToRefreshSettings)=\"viewRequestToRefreshSettings($event)\">\r\n\t</app-settings-view>\r\n\t\r\n</div>\r\n"
 
 /***/ }),
 
 /***/ 673:
 /***/ (function(module, exports) {
 
-module.exports = "<div class=\"col-6-12\">\r\n  <h2>Project Structure</h2>\r\n  <app-code-editor\r\n    [codeJson]=\"projectStructureJson\"\r\n    (codeUpdated)=\"codeUpdated($event)\"\r\n    (requestToResetProjectStructure)=\"resetProjectStructure()\"\r\n    (requestToSaveProjectStructure)=\"saveProjectStructure($event)\">\r\n  </app-code-editor>\r\n</div>\r\n<div class=\"col-6-12\">\r\n  <h2>Input Preview</h2>\r\n  <div *ngIf=\"projectStructure != null\">\r\n    <app-content-editor\r\n      [viewContent]=\"false\"\r\n      [viewOnly]=\"false\"\r\n      [projectStructure]=\"projectStructure\"\r\n      (structureCollectionTabsReordered)=\"structureCollectionTabsReordered($event)\">\r\n    </app-content-editor>\r\n  </div>\r\n</div>"
+module.exports = "<button\n  (click)=\"refreshUserProjects()\"\n  class=\"button cms top-tabs\">Refresh from Server</button>\n<div class=\"row container-background\">\n  <div class=\"col-8-12\">\n    <div *ngIf=\"_userProjects != null && _userProjects.length > 0\" class=\"topOfTable\">\n      <table class=\"head\">\n        <thead>\n          <tr>\n            <th>Project Name</th>\n            <th>Access Level</th>\n            <th>Last Modified By</th>\n            <th>Last Modified On</th>\n            <th>Options</th>\t\t\t\n          </tr>\n        </thead>\n      </table>\n\n      <div class=\"scrollable\">\n        <table>\n          <tbody>\n            <tr *ngFor=\"let project of _userProjects\">\n              <td>{{project.project_name}}</td>\n              <td>{{project.access_level_name}}</td>\n              <td>{{project.last_modified_by}}</td>\n              <td>{{project.last_modified_on != null ? (project.last_modified_on | customDate : false : true) : \"&nbsp;\"}}</td>\n              <td><button (click)=\"editProject(project.project_id, project.project_name, project.access_level_int)\">{{project.access_level_int == 3 ? \"View\" : \"Edit\"}}</button></td>\n            </tr>\n          </tbody>\n        </table>\n      </div>\n    </div>\n  </div>\n  <div class=\"col-4-12\">\n    <h2>Create a New Project</h2>\n    <h3>New Project Name</h3>\n    <input #pnInput type=\"text\">\n    \n    <h3>Templates</h3>\n    <span class=\"templates\">\n      <button (click)=\"createNewProject(pnInput)\" class=\"button template\">No Template</button>\n      <button (click)=\"createNewProject(pnInput, 'website_template')\" class=\"button template\">Website Template</button>\n      <button (click)=\"createNewProject(pnInput, 'mediaitems_template')\" class=\"button template\">Media Items Template</button>\n    </span>\n  </div>\n</div>"
 
 /***/ }),
 
 /***/ 674:
 /***/ (function(module, exports) {
 
-module.exports = "<app-cms-navigation\r\n\t[userAccessLevel]=\"userAccessLevel\"\r\n\t(requestToChangeView)=\"changeView($event)\"></app-cms-navigation>\r\n<app-errors\r\n\t[errors]=\"errors\"\r\n\t(requestToDismissErrors)=\"requestToDismissErrors($event)\"></app-errors>\r\n<div class=\"row\">\r\n\t<app-content-view\r\n\t\t*ngIf=\"_view == 'content'\"\r\n\t\t[userAccessLevel]=\"userAccessLevel\"\r\n\t\t[customCss]=\"customCss\"\r\n\t\t[projectStructure]=\"projectStructure\"\r\n\t\t[(projectContent)]=\"projectContent\"\r\n\t\t(viewRequestToSaveContent)=\"viewRequestToSaveContent($event)\"\r\n\t\t(viewRequestToResetContent)=\"viewRequestToResetContent()\">\r\n\t</app-content-view>\r\n\t\r\n\t<app-history-display\r\n\t\t*ngIf=\"_view == 'history'\"\r\n\t\t[history]=\"projectContentHistory\"\r\n\t\t[historyOf]=\"'content'\"\r\n\t\t[showPreview]=\"false\"\r\n\t\t(revertToCommit)=\"revertToCommit($event)\"\r\n\t\t(previewCommit)=\"previewCommit($event)\">\r\n\t</app-history-display>\r\n\r\n\t<app-settings-view\r\n\t\t*ngIf=\"_view == 'settings' && userAccessLevel == 2\"\r\n\t\t[(projectSettings)]=\"projectSettings\"\r\n\t\t(settingsUpdated)=\"viewRequestToRefreshSettings($event)\"\r\n\t\t(viewRequestToRefreshSettings)=\"viewRequestToRefreshSettings($event)\">\r\n\t</app-settings-view>\r\n\t\r\n</div>\r\n"
+module.exports = "<app-content-view\r\n  [userAccessLevel]=\"3\"\r\n  [projectContent]=\"projectContent\"\r\n  [projectStructure]=\"projectStructure\"\r\n  [customCss]=\"customCss\"\r\n  [viewOnly]=\"true\"></app-content-view>\r\n"
 
 /***/ }),
 
 /***/ 675:
 /***/ (function(module, exports) {
 
-module.exports = "<button (click)=\"refreshUserProjects()\">Refresh from Server</button>\n<div class=\"row\">\n  <div class=\"col-8-12\">\n    <div *ngIf=\"_userProjects != null && _userProjects.length > 0\">\n      <table>\n        <thead>\n          <tr>\n            <th>Project Name</th>\n            <th>Access Level</th>\n            <th>Last Modified By</th>\n            <th>Last Modified On</th>\n            <th>Options</th>\t\t\t\n          </tr>\n        </thead>\n      </table>\n\n      <div class=\"scrollable\">\n        <table>\n          <tbody>\n            <tr *ngFor=\"let project of _userProjects\">\n              <td>{{project.project_name}}</td>\n              <td>{{project.access_level_name}}</td>\n              <td>{{project.last_modified_by}}</td>\n              <td>{{project.last_modified_on != null ? (project.last_modified_on | customDate : false : true) : \"&nbsp;\"}}</td>\n              <td><button (click)=\"editProject(project.project_id, project.project_name, project.access_level_int)\">{{project.access_level_int == 3 ? \"View\" : \"Edit\"}}</button></td>\n            </tr>\n          </tbody>\n        </table>\n      </div>\n    </div>\n  </div>\n  <div class=\"col-4-12\">\n    <h2>Create a New Project</h2>\n    <h3>Project Name</h3>\n    <input #pnInput type=\"text\">\n    \n    <h3>Templates</h3>\n    <span class=\"templates\">\n      <button (click)=\"createNewProject(pnInput)\">No Template</button>\n      <button (click)=\"createNewProject(pnInput, 'website_template')\">Website Template</button>\n      <button (click)=\"createNewProject(pnInput, 'mediaitems_template')\">Media Items Template</button>\n    </span>\n  </div>\n</div>"
+module.exports = "<ng-container *ngIf=\"_projectId == null && _userAccessLevel == null\">\r\n    <app-user-projects\r\n        (viewProject)=\"viewProject($event)\"\r\n        (viewLoginRequired)=\"viewLoginRequired($event)\"></app-user-projects>\r\n</ng-container>\r\n\r\n<ng-container *ngIf=\"_projectId != null && _userAccessLevel != null\">\r\n    <button (click)=\"refreshProject()\" class=\"button cms top-tabs\">Refresh from Server</button>\r\n    <button (click)=\"viewUserProjects()\" class=\"button cms top-tabs\">Back to all Projects</button>\r\n    <a\r\n        *ngIf=\"_userAccessLevel == 1\"\r\n        [href]=\"'./../feeds/' + _projectId\"\r\n        target=\"_blank\"\r\n        class=\"button cms top-tabs\">View JSON</a>\r\n    <app-cms-admin\r\n        *ngIf=\"_userAccessLevel == 1\"\r\n        [errors]=\"errors\"\r\n        [(projectStructure)]=\"projectStructure\"\r\n        [(projectContent)]=\"projectContent\"\r\n        [projectStructureHistory]=\"projectStructureHistory\"\r\n        [projectContentHistory]=\"projectContentHistory\"\r\n        [(projectSettings)]=\"projectSettings\"\r\n        (adminRequestToSaveStructure)=\"saveProjectStructure($event)\"\r\n        (adminRequestToResetStructure)=\"resetProjectStructure()\"\r\n        (adminRequestToSaveContent)=\"saveProjectContent($event)\"\r\n        (adminRequestToResetContent)=\"resetProjectContent()\"\r\n        (adminRequestToRefreshSettings)=\"loadProjectSettings()\"\r\n        (adminNotifyingOfProjectDeletion)=\"projectDeleted()\"\r\n        (adminRequestToDismissErrors)=\"dismissErrors()\">\r\n    </app-cms-admin>\r\n    <app-cms-editor\r\n        *ngIf=\"_userAccessLevel == 2 || _userAccessLevel > 3\"\r\n        [errors]=\"errors\"\r\n        [userAccessLevel]=\"_userAccessLevel\"\r\n        [(projectContent)]=\"projectContent\"\r\n        [projectStructure]=\"projectStructure\"\r\n        [(projectSettings)]=\"projectSettings\"\r\n        [projectContentHistory]=\"projectContentHistory\"\r\n        [customCss]=\"projectSettings != null ? projectSettings.custom_css : ''\"\r\n        (editorRequestToSaveContent)=\"saveProjectContent($event)\"\r\n        (editorRequestToResetContent)=\"resetProjectContent()\"\r\n        (editorRequestToRefreshSettings)=\"loadProjectSettings()\"\r\n        (editorRequestToDismissErrors)=\"dismissErrors()\">\r\n    </app-cms-editor>\r\n    <app-cms-view-only\r\n        *ngIf=\"_userAccessLevel == 3\"\r\n        [projectContent]=\"projectContent\"\r\n        [projectStructure]=\"projectStructure\"\r\n        [customCss]=\"projectSettings != null ? projectSettings.custom_css : ''\">\r\n    </app-cms-view-only>\r\n</ng-container>"
 
 /***/ }),
 
 /***/ 676:
 /***/ (function(module, exports) {
 
-module.exports = "<app-content-view\r\n  [userAccessLevel]=\"3\"\r\n  [projectContent]=\"projectContent\"\r\n  [projectStructure]=\"projectStructure\"\r\n  [customCss]=\"customCss\"\r\n  [viewOnly]=\"true\"></app-content-view>\r\n"
+module.exports = "<div class=\"row\">\n\t<nav>\n\t\t<ul [class]=\"userAccessLevel == 1 ? 'admin' : 'editor'\">\n\t\t\t<li *ngIf=\"userAccessLevel == 1\" (click)=\"changeView('structure')\">Structure</li>\n\t\t\t<li (click)=\"changeView('content')\">Content</li>\n\t\t\t<li (click)=\"changeView('history')\">Project History</li>\n\t\t\t<li *ngIf=\"userAccessLevel <= 2\" (click)=\"changeView('settings')\">Project Settings</li>\n\t\t</ul>\n\t</nav>\n</div>\n"
 
 /***/ }),
 
 /***/ 677:
 /***/ (function(module, exports) {
 
-module.exports = "<ng-container *ngIf=\"_projectId == null && _userAccessLevel == null\">\r\n    <app-user-projects\r\n        (viewProject)=\"viewProject($event)\"\r\n        (viewLoginRequired)=\"viewLoginRequired($event)\"></app-user-projects>\r\n</ng-container>\r\n\r\n<ng-container *ngIf=\"_projectId != null && _userAccessLevel != null\">\r\n    <button (click)=\"refreshProject()\">Refresh from Server</button>\r\n    <button (click)=\"viewUserProjects()\">Back to all Projects</button>\r\n    <button *ngIf=\"_userAccessLevel == 1\"><a [href]=\"'./../feeds/' + _projectId\" target=\"_blank\">View JSON</a></button>\r\n    <app-cms-admin\r\n        *ngIf=\"_userAccessLevel == 1\"\r\n        [errors]=\"errors\"\r\n        [(projectStructure)]=\"projectStructure\"\r\n        [(projectContent)]=\"projectContent\"\r\n        [projectStructureHistory]=\"projectStructureHistory\"\r\n        [projectContentHistory]=\"projectContentHistory\"\r\n        [(projectSettings)]=\"projectSettings\"\r\n        (adminRequestToSaveStructure)=\"saveProjectStructure($event)\"\r\n        (adminRequestToResetStructure)=\"resetProjectStructure()\"\r\n        (adminRequestToSaveContent)=\"saveProjectContent($event)\"\r\n        (adminRequestToResetContent)=\"resetProjectContent()\"\r\n        (adminRequestToRefreshSettings)=\"loadProjectSettings()\"\r\n        (adminNotifyingOfProjectDeletion)=\"projectDeleted()\"\r\n        (adminRequestToDismissErrors)=\"dismissErrors()\">\r\n    </app-cms-admin>\r\n    <app-cms-editor\r\n        *ngIf=\"_userAccessLevel == 2 || _userAccessLevel > 3\"\r\n        [errors]=\"errors\"\r\n        [userAccessLevel]=\"_userAccessLevel\"\r\n        [(projectContent)]=\"projectContent\"\r\n        [projectStructure]=\"projectStructure\"\r\n        [(projectSettings)]=\"projectSettings\"\r\n        [projectContentHistory]=\"projectContentHistory\"\r\n        [customCss]=\"projectSettings != null ? projectSettings.custom_css : ''\"\r\n        (editorRequestToSaveContent)=\"saveProjectContent($event)\"\r\n        (editorRequestToResetContent)=\"resetProjectContent()\"\r\n        (editorRequestToRefreshSettings)=\"loadProjectSettings()\"\r\n        (editorRequestToDismissErrors)=\"dismissErrors()\">\r\n    </app-cms-editor>\r\n    <app-cms-view-only\r\n        *ngIf=\"_userAccessLevel == 3\"\r\n        [projectContent]=\"projectContent\"\r\n        [projectStructure]=\"projectStructure\"\r\n        [customCss]=\"projectSettings != null ? projectSettings.custom_css : ''\">\r\n    </app-cms-view-only>\r\n</ng-container>"
+module.exports = "<div>\n  <button\n    (click)=\"formatJsonClicked()\"\n    class=\"button cms bottom-tabs\">Format JSON</button>\n  <button\n    (click)=\"resetProjectStructureClicked()\"\n    class=\"button cms bottom-tabs\">Reset</button>\n  <button\n    (click)=\"saveProjectStructureClicked()\"\n    class=\"button cms bottom-tabs\">Save</button>\n  <label class=\"right\">Commit Message:\n    <input\n      type=\"text\"\n      [(ngModel)]=\"_commitMessage\">\n  </label>\n<textarea\n  [(ngModel)]=\"codeJson\">\n</textarea>\n"
 
 /***/ }),
 
 /***/ 678:
 /***/ (function(module, exports) {
 
-module.exports = "<div class=\"row\">\n\t<nav>\n\t\t<ul [class]=\"userAccessLevel == 1 ? 'admin' : 'editor'\">\n\t\t\t<li *ngIf=\"userAccessLevel == 1\" (click)=\"changeView('structure')\">Structure</li>\n\t\t\t<li (click)=\"changeView('content')\">Content</li>\n\t\t\t<li (click)=\"changeView('history')\">Project History</li>\n\t\t\t<li *ngIf=\"userAccessLevel <= 2\" (click)=\"changeView('settings')\">Project Settings</li>\n\t\t</ul>\n\t</nav>\n</div>\n"
+module.exports = "<ng-container *ngIf=\"itemStructure != null && itemStructure.attributes != null\">\r\n  <br *ngIf=\"itemStructure.input_type == 'textarea'\">\r\n  <label>{{itemName | title}} {{itemStructure.attributes.required == \"required\" ? '*' : ''}}\r\n    <ng-container *ngIf=\"itemStructure.type != 'html'\">\r\n      <input\r\n        *ngIf=\"(itemStructure.input_type == null || itemStructure.input_type == 'input') && itemStructure.attributes.type != 'file'\"\r\n        [type]=\"itemStructure.attributes.type != null ? itemStructure.attributes.type : 'text'\"\r\n        [(ngModel)]=\"itemContent\"\r\n        (change)=\"contentChanged($event)\"\r\n        [disabled]=\"viewOnly\"\r\n        [id]=\"itemStructure.attributes.id != null ? itemStructure.attributes.id : ''\"\r\n        [class]=\"'contentInput' + (itemStructure.attributes.class != null ? ' ' + itemStructure.attributes.class : '')\"\r\n        [required]=\"itemStructure.attributes.required != null && itemStructure.attributes.required\"\r\n        [max]=\"itemStructure.attributes.max != null ? itemStructure.attributes.max : ''\"\r\n        [min]=\"itemStructure.attributes.min != null ? itemStructure.attributes.min : ''\"\r\n        [maxlength]=\"itemStructure.attributes.maxlength != null ? itemStructure.attributes.maxlength : ''\"\r\n        [attr.data-name]=\"encapsulationPath\"\r\n        appFormControl>\r\n\r\n      <textarea\r\n        *ngIf=\"itemStructure.input_type == 'textarea'\"\r\n        [(ngModel)]=\"itemContent\"\r\n        (change)=\"contentChanged($event)\"\r\n        [disabled]=\"viewOnly\"\r\n        [id]=\"itemStructure.attributes.id != null ? itemStructure.attributes.id : ''\"\r\n        [class]=\"'contentInput' + (itemStructure.attributes.class != null ? ' ' + itemStructure.attributes.class : '')\"\r\n        [required]=\"itemStructure.attributes.required != null && itemStructure.attributes.required\"\r\n        [attr.data-name]=\"encapsulationPath\"\r\n        appFormControl>\r\n      </textarea>\r\n\r\n      <ng-container *ngIf=\"itemStructure.input_type != null && itemStructure.input_type == 'select'\">\r\n        <select\r\n          *ngIf=\"viewOnly == false\"\r\n          [(ngModel)]=\"itemContent\"\r\n          (change)=\"contentChanged($event)\"\r\n          [id]=\"itemStructure.attributes.id != null ? itemStructure.attributes.id : ''\"\r\n          [class]=\"'contentInput' + (itemStructure.attributes.class != null ? ' ' + itemStructure.attributes.class : '')\"\r\n          [required]=\"itemStructure.attributes.required != null && itemStructure.attributes.required\"\r\n          [attr.data-name]=\"encapsulationPath\"\r\n          appFormControl>\r\n          <ng-container *ngIf=\"itemStructure.attributes != null && itemStructure.attributes.options != null\">\r\n            <option\r\n              *ngFor=\"let option of itemStructure.attributes.options\"\r\n              [value]=\"option\"\r\n              [selected]=\"itemContent != null && viewContent != false && option == itemContent\">\r\n              {{option | title}}\r\n            </option>\r\n          </ng-container>\r\n        </select>\r\n        <input\r\n          *ngIf=\"viewOnly\"\r\n          [value]=\"itemContent\"\r\n          disabled=\"true\">\r\n      </ng-container>\r\n    </ng-container>\r\n  </label>\r\n  \r\n<span *ngIf=\"_contentError != null && _contentError.length > 0\" class=\"error\">\r\n  {{_contentError}}\r\n</span>\r\n\r\n  <app-wysiwyg-html\r\n    *ngIf=\"itemStructure.type == 'html'\"\r\n    [viewContent]=\"viewContent\"\r\n    [viewOnly]=\"viewOnly\"\r\n    [itemContent]=\"itemContent\"\r\n    [itemAttributes]=\"itemStructure.attributes\"\r\n    [encapsulationPath]=\"encapsulationPath\"\r\n    (wysiwygContentChanged)=\"contentChanged($event)\"></app-wysiwyg-html>\r\n  <app-file-upload\r\n    *ngIf=\"itemStructure.attributes.type == 'file'\"\r\n    [viewOnly]=\"viewOnly\"\r\n    [viewContent]=\"viewContent\"\r\n    [(itemContent)]=\"itemContent\"\r\n    [itemAttributes]=\"itemStructure.attributes\"\r\n    [encapsulationPath]=\"encapsulationPath\"\r\n    (fileChanged)=\"contentChanged($event)\">\r\n  </app-file-upload>\r\n</ng-container>"
 
 /***/ }),
 
 /***/ 679:
 /***/ (function(module, exports) {
 
-module.exports = "<div class=\"row\">\n  <button (click)=\"formatJsonClicked()\">Format JSON</button>\n  <button (click)=\"resetProjectStructureClicked()\">Reset</button>\n  <button (click)=\"saveProjectStructureClicked()\">Save</button>\n  <label>Commit Message:\n    <input\n      type=\"text\"\n      [(ngModel)]=\"_commitMessage\">\n  </label>\n<textarea\n  [(ngModel)]=\"codeJson\">\n</textarea>\n"
+module.exports = "<h3 *ngIf=\"subCollection\">{{collection | title}}</h3>\r\n<br *ngIf=\"projectStructure != null && (projectStructure[collection] != null && (projectStructure[collection].input_type == 'textarea' || projectStructure[collection].type == 'html'))\">\r\n<div [class]=\"subCollection ? 'subCollection ' + collection : 'inline'\">\r\n  <ng-container *ngIf=\"projectStructure != null && projectStructure[collection] != null\">\r\n    <ng-container *ngIf=\"projectStructure[collection] != null && projectStructure[collection].items == null && encapsulationPath != null\">\r\n      <app-collection-item\r\n        *ngIf=\"userAccessLevel <= 2 || projectStructure[collection].no_access == null || (projectStructure[collection].no_access != null && projectStructure[collection].no_access.indexOf(userAccessLevel) < 0)\"\r\n        [class]=\"encapsulationPath.split('/').join(' ')\"\r\n        [encapsulationPath]=\"encapsulationPath\"\r\n        [itemName]=\"collection\"\r\n        [itemStructure]=\"projectStructure[collection]\"\r\n        [itemContent]=\"projectContent != null && projectContent[collection] != null ? projectContent[collection] : null\"\r\n        [viewContent]=\"viewContent\"\r\n        [viewOnly]=\"viewOnly\"\r\n        (itemContentChanged)=\"collectionContentChanged($event)\">\r\n      </app-collection-item>\r\n    </ng-container>\r\n    \r\n    <ng-container *ngIf=\"projectStructure[collection] != null && projectStructure[collection].items != null\">\r\n      \r\n      <ng-container *ngIf=\"projectStructure[collection].type == 'object'\">\r\n        <ng-container *ngFor=\"let collectionItemName of projectStructure[collection].items | keyValArray : 'keys'\">\r\n          <app-collection\r\n            *ngIf=\"userAccessLevel <= 2 || projectStructure[collection].items[collectionItemName].no_access == null || (projectStructure[collection].items[collectionItemName].no_access != null && projectStructure[collection].items[collectionItemName].no_access.indexOf(userAccessLevel) < 0)\"\r\n            [encapsulationPath]=\"encapsulationPath + '/' + collectionItemName\"\r\n            [subCollection]=\"projectStructure[collection].items[collectionItemName].type == 'object' || projectStructure[collection].items[collectionItemName].type == 'array'\"\r\n            [collection]=\"collectionItemName\"\r\n            [projectStructure]=\"projectStructure[collection].items\"\r\n            [projectContent]=\"projectContent != null && projectContent[collection] != null ? projectContent[collection] : null\"\r\n            [viewContent]=\"viewContent\"\r\n            [viewOnly]=\"viewOnly\"\r\n            (itemContentChanged)=\"itemContentChanged($event)\"\r\n            (contentChanged)=\"collectionContentChanged($event)\">\r\n          </app-collection>\r\n        </ng-container>\r\n      </ng-container>\r\n\r\n      <ng-container *ngIf=\"projectStructure[collection].type == 'array'\">\r\n        <ng-container *ngIf=\"projectContent != null && projectContent[collection] != null && viewContent\">\r\n          <app-draggable-container\r\n            [content]=\"projectContent[collection]\"\r\n            [contentEncapsulationPath]=\"encapsulationPath\"\r\n            [contentType]=\"projectStructure[collection].type\"\r\n            (contentReordered)=\"collectionContentChanged($event)\">\r\n            <ng-container *ngFor=\"let index of projectContent[collection] | keyValArray : 'keys'\">\r\n              <div\r\n                *ngIf=\"userAccessLevel <= 2 || projectStructure[collection].no_access == null || (projectStructure[collection].no_access != null && projectStructure[collection].no_access.indexOf(userAccessLevel) < 0)\"\r\n                class=\"collection\"\r\n                [draggable]=\"viewOnly == false\"\r\n                [attr.data-key]=\"index\">\r\n                <ng-container *ngFor=\"let collectionItemName of projectStructure[collection].items | keyValArray : 'keys'\">\r\n                  <app-collection\r\n                    *ngIf=\"projectContent[collection][index] != null\"\r\n                    [subCollection]=\"projectStructure[collection].items[collectionItemName].type == 'array'\"\r\n                    [encapsulationPath]=\"encapsulationPath + '/' + index + '/' + collectionItemName\"\r\n                    [collection]=\"collectionItemName\"\r\n                    [projectStructure]=\"projectStructure[collection].items\"\r\n                    [projectContent]=\"projectContent[collection][index] != null ? projectContent[collection][index] : null\"\r\n                    [viewContent]=\"viewContent\"\r\n                    [viewOnly]=\"viewOnly\"\r\n                    (itemContentChanged)=\"collectionContentChanged($event)\"\r\n                    (contentChanged)=\"collectionContentChanged($event)\">\r\n                  </app-collection>\r\n                </ng-container>\r\n                <button\r\n                  *ngIf=\"viewOnly == false\"\r\n                  (click)=\"deleteItem(encapsulationPath, index)\">Delete</button>\r\n              </div>\r\n            </ng-container>\r\n          </app-draggable-container>\r\n        </ng-container>\r\n\r\n        <ng-container *ngIf=\"(projectContent == null || projectContent[collection] == null) && viewContent == false\">\r\n          <ng-container *ngFor=\"let collectionItemName of projectStructure[collection].items | keyValArray : 'keys'\">\r\n            <ng-container *ngIf=\"projectStructure[collection].items[collectionItemName].type != 'object' && projectStructure[collection].items[collectionItemName].type != 'array'\">\r\n                <app-collection\r\n                  [encapsulationPath]=\"projectStructure[collection].type == 'array' ? encapsulationPath + '/0/' + collectionItemName : encapsulationPath + '/' + collectionItemName\"\r\n                  [collection]=\"collectionItemName\"\r\n                  [projectStructure]=\"projectStructure[collection].items\"\r\n                  [viewContent]=\"viewContent\"\r\n                  [viewOnly]=\"viewOnly\"\r\n                  (itemContentChanged)=\"collectionContentChanged($event)\"\r\n                  (contentChanged)=\"collectionContentChanged($event)\">\r\n                </app-collection>\r\n            </ng-container>\r\n            \r\n            <ng-container *ngIf=\"projectStructure[collection].items[collectionItemName].type == 'object'\">\r\n              <app-collection\r\n                [encapsulationPath]=\"encapsulationPath + '/' + collectionItemName\"\r\n                [subCollection]=\"true\"\r\n                [collection]=\"collectionItemName\"\r\n                [projectStructure]=\"projectStructure[collection].items\"\r\n                [viewContent]=\"viewContent\"\r\n                [viewOnly]=\"viewOnly\"\r\n                (itemContentChanged)=\"collectionContentChanged($event)\"\r\n                (contentChanged)=\"collectionContentChanged($event)\">\r\n              </app-collection>\r\n            </ng-container>\r\n\r\n            <ng-container *ngIf=\"projectStructure[collection].items[collectionItemName].type == 'array'\">\r\n              <app-collection\r\n                [encapsulationPath]=\"encapsulationPath + '/0/' + collectionItemName\"\r\n                [subCollection]=\"true\"\r\n                [collection]=\"collectionItemName\"\r\n                [projectStructure]=\"projectStructure[collection].items\"\r\n                [viewContent]=\"viewContent\"\r\n                [viewOnly]=\"viewOnly\"\r\n                (itemContentChanged)=\"collectionContentChanged($event)\"\r\n                (contentChanged)=\"collectionContentChanged($event)\">\r\n              </app-collection>\r\n            </ng-container>\r\n          </ng-container>\r\n        </ng-container>\r\n\r\n        <button\r\n            *ngIf=\"viewOnly == false\"\r\n            (click)=\"addNewItem(encapsulationPath, projectStructure[collection])\"> Add {{collection | title}}</button>\r\n      </ng-container>\r\n\r\n    </ng-container>\r\n  </ng-container>\r\n</div>"
 
 /***/ }),
 
 /***/ 680:
 /***/ (function(module, exports) {
 
-module.exports = "<ng-container *ngIf=\"itemStructure != null && itemStructure.attributes != null\">\r\n  <br *ngIf=\"itemStructure.input_type == 'textarea'\">\r\n  <label>{{itemName | title}} {{itemStructure.attributes.required == \"required\" ? '*' : ''}}\r\n    <ng-container *ngIf=\"itemStructure.type != 'html'\">\r\n      <input\r\n        *ngIf=\"(itemStructure.input_type == null || itemStructure.input_type == 'input') && itemStructure.attributes.type != 'file'\"\r\n        [type]=\"itemStructure.attributes.type != null ? itemStructure.attributes.type : 'text'\"\r\n        [(ngModel)]=\"itemContent\"\r\n        (change)=\"contentChanged($event)\"\r\n        [disabled]=\"viewOnly\"\r\n        [id]=\"itemStructure.attributes.id != null ? itemStructure.attributes.id : ''\"\r\n        [class]=\"'contentInput' + (itemStructure.attributes.class != null ? ' ' + itemStructure.attributes.class : '')\"\r\n        [required]=\"itemStructure.attributes.required != null && itemStructure.attributes.required\"\r\n        [max]=\"itemStructure.attributes.max != null ? itemStructure.attributes.max : ''\"\r\n        [min]=\"itemStructure.attributes.min != null ? itemStructure.attributes.min : ''\"\r\n        [maxlength]=\"itemStructure.attributes.maxlength != null ? itemStructure.attributes.maxlength : ''\"\r\n        [attr.data-name]=\"encapsulationPath\"\r\n        appFormControl>\r\n\r\n      <textarea\r\n        *ngIf=\"itemStructure.input_type == 'textarea'\"\r\n        [(ngModel)]=\"itemContent\"\r\n        (change)=\"contentChanged($event)\"\r\n        [disabled]=\"viewOnly\"\r\n        [id]=\"itemStructure.attributes.id != null ? itemStructure.attributes.id : ''\"\r\n        [class]=\"'contentInput' + (itemStructure.attributes.class != null ? ' ' + itemStructure.attributes.class : '')\"\r\n        [required]=\"itemStructure.attributes.required != null && itemStructure.attributes.required\"\r\n        [attr.data-name]=\"encapsulationPath\"\r\n        appFormControl>\r\n      </textarea>\r\n\r\n      <ng-container *ngIf=\"itemStructure.input_type != null && itemStructure.input_type == 'select'\">\r\n        <select\r\n          *ngIf=\"viewOnly == false\"\r\n          [(ngModel)]=\"itemContent\"\r\n          (change)=\"contentChanged($event)\"\r\n          [id]=\"itemStructure.attributes.id != null ? itemStructure.attributes.id : ''\"\r\n          [class]=\"'contentInput' + (itemStructure.attributes.class != null ? ' ' + itemStructure.attributes.class : '')\"\r\n          [required]=\"itemStructure.attributes.required != null && itemStructure.attributes.required\"\r\n          [attr.data-name]=\"encapsulationPath\"\r\n          appFormControl>\r\n          <ng-container *ngIf=\"itemStructure.attributes != null && itemStructure.attributes.options != null\">\r\n            <option\r\n              *ngFor=\"let option of itemStructure.attributes.options\"\r\n              [value]=\"option\"\r\n              [selected]=\"itemContent != null && viewContent != false && option == itemContent\">\r\n              {{option | title}}\r\n            </option>\r\n          </ng-container>\r\n        </select>\r\n        <input\r\n          *ngIf=\"viewOnly\"\r\n          [value]=\"itemContent\"\r\n          disabled=\"true\">\r\n      </ng-container>\r\n    </ng-container>\r\n  </label>\r\n  \r\n<span *ngIf=\"_contentError != null && _contentError.length > 0\" class=\"error\">\r\n  {{_contentError}}\r\n</span>\r\n\r\n  <app-wysiwyg-html\r\n    *ngIf=\"itemStructure.type == 'html'\"\r\n    [viewContent]=\"viewContent\"\r\n    [viewOnly]=\"viewOnly\"\r\n    [itemContent]=\"itemContent\"\r\n    [itemAttributes]=\"itemStructure.attributes\"\r\n    [encapsulationPath]=\"encapsulationPath\"\r\n    (wysiwygContentChanged)=\"contentChanged($event)\"></app-wysiwyg-html>\r\n  <app-file-upload\r\n    *ngIf=\"itemStructure.attributes.type == 'file'\"\r\n    [viewOnly]=\"viewOnly\"\r\n    [viewContent]=\"viewContent\"\r\n    [(itemContent)]=\"itemContent\"\r\n    [itemAttributes]=\"itemStructure.attributes\"\r\n    [encapsulationPath]=\"encapsulationPath\"\r\n    (fileChanged)=\"contentChanged($event)\">\r\n  </app-file-upload>\r\n</ng-container>"
+module.exports = "<div *ngIf=\"projectStructure != null\">\r\n  <ng-container *ngIf=\"viewContent && viewOnly == false\">\r\n      <button\r\n        (click)=\"resetProjectContent()\"\r\n        class=\"button cms bottom-tabs\">Reset</button>\r\n      <button\r\n        (click)=\"saveProjectContent()\"\r\n        class=\"button cms bottom-tabs\">Save</button>\r\n      <label>Commit Message:\r\n        <input\r\n          type=\"text\"\r\n          [(ngModel)]=\"_commitMessage\">\r\n      </label>\r\n  </ng-container>\r\n<app-errors\r\n\t[errors]=\"_contentErrors | keyValArray : 'values'\"\r\n\t(requestToDismissErrors)=\"requestToDismissErrors($event)\"></app-errors>\r\n  <div>\r\n    <div [class]=\"viewContent ? 'col-2-12' : 'col-3-12'\">\r\n        <div *ngIf=\"projectStructure != null\">\r\n          <app-draggable-container\r\n            [content]=\"projectStructure\"\r\n            [contentEncapsulationPath]=\"\"\r\n            [contentType]=\"object\"\r\n            (contentReordered)=\"collectionTabsReordered($event)\">\r\n            <ng-container *ngFor=\"let collection of projectStructure | keyValArray : 'keys'\">\r\n              <div *ngIf=\"userAccessLevel <= 2 || projectStructure[collection].no_access == null || (projectStructure[collection].no_access != null && projectStructure[collection].no_access.indexOf(userAccessLevel) < 0)\"\r\n                [draggable]=\"viewContent == false\"\r\n                [attr.data-key]=\"collection\"\r\n                (click)=\"viewCollection(collection)\"\r\n                [class]=\"(viewContent ? 'padding' : '') + (collection === currentCollectionName ? ' active' : '')  + ' collectionTab'\">{{collection | title}}\r\n              </div>\r\n            </ng-container>\r\n          </app-draggable-container>\r\n        </div>\r\n    </div>\r\n    <div [class]=\"viewContent ? 'col-10-12' : 'col-9-12'\">\r\n      <ng-container *ngIf=\"currentCollectionName != null && (userAccessLevel <= 2 || projectStructure[currentCollectionName].no_access == null || (projectStructure[currentCollectionName].no_access != null && projectStructure[currentCollectionName].no_access.indexOf(userAccessLevel) < 0))\">\r\n        <h2>{{currentCollectionName | title}}</h2>\r\n        <form>\r\n          <app-collection\r\n            [userAccessLevel]=\"userAccessLevel\"\r\n            [topLevelCollection]=\"true\"\r\n            [encapsulationPath]=\"currentCollectionName\"\r\n            [collection]=\"currentCollectionName\"\r\n            [projectContent]=\"projectContent\"\r\n            [projectStructure]=\"projectStructure\"\r\n            [viewContent]=\"viewContent\"\r\n            [viewOnly]=\"viewOnly\"\r\n            (contentChanged)=\"projectContentChanged($event)\">\r\n          </app-collection>\r\n        </form>\r\n      </ng-container>\r\n    </div>\r\n  </div>\r\n</div>\r\n"
 
 /***/ }),
 
 /***/ 681:
 /***/ (function(module, exports) {
 
-module.exports = "<h3 *ngIf=\"subCollection\">{{collection | title}}</h3>\r\n<br *ngIf=\"projectStructure != null && (projectStructure[collection] != null && (projectStructure[collection].input_type == 'textarea' || projectStructure[collection].type == 'html'))\">\r\n<div [class]=\"subCollection ? 'subCollection ' + collection : 'inline'\">\r\n  <ng-container *ngIf=\"projectStructure != null && projectStructure[collection] != null\">\r\n    <ng-container *ngIf=\"projectStructure[collection] != null && projectStructure[collection].items == null && encapsulationPath != null\">\r\n      <app-collection-item\r\n        *ngIf=\"userAccessLevel <= 2 || projectStructure[collection].no_access == null || (projectStructure[collection].no_access != null && projectStructure[collection].no_access.indexOf(userAccessLevel) < 0)\"\r\n        [class]=\"encapsulationPath.split('/').join(' ')\"\r\n        [encapsulationPath]=\"encapsulationPath\"\r\n        [itemName]=\"collection\"\r\n        [itemStructure]=\"projectStructure[collection]\"\r\n        [itemContent]=\"projectContent != null && projectContent[collection] != null ? projectContent[collection] : null\"\r\n        [viewContent]=\"viewContent\"\r\n        [viewOnly]=\"viewOnly\"\r\n        (itemContentChanged)=\"collectionContentChanged($event)\">\r\n      </app-collection-item>\r\n    </ng-container>\r\n    \r\n    <ng-container *ngIf=\"projectStructure[collection] != null && projectStructure[collection].items != null\">\r\n      \r\n      <ng-container *ngIf=\"projectStructure[collection].type == 'object'\">\r\n        <ng-container *ngFor=\"let collectionItemName of projectStructure[collection].items | keyValArray : 'keys'\">\r\n          <app-collection\r\n            *ngIf=\"userAccessLevel <= 2 || projectStructure[collection].items[collectionItemName].no_access == null || (projectStructure[collection].items[collectionItemName].no_access != null && projectStructure[collection].items[collectionItemName].no_access.indexOf(userAccessLevel) < 0)\"\r\n            [encapsulationPath]=\"encapsulationPath + '/' + collectionItemName\"\r\n            [subCollection]=\"projectStructure[collection].items[collectionItemName].type == 'object' || projectStructure[collection].items[collectionItemName].type == 'array'\"\r\n            [collection]=\"collectionItemName\"\r\n            [projectStructure]=\"projectStructure[collection].items\"\r\n            [projectContent]=\"projectContent != null && projectContent[collection] != null ? projectContent[collection] : null\"\r\n            [viewContent]=\"viewContent\"\r\n            [viewOnly]=\"viewOnly\"\r\n            (itemContentChanged)=\"itemContentChanged($event)\"\r\n            (contentChanged)=\"collectionContentChanged($event)\">\r\n          </app-collection>\r\n        </ng-container>\r\n      </ng-container>\r\n\r\n      <ng-container *ngIf=\"projectStructure[collection].type == 'array'\">\r\n        <ng-container *ngIf=\"projectContent != null && projectContent[collection] != null && viewContent\">\r\n          <app-draggable-container\r\n            [content]=\"projectContent[collection]\"\r\n            [contentEncapsulationPath]=\"encapsulationPath\"\r\n            [contentType]=\"projectStructure[collection].type\"\r\n            (contentReordered)=\"collectionContentChanged($event)\">\r\n            <ng-container *ngFor=\"let index of projectContent[collection] | keyValArray : 'keys'\">\r\n              <div\r\n                *ngIf=\"userAccessLevel <= 2 || projectStructure[collection].no_access == null || (projectStructure[collection].no_access != null && projectStructure[collection].no_access.indexOf(userAccessLevel) < 0)\"\r\n                class=\"collection\"\r\n                [draggable]=\"viewOnly == false\"\r\n                [attr.data-key]=\"index\">\r\n                <ng-container *ngFor=\"let collectionItemName of projectStructure[collection].items | keyValArray : 'keys'\">\r\n                  <app-collection\r\n                    *ngIf=\"projectContent[collection][index] != null\"\r\n                    [subCollection]=\"projectStructure[collection].items[collectionItemName].type == 'array'\"\r\n                    [encapsulationPath]=\"encapsulationPath + '/' + index + '/' + collectionItemName\"\r\n                    [collection]=\"collectionItemName\"\r\n                    [projectStructure]=\"projectStructure[collection].items\"\r\n                    [projectContent]=\"projectContent[collection][index] != null ? projectContent[collection][index] : null\"\r\n                    [viewContent]=\"viewContent\"\r\n                    [viewOnly]=\"viewOnly\"\r\n                    (itemContentChanged)=\"collectionContentChanged($event)\"\r\n                    (contentChanged)=\"collectionContentChanged($event)\">\r\n                  </app-collection>\r\n                </ng-container>\r\n                <button\r\n                  *ngIf=\"viewOnly == false\"\r\n                  (click)=\"deleteItem(encapsulationPath, index)\">Delete</button>\r\n              </div>\r\n            </ng-container>\r\n          </app-draggable-container>\r\n        </ng-container>\r\n\r\n        <ng-container *ngIf=\"(projectContent == null || projectContent[collection] == null) && viewContent == false\">\r\n          <ng-container *ngFor=\"let collectionItemName of projectStructure[collection].items | keyValArray : 'keys'\">\r\n            <ng-container *ngIf=\"projectStructure[collection].items[collectionItemName].type != 'object' && projectStructure[collection].items[collectionItemName].type != 'array'\">\r\n                <app-collection\r\n                  [encapsulationPath]=\"projectStructure[collection].type == 'array' ? encapsulationPath + '/0/' + collectionItemName : encapsulationPath + '/' + collectionItemName\"\r\n                  [collection]=\"collectionItemName\"\r\n                  [projectStructure]=\"projectStructure[collection].items\"\r\n                  [viewContent]=\"viewContent\"\r\n                  [viewOnly]=\"viewOnly\"\r\n                  (itemContentChanged)=\"collectionContentChanged($event)\"\r\n                  (contentChanged)=\"collectionContentChanged($event)\">\r\n                </app-collection>\r\n            </ng-container>\r\n            \r\n            <ng-container *ngIf=\"projectStructure[collection].items[collectionItemName].type == 'object'\">\r\n              <app-collection\r\n                [encapsulationPath]=\"encapsulationPath + '/' + collectionItemName\"\r\n                [subCollection]=\"true\"\r\n                [collection]=\"collectionItemName\"\r\n                [projectStructure]=\"projectStructure[collection].items\"\r\n                [viewContent]=\"viewContent\"\r\n                [viewOnly]=\"viewOnly\"\r\n                (itemContentChanged)=\"collectionContentChanged($event)\"\r\n                (contentChanged)=\"collectionContentChanged($event)\">\r\n              </app-collection>\r\n            </ng-container>\r\n\r\n            <ng-container *ngIf=\"projectStructure[collection].items[collectionItemName].type == 'array'\">\r\n              <app-collection\r\n                [encapsulationPath]=\"encapsulationPath + '/0/' + collectionItemName\"\r\n                [subCollection]=\"true\"\r\n                [collection]=\"collectionItemName\"\r\n                [projectStructure]=\"projectStructure[collection].items\"\r\n                [viewContent]=\"viewContent\"\r\n                [viewOnly]=\"viewOnly\"\r\n                (itemContentChanged)=\"collectionContentChanged($event)\"\r\n                (contentChanged)=\"collectionContentChanged($event)\">\r\n              </app-collection>\r\n            </ng-container>\r\n          </ng-container>\r\n        </ng-container>\r\n\r\n        <button\r\n            *ngIf=\"viewOnly == false\"\r\n            (click)=\"addNewItem(encapsulationPath, projectStructure[collection])\"> Add {{collection | title}}</button>\r\n      </ng-container>\r\n\r\n    </ng-container>\r\n  </ng-container>\r\n</div>"
+module.exports = "<div class=\"row\">\r\n  <div class=\"col-12-12\">\r\n    <h2>Project Content</h2>\r\n    <div *ngIf=\"projectStructure != null\">\r\n      <app-content-editor\r\n        [userAccessLevel]=\"userAccessLevel\"\r\n        [viewContent]=\"true\"\r\n        [viewOnly]=\"viewOnly\"\r\n        [(projectContent)]=\"projectContent\"\r\n        [projectStructure]=\"projectStructure\"\r\n        (requestToSaveProjectContent)=\"requestToSaveProjectContent($event)\"\r\n        (requestToResetProjectContent)=\"requestToResetProjectContent()\">\r\n      </app-content-editor>\r\n    </div>\r\n  </div>\r\n</div>"
 
 /***/ }),
 
 /***/ 682:
 /***/ (function(module, exports) {
 
-module.exports = "<div *ngIf=\"projectStructure != null\">\r\n  <ng-container *ngIf=\"viewContent && viewOnly == false\">\r\n    <div class=\"row\">\r\n      <button (click)=\"resetProjectContent()\">Reset</button>\r\n      <button (click)=\"saveProjectContent()\">Save</button>\r\n      <label>Commit Message:\r\n        <input\r\n          type=\"text\"\r\n          [(ngModel)]=\"_commitMessage\">\r\n      </label>\r\n    </div>\r\n  </ng-container>\r\n<app-errors\r\n\t[errors]=\"_contentErrors | keyValArray : 'values'\"\r\n\t(requestToDismissErrors)=\"requestToDismissErrors($event)\"></app-errors>\r\n  <div class=\"row\">\r\n    <div class=\"col-2-12\">\r\n        <div *ngIf=\"projectStructure != null\">\r\n          <app-draggable-container\r\n            [content]=\"projectStructure\"\r\n            [contentEncapsulationPath]=\"\"\r\n            [contentType]=\"object\"\r\n            (contentReordered)=\"collectionTabsReordered($event)\">\r\n            <ng-container *ngFor=\"let collection of projectStructure | keyValArray : 'keys'\">\r\n              <div *ngIf=\"userAccessLevel <= 2 || projectStructure[collection].no_access == null || (projectStructure[collection].no_access != null && projectStructure[collection].no_access.indexOf(userAccessLevel) < 0)\"\r\n                [draggable]=\"viewContent == false\"\r\n                [attr.data-key]=\"collection\"\r\n                (click)=\"viewCollection(collection)\"\r\n                [class]=\"(collection === currentCollectionName ? 'active ' : '')  + 'collectionTab'\">{{collection | title}}\r\n              </div>\r\n            </ng-container>\r\n          </app-draggable-container>\r\n        </div>\r\n    </div>\r\n    <div class=\"col-10-12\">\r\n      <ng-container *ngIf=\"currentCollectionName != null && (userAccessLevel <= 2 || projectStructure[currentCollectionName].no_access == null || (projectStructure[currentCollectionName].no_access != null && projectStructure[currentCollectionName].no_access.indexOf(userAccessLevel) < 0))\">\r\n        <h2>{{currentCollectionName | title}}</h2>\r\n        <form>\r\n          <app-collection\r\n            [userAccessLevel]=\"userAccessLevel\"\r\n            [topLevelCollection]=\"true\"\r\n            [encapsulationPath]=\"currentCollectionName\"\r\n            [collection]=\"currentCollectionName\"\r\n            [projectContent]=\"projectContent\"\r\n            [projectStructure]=\"projectStructure\"\r\n            [viewContent]=\"viewContent\"\r\n            [viewOnly]=\"viewOnly\"\r\n            (contentChanged)=\"projectContentChanged($event)\">\r\n          </app-collection>\r\n        </form>\r\n      </ng-container>\r\n    </div>\r\n  </div>\r\n</div>\r\n"
+module.exports = "<div\n  *ngIf=\"_warning != null\">{{_warning}}</div>\n<span *ngIf=\"_contentError != null && _contentError.length > 0\" class=\"error\">\n  {{_contentError}}\n</span>\n<input\n  *ngIf=\"viewOnly == false\"\n  #fileInput\n  type=\"file\"\n  [id]=\"itemAttributes != null && itemAttributes.id != null ? itemAttributes.id : ''\"\n  [class]=\"'button cms small fileInput' + (itemAttributes != null && itemAttributes.class != null ? ' ' + itemAttributes.attributes.class : '')\"\n  (change)=\"fileInputChanged(fileInput)\"\n  [attr.data-required]=\"itemAttributes != null && itemAttributes.required != null && itemAttributes.required ? true : false\"\n  [attr.data-name]=\"encapsulationPath\"\n  appFormControl>\n<button\n  *ngIf=\"viewOnly == false\" \n  (click)=\"showMediaItemGallery()\" class=\"button cms small\">Select Existing Image</button>\n<img\n  *ngIf=\"viewContent && itemContent != null && _mediaItemGalleryVisible == false\"\n  [src]=\"itemContent\">\n\n<app-media-item-gallery\n    *ngIf=\"_mediaItemGalleryVisible\"\n    [numItemsPerPage]=9\n    [numItemsPerRow]=3\n    (closeButtonClicked)=\"hideMediaItemGallery()\"\n    (mediaItemSelected)=\"mediaItemSelected($event)\">\n</app-media-item-gallery>"
 
 /***/ }),
 
 /***/ 683:
 /***/ (function(module, exports) {
 
-module.exports = "<div class=\"row\">\r\n  <div class=\"col-12-12\">\r\n    <h2>Project Content</h2>\r\n    <div *ngIf=\"projectStructure != null\">\r\n      <app-content-editor\r\n        [userAccessLevel]=\"userAccessLevel\"\r\n        [viewContent]=\"true\"\r\n        [viewOnly]=\"viewOnly\"\r\n        [(projectContent)]=\"projectContent\"\r\n        [projectStructure]=\"projectStructure\"\r\n        (requestToSaveProjectContent)=\"requestToSaveProjectContent($event)\"\r\n        (requestToResetProjectContent)=\"requestToResetProjectContent()\">\r\n      </app-content-editor>\r\n    </div>\r\n  </div>\r\n</div>"
+module.exports = "<div>\n  <div [class]=\"viewContent ? 'col-8-12' : 'col-12-12'\">\n    <div *ngIf=\"viewOnly == false\">\n      <button (click)=\"addImage()\" class=\"button cms bottom-tabs\">Image</button>\n      <button (click)=\"addHeading('h1')\" class=\"button cms bottom-tabs\">H1</button>\n      <button (click)=\"addHeading('h2')\" class=\"button cms bottom-tabs\">H2</button>\n      <button (click)=\"addHeading('h3')\" class=\"button cms bottom-tabs\">H3</button>\n      <button (click)=\"addLink()\" class=\"button cms bottom-tabs\">Hyperlink</button>\n      <button (click)=\"undoLastChange()\" [disabled]=\"_lastChange == null\" class=\"button cms bottom-tabs\">Undo</button>\n      <button (click)=\"clearAllContent()\" class=\"button cms bottom-tabs\">Clear All</button>\n    </div>\n\n    <span *ngIf=\"_contentError != null && _contentError.length > 0\" class=\"error\">\n      {{_contentError}}\n    </span>\n\n    <div\n      *ngIf=\"viewContent && viewOnly == false\"\n      #textareaInput\n      contenteditable=\"true\"\n      (click)=\"updateCursorPosition()\"\n      (change)=\"updateCursorPosition()\"\n      (keyup)=\"updateCursorPosition()\"\n      [class]=\"'input wysiwyg-input' + (itemAttributes != null && itemAttributes.class != null ? ' ' + itemAttributes.attributes.class : '')\"\n      [attr.data-required]=\"itemAttributes.required != null && itemAttributes.required ? true : false\"\n      [attr.data-maxlength]=\"itemAttributes.maxlength != null ? itemAttributes.maxlength : ''\"\n      [attr.data-name]=\"encapsulationPath\"\n      appFormControl>\n    </div>\n\n  </div>\n\n  <div \n    *ngIf=\"viewContent && viewOnly == false\"\n    class=\"col-4-12\">\n    <div *ngIf=\"_insertType == 'image'\">\n      <div class=\"row\">\n        <h3>Image</h3>\n      </div>\n      <div class=\"row\">\n        <label>Alt Text:\n          <input #altTextInput type=\"text\">\n        </label>\n      </div>\n      <div class=\"row\">\n        <app-file-upload\n          [viewContent]=\"viewContent\"\n          [encapsulationPath]=\"encapsulationPath\"\n          (fileChanged)=\"imageSelected($event)\"></app-file-upload>\n      </div>\n      <div class=\"row\">\n        <button (click)=\"insertImage(altTextInput)\" class=\"button cms bottom-tabs bottom-border\">Insert</button>\n        <button (click)=\"cancel()\"  class=\"button cms bottom-tabs bottom-border\">Cancel</button>\n      </div>\n    </div>\n\n    <div *ngIf=\"_insertType == 'heading'\">\n      <div class=\"row\">\n        <h3>Heading {{_headingType}}</h3>\n      </div>\n      <div class=\"row\">\n        <label>Heading Text\n          <input #hTextInput type=\"text\">\n        </label>\n      </div>\n      <div class=\"row\">\n        <button (click)=\"insertHeading(hTextInput)\">Insert</button>\n        <button (click)=\"cancel()\">Cancel</button>\n      </div>\n    </div>\n\n    <div *ngIf=\"_insertType == 'link'\">\n      <div class=\"row\">\n        <h3>Hyperlink</h3>\n      </div>\n      <div class=\"row\">\n        <label>Link Text\n          <input #linkTextInput type=\"text\">\n        </label>\n        <label>Link To\n          <input #linkHrefInput type=\"text\">\n        </label>\n      </div>\n      <div class=\"row\">\n        <button (click)=\"insertLink(linkTextInput, linkHrefInput)\">Insert</button>\n        <button (click)=\"cancel()\">Cancel</button>\n      </div>\n    </div>\n  </div>\n</div>\n\n<div\n  *ngIf=\"viewContent == false || viewOnly\"\n  class=\"input wysiwyg-input\">\n</div>"
 
 /***/ }),
 
 /***/ 684:
 /***/ (function(module, exports) {
 
-module.exports = "<div\n  *ngIf=\"_warning != null\">{{_warning}}</div>\n<span *ngIf=\"_contentError != null && _contentError.length > 0\" class=\"error\">\n  {{_contentError}}\n</span>\n<input\n  *ngIf=\"viewOnly == false\"\n  #fileInput\n  type=\"file\"\n  [id]=\"itemAttributes != null && itemAttributes.id != null ? itemAttributes.id : ''\"\n  [class]=\"'fileInput' + (itemAttributes != null && itemAttributes.class != null ? ' ' + itemAttributes.attributes.class : '')\"\n  (change)=\"fileInputChanged(fileInput)\"\n  [attr.data-required]=\"itemAttributes != null && itemAttributes.required != null && itemAttributes.required ? true : false\"\n  [attr.data-name]=\"encapsulationPath\"\n  appFormControl>\n<button\n  *ngIf=\"viewOnly == false\" \n  (click)=\"showMediaItemGallery()\">Select Image</button>\n<img\n  *ngIf=\"viewContent && itemContent != null\"\n  [src]=\"itemContent\">\n\n<app-media-item-gallery\n    *ngIf=\"_mediaItemGalleryVisible\"\n    [numItemsPerPage]=9\n    [numItemsPerRow]=3\n    (closeButtonClicked)=\"hideMediaItemGallery()\"\n    (mediaItemSelected)=\"mediaItemSelected($event)\">\n</app-media-item-gallery>"
+module.exports = "<div\n\t*ngIf=\"errors != null && errors.length > 0\"\n\tclass=\"row\">\n\t<div class=\"col-12-12\">\n\t\tErrors\n\t\t<ul>\n\t\t\t<li *ngFor=\"let error of errors\">{{error}}</li>\n\t\t</ul>\n\t\t<button (click)=\"dismissErrors()\">Close</button>\n\t</div>\n</div>"
 
 /***/ }),
 
 /***/ 685:
 /***/ (function(module, exports) {
 
-module.exports = "<div *ngIf=\"viewOnly == false\">\n  <button (click)=\"addImage()\">Image</button>\n  <button (click)=\"addHeading('h1')\">H1</button>\n  <button (click)=\"addHeading('h2')\">H2</button>\n  <button (click)=\"addHeading('h3')\">H3</button>\n  <button (click)=\"addLink()\">Hyperlink</button>\n  <button (click)=\"undoLastChange()\" [disabled]=\"_lastChange == null\">Undo</button>\n  <button (click)=\"clearAllContent()\">Clear All</button>\n</div>\n\n<div *ngIf=\"viewContent && viewOnly == false\">\n  <div *ngIf=\"_insertType == 'image'\">\n    <div class=\"row\">\n      <h3>Image</h3>\n    </div>\n    <div class=\"row\">\n      <label>Alt Text:\n        <input #altTextInput type=\"text\">\n      </label>\n    </div>\n    <div class=\"row\">\n      <app-file-upload\n        [viewContent]=\"viewContent\"\n        [encapsulationPath]=\"encapsulationPath\"\n        (fileChanged)=\"imageSelected($event)\"></app-file-upload>\n    </div>\n    <div class=\"row\">\n      <button (click)=\"insertImage(altTextInput)\">Insert</button>\n      <button (click)=\"cancel()\">Cancel</button>\n    </div>\n  </div>\n\n  <div *ngIf=\"_insertType == 'heading'\">\n    <div class=\"row\">\n      <h3>Heading {{_headingType}}</h3>\n    </div>\n    <div class=\"row\">\n      <label>Heading Text\n        <input #hTextInput type=\"text\">\n      </label>\n    </div>\n    <div class=\"row\">\n      <button (click)=\"insertHeading(hTextInput)\">Insert</button>\n      <button (click)=\"cancel()\">Cancel</button>\n    </div>\n  </div>\n\n  <div *ngIf=\"_insertType == 'link'\">\n    <div class=\"row\">\n      <h3>Hyperlink</h3>\n    </div>\n    <div class=\"row\">\n      <label>Link Text\n        <input #linkTextInput type=\"text\">\n      </label>\n      <label>Link To\n        <input #linkHrefInput type=\"text\">\n      </label>\n    </div>\n    <div class=\"row\">\n      <button (click)=\"insertLink(linkTextInput, linkHrefInput)\">Insert</button>\n      <button (click)=\"cancel()\">Cancel</button>\n    </div>\n  </div>\n</div>\n\n<span *ngIf=\"_contentError != null && _contentError.length > 0\" class=\"error\">\n  {{_contentError}}\n</span>\n\n<div\n  *ngIf=\"viewContent && viewOnly == false\"\n  #textareaInput\n  contenteditable=\"true\"\n  (click)=\"updateCursorPosition()\"\n  (change)=\"updateCursorPosition()\"\n  (keyup)=\"updateCursorPosition()\"\n  id=\"wysiwyg-input\"\n  [class]=\"'input' + (itemAttributes != null && itemAttributes.class != null ? ' ' + itemAttributes.attributes.class : '')\"\n  [attr.data-required]=\"itemAttributes.required != null && itemAttributes.required ? true : false\"\n  [attr.data-maxlength]=\"itemAttributes.maxlength != null ? itemAttributes.maxlength : ''\"\n  [attr.data-name]=\"encapsulationPath\"\n  appFormControl>\n</div>\n\n<div\n  *ngIf=\"viewContent == false || viewOnly\"\n  class=\"input\"\n  id=\"wysiwyg-input\">\n</div>"
+module.exports = "<h2 *ngIf=\"historyOf\">{{historyOf | upperCamelCase }}History</h2>\n<div *ngIf=\"history != null\" class=\"row\">\n  <div [class]=\"showPreview ? 'col-8-12' : 'col-12-12'\">\n    <table>\n      <thead>\n        <tr>\n          <th>Commit ID</th>\n          <th>Date</th>\n          <th>Changes</th>\n          <th>Made By</th>\n          <th>Options</th>\n        </tr>\n      </thead>\n    </table>\n    <div class=\"scrollable\">\n      <table>\n        <tbody>\n          <tr\n            *ngFor=\"let commit of history\"\n            [class]=\"_previewHistoryHash == commit.hash ? 'selected' : ''\">\n            <td>{{commit.hash | shortener : 6}}</td>\n            <td>{{commit.date | customDate : false : true}}</td>\n            <td>{{commit.message.split(\" (HEAD ->\")[0]}}</td>\n            <td>{{commit.author_name}}</td>\n            <td><button (click)=\"preview(commit)\">Preview</button></td>\n          </tr>\n        </tbody>\n      </table>  \n    </div>\n  </div>\n  <div *ngIf=\"showPreview\" class=\"col-4-12\">\n    <button (click)=\"clear()\" class=\"button cms bottom-tabs\">Clear Preview</button>\n    <button (click)=\"revert()\" class=\"button cms bottom-tabs\">Revert to this {{historyOf | upperCamelCase}}</button>\n    <textarea\n      [value]=\"_previewHistoryObject != null ? (_previewHistoryObject | customJson : 'stringify') : ''\">\n    </textarea>\n  </div>\n</div>"
 
 /***/ }),
 
 /***/ 686:
 /***/ (function(module, exports) {
 
-module.exports = "<div\n\t*ngIf=\"errors != null && errors.length > 0\"\n\tclass=\"row\">\n\t<div class=\"col-12-12\">\n\t\tErrors\n\t\t<ul>\n\t\t\t<li *ngFor=\"let error of errors\">{{error}}</li>\n\t\t</ul>\n\t\t<button (click)=\"dismissErrors()\">Close</button>\n\t</div>\n</div>"
+module.exports = "<div *ngIf=\"_mediaItems != null\">\n  <h2>Available Images</h2>\n  <div class=\"row\">\n    <button\n      (click)=\"hide()\"\n      class=\"button cms small\">Close</button>\n    <button\n      (click)=\"loadMediaItems()\"\n      [class]=\"'button cms small' + (_mediaItemNextPageToken != null ? '' : ' disabled')\">Next</button>\n  </div>\n  <div>\n    <app-media-item\n        *ngFor=\"let mediaItem of _mediaItems\"\n        [mediaItemUrl]=\"mediaItem.url\"\n        [mediaItemName]=\"mediaItem.name\"\n        (mediaItemClicked)=\"mediaItemClicked($event)\"\n        [style.width]=\"((100 / numItemsPerRow) - 1) + '%'\">\n    </app-media-item>\n  </div>\n</div>\n"
 
 /***/ }),
 
 /***/ 687:
 /***/ (function(module, exports) {
 
-module.exports = "<h2 *ngIf=\"historyOf\">{{historyOf | upperCamelCase }}History</h2>\n<div *ngIf=\"history != null\" class=\"row\">\n  <div [class]=\"showPreview ? 'col-8-12' : 'col-12-12'\">\n    <table>\n      <thead>\n        <tr>\n          <th>Commit ID</th>\n          <th>Date</th>\n          <th>Changes</th>\n          <th>Made By</th>\n          <th>Options</th>\n        </tr>\n      </thead>\n    </table>\n    <div class=\"scrollable\">\n      <table>\n        <tbody>\n          <tr\n            *ngFor=\"let commit of history\"\n            [class]=\"_previewHistoryHash == commit.hash ? 'selected' : ''\">\n            <td>{{commit.hash | shortener : 6}}</td>\n            <td>{{commit.date | customDate : false : true}}</td>\n            <td>{{commit.message.split(\" (HEAD ->\")[0]}}</td>\n            <td>{{commit.author_name}}</td>\n            <td><button (click)=\"preview(commit)\">Preview</button></td>\n          </tr>\n        </tbody>\n      </table>  \n    </div>\n  </div>\n  <div *ngIf=\"showPreview\" class=\"col-4-12\">\n    <button (click)=\"clear()\">Clear Preview</button>\n    <button (click)=\"revert()\">Revert to this {{historyOf | upperCamelCase}}</button>\n    <textarea\n      [value]=\"_previewHistoryObject != null ? (_previewHistoryObject | customJson : 'stringify') : ''\">\n    </textarea>\n  </div>\n</div>"
+module.exports = "<img\n  [src]=\"mediaItemUrl\"\n  [title]=\"mediaItemName\"\n  [alt]=\"mediaItemName\"\n  (click)=\"onClick()\">\n"
 
 /***/ }),
 
 /***/ 688:
 /***/ (function(module, exports) {
 
-module.exports = "<div *ngIf=\"_mediaItems != null\">\n  <h2>Available Images</h2>\n  <div class=\"row\">\n    <button (click)=\"hide()\">Close</button>\n    <button (click)=\"loadMediaItems()\">Next</button>\n  </div>\n  <div>\n    <app-media-item\n        *ngFor=\"let mediaItem of _mediaItems\"\n        [mediaItemUrl]=\"mediaItem.url\"\n        [mediaItemName]=\"mediaItem.name\"\n        (mediaItemClicked)=\"mediaItemClicked($event)\"\n        [style.width]=\"((100 / numItemsPerRow) - 1) + '%'\">\n    </app-media-item>\n  </div>\n</div>\n"
+module.exports = "<h3>Access Levels</h3>\n<div class=\"row\">\n  <div class=\"col-6-12\">\n    <h4>Project Access Levels</h4>\n    <table>\n      <thead>\n        <tr>\n          <th>Access Level Name</th>\n          <th>Access Level Int</th>\n          <th>In Use</th>\n          <th>Options</th>\n        </tr>\n      </thead>\n      <tbody>\n        <tr *ngFor=\"let accessLevel of projectSettings.access_levels\">\n          <td>\n            <input type=\"text\" [(ngModel)]=\"accessLevel.access_level_name\">\n          </td>\n          <td>\n            {{accessLevel.access_level_int}}\n          </td>\n          <td>{{accessLevel.in_use ? \"Yes\" : \"No\"}}</td>\n          <td>\n            <button\n              *ngIf=\"accessLevel.access_level_int > 3 && !accessLevel.in_use\"\n              (click)=\"deleteAccessLevel(accessLevel.access_level_int)\">Delete</button>\n          </td>\n        </tr>\n      </tbody>\n    </table>\n  </div>\n  <div class=\"col-6-12\">\n    <h4>Add Access Level</h4>\n    <label>Access Level Name:\n      <input #aalLevelNameInput type=\"text\">\n    </label>\n    <br>\n    <label>Access Level Int:\n      <input #aalLevelIntInput type=\"text\">\n    </label>\n    <br>\n    <button (click)=\"addNewAccessLevel(aalLevelNameInput, aalLevelIntInput)\">Add New Access Level</button>\n  </div>\n</div>"
 
 /***/ }),
 
 /***/ 689:
 /***/ (function(module, exports) {
 
-module.exports = "<img\n  [src]=\"mediaItemUrl\"\n  [title]=\"mediaItemName\"\n  [alt]=\"mediaItemName\"\n  (click)=\"onClick()\">\n"
+module.exports = "<h3>Collaborators</h3>\n<div class=\"row\">\n  <div class=\"col-6-12\">\n    <h4>Project Collaborators</h4>\n    <table>\n      <thead>\n        <tr>\n          <th>User</th>\n          <th>Access Level</th>\n          <th>Options</th>\n        </tr>\n      </thead>\n      <tbody>\n        <tr *ngFor=\"let collaborator of projectSettings.collaborators\">\n          <td>{{collaborator.display_name}}</td>\n          <td>\n            <select\n              #calInput\n              [(ngModel)]=\"collaborator.access_level_int\">\n              <option\n                *ngFor=\"let accessLevel of projectSettings.access_levels\"\n                [value]=\"accessLevel.access_level_int\">\n                {{accessLevel.access_level_name}}\n              </option>\n            </select>\n          </td>\n          <td>\n            <button\n              *ngIf=\"_currentUserId != null && collaborator.user_id != _currentUserId\"\n              (click)=\"deleteCollaborator(collaborator)\">Delete</button>\n          </td>\n        </tr>\n      </tbody>\n    </table>\n  </div>\n  <div class=\"col-6-12\">\n    <h4>Add Collaborator</h4>\n    <label>Email Address:\n      <input #acEmailInput type=\"text\">\n    </label>\n    <br>\n    <label>Access Level\n      <select #acAccessInput>\n        <option\n          *ngFor=\"let accessLevel of projectSettings.access_levels\"\n          [value]=\"accessLevel.access_level_int\">\n          {{accessLevel.access_level_name}}\n        </option>\n      </select>\n    </label>\n    <br>\n    <button (click)=\"addCollaborator(acEmailInput, acAccessInput)\">Add Collaborator</button>\n  </div>\n</div>\n"
 
 /***/ }),
 
 /***/ 690:
 /***/ (function(module, exports) {
 
-module.exports = "<h3>Access Levels</h3>\n<div class=\"row\">\n  <h4>Add Access Level</h4>\n  <label>Access Level Name:\n    <input #aalLevelNameInput type=\"text\">\n  </label>\n  <br>\n  <label>Access Level Int:\n    <input #aalLevelIntInput type=\"text\">\n  </label>\n  <br>\n  <button (click)=\"addNewAccessLevel(aalLevelNameInput, aalLevelIntInput)\">Add New Access Level</button>\n</div>\n<div class=\"row\">\n  <h4>Project Access Levels</h4>\n  <table>\n    <thead>\n      <tr>\n        <th>Access Level Name</th>\n        <th>Access Level Int</th>\n        <th>In Use</th>\n        <th>Options</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr *ngFor=\"let accessLevel of projectSettings.access_levels\">\n        <td>\n          <input type=\"text\" [(ngModel)]=\"accessLevel.access_level_name\">\n        </td>\n        <td>\n          {{accessLevel.access_level_int}}\n        </td>\n        <td>{{accessLevel.in_use ? \"Yes\" : \"No\"}}</td>\n        <td>\n          <button\n            *ngIf=\"accessLevel.access_level_int > 3 && !accessLevel.in_use\"\n            (click)=\"deleteAccessLevel(accessLevel.access_level_int)\">Delete</button>\n        </td>\n      </tr>\n    </tbody>\n  </table>\n</div>"
+module.exports = "<h2>Project Settings</h2>\n<button (click)=\"saveAllProjectSettings()\" class=\"button cms bottom-tabs\">Save All</button>\n<button (click)=\"resetAllProjectSettings()\" class=\"button cms bottom-tabs\">Reset All</button>\n\n<ng-container *ngIf=\"projectSettings != null\">\n  <div class=\"row\">\n    <h3>General</h3>\n\n    <div class=\"row\">\n      <div [class]=\"isAdmin ? 'col-6-12' : 'col-12-12'\">\n        <div class=\"row\">\n          <label>Project Name:\n            <input #pnInput type=\"text\" [(ngModel)]=\"projectSettings.project_name\">\n          </label>\n        </div>\n\n        <div class=\"row\" *ngIf=\"isAdmin\">\n          <label>Maximum Content Cache Time (in milliseconds)\n            <input #pmcInput type=\"number\" [(ngModel)]=\"projectSettings.max_cache_age\">ms\n          </label>\n        </div>\n      </div>\n\n      <div class=\"col-6-12\" *ngIf=\"isAdmin\">\n        <div class=\"row\">\n          <label>Custom Content Editor CSS\n            <textarea\n              #cssInput\n              class=\"customCss\"\n              [(ngModel)]=\"projectSettings.custom_css\">\n            </textarea>\n          </label>\n        </div>\n      </div>\n    </div>\n  </div>\n\n  <div class=\"row\" *ngIf=\"isAdmin\">\n    <h3>Project Credentials</h3>\n    <div class=\"row\">\n      <div class=\"col-6-12\">\n        <strong>Project ID:</strong> {{_projectId}}<br>\n        <strong>Public Auth Token:</strong> {{projectSettings.public_auth_token}}\n      </div>\n      <div class=\"col-6-12\">\n        <div class=\"row\">\n          <label>Allowed Update Origins:\n            <textarea [(ngModel)]=\"projectSettings.update_origins\"></textarea>\n          </label>\n        </div>\n\n        <div class=\"row\">\n          <label>Allowed Read Origins:\n            <textarea [(ngModel)]=\"projectSettings.read_origins\"></textarea>\n          </label>\n        </div>\n      </div>\n    </div>\n  </div>\n\n  <div class=\"row\">\n    <app-collaborators\n      [projectSettings]=\"projectSettings\"\n      (collaboratorsUpdated)=\"updateSettings()\"></app-collaborators>\n  </div>\n  \n  <div class=\"row\">\n    <app-access-levels\n      [projectSettings]=\"projectSettings\"\n      (accessLevelsUpdated)=\"updateSettings()\"></app-access-levels>\n  </div>\n\n  <div class=\"row\" *ngIf=\"isAdmin\">\n    <h3>Danger Zone</h3>\n    <div class=\"row\">\n      <h4>Delete Project</h4>\n      <div class=\"row\" >\n          <label>Project Name:\n            <input #pName type=\"text\">\n          </label>\n          <button (click)=\"deleteProject(pName.value)\">Confirm Delete (can't undo)</button>\n      </div>\n      <h4>Generate New Public Auth Token</h4>\n      <div class=\"row\">\n          <label>Current Auth Token:\n            <input #aToken type=\"text\">\n          </label>\n          <button (click)=\"generateNewPublicAuthToken(aToken)\">Generate New Token (can't undo)</button>\n      </div>\n    </div>\n  </div>\n</ng-container>"
 
 /***/ }),
 
 /***/ 691:
 /***/ (function(module, exports) {
 
-module.exports = "<h3>Collaborators</h3>\n<div class=\"row\">\n  <h4>Add Collaborator</h4>\n  <label>Email Address:\n    <input #acEmailInput type=\"text\">\n  </label>\n  <br>\n  <label>Access Level\n    <select #acAccessInput>\n      <option\n        *ngFor=\"let accessLevel of projectSettings.access_levels\"\n        [value]=\"accessLevel.access_level_int\">\n        {{accessLevel.access_level_name}}\n      </option>\n    </select>\n  </label>\n  <br>\n  <button (click)=\"addCollaborator(acEmailInput, acAccessInput)\">Add Collaborator</button>\n</div>\n<div class=\"row\">\n  <h4>Project Collaborators</h4>\n  <table>\n    <thead>\n      <tr>\n        <th>User</th>\n        <th>Access Level</th>\n        <th>Options</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr *ngFor=\"let collaborator of projectSettings.collaborators\">\n        <td>{{collaborator.display_name}}</td>\n        <td>\n          <select\n            #calInput\n            [(ngModel)]=\"collaborator.access_level_int\">\n            <option\n              *ngFor=\"let accessLevel of projectSettings.access_levels\"\n              [value]=\"accessLevel.access_level_int\">\n              {{accessLevel.access_level_name}}\n            </option>\n          </select>\n        </td>\n        <td>\n          <button\n            *ngIf=\"_currentUserId != null && collaborator.user_id != _currentUserId\"\n            (click)=\"deleteCollaborator(collaborator)\">Delete</button>\n        </td>\n      </tr>\n    </tbody>\n  </table>\n</div>\n"
+module.exports = "<div class=\"copyright\">\n  Copyright &copy; <a href=\"http://www.pigottlaura.com\" target=\"_blank\">Laura Pigott</a> {{_currentDate | date : \"y\"}}\n</div>\n"
 
 /***/ }),
 
 /***/ 692:
 /***/ (function(module, exports) {
 
-module.exports = "<h2>Project Settings</h2>\n<button (click)=\"saveAllProjectSettings()\">Save All</button>\n<button (click)=\"resetAllProjectSettings()\">Reset All</button>\n\n<div *ngIf=\"projectSettings != null\">\n  <div class=\"row\">\n    <div class=\"col-12-12\">\n      <h3>General</h3>\n\n      <div [class]=\"isAdmin ? 'col-6-12' : 'col-12-12'\">\n        <div class=\"row\">\n          <label>Project Name:\n            <input #pnInput type=\"text\" [(ngModel)]=\"projectSettings.project_name\">\n          </label>\n        </div>\n\n        <div class=\"row\" *ngIf=\"isAdmin\">\n          <label>Maximum Content Cache Time (in milliseconds)\n            <input #pmcInput type=\"number\" [(ngModel)]=\"projectSettings.max_cache_age\">ms\n          </label>\n        </div>\n\n        <div class=\"row\" *ngIf=\"isAdmin\">\n          <label>Allowed Update Origins:\n            <textarea [(ngModel)]=\"projectSettings.update_origins\"></textarea>\n          </label>\n        </div>\n\n        <div class=\"row\" *ngIf=\"isAdmin\">\n          <label>Allowed Read Origins:\n            <textarea [(ngModel)]=\"projectSettings.read_origins\"></textarea>\n          </label>\n        </div>\n      </div>\n\n      <div class=\"col-6-12\" *ngIf=\"isAdmin\">\n        <div class=\"row\">\n          <label>Custom Content Editor CSS\n            <textarea\n              #cssInput\n              class=\"customCss\"\n              [(ngModel)]=\"projectSettings.custom_css\">\n            </textarea>\n          </label>\n        </div>\n      </div>\n    </div>\n  </div>\n\n  <div class=\"row\" *ngIf=\"isAdmin\">\n    <h3>Project Credentials</h3>\n    <div class=\"row\" >\n        <strong>Project ID:</strong> {{_projectId}}<br>\n        <strong>Public Auth Token:</strong> {{projectSettings.public_auth_token}}\n    </div>\n  </div>\n\n  <div class=\"row\">\n    <div [class]=\"isAdmin ? 'col-6-12' : 'col-12-12'\">\n      <app-collaborators\n        [projectSettings]=\"projectSettings\"\n        (collaboratorsUpdated)=\"updateSettings()\"></app-collaborators>\n    </div>\n    <div class=\"col-6-12\" *ngIf=\"isAdmin\">\n      <app-access-levels\n        [projectSettings]=\"projectSettings\"\n        (accessLevelsUpdated)=\"updateSettings()\"></app-access-levels>\n    </div>\n  </div>\n\n  <div class=\"row\" *ngIf=\"isAdmin\">\n    <h3>Danger Zone</h3>\n    <h4>Delete Project</h4>\n    <div class=\"row\" >\n        <label>Project Name:\n          <input #pName type=\"text\">\n        </label>\n        <button (click)=\"deleteProject(pName.value)\">Confirm Delete (can't undo)</button>\n    </div>\n    <h4>Generate New Public Auth Token</h4>\n    <div class=\"row\">\n        <label>Current Auth Token:\n          <input #aToken type=\"text\">\n        </label>\n        <button (click)=\"generateNewPublicAuthToken(aToken)\">Generate New Token (can't undo)</button>\n    </div>\n  </div>\n</div>"
+module.exports = "<div class=\"row\">\r\n  <div class=\"col-6-12\">\r\n    <h1>{{pageTitle}}</h1>\r\n  </div>\r\n  <div class=\"col-6-12 right\">\r\n    <ng-container *ngIf=\"user != null\" class=\"col-4-12 right\">\r\n      <span>Welcome back {{user.displayName}}</span>\r\n      <img \r\n        *ngIf=\"user.profileImage != null\"\r\n        [src]=\"user.profileImage + '&sz=50'\">\r\n      <span\r\n        (click)=\"logoutClicked()\"\r\n        class=\"button\">Logout</span>\r\n    </ng-container>\r\n\r\n    <ng-container *ngIf=\"user == null\">\r\n      <a\r\n        [href]=\"_loginUrl\"\r\n        class=\"button\">\r\n        Login\r\n      </a>\r\n    </ng-container>\r\n\r\n    <a href=\"./../documentation\" target=\"_blank\" class=\"button\">\r\n      Documentation\r\n    </a>\r\n  </div>\r\n</div>"
 
 /***/ }),
 
-/***/ 693:
-/***/ (function(module, exports) {
-
-module.exports = "<div class=\"row\">\n  Copyright &copy; Laura Pigott\n</div>\n"
-
-/***/ }),
-
-/***/ 694:
-/***/ (function(module, exports) {
-
-module.exports = "<div class=\"row\">\r\n  <div class=\"col-8-12\">\r\n    <h1>{{pageTitle}}</h1>\r\n  </div>\r\n  <div *ngIf=\"user != null\" class=\"col-4-12 right\">\r\n    <span>{{user.displayName}}</span>\r\n    <button (click)=\"logoutClicked()\">Logout</button>\r\n    <img \r\n      *ngIf=\"user.profileImage != null\"\r\n      [src]=\"user.profileImage + '&sz=50'\">\r\n  </div>\r\n</div>"
-
-/***/ }),
-
-/***/ 695:
-/***/ (function(module, exports) {
-
-module.exports = "<ng-container *ngIf=\"_loginUrl != null\">\n  <a [href]=\"_loginUrl\">\n    <button>Login with Google</button>\n  </a>\n</ng-container>\n"
-
-/***/ }),
-
-/***/ 721:
+/***/ 719:
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__(354);
@@ -4165,5 +4115,5 @@ module.exports = __webpack_require__(354);
 
 /***/ })
 
-},[721]);
+},[719]);
 //# sourceMappingURL=main.bundle.map
