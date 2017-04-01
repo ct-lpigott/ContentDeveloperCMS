@@ -187,6 +187,176 @@
 	</section>
 	<section id="examples">
       <h1>Examples</h1>
+	  <div>
+		  <h2>Forever Flowers</h2>
+		  <a href="./../examples/forever-flowers/index.html" target="_blank" class="docButton">View the Site</a>
+		  <a href="https://github.com/pigottlaura/ContentDeveloperCMS/tree/master/public/examples/forever-flowers" target="_blank" class="docButton">View the Code</a>
+		  <figure>
+		  	<img src="./img/forever_flowers_cms_screenshot.jpg" alt="Forever Flowers Content Developer CMS">
+			<figcaption>Website Admin Panel on Content Developer CMS</figcaption>
+		  </figure>
+		  <figure>
+		  	<img src="./img/forever_flowers_screenshot.jpg" alt="Forever Flowers Website">
+			<figcaption>Final Website</figcaption>
+		  </figure>
+		  <h3>Interesting Parts</h3>
+		  <ul>
+			  <li>
+				  <img class="small" src="./img/forever_flowers_cms_colourpicker_screenshot.jpg" alt="Forever Flowers Content Developer CMS Colour Picker">
+				  The background and navigation colours are controled using colour pickers in the CMS admin panel
+			  </li>
+			  <li>
+				  <img class="small" src="./img/forever_flowers_cms_draganddrop_screenshot.jpg" alt="Forever Flowers Content Developer CMS Drag and Drop">
+				  The special offers array is editable through HTML WYSIWYGs, and the order of them can be changed through drag and drop
+			  </li>
+		  </ul>
+		  <h3>Project Structure</h3>
+		  <pre>
+{
+  "home": {
+    "type": "object",
+    "no_access": [ 4 ],
+    "items": {
+      "welcome": {
+        "type": "html",
+        "attributes": {}
+      }
+    }
+  },
+  "about_us": {
+    "no_access": [ 4 ],
+    "type": "object",
+    "items": {
+      "shop_photo": {
+        "attributes": {
+          "type": "file"
+        }
+      },
+      "history": {
+        "type": "html",
+        "attributes": {}
+      }
+    }
+  },
+  "contact_details": {
+    "no_access": [ 4 ],
+    "type": "object",
+    "items": {
+      "google_maps_embed_url": {
+        "attributes": {
+          "type": "link"
+        }
+      },
+      "phone": {
+        "attributes": {
+          "type": "tel"
+        }
+      },
+      "address": {
+        "input_type": "textarea",
+        "attributes": {}
+      }
+    }
+  },
+  "special_offers": {
+    "type": "array",
+    "items": {
+      "offer_name": {
+        "attributes": {}
+      },
+      "start_date": {
+        "attributes": {
+          "type": "date"
+        }
+      },
+      "end_date": {
+        "attributes": {
+          "type": "date"
+        }
+      },
+      "details": {
+        "type": "html",
+        "attributes": {}
+      }
+    }
+  },
+  "header": {
+    "no_access": [ 4 ],
+    "type": "object",
+    "items": {
+      "logo": {
+        "attributes": {
+          "type": "file"
+        }
+      },
+      "title": {
+        "attributes": {
+          "class": "block",
+          "maxlength": 20
+        }
+      },
+      "navigation": {
+        "type": "array",
+        "items": {
+          "title": {
+            "attributes": {}
+          },
+          "link": {
+            "attributes": {
+              "type": "link"
+            }
+          }
+        }
+      }
+    }
+  },
+  "footer": {
+    "no_access": [ 4 ],
+    "type": "object",
+    "items": {
+      "copyright": {
+        "attributes": {}
+      },
+      "useful_links": {
+        "type": "array",
+        "items": {
+          "title": {
+            "attributes": {}
+          },
+          "link": {
+            "attributes": {
+              "type": "link"
+            }
+          }
+        }
+      }
+    }
+  },
+  "styles": {
+    "no_access": [ 4 ],
+    "type": "object",
+    "items": {
+      "colors": {
+        "type": "object",
+        "items": {
+          "navigation_background_color": {
+            "attributes": {
+              "type": "color",
+              "class": "block"
+            }
+          },
+          "page_background_color": {
+            "attributes": {
+              "type": "color",
+              "class": "block"
+            }
+          }
+        }
+      }
+    }
+  }
+}
+		  </pre>
 	</section>
   </div>
   <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
