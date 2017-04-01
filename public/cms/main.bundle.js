@@ -2564,7 +2564,7 @@ var WysiwygHtmlComponent = (function () {
         this.wysiwygContentChanged = new __WEBPACK_IMPORTED_MODULE_0__angular_core__["G" /* EventEmitter */]();
     }
     WysiwygHtmlComponent.prototype.ngAfterViewInit = function () {
-        this._textareaElement = document.getElementsByClassName("wysiwyg-input")[0];
+        this._textareaElement = this._el.nativeElement.getElementsByClassName("wysiwyg-input")[0];
         this.updateTextAreaToItemContent();
     };
     WysiwygHtmlComponent.prototype.ngOnChanges = function (changes) {
@@ -4033,7 +4033,7 @@ module.exports = "<div class=\"row\">\r\n  <div class=\"col-12-12\">\r\n    <h2>
 /***/ 682:
 /***/ (function(module, exports) {
 
-module.exports = "<div\n  *ngIf=\"_warning != null\">{{_warning}}</div>\n<span *ngIf=\"_contentError != null && _contentError.length > 0\" class=\"error\">\n  {{_contentError}}\n</span>\n<input\n  *ngIf=\"viewOnly == false\"\n  #fileInput\n  type=\"file\"\n  [id]=\"itemAttributes != null && itemAttributes.id != null ? itemAttributes.id : ''\"\n  [class]=\"'button cms small fileInput' + (itemAttributes != null && itemAttributes.class != null ? ' ' + itemAttributes.attributes.class : '')\"\n  (change)=\"fileInputChanged(fileInput)\"\n  [attr.data-required]=\"itemAttributes != null && itemAttributes.required != null && itemAttributes.required ? true : false\"\n  [attr.data-name]=\"encapsulationPath\"\n  appFormControl>\n<button\n  *ngIf=\"viewOnly == false\" \n  (click)=\"showMediaItemGallery()\" class=\"button cms small\">Select Existing Image</button>\n<img\n  *ngIf=\"viewContent && itemContent != null && _mediaItemGalleryVisible == false\"\n  [src]=\"itemContent\">\n\n<app-media-item-gallery\n    *ngIf=\"_mediaItemGalleryVisible\"\n    [numItemsPerPage]=9\n    [numItemsPerRow]=3\n    (closeButtonClicked)=\"hideMediaItemGallery()\"\n    (mediaItemSelected)=\"mediaItemSelected($event)\">\n</app-media-item-gallery>"
+module.exports = "<div\n  *ngIf=\"_warning != null\">{{_warning}}</div>\n<span *ngIf=\"_contentError != null && _contentError.length > 0\" class=\"error\">\n  {{_contentError}}\n</span>\n<input\n  *ngIf=\"viewOnly == false\"\n  #fileInput\n  type=\"file\"\n  [id]=\"itemAttributes != null && itemAttributes.id != null ? itemAttributes.id : ''\"\n  [class]=\"'button cms small fileInput' + (itemAttributes != null && itemAttributes.class != null ? ' ' + itemAttributes.class : '')\"\n  (change)=\"fileInputChanged(fileInput)\"\n  [attr.data-required]=\"itemAttributes != null && itemAttributes.required != null && itemAttributes.required ? true : false\"\n  [attr.data-name]=\"encapsulationPath\"\n  appFormControl>\n<button\n  *ngIf=\"viewOnly == false\" \n  (click)=\"showMediaItemGallery()\" class=\"button cms small\">Select Existing Image</button>\n<img\n  *ngIf=\"viewContent && itemContent != null && _mediaItemGalleryVisible == false\"\n  [src]=\"itemContent\">\n\n<app-media-item-gallery\n    *ngIf=\"_mediaItemGalleryVisible\"\n    [numItemsPerPage]=9\n    [numItemsPerRow]=3\n    (closeButtonClicked)=\"hideMediaItemGallery()\"\n    (mediaItemSelected)=\"mediaItemSelected($event)\">\n</app-media-item-gallery>"
 
 /***/ }),
 
