@@ -28,8 +28,10 @@
   "contact_details": {
     "type": "object",
     "items": {
-      "google_map_url": {
-        "attributes": {}
+      "google_maps_embed_url": {
+        "attributes": {
+          "type": "link"
+        }
       },
       "phone": {
         "attributes": {
