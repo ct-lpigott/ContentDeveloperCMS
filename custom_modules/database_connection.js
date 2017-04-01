@@ -15,6 +15,7 @@ if (connection.threadId == null) {
 
 // If an error occurs on the database connection, reconnecting to the database
 connection.on("error", function(err){
+    console.log("DB Error - " + err.code);
     if(err.code == "PROTOCOL_CONNECTION_LOST"){
         connectToDatabase();
     }
