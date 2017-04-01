@@ -76,14 +76,11 @@
         "type": "array",
         "items": {
           "title": {
-            "attributes": {
-              "required": "required"
-            }
+            "attributes": {}
           },
           "link": {
-            "type": "link",
             "attributes": {
-              "required": "required"
+              "type": "link"
             }
           }
         }
@@ -100,14 +97,11 @@
         "type": "array",
         "items": {
           "title": {
-            "attributes": {
-              "required": "required"
-            }
+            "attributes": {}
           },
           "link": {
-            "type": "link",
             "attributes": {
-              "required": "required"
+              "type": "link"
             }
           }
         }
@@ -116,15 +110,11 @@
         "type": "array",
         "items": {
           "title": {
-            "attributes": {
-              "required": "required"
-            }
+            "attributes": {}
           },
           "link": {
             "type": "link",
-            "attributes": {
-              "required": "required"
-            }
+            "attributes": {}
           }
         }
       }
