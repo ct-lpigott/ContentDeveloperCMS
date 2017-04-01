@@ -19,6 +19,13 @@ function clickHandler(e){
         if(hasClass(e.target.parentNode.parentNode, "subNav")){
             addClass(e.target.parentNode.parentNode.parentNode, "active");
         }
+        if(hasClass(e.target.parentNode.parentNode, "subSubNav")){
+            addClass(e.target.parentNode.parentNode, "active");
+            if(hasClass(e.target.parentNode.parentNode.parentNode.parentNode, "subNav")){
+                addClass(e.target.parentNode.parentNode.parentNode, "active");
+                addClass(e.target.parentNode.parentNode.parentNode.parentNode.parentNode, "active");
+            }
+        }
     }
 }
 
