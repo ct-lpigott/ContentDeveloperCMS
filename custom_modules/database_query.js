@@ -346,6 +346,7 @@ function update_UserProject_PublicAuthToken(userId, projectId, currentPublicAuth
 
 // CREATE
 function create_User(emailAddress, cb){
+    console.log("About to create user - " + emailAddress);
     // Sanitising any parameters to be used in the query
     emailAddress = validation.sanitise(emailAddress);
 
@@ -355,8 +356,10 @@ function create_User(emailAddress, cb){
         // columns data set to be encrypted (for INSERT and UPDATE statements)
         var encryptedValues = combineColVals(["email_address", "cd_user_auth_token"], [emailAddress, newAuthToken], "insert");
         
+        console.log(encryptedValues);
         // Querying the database, with the sanitised data
         dbconn.query("INSERT INTO User(email_address, cd_user_auth_token) VALUES(" + encryptedValues + ")", function(err, result){
+            console.log("User created - " + result);
             // Using a method to handle all create results i.e. to check if
             // there was an error, check if the insert was successful, and pass back
             // the id of the new row to the callback function
@@ -436,13 +439,16 @@ function create_UserProject(currentUserId, newUserId, projectId, accessLevelInt,
 
 // CHECK
 function check_User(emailAddress, cb){
+    console.log("About to query DB - " + emailAddress);
     // Checking if a user with this email exists
     getWhere_User("id", ["email_address"], [emailAddress], function(err, existingUser){
         if(err){console.log(err);}
         // If the user exists, return their id
         if(existingUser){
+            console.log("DB user found - " + existingUser);
             cb(null, existingUser.id);
         } else {
+            console.log("Need to create new user");
             // otherwise create a new user (which will in turn return 
             // the new user id to the callback funciton passed to the request)
             create_User(emailAddress, cb);
