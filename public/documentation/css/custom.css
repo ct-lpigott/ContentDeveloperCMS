@@ -67,3 +67,37 @@ pre {
 .fullSize {
     width: 100%;
 }
+figcaption {
+    text-align: center;
+    font-style: italic;
+}
+#examples figure {
+    width: 49%;
+    display: inline-block;
+}
+#examples img {
+    width: 100%;
+}
+#examples h2 {
+    display: inline-block;
+}
+#examples img.small {
+    width: 50%;
+}
+#examples li img {
+    float: right;
+    margin-bottom: 2%;
+}
+#examples ul, #examples li, pre, h3 {
+    clear: both;
+}
+.docButton, .docButton:active, .docButton:hover {
+    text-decoration: none;
+    display: inline-block;
+    border: none;
+    border-radius: 7px;
+    cursor: pointer;
+    background-color: #1773a2;
+    color: white;
+    padding: 1% 4%;
+}
