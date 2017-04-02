@@ -117,9 +117,8 @@ router.get("/:projectID", function(req, res, next){
             }
         } else {
             // Adding the content of the project (as returned from the content.json file) as 
-            // a property on the response object, as the response will contain both the content
-            // and the structure
-            req.responseObject.content = req.fileData.content;
+            // the response object
+            req.responseObject = req.fileData.content;
             res.send(req.responseObject);
         }        
     } else {
