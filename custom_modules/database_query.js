@@ -434,6 +434,18 @@ function create_UserProject(currentUserId, newUserId, projectId, accessLevelInt,
                     } else {
                         cb(err, newUserProjectId);
                     }
+
+                    get_UserProject_Project_User("u.email_address, u.display_name, up.access_level_int, p.project_name, p.access_levels, p.media_folder_id", newUserId, projectId, function(err, row){
+                        if(row){
+                            // As with the googleOAuth module, only requiring the accessLevels module
+                            // as needed, as there is a two way dependancy between it and this module
+                            let accessLevels = require("./access_levels.js");
+                            // Getting the name of the users access level
+                            var accessLevelName = accessLevels.getAccessLevelName(row.access_level_int, row.access_levels);
+                            // Using the sendEmail module to generate an email to the user
+                            sendEmail.addedToProject(row.email_address, row.display_name, row.project_name, accessLevelName);
+                        }
+                    });
                 }
             });
         });
@@ -510,6 +522,7 @@ function delete_Project(userId, projectId, projectName, cb){
     // this data from the database
     var emailUsers = [];
     var allowDelete = false;
+    var deletedBy;
 
     // Getting all users that are collaborators on this project
     get_UserProjects_forProject("up.user_id, up.access_level_int, u.email_address, u.display_name, p.project_name", projectId, function(err, rows){
@@ -526,6 +539,7 @@ function delete_Project(userId, projectId, projectName, cb){
                     // the name of the project (to ensure they dont accidentally delete it)
                     if(rows[i].user_id == userId && rows[i].access_level_int == 1 && rows[i].project_name == projectName){
                         allowDelete = true;
+                        deletedBy = rows[i].display_name;
                     }
 
                     // Pushing the details of each of the projects users to the email array,
@@ -551,7 +565,7 @@ function delete_Project(userId, projectId, projectName, cb){
                                         // were collaborators on this project
                                         for(var i=0; i<emailUsers.length; i++){
                                             // Using the sendEmail module to generate an email to each user
-                                            sendEmail.projectDeleted(emailUsers[i].emailAddress, emailUsers[i].displayName, emailUsers[i].projectName);
+                                            sendEmail.projectDeleted(emailUsers[i].emailAddress, emailUsers[i].displayName, emailUsers[i].projectName, deletedBy);
                                         }     
                                         cb(err, success);                                   
                                     }

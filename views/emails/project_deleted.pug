@@ -1,3 +1,5 @@
-h1 Dear #{userDisplayName}
-h2 #{userEmail}
-p '#{projectName}' has been deleted.
+if userDisplayName
+    h1 Dear #{userDisplayName}
+else
+    h2 #{userEmail}
+p '#{projectName}' has been deleted from the Content Developer Server by #{deletedBy}.

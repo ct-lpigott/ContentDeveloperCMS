@@ -25,7 +25,7 @@ function sendEmail(to, subject, htmlBody){
         // Creating a mail options object, with the details supplied
         // to the function
         var mailOptions = {
-            from: "'Content Developer' <" + process.env.EMAIL_ADDRESS + ">",
+            from: "'Content Developer CMS' <" + process.env.EMAIL_ADDRESS + ">",
             to: to,
             subject: subject,
             html: htmlBody
@@ -42,7 +42,7 @@ function sendEmail(to, subject, htmlBody){
     }
 }
 
-function addedToProject(userEmail, userDisplayName, projectName){
+function addedToProject(userEmail, userDisplayName, projectName, accessLevelName){
     // Compiling the appropriate tempalte file
     var addedToProjectTemplate = pug.compileFile("./views/emails/added_to_project.pug");
     // Rendering the template file with the details passed to the function
@@ -50,6 +50,7 @@ function addedToProject(userEmail, userDisplayName, projectName){
         userEmail: userEmail,
         userDisplayName: userDisplayName,
         projectName: projectName,
+        accessLevelName: accessLevelName,
         siteUrl: process.env.SITE_URL
     });
     // Calling the send email function (as defined above)
@@ -85,7 +86,7 @@ function removedFromProject(userEmail, userDisplayName, projectName){
     sendEmail(userEmail, "Removed as Collaborator", emailContent);
 }
 
-function projectDeleted(userEmail, userDisplayName, projectName){
+function projectDeleted(userEmail, userDisplayName, projectName, deletedBy){
     // Compiling the appropriate tempalte file
     var projectDeletedTemplate = pug.compileFile("./views/emails/project_deleted.pug");
     // Rendering the template file with the details passed to the function
@@ -93,6 +94,7 @@ function projectDeleted(userEmail, userDisplayName, projectName){
         userEmail: userEmail,
         userDisplayName: userDisplayName,
         projectName: projectName,
+        deletedBy: deletedBy,
         siteUrl: process.env.SITE_URL
     });
     // Calling the send email function (as defined above)

@@ -1,5 +1,7 @@
-h1 Dear #{userDisplayName}
-h2 #{userEmail}
+if userDisplayName
+    h1 Dear #{userDisplayName}
+else
+    h2 #{userEmail}
 p You have been added as a collaborator of '#{projectName}'
 p To log in to edit this project please go to 
     a(href=siteUrl target="_blank") Content Developer
