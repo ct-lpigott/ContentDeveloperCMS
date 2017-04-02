@@ -21,8 +21,14 @@ connection.on("error", function(err){
     }
 });
 
+connection.on("timeout", function(err){
+    console.log("DB timeout");
+    connectToDatabase();
+});
+
 // Function used to connect to the database
 function connectToDatabase(){
+    console.log("Connection thread ID - " + connection.threadId);
     connection.connect(function (err) {
         if (err) {
             console.error("Unable to connect to server " + err.stack + "\n");
@@ -35,4 +41,7 @@ function connectToDatabase(){
 // Returning the database connection as the export for this module,
 // so that no many how many files request it, only one connection will
 // ever be used
-module.exports = connection;
+module.exports = {
+    connection: connection,
+    reconnectToDatabase: connectToDatabase
+};

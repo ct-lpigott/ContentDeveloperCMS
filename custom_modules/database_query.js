@@ -2,7 +2,8 @@
 // to make queries to the database. This is the only module that
 // should ever request this connection, as all other modules
 // will use the prepared query statements below
-var dbconn = require("./database_connection");
+var database = require("./database_connection");
+var dbconn = database.connection;
 
 // Requiring the sendEmail module, which is used to send emails to
 // collaborators when they are added/updated/removed from a project,
@@ -164,6 +165,8 @@ function getWhere_User(selectCols="", whereCols=[], whereVals=[], cb){
     // encrypted columns set to be decrypted (for WHERE statements)
     var where = "WHERE " + combineColVals(whereCols, whereVals, "where",  " AND ");
 
+    console.log(where);
+    
     // Querying the database, with the sanitised data
     dbconn.query("SELECT " + selectCols + " FROM User " + where, function(err, rows, fields){
         // Using a method to handle all get results i.e. to check if
@@ -601,6 +604,7 @@ function delete_UserProject(currentUserId, removeUserId, projectId, cb){
 
 // RESULT HANDLERS
 function handleGetResult(err, rows, numRows="single", cb){
+    console.log("Handling get result - " + err + " - " + rows);
     // Handling all get results i.e. to check if
     // there was an error, check that the appropriate number of rows
     // were returned, and pass them back to the callback function

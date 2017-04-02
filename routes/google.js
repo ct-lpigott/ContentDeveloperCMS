@@ -8,6 +8,8 @@ var router = require('express').Router();
 // i.e. to make request to the Plus API, to get the users email address
 var google = require("googleapis");
 
+var database = require("../custom_modules/database_connection");
+
 // Including the dbQuery module, which contains prepared queries to the 
 // database, which ensure that all data used within them is sanitised and
 // escaped before being included in a statement
@@ -22,7 +24,8 @@ var googleOAuth = require("../custom_modules/google_oauth");
 // their Google account
 router.get("/oauthRedirectURL", function(req, res, next){
     req.loginErrors = [];
-    
+    database.reconnectToDatabase();
+
     // Temporarily storing the auth code, included in the request, as this will be used
     // request the access token from the Google API i.e. it proves that the user has 
     // authorised us to do so
@@ -57,14 +60,14 @@ router.get("/oauthRedirectURL", function(req, res, next){
                 plus.people.get({
                     userId: 'me',
                     auth: oauth2Client
-                }, function (err, user) {
+                }, function (err, googleUser) {
                     if(err){
                         console.log("Unable to get user - " + err);
                         next();
                     } else {
                         // Temporarily storing the link to the users profile image (with
                         // the size specification removed - as by default it is set to 50px)
-                        var userProfileImageURL = user.image.url.replace("?sz=50", "");
+                        var userProfileImageURL = googleUser.image.url.replace("?sz=50", "");
 
                         // Temporarily storing the users access token in a JSON string.
                         // Storing the refresh token seperate from the access token, as this
@@ -73,13 +76,13 @@ router.get("/oauthRedirectURL", function(req, res, next){
                         var accessToken = JSON.stringify(token);
                         var refreshToken = token.refresh_token;
 
-                        console.log("Got user - " + user.displayName);
-                        if(user.emails != null && user.emails.length > 0){
-                            console.log("User email - " + user.emails[0].value);
+                        console.log("Got user - " + googleUser.displayName);
+                        if(googleUser.emails != null && googleUser.emails.length > 0){
+                            console.log("User email - " + googleUser.emails[0].value);
                         }
 
                         // Checking if the user exists, and if not, then creating them
-                        dbQuery.check_User(user.emails[0].value, function(err, userId){
+                        dbQuery.check_User(googleUser.emails[0].value, function(err, userId){
                             console.log("Found user - " + userId);
                             console.log(err);
                             // Getting the details of this user (either new or existing)
@@ -89,12 +92,12 @@ router.get("/oauthRedirectURL", function(req, res, next){
 
                                     // If no refresh token was supplied, then no need to update its value
                                     if(refreshToken != null){
-                                        dbQuery.update_User(["display_name", "google_profile_image_url", "google_profile_id", "google_access_token", "google_refresh_token"], [user.displayName, userProfileImageURL, user.id, accessToken, refreshToken], userId, function(err, success){
+                                        dbQuery.update_User(["display_name", "google_profile_image_url", "google_profile_id", "google_access_token", "google_refresh_token"], [googleUser.displayName, userProfileImageURL, googleUser.id, accessToken, refreshToken], userId, function(err, success){
                                             // Passing this request on to the next stage of this route
                                             next();
                                         });
                                     } else {
-                                        dbQuery.update_User(["display_name", "google_profile_image_url", "google_profile_id", "google_access_token"], [user.displayName, userProfileImageURL, user.id, accessToken], userId, function(err, success){
+                                        dbQuery.update_User(["display_name", "google_profile_image_url", "google_profile_id", "google_access_token"], [googleUser.displayName, userProfileImageURL, googleUser.id, accessToken], userId, function(err, success){
                                             // Passing this request on to the next stage of this route
                                             next();
                                         });
