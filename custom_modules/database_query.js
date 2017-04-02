@@ -3,7 +3,6 @@
 // should ever request this connection, as all other modules
 // will use the prepared query statements below
 var database = require("./database_connection");
-var dbconn = database.connection;
 
 // Requiring the sendEmail module, which is used to send emails to
 // collaborators when they are added/updated/removed from a project,
@@ -41,6 +40,9 @@ function get_User(selectCols="", userId, cb){
     // Sanitising any parameters to be used in the query
     userId = validation.sanitise(userId);
 
+    // Reloading the database connection incase it has disconnected
+    var dbconn = database.connection;
+    
     // Querying the database, with the sanitised data
     dbconn.query("SELECT " + selectCols + " FROM User WHERE id=" + dbconn.escape(userId), function(err, rows, fields){
         // Using a method to handle all get results i.e. to check if
@@ -57,6 +59,9 @@ function get_Project(selectCols="", projectId, cb){
 
     // Sanitising any parameters to be used in the query
     projectId = validation.sanitise(projectId);
+
+    // Reloading the database connection incase it has disconnected
+    var dbconn = database.connection;
 
     // Querying the database, with the sanitised data
     dbconn.query("SELECT " + selectCols + " FROM Project WHERE id=" + dbconn.escape(projectId), function(err, rows, fields){
@@ -76,6 +81,9 @@ function get_UserProject(selectCols="", userId, projectId, cb){
     userId = validation.sanitise(userId);
     projectId = validation.sanitise(projectId);
 
+    // Reloading the database connection incase it has disconnected
+    var dbconn = database.connection;
+
     // Querying the database, with the sanitised data
     dbconn.query("SELECT " + selectCols + " FROM User_Project WHERE user_id=" + dbconn.escape(userId) + " AND project_id=" + dbconn.escape(projectId), function(err, rows, fields){
         // Using a method to handle all get results i.e. to check if
@@ -93,6 +101,9 @@ function get_UserProjects_forUser(selectCols, userId, cb){
     // Sanitising any parameters to be used in the query
     userId = validation.sanitise(userId);
 
+    // Reloading the database connection incase it has disconnected
+    var dbconn = database.connection;
+
     // Querying the database, with the sanitised data
     dbconn.query("SELECT " + selectCols + " FROM User_Project up LEFT JOIN Project p ON up.project_id = p.id WHERE up.user_id=" + dbconn.escape(userId), function(err, rows, fields){
         // Using a method to handle all get results i.e. to check if
@@ -109,6 +120,9 @@ function get_UserProjects_forProject(selectCols, projectId, cb){
 
     // Sanitising any parameters to be used in the query
     projectId = validation.sanitise(projectId);
+
+    // Reloading the database connection incase it has disconnected
+    var dbconn = database.connection;
 
     // Querying the database, with the sanitised data
     dbconn.query("SELECT " + selectCols + " FROM User_Project up LEFT JOIN User u ON up.user_id = u.id LEFT JOIN Project p ON up.project_id = p.id WHERE up.project_id=" + dbconn.escape(projectId), function(err, rows, fields){
@@ -128,6 +142,9 @@ function get_UserProject_Project(selectCols, userId, projectId, cb){
     userId = validation.sanitise(userId);
     projectId = validation.sanitise(projectId);
 
+    // Reloading the database connection incase it has disconnected
+    var dbconn = database.connection;
+
     // Querying the database, with the sanitised data
     dbconn.query("SELECT " + selectCols + " FROM User_Project up LEFT JOIN Project p ON up.project_id = p.id WHERE up.user_id=" + dbconn.escape(userId) + " AND up.project_id=" + dbconn.escape(projectId), function(err, rows, fields){
         // Using a method to handle all get results i.e. to check if
@@ -145,6 +162,9 @@ function get_UserProject_Project_User(selectCols, userId, projectId, cb){
     // Sanitising any parameters to be used in the query
     userId = validation.sanitise(userId);
     projectId = validation.sanitise(projectId);
+
+    // Reloading the database connection incase it has disconnected
+    var dbconn = database.connection;
 
     // Querying the database, with the sanitised data
     dbconn.query("SELECT " + selectCols + " FROM User_Project up LEFT JOIN Project p ON up.project_id = p.id LEFT JOIN User u ON up.user_id = u.id WHERE up.user_id=" + dbconn.escape(userId) + " AND up.project_id=" + dbconn.escape(projectId), function(err, rows, fields){
@@ -166,6 +186,10 @@ function getWhere_User(selectCols="", whereCols=[], whereVals=[], cb){
     var where = "WHERE " + combineColVals(whereCols, whereVals, "where",  " AND ");
 
     console.log(where);
+
+    // Reloading the database connection incase it has disconnected
+    var dbconn = database.connection;
+    console.log("Database connection - " + dbconn.threadId);
     
     // Querying the database, with the sanitised data
     dbconn.query("SELECT " + selectCols + " FROM User " + where, function(err, rows, fields){
@@ -185,6 +209,9 @@ function getWhere_UserProject(selectCols="", whereCols=[], whereVals=[], cb){
     // encrypted columns set to be decrypted (for WHERE statements)
     var where = "WHERE " + combineColVals(whereCols, whereVals, "where",  " AND ");
 
+    // Reloading the database connection incase it has disconnected
+    var dbconn = database.connection;
+
     // Querying the database, with the sanitised data
     dbconn.query("SELECT " + selectCols + " FROM User_Project " + where, function(err, rows, fields){
         // Using a method to handle all get results i.e. to check if
@@ -202,6 +229,9 @@ function update_User(updateCols=[], updateVals=[], userId, cb){
 
     // Sanitising any parameters to be used in the query
     userId = validation.sanitise(userId);
+
+    // Reloading the database connection incase it has disconnected
+    var dbconn = database.connection;
 
     // Querying the database, with the sanitised data
     dbconn.query("UPDATE User " + setCols + " WHERE id=" + dbconn.escape(userId), function(err, result){
@@ -221,6 +251,9 @@ function update_Project(updateCols=[], updateVals=[], userId, projectId, cb){
     userId = validation.sanitise(userId);
     projectId = validation.sanitise(projectId);
 
+    // Reloading the database connection incase it has disconnected
+    var dbconn = database.connection;
+    
     // Querying the database, with the sanitised data
     dbconn.query("UPDATE Project p LEFT JOIN User_Project up ON p.id = up.project_id " + setCols + " WHERE up.project_id=" + dbconn.escape(projectId) + " AND up.user_id=" + dbconn.escape(userId), function(err, result){
         // Using a method to handle all update/delete results i.e. to check if
@@ -240,6 +273,9 @@ function update_UserProject(updateCols=[], updateVals=[], currentUserId, updateU
             // Sanitising any parameters to be used in the query
             updateUserId = validation.sanitise(updateUserId);
             projectId = validation.sanitise(projectId);
+
+            // Reloading the database connection incase it has disconnected
+            var dbconn = database.connection;
 
             // Querying the database, with the sanitised data
             dbconn.query("UPDATE User_Project " + setCols + " WHERE user_id=" + updateUserId  + " AND project_id=" + projectId, function(err, result) {
@@ -328,6 +364,9 @@ function update_UserProject_PublicAuthToken(userId, projectId, currentPublicAuth
                     // columns data set to be encrypted (for INSERT and UPDATE statements)
                     var setCols = "SET " + combineColVals(["public_auth_token"], [newPublicAuthToken], "set", ", ", false);
                     
+                    // Reloading the database connection incase it has disconnected
+                    var dbconn = database.connection;
+
                     // Querying the database, with the sanitised data
                     dbconn.query("UPDATE User_Project " + setCols + " WHERE user_id=" + userId + " AND project_id=" + projectId, function(err, result){
                         // Using a method to handle all update/delete results i.e. to check if
@@ -366,6 +405,10 @@ function create_User(emailAddress, cb){
         var encryptedValues = combineColVals(["email_address", "cd_user_auth_token"], [emailAddress, newAuthToken], "insert");
         
         console.log(encryptedValues);
+
+        // Reloading the database connection incase it has disconnected
+        var dbconn = database.connection;
+        
         // Querying the database, with the sanitised data
         dbconn.query("INSERT INTO User(email_address, cd_user_auth_token) VALUES(" + encryptedValues + ")", function(err, result){
             console.log("User created - " + result);
@@ -386,6 +429,9 @@ function create_Project(projectName, accessLevels, mediaFolderId, userPermission
     // columns data set to be encrypted (for INSERT and UPDATE statements)
     var encryptedValues = combineColVals(["project_name", "access_levels", "media_folder_id"], [projectName, accessLevels, mediaFolderId], "insert");
     
+    // Reloading the database connection incase it has disconnected
+    var dbconn = database.connection;
+
     // Querying the database, with the sanitised data
     dbconn.query("INSERT INTO Project(project_name, access_levels, media_folder_id) VALUES(" + encryptedValues + ")", function(err, result){
         // Using a method to handle all create results i.e. to check if
@@ -418,6 +464,9 @@ function create_UserProject(currentUserId, newUserId, projectId, accessLevelInt,
         // columns data set to be encrypted (for INSERT and UPDATE statements)
         var encryptedValues = combineColVals(["user_id", "project_id", "access_level_int", "media_folder_permission_id", "public_auth_token"], [newUserId, projectId, accessLevelInt, userPermissionId, newPublicAuthToken], "insert");
         
+        // Reloading the database connection incase it has disconnected
+        var dbconn = database.connection;
+
         // Querying the database, with the sanitised data
         dbconn.query("INSERT INTO User_Project(user_id, project_id, access_level_int, media_folder_permission_id, public_auth_token) VALUES(" + encryptedValues + ")", function(err, result){
             // Using a method to handle all create results i.e. to check if
@@ -557,6 +606,9 @@ function delete_Project(userId, projectId, projectName, cb){
                     });
                 }
                 if(allowDelete){
+                    // Reloading the database connection incase it has disconnected
+                    var dbconn = database.connection;
+
                     // Deleting all user realtionships for this project
                     dbconn.query("DELETE FROM User_Project WHERE project_id=" + dbconn.escape(projectId), function(err, result){
                         // Using a method to handle all update/delete results i.e. to check if
@@ -597,6 +649,9 @@ function delete_UserProject(currentUserId, removeUserId, projectId, cb){
     // Getting details of the user that is going to be removed from the 
     // project, so that they can be notified once it is deleted
     get_UserProject_Project_User("u.email_address, u.display_name, p.project_name, p.media_folder_id, up.media_folder_permission_id", removeUserId, projectId, function(err, row){
+        // Reloading the database connection incase it has disconnected
+        var dbconn = database.connection;
+        
         // Deleting this users relationship with the project
         dbconn.query("DELETE FROM User_Project WHERE user_id=" + dbconn.escape(removeUserId) + " AND project_id=" + dbconn.escape(projectId), function(err, result){
             // Using a method to handle all update/delete results i.e. to check if

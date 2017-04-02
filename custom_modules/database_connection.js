@@ -28,6 +28,7 @@ function connectToDatabase(){
         if (err) {
             console.error("Unable to connect to server " + err.stack + "\n");
         } else {
+            console.log("DB thread - " + connection.threadId);
             if(connection.threadId != null){
                 connection.destroy(); 
             }
