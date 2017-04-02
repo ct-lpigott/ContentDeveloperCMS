@@ -147,7 +147,9 @@ router.put("/:projectID", function(req, res, next){
                 req.feedsErrors.push(contentValidation.errors[i]);
             }
             if(contentValidation.allowed){
-                req.fileData.content = contentValidation.sanitisedContent;
+                for(var property in contentValidation.sanitisedContent){
+                    req.fileData.content[property] = contentValidation.sanitisedContent[property];
+                }
                 console.log("Entire contents of project content updated");
                 if(req.body.short_commit_id != null){
                     req.gitCommitMessage = "Project content rolled back to commit id: " + req.body.short_commit_id;
