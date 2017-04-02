@@ -171,7 +171,7 @@ function createNewAccessLevel(adminUserId, projectId, accessLevelName, accessLev
         // Determining the access level int based on whether or not one was provided, and 
         // whether it is a valid number. If not, then defaulting it to 4 (the next available
         // int after the first 3 default access levels)
-        accessLevelInt = accessLevelInt == "" || isNaN(accessLevelInt) ? 4 : parseInt(accessLevelInt);
+        accessLevelInt = accessLevelInt == "" || isNaN(accessLevelInt) || parseInt(accessLevelInt) < 4 ? 4 : parseInt(accessLevelInt);
 
         if(currentAccessLevels != null){
             // Checking if this access level int already exists on this projects access levels. 
