@@ -2869,6 +2869,7 @@ var DraggableContainerDirective = (function () {
         this._dragStartY = e.screenY;
         if (e.target.parentNode == this._containerElement) {
             this._draggingElement = e.target;
+            this._draggingElement.setAttribute("data-dragging", "true");
         }
     };
     DraggableContainerDirective.prototype.onDragOver = function (e) {
@@ -2877,7 +2878,18 @@ var DraggableContainerDirective = (function () {
         // will occur, so the item can be moved within the DOM
         e.preventDefault();
     };
+    DraggableContainerDirective.prototype.onDragEnter = function (e) {
+        if (e.target.parentNode === this._containerElement) {
+            e.target.setAttribute("data-draggingover", "true");
+        }
+        e.stopPropagation();
+    };
+    DraggableContainerDirective.prototype.onDragLeave = function (e) {
+        e.target.removeAttribute("data-draggingover");
+    };
     DraggableContainerDirective.prototype.onDrop = function (e) {
+        this._draggingElement.removeAttribute("data-dragging");
+        e.target.removeAttribute("data-draggingover");
         if (this._draggingElement != null && e.target.parentNode === this._containerElement) {
             var direction = e.screenY < this._dragStartY ? -1 : 1;
             var dragData = {
@@ -2891,6 +2903,7 @@ var DraggableContainerDirective = (function () {
             this._dragStartY = null;
             this._reorderContent(dragData);
         }
+        e.stopPropagation();
     };
     DraggableContainerDirective.prototype._reorderContent = function (dragData) {
         if (this.content != null) {
@@ -3026,6 +3039,18 @@ var DraggableContainerDirective = (function () {
         __metadata('design:paramtypes', [Object]), 
         __metadata('design:returntype', void 0)
     ], DraggableContainerDirective.prototype, "onDragOver", null);
+    __decorate([
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["V" /* HostListener */])("dragenter", ["$event"]), 
+        __metadata('design:type', Function), 
+        __metadata('design:paramtypes', [Object]), 
+        __metadata('design:returntype', void 0)
+    ], DraggableContainerDirective.prototype, "onDragEnter", null);
+    __decorate([
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["V" /* HostListener */])("dragleave", ["$event"]), 
+        __metadata('design:type', Function), 
+        __metadata('design:paramtypes', [Object]), 
+        __metadata('design:returntype', void 0)
+    ], DraggableContainerDirective.prototype, "onDragLeave", null);
     __decorate([
         __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["V" /* HostListener */])("drop", ["$event"]), 
         __metadata('design:type', Function), 
@@ -3816,7 +3841,7 @@ var environment = {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_13_core_js_es6_reflect___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_13_core_js_es6_reflect__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_14_core_js_es7_reflect__ = __webpack_require__(505);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_14_core_js_es7_reflect___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_14_core_js_es7_reflect__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_15_zone_js_dist_zone__ = __webpack_require__(718);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_15_zone_js_dist_zone__ = __webpack_require__(720);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_15_zone_js_dist_zone___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_15_zone_js_dist_zone__);
 
 
@@ -4188,7 +4213,7 @@ module.exports = "<div class=\"row\">\r\n  <div class=\"col-6-12\">\r\n    <h1>{
 
 /***/ }),
 
-/***/ 719:
+/***/ 721:
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__(354);
@@ -4196,5 +4221,5 @@ module.exports = __webpack_require__(354);
 
 /***/ })
 
-},[719]);
+},[721]);
 //# sourceMappingURL=main.bundle.map
