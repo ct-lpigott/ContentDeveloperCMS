@@ -449,7 +449,7 @@ function objectToJson(jsObject){
     return validJson;
 }
 
-function checkAccessLevelAllowedUpdate(structure, accessLevel, responseObject){
+function checkAccessLevelAllowedUpdate(structure, accessLevel, responseObject, itemName="this content"){
     // Assuming that this user does not have the appropriate access level to update
     // the content, until proved otherwise
     var allowedUpdate = false;
@@ -463,7 +463,7 @@ function checkAccessLevelAllowedUpdate(structure, accessLevel, responseObject){
     } else {
         // Pusing the error onto the main response object passed to the function,
         // so that it will be included in the response to the user
-        responseObject.errors.push("This user does not have the appropriate access level to update this content");
+        responseObject.errors.push("This user does not have the appropriate access level to update '" + itemName + "'");
     }
 
     // Returning true/false
@@ -519,7 +519,6 @@ function validateNewContent(content, structure, accessLevel){
                         if(itemsValidation.allowed){
                             responseObject.sanitisedContent[property] = itemsValidation.sanitisedContent;
                         } else {
-                            responseObject.allowed = false;
                             delete responseObject.sanitisedContent[property];
                         }
                         // Looping through any errors returned from the validation, and storing them on the
@@ -576,7 +575,7 @@ function validateContentAgainstStructure(content, structure, accessLevel, conten
     }
 
     // Checking that the user has to appropriate access level to update this content
-    if(checkAccessLevelAllowedUpdate(structure, accessLevel, responseObject)){
+    if(checkAccessLevelAllowedUpdate(structure, accessLevel, responseObject, contentName)){
         if(content != null){
             if(structure.attributes != null){
                 // Checking if the content matches the attriubtes
@@ -656,7 +655,7 @@ function validateContentAgainstStructure(content, structure, accessLevel, conten
                         for(var property in structure["items"]){
                             // Checking that the user has the appropriate access level to update
                             // the next level of content
-                            if(checkAccessLevelAllowedUpdate(structure["items"][property], accessLevel, responseObject)){
+                            if(checkAccessLevelAllowedUpdate(structure["items"][property], accessLevel, responseObject, property)){
                                 if(structure["items"][property]["attributes"] != null){
                                     // If the property in the items has attriubtes, then checking if the content
                                     // matches the attriubtes

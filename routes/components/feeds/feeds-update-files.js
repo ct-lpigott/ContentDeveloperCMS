@@ -52,6 +52,10 @@ router.use(function(req, res, next){
                                 content: req.resultData,
                                 errors: req.feedsErrors
                             };
+
+                            if(req.user_access_level > 2){
+                                delete responseObject.errors;
+                            }
                             res.send(responseObject);
                         });
                     }

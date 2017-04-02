@@ -147,9 +147,8 @@ router.put("/:projectID", function(req, res, next){
                 req.feedsErrors.push(contentValidation.errors[i]);
             }
             if(contentValidation.allowed){
-                for(var property in contentValidation.sanitisedContent){
-                    req.fileData.content[property] = contentValidation.sanitisedContent[property];
-                }
+                req.resultData = contentValidation.sanitisedContent;
+                req.fileData.content = parseSanitisedContent(req.fileData.content, contentValidation.sanitisedContent);
                 console.log("Entire contents of project content updated");
                 if(req.body.short_commit_id != null){
                     req.gitCommitMessage = "Project content rolled back to commit id: " + req.body.short_commit_id;
@@ -528,6 +527,23 @@ router.put("/:projectID/*", function(req, res, next){
         next();
     }
 });
+
+function parseSanitisedContent(originalContent, sanitisedContent){
+    var updatedContent = checkObjectForProperties(originalContent, sanitisedContent);
+    return updatedContent;
+}
+
+function checkObjectForProperties(originalContent, sanitisedContent){
+    for(var property in sanitisedContent){
+        if(typeof originalContent[property] == "object"){
+            originalContent[property] = checkObjectForProperties(originalContent[property], sanitisedContent[property]);
+        } else {
+            originalContent[property] = sanitisedContent[property];
+        }
+    }
+    return originalContent;
+}
+                
 
 // Exporting the router that was set up in this file, so that it can be included
 // in the feeds.js route and specified as the route for all put requests to update
