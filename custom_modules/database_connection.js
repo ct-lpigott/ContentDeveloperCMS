@@ -21,18 +21,17 @@ connection.on("error", function(err){
     }
 });
 
-connection.on("timeout", function(err){
-    console.log("DB timeout");
-    connectToDatabase();
-});
-
 // Function used to connect to the database
 function connectToDatabase(){
-    console.log("Connection thread ID - " + connection.threadId);
-    connection.connect(function (err) {
+    var newConnection = mysql.createConnection(connectionString);
+    newConnection.connect(function (err) {
         if (err) {
             console.error("Unable to connect to server " + err.stack + "\n");
         } else {
+            if(connection.threadId != null){
+                connection.destroy(); 
+            }
+            connection = newConnection;
             console.log("Successfully connected to database \n");
         }
     });
