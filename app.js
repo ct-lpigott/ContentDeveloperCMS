@@ -44,7 +44,7 @@ app.use("/", session({
     saveUninitialized: false,
     cookie: {
       secure: process.env.DEBUG != "true",
-      maxAge: 1000 * 60 * 15 // 15 minutes
+      maxAge: 1000 * 60 * 30 // 30 minutes
     },
     rolling: true,
     store: new SessionFileStore({
