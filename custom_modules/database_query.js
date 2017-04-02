@@ -231,74 +231,80 @@ function update_Project(updateCols=[], updateVals=[], userId, projectId, cb){
 }
 
 function update_UserProject(updateCols=[], updateVals=[], currentUserId, updateUserId, projectId, cb){
-    // Joining the columns/values arrays into a string, all values sanitised and escaped, and all encrypted 
-    // columns data set to be encrypted (for INSERT and UPDATE statements)
-    var setCols = "SET " + combineColVals(updateCols, updateVals, "set");
+    checkThatOneAdminWillAlwaysRemain(updateCols, updateVals, updateUserId, projectId, function(allowUpdate){
+        if(allowUpdate){
+            // Joining the columns/values arrays into a string, all values sanitised and escaped, and all encrypted 
+            // columns data set to be encrypted (for INSERT and UPDATE statements)
+            var setCols = "SET " + combineColVals(updateCols, updateVals, "set");
 
-    // Sanitising any parameters to be used in the query
-    updateUserId = validation.sanitise(updateUserId);
-    projectId = validation.sanitise(projectId);
+            // Sanitising any parameters to be used in the query
+            updateUserId = validation.sanitise(updateUserId);
+            projectId = validation.sanitise(projectId);
 
-    // Querying the database, with the sanitised data
-    dbconn.query("UPDATE User_Project " + setCols + " WHERE user_id=" + updateUserId  + " AND project_id=" + projectId, function(err, result) {
-        // Using a method to handle all update/delete results i.e. to check if
-        // there was an error, check if the update was successful, and pass back
-        // the result to the callback function
-        handleUpdateResult(err, result, function(err, success){
-            if(err || success == null){
-                cb(err, false);
-            } else {
-                // Creating temporary variables to determing if the access level was changed,
-                // and if so, what it was changed to
-                var accessLevelChanged = false;
-                var updatedAccessLevel = null;
+            // Querying the database, with the sanitised data
+            dbconn.query("UPDATE User_Project " + setCols + " WHERE user_id=" + updateUserId  + " AND project_id=" + projectId, function(err, result) {
+                // Using a method to handle all update/delete results i.e. to check if
+                // there was an error, check if the update was successful, and pass back
+                // the result to the callback function
+                handleUpdateResult(err, result, function(err, success){
+                    if(err || success == null){
+                        cb(err, false);
+                    } else {
+                        // Creating temporary variables to determing if the access level was changed,
+                        // and if so, what it was changed to
+                        var accessLevelChanged = false;
+                        var updatedAccessLevel = null;
 
-                // Looping through the columns used in the query, to determine if the 
-                // access_level_int column was one of them. If so, storing its value
-                for(var i=0; i<updateCols.length; i++){
-                    if(updateCols[i] == "access_level_int"){
-                        accessLevelChanged = true;
-                        updatedAccessLevel = updateVals[i];
-                        break;
-                    }
-                }
-                
-                // Checking if the access level for this user to this project was changed,
-                // so that their access to the projects Google Drive folder can be updated,
-                // and an email sent to them to notify them of the change
-                if(accessLevelChanged){
-                    // Only requiring the googleOAuth module at this point, as it cannot
-                    // be declare at the top of the file like the other modules (as there is 
-                    // a two way dependancy - this module requires the googleOAuth module, and
-                    // the googleOAuth module requires this module. getting around this by 
-                    // only requiring the googleOAuth module when needed)
-                    var googleOAuth = require("./google_oauth");
-
-                    // Updating the users access to the projects Google drive folder, based
-                    // on the value of their access level int
-                    googleOAuth.updateUserAccessToFolder(currentUserId, updateUserId, projectId, updatedAccessLevel, function(success){});
-                    
-                    // Getting the users details, along with the project details, so that the appropriate
-                    // information can be included in the email, notifying them of this change
-                    get_UserProject_Project_User("u.email_address, u.display_name, up.access_level_int, p.project_name, p.access_levels, p.media_folder_id", updateUserId, projectId, function(err, row){
-                        if(row){
-                            // As with the googleOAuth module, only requiring the accessLevels module
-                            // as needed, as there is a two way dependancy between it and this module
-                            let accessLevels = require("./access_levels.js");
-                            // Getting the name of the users access level
-                            var accessLevelName = accessLevels.getAccessLevelName(row.access_level_int, row.access_levels);
-                            // Using the sendEmail module to generate an email to the user
-                            sendEmail.accessLevelChanged(row.email_address, row.display_name, row.project_name, accessLevelName);
+                        // Looping through the columns used in the query, to determine if the 
+                        // access_level_int column was one of them. If so, storing its value
+                        for(var i=0; i<updateCols.length; i++){
+                            if(updateCols[i] == "access_level_int"){
+                                accessLevelChanged = true;
+                                updatedAccessLevel = updateVals[i];
+                                break;
+                            }
                         }
-                        cb(err, success);
-                    });
-                } else {
-                    // Since the access level was not changed, no further
-                    // action is required
-                    cb(err, success);
-                }
-            }
-        });
+                        
+                        // Checking if the access level for this user to this project was changed,
+                        // so that their access to the projects Google Drive folder can be updated,
+                        // and an email sent to them to notify them of the change
+                        if(accessLevelChanged){
+                            // Only requiring the googleOAuth module at this point, as it cannot
+                            // be declare at the top of the file like the other modules (as there is 
+                            // a two way dependancy - this module requires the googleOAuth module, and
+                            // the googleOAuth module requires this module. getting around this by 
+                            // only requiring the googleOAuth module when needed)
+                            var googleOAuth = require("./google_oauth");
+
+                            // Updating the users access to the projects Google drive folder, based
+                            // on the value of their access level int
+                            googleOAuth.updateUserAccessToFolder(currentUserId, updateUserId, projectId, updatedAccessLevel, function(success){});
+                            
+                            // Getting the users details, along with the project details, so that the appropriate
+                            // information can be included in the email, notifying them of this change
+                            get_UserProject_Project_User("u.email_address, u.display_name, up.access_level_int, p.project_name, p.access_levels, p.media_folder_id", updateUserId, projectId, function(err, row){
+                                if(row){
+                                    // As with the googleOAuth module, only requiring the accessLevels module
+                                    // as needed, as there is a two way dependancy between it and this module
+                                    let accessLevels = require("./access_levels.js");
+                                    // Getting the name of the users access level
+                                    var accessLevelName = accessLevels.getAccessLevelName(row.access_level_int, row.access_levels);
+                                    // Using the sendEmail module to generate an email to the user
+                                    sendEmail.accessLevelChanged(row.email_address, row.display_name, row.project_name, accessLevelName);
+                                }
+                                cb(err, success);
+                            });
+                        } else {
+                            // Since the access level was not changed, no further
+                            // action is required
+                            cb(err, success);
+                        }
+                    }
+                });
+            });
+        } else {
+            cb("Projects must always have one admin", false);
+        }
     });
 }
 
@@ -855,6 +861,76 @@ function columnStringDecryption(stringOfCols){
     // Joining the array of columns back into a comma seperated string,
     // and returning them to the caller
     return columns.join(", ");
+}
+
+function checkThatOneAdminWillAlwaysRemain(updateCols, updateVals, userId, projectId, cb){
+    // Temporary variable to see what the access level is being updated to
+    var updatingAccessLevelTo;
+
+    // Looping through all the colummns passed to the original update function,
+    // to see if "access_level_int" was specified as one of them
+    for(var i=0; i<updateCols.length; i++){
+        if(updateCols[i] == "access_level_int"){
+            updatingAccessLevelTo = updateVals[i];
+            break;
+        }
+    }
+
+    // Checking if an attempt is being made to update an access level (based
+    // on the loop preformed above) and if the resulting access level will be
+    // greater than 2 (i.e. no longer an admin level access)
+    if(updatingAccessLevelTo != null && parseInt(updatingAccessLevelTo) > 2){
+        // Getting the users current access level
+        var currentUserAccessLevel = get_UserProject("access_level_int", userId, projectId, function(err, currentUserRow){
+            if(currentUserRow.access_level_int <= 2){
+                // Since this user is an admin, checking to see that the project currently
+                // contains more than one admin i.e. that removing this one will not leave the project
+                // without an admin (i.e. a user of level 1 or 2, that will be able to add/remove
+                // collaborators from the project)
+                var currentProjectUsers = get_UserProjects_forProject("up.access_level_int", projectId, function(err, collaboratorRows){
+                    if(collaboratorRows != null && collaboratorRows.length > 0){
+                        // Creating a temporary variable to store the number of admin
+                        // level users (with access level 1 or 2) found for this project)
+                        var numOfAdmins = 0;
+
+                        // Looping through all of the collaborator rows returned,
+                        // to count the number of admins
+                        for(var i=0; i<collaboratorRows.length; i++){
+                            // If this user has an access level less than or equal to two,
+                            // then they will be counted as an admin (as they can add other
+                            // collaborats to a project)
+                            if(collaboratorRows[i].access_level_int <= 2){
+                                numOfAdmins++;
+                            }
+                        }
+                        
+                        if(numOfAdmins > 1){
+                            // Since there is currently more than one admin, then at least
+                            // one will remain following this update, so allowing it to go ahead
+                            cb(true);
+                        } else {
+                            // Since there appears to be only one admin on this project, and the
+                            // user being updated is an admin, then not allowing their access level to
+                            // be updated
+                            cb(false);
+                        }
+                    } else {
+                        // Since there were no rows returned, there must have been
+                        // an error, so not allowing the update to happen just incase
+                        cb(false);
+                    }
+                });
+            } else {
+                // Since this user is not an admin (level 1 or 2) then this update
+                // can proceed, as it will not lessen the number of admins on the project
+                cb(true);
+            }
+        });
+    } else {
+        // Since the access level is not being updated, or is being
+        // updated to another admin level value, then allowing this update to proceed
+        cb(true);
+    }
 }
 
 // Setting the module exports to be an object, with all of the functions
