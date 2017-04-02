@@ -47,6 +47,9 @@ router.use(function(req, res, next){
 					req.userID = row.id;
 					next();
 				} else {
+					req.session.destroy();
+					req.userID = null;
+					res.clearCookie("connect.sid");
 					req.preRequestErrors.push("Invalid user authentication token");
 					next(new Error());
 				}
