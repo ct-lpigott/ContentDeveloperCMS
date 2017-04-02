@@ -269,8 +269,10 @@ var ContentDeveloperServerService = (function () {
             .map(function (responseObject) { return responseObject.json(); })
             .catch(function (error) { return __WEBPACK_IMPORTED_MODULE_2_rxjs_Observable__["Observable"].throw(error.json().error) || "Unknown error refreshing project history"; })
             .do(function (responseObject) {
-            _this._currentProjectContentStructureHistory.content_history = responseObject.content_history;
-            _this._currentProjectContentStructureHistory.structure_hisory = responseObject.structure_history;
+            if (_this._currentProjectContentStructureHistory != null) {
+                _this._currentProjectContentStructureHistory.content_history = responseObject.content_history;
+                _this._currentProjectContentStructureHistory.structure_hisory = responseObject.structure_history;
+            }
         });
         return refreshProjectHistoryObservable;
     };
@@ -2127,7 +2129,8 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 
 
 var ContentEditorComponent = (function () {
-    function ContentEditorComponent(_kvaPipe, _cdService) {
+    function ContentEditorComponent(el, _kvaPipe, _cdService) {
+        this.el = el;
         this._kvaPipe = _kvaPipe;
         this._cdService = _cdService;
         this.viewOnly = false;
@@ -2137,13 +2140,28 @@ var ContentEditorComponent = (function () {
         this.structureCollectionTabsReordered = new __WEBPACK_IMPORTED_MODULE_0__angular_core__["G" /* EventEmitter */]();
     }
     ContentEditorComponent.prototype.ngOnInit = function () {
-        this._selectFirstComponent();
+        this._contentEditorElement = this.el.nativeElement;
+        this._selectFirstComponent("", false);
     };
     ContentEditorComponent.prototype.ngOnChanges = function (changes) {
+        var _this = this;
         if (changes.projectStructure) {
             if (this.projectStructure[this.currentCollectionName] == undefined) {
                 this.currentCollectionName = null;
-                this._selectFirstComponent();
+            }
+        }
+        if (changes.userAccessLevel) {
+            console.log(this.userAccessLevel);
+            if (changes.userAccessLevel.currentValue != changes.userAccessLevel.previousValue) {
+                if (this.userAccessLevel == 3) {
+                    this.viewOnly = true;
+                }
+                else {
+                    this.viewOnly = false;
+                }
+                var selectedCollectionName = this.currentCollectionName;
+                this.currentCollectionName = null;
+                setTimeout(function () { return _this._selectFirstComponent(selectedCollectionName); }, 10);
             }
         }
     };
@@ -2193,11 +2211,31 @@ var ContentEditorComponent = (function () {
     ContentEditorComponent.prototype.collectionTabsReordered = function (updatedTabOrder) {
         this.structureCollectionTabsReordered.emit(updatedTabOrder.content);
     };
-    ContentEditorComponent.prototype._selectFirstComponent = function () {
-        if (this.currentCollectionName == null) {
-            for (var collection in this.projectStructure) {
-                this.viewCollection(collection);
-                break;
+    ContentEditorComponent.prototype._selectFirstComponent = function (selectedCollectionName, click) {
+        if (click === void 0) { click = true; }
+        if (click) {
+            if (this._contentEditorElement != null) {
+                var allCollectionTabs = this._contentEditorElement.getElementsByClassName("collectionTab");
+                var firstVisibleCollection;
+                for (var i = 0; i < allCollectionTabs.length; i++) {
+                    if (allCollectionTabs[i].getAttribute("data-key") == selectedCollectionName) {
+                        firstVisibleCollection = allCollectionTabs[i];
+                    }
+                }
+                if (firstVisibleCollection == null && allCollectionTabs[0] != null) {
+                    firstVisibleCollection = allCollectionTabs[0];
+                }
+                if (firstVisibleCollection != null) {
+                    firstVisibleCollection.click();
+                }
+            }
+        }
+        else {
+            if (this.currentCollectionName == null) {
+                for (var collection in this.projectStructure) {
+                    this.viewCollection(collection);
+                    break;
+                }
             }
         }
     };
@@ -2248,10 +2286,10 @@ var ContentEditorComponent = (function () {
             template: __webpack_require__(680),
             styles: [__webpack_require__(655)]
         }), 
-        __metadata('design:paramtypes', [(typeof (_d = typeof __WEBPACK_IMPORTED_MODULE_2__pipes_key_val_array_pipe__["a" /* KeyValArrayPipe */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_2__pipes_key_val_array_pipe__["a" /* KeyValArrayPipe */]) === 'function' && _d) || Object, (typeof (_e = typeof __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__["a" /* ContentDeveloperServerService */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__["a" /* ContentDeveloperServerService */]) === 'function' && _e) || Object])
+        __metadata('design:paramtypes', [(typeof (_d = typeof __WEBPACK_IMPORTED_MODULE_0__angular_core__["C" /* ElementRef */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_0__angular_core__["C" /* ElementRef */]) === 'function' && _d) || Object, (typeof (_e = typeof __WEBPACK_IMPORTED_MODULE_2__pipes_key_val_array_pipe__["a" /* KeyValArrayPipe */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_2__pipes_key_val_array_pipe__["a" /* KeyValArrayPipe */]) === 'function' && _e) || Object, (typeof (_f = typeof __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__["a" /* ContentDeveloperServerService */] !== 'undefined' && __WEBPACK_IMPORTED_MODULE_1__services_content_developer_server_content_developer_server_service__["a" /* ContentDeveloperServerService */]) === 'function' && _f) || Object])
     ], ContentEditorComponent);
     return ContentEditorComponent;
-    var _a, _b, _c, _d, _e;
+    var _a, _b, _c, _d, _e, _f;
 }());
 //# sourceMappingURL=C:/GitHub/ContentDeveloperCMS/ContentDeveloperCMS-AngularApp/src/content-editor.component.js.map
 
@@ -2280,6 +2318,9 @@ var ContentViewComponent = (function () {
         this.viewRequestToSaveContent = new __WEBPACK_IMPORTED_MODULE_0__angular_core__["G" /* EventEmitter */]();
         this.viewRequestToResetContent = new __WEBPACK_IMPORTED_MODULE_0__angular_core__["G" /* EventEmitter */]();
     }
+    ContentViewComponent.prototype.ngOnInit = function () {
+        this._viewAsAccessLevel = this.userAccessLevel;
+    };
     ContentViewComponent.prototype.ngOnChanges = function (changes) {
         if (changes.customCss) {
             if (this._styleElement == null) {
@@ -2288,6 +2329,11 @@ var ContentViewComponent = (function () {
                 this._containerElement.nativeElement.appendChild(this._styleElement);
             }
             this._styleElement.innerHTML = this.customCss;
+        }
+    };
+    ContentViewComponent.prototype.viewAsAccessLevelChange = function (accessLevelInt) {
+        if (accessLevelInt > 1 || (accessLevelInt == 1 && this.userAccessLevel == 1)) {
+            this._viewAsAccessLevel = parseInt(accessLevelInt);
         }
     };
     ContentViewComponent.prototype.requestToSaveProjectContent = function (contentData) {
@@ -2304,6 +2350,10 @@ var ContentViewComponent = (function () {
         __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["w" /* Input */])(), 
         __metadata('design:type', Object)
     ], ContentViewComponent.prototype, "projectContent", void 0);
+    __decorate([
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["w" /* Input */])(), 
+        __metadata('design:type', Object)
+    ], ContentViewComponent.prototype, "projectAccessLevels", void 0);
     __decorate([
         __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["w" /* Input */])(), 
         __metadata('design:type', Number)
@@ -3834,14 +3884,14 @@ module.exports = ""
 /***/ 650:
 /***/ (function(module, exports) {
 
-module.exports = ":host {\r\n    display: block;\r\n    background-color: #8fb7cc;\r\n    padding: 0 1% 2% 1%;\r\n    min-height: 77vh;\r\n}\r\na {\r\n    text-decoration: none;\r\n    color: initial;\r\n}"
+module.exports = ":host {\r\n    display: block;\r\n    background-color: #8fb7cc;\r\n    padding: 0 1% 2% 1%;\r\n    min-height: 80vh;\r\n}\r\na {\r\n    text-decoration: none;\r\n    color: initial;\r\n}"
 
 /***/ }),
 
 /***/ 651:
 /***/ (function(module, exports) {
 
-module.exports = "nav ul {\r\n    list-style: none;\r\n    margin: 0;\r\n    padding: 0;\r\n}\r\n\r\nnav ul li {\r\n    cursor: pointer;\r\n    box-sizing: border-box;\r\n    display: inline-block;\r\n    padding: 1%;\r\n    background-color: #0a2f42;\r\n    color: #fff;\r\n    text-align: center;\r\n}\r\n\r\nnav ul.admin li{\r\n    width: 24%;\r\n}\r\n\r\nnav ul.editor li{\r\n    width: 32%;\r\n}"
+module.exports = "nav {\r\n    clear: both;\r\n}\r\nnav ul {\r\n    list-style: none;\r\n    display: -webkit-box;\r\n    display: -ms-flexbox;\r\n    display: flex;\r\n    margin: 0;\r\n    padding: 0;\r\n}\r\n\r\nnav ul li {\r\n    cursor: pointer;\r\n    box-sizing: border-box;\r\n    display: inline-block;\r\n    padding: 1%;\r\n    background-color: #0a2f42;\r\n    color: #fff;\r\n    text-align: center;\r\n    -webkit-box-flex: 1;\r\n        -ms-flex: 1;\r\n            flex: 1;\r\n    margin-right: 5px;\r\n}"
 
 /***/ }),
 
@@ -3855,7 +3905,7 @@ module.exports = "textarea {\r\n    min-height: 250px;\r\n    width: 99%;\r\n}\r
 /***/ 653:
 /***/ (function(module, exports) {
 
-module.exports = "textarea {\r\n    width: 100%;\r\n}\r\ninput, textarea {\r\n    border: 1px solid #777;\r\n}\r\n\r\n[disabled] {\r\n    background-color: initial !important;\r\n    color: initial !important;\r\n}"
+module.exports = "textarea {\r\n    width: 100%;\r\n}\r\ninput, textarea {\r\n    border: 1px solid #777;\r\n}\r\n\r\n[disabled] {\r\n    background-color: white !important;\r\n    color: initial !important;\r\n}"
 
 /***/ }),
 
@@ -3967,7 +4017,7 @@ module.exports = "<app-header\r\n    [user]=\"user\"\r\n    [pageTitle]=\"pageTi
 /***/ 669:
 /***/ (function(module, exports) {
 
-module.exports = "<app-cms-navigation\r\n\t[userAccessLevel]=\"1\"\r\n\t(requestToChangeView)=\"changeView($event)\"></app-cms-navigation>\r\n<app-errors\r\n\t[errors]=\"errors\"\r\n\t(requestToDismissErrors)=\"requestToDismissErrors($event)\"></app-errors>\r\n<div class=\"row container-background\">\r\n\t<app-structure-view\r\n\t\t*ngIf=\"_view == 'structure'\"\r\n\t\t[projectStructure]=\"projectStructure\"\r\n\t\t(viewRequestToSaveStructure)=\"viewRequestToSaveStructure($event)\"\r\n\t\t(viewRequestToResetStructure)=\"viewRequestToResetStructure()\">\r\n\t</app-structure-view>\r\n\r\n\t<app-content-view\r\n\t\t*ngIf=\"_view == 'content'\"\r\n\t\t[userAccessLevel]=\"1\"\r\n\t\t[customCss]=\"projectSettings.custom_css\"\r\n\t\t[projectStructure]=\"projectStructure\"\r\n\t\t[(projectContent)]=\"projectContent\"\r\n\t\t(viewRequestToSaveContent)=\"viewRequestToSaveContent($event)\"\r\n\t\t(viewRequestToResetContent)=\"viewRequestToResetContent()\">\r\n\t</app-content-view>\r\n\r\n\t<app-history-view\r\n\t\t*ngIf=\"_view == 'history'\"\r\n\t\t[projectStructureHistory]=\"projectStructureHistory\"\r\n\t\t[projectContentHistory]=\"projectContentHistory\"\r\n\t\t(viewRequestToSaveStructure)=\"viewRequestToSaveStructure($event)\"\r\n\t\t(viewRequestToSaveContent)=\"viewRequestToSaveContent($event)\">\r\n\t</app-history-view>\r\n\r\n\t<app-settings-view\r\n\t\t*ngIf=\"_view == 'settings'\"\r\n\t\t[isAdmin]=\"true\"\r\n\t\t[(projectSettings)]=\"projectSettings\"\r\n\t\t(settingsUpdated)=\"viewRequestToRefreshSettings($event)\"\r\n\t\t(viewRequestToRefreshSettings)=\"viewRequestToRefreshSettings($event)\"\r\n\t\t(viewNotifyingOfProjectDeletion)=\"viewNotifyingOfProjectDeletion($event)\">\r\n\t</app-settings-view>\r\n</div>"
+module.exports = "<app-cms-navigation\r\n\t[userAccessLevel]=\"1\"\r\n\t(requestToChangeView)=\"changeView($event)\"></app-cms-navigation>\r\n<app-errors\r\n\t[errors]=\"errors\"\r\n\t(requestToDismissErrors)=\"requestToDismissErrors($event)\"></app-errors>\r\n<div class=\"row container-background\">\r\n\t<app-structure-view\r\n\t\t*ngIf=\"_view == 'structure'\"\r\n\t\t[projectStructure]=\"projectStructure\"\r\n\t\t(viewRequestToSaveStructure)=\"viewRequestToSaveStructure($event)\"\r\n\t\t(viewRequestToResetStructure)=\"viewRequestToResetStructure()\">\r\n\t</app-structure-view>\r\n\r\n\t<app-content-view\r\n\t\t*ngIf=\"_view == 'content'\"\r\n\t\t[userAccessLevel]=\"1\"\r\n\t\t[customCss]=\"projectSettings.custom_css\"\r\n\t\t[projectStructure]=\"projectStructure\"\r\n\t\t[(projectContent)]=\"projectContent\"\r\n\t\t[projectAccessLevels]=\"projectSettings.access_levels\"\r\n\t\t(viewRequestToSaveContent)=\"viewRequestToSaveContent($event)\"\r\n\t\t(viewRequestToResetContent)=\"viewRequestToResetContent()\">\r\n\t</app-content-view>\r\n\r\n\t<app-history-view\r\n\t\t*ngIf=\"_view == 'history'\"\r\n\t\t[projectStructureHistory]=\"projectStructureHistory\"\r\n\t\t[projectContentHistory]=\"projectContentHistory\"\r\n\t\t(viewRequestToSaveStructure)=\"viewRequestToSaveStructure($event)\"\r\n\t\t(viewRequestToSaveContent)=\"viewRequestToSaveContent($event)\">\r\n\t</app-history-view>\r\n\r\n\t<app-settings-view\r\n\t\t*ngIf=\"_view == 'settings'\"\r\n\t\t[isAdmin]=\"true\"\r\n\t\t[(projectSettings)]=\"projectSettings\"\r\n\t\t(settingsUpdated)=\"viewRequestToRefreshSettings($event)\"\r\n\t\t(viewRequestToRefreshSettings)=\"viewRequestToRefreshSettings($event)\"\r\n\t\t(viewNotifyingOfProjectDeletion)=\"viewNotifyingOfProjectDeletion($event)\">\r\n\t</app-settings-view>\r\n</div>"
 
 /***/ }),
 
@@ -3988,7 +4038,7 @@ module.exports = "<div class=\"col-6-12\">\r\n  <h2>Project Structure</h2>\r\n  
 /***/ 672:
 /***/ (function(module, exports) {
 
-module.exports = "<app-cms-navigation\r\n\t[userAccessLevel]=\"userAccessLevel\"\r\n\t(requestToChangeView)=\"changeView($event)\"></app-cms-navigation>\r\n<app-errors\r\n\t[errors]=\"errors\"\r\n\t(requestToDismissErrors)=\"requestToDismissErrors($event)\"></app-errors>\r\n<div class=\"row\">\r\n\t<app-content-view\r\n\t\t*ngIf=\"_view == 'content'\"\r\n\t\t[userAccessLevel]=\"userAccessLevel\"\r\n\t\t[customCss]=\"customCss\"\r\n\t\t[projectStructure]=\"projectStructure\"\r\n\t\t[(projectContent)]=\"projectContent\"\r\n\t\t(viewRequestToSaveContent)=\"viewRequestToSaveContent($event)\"\r\n\t\t(viewRequestToResetContent)=\"viewRequestToResetContent()\">\r\n\t</app-content-view>\r\n\t\r\n\t<app-history-display\r\n\t\t*ngIf=\"_view == 'history'\"\r\n\t\t[history]=\"projectContentHistory\"\r\n\t\t[historyOf]=\"'content'\"\r\n\t\t[showPreview]=\"false\"\r\n\t\t(revertToCommit)=\"revertToCommit($event)\"\r\n\t\t(previewCommit)=\"previewCommit($event)\">\r\n\t</app-history-display>\r\n\r\n\t<app-settings-view\r\n\t\t*ngIf=\"_view == 'settings' && userAccessLevel == 2\"\r\n\t\t[(projectSettings)]=\"projectSettings\"\r\n\t\t(settingsUpdated)=\"viewRequestToRefreshSettings($event)\"\r\n\t\t(viewRequestToRefreshSettings)=\"viewRequestToRefreshSettings($event)\">\r\n\t</app-settings-view>\r\n\t\r\n</div>\r\n"
+module.exports = "<app-cms-navigation\r\n\t*ngIf=\"userAccessLevel == 2\"\r\n\t[userAccessLevel]=\"userAccessLevel\"\r\n\t(requestToChangeView)=\"changeView($event)\"></app-cms-navigation>\r\n<app-errors\r\n\t[errors]=\"errors\"\r\n\t(requestToDismissErrors)=\"requestToDismissErrors($event)\"></app-errors>\r\n<div class=\"row container-background\">\r\n\t<app-content-view\r\n\t\t*ngIf=\"_view == 'content'\"\r\n\t\t[userAccessLevel]=\"userAccessLevel\"\r\n\t\t[customCss]=\"customCss\"\r\n\t\t[projectStructure]=\"projectStructure\"\r\n\t\t[(projectContent)]=\"projectContent\"\r\n\t\t[projectAccessLevels]=\"projectSettings != null ? projectSettings.access_levels : []\"\r\n\t\t(viewRequestToSaveContent)=\"viewRequestToSaveContent($event)\"\r\n\t\t(viewRequestToResetContent)=\"viewRequestToResetContent()\">\r\n\t</app-content-view>\r\n\t\r\n\t<ng-container *ngIf=\"userAccessLevel == 2\">\r\n\t\t<app-history-display\r\n\t\t\t*ngIf=\"_view == 'history'\"\r\n\t\t\t[history]=\"projectContentHistory\"\r\n\t\t\t[historyOf]=\"'content'\"\r\n\t\t\t[showPreview]=\"false\"\r\n\t\t\t(revertToCommit)=\"revertToCommit($event)\"\r\n\t\t\t(previewCommit)=\"previewCommit($event)\">\r\n\t\t</app-history-display>\r\n\r\n\t\t<app-settings-view\r\n\t\t\t*ngIf=\"_view == 'settings'\"\r\n\t\t\t[(projectSettings)]=\"projectSettings\"\r\n\t\t\t(settingsUpdated)=\"viewRequestToRefreshSettings($event)\"\r\n\t\t\t(viewRequestToRefreshSettings)=\"viewRequestToRefreshSettings($event)\">\r\n\t\t</app-settings-view>\r\n\t</ng-container>\r\n</div>\r\n"
 
 /***/ }),
 
@@ -4051,7 +4101,7 @@ module.exports = "<div *ngIf=\"projectStructure != null\">\r\n  <ng-container *n
 /***/ 681:
 /***/ (function(module, exports) {
 
-module.exports = "<div class=\"row\">\r\n  <div class=\"col-12-12\">\r\n    <h2>Project Content</h2>\r\n    <div *ngIf=\"projectStructure != null\">\r\n      <app-content-editor\r\n        [userAccessLevel]=\"userAccessLevel\"\r\n        [viewContent]=\"true\"\r\n        [viewOnly]=\"viewOnly\"\r\n        [(projectContent)]=\"projectContent\"\r\n        [projectStructure]=\"projectStructure\"\r\n        (requestToSaveProjectContent)=\"requestToSaveProjectContent($event)\"\r\n        (requestToResetProjectContent)=\"requestToResetProjectContent()\">\r\n      </app-content-editor>\r\n    </div>\r\n  </div>\r\n</div>"
+module.exports = "<div class=\"row\">\r\n  <div class=\"col-12-12\">\r\n    <h2>Project Content</h2>\r\n    <div *ngIf=\"projectStructure != null\">\r\n      <ng-container *ngIf=\"userAccessLevel == 1 || userAccessLevel == 2\">\r\n        View As\r\n        <select\r\n          #viewAs\r\n          (change)=\"viewAsAccessLevelChange(viewAs.value)\">\r\n          <ng-container *ngFor=\"let accessLevel of projectAccessLevels\">\r\n            <option\r\n              *ngIf=\"accessLevel.access_level_int > 1 || (accessLevel.access_level_int == 1 && userAccessLevel == 1)\"\r\n              [value]=\"accessLevel.access_level_int\">\r\n              {{accessLevel.access_level_name}}\r\n            </option>\r\n          </ng-container>\r\n        </select>\r\n      </ng-container>\r\n      <app-content-editor\r\n        [userAccessLevel]=\"_viewAsAccessLevel\"\r\n        [viewContent]=\"true\"\r\n        [viewOnly]=\"viewOnly\"\r\n        [(projectContent)]=\"projectContent\"\r\n        [projectStructure]=\"projectStructure\"\r\n        (requestToSaveProjectContent)=\"requestToSaveProjectContent($event)\"\r\n        (requestToResetProjectContent)=\"requestToResetProjectContent()\">\r\n      </app-content-editor>\r\n    </div>\r\n  </div>\r\n</div>"
 
 /***/ }),
 
