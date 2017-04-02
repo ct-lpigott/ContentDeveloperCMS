@@ -325,7 +325,7 @@ define({ "api": [
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "collaborators: [\n     {\n         display_name: {string},\n         user_id: {int},\n         access_level_int: {int},\n         access_level_name: {string}\n     }\n]",
+          "content": "collaborators: [\n     {\n         user_id: 65742,\n         display_name: \"Laura Pigott\",\n         email_address: \"pigottlaura@gmail.com\"\n         access_level_int: 1,\n         access_level_name: \"Administrator\"\n     }\n]",
           "type": "json"
         }
       ]
@@ -1093,7 +1093,7 @@ define({ "api": [
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "{\n     collaborators: [\n         {\n             display_name: \"Laura Pigott\",\n             user_id: 65742,\n             access_level_int: 1,\n             access_level_name: \"Administrator\"\n         }\n     ],\n     access_levels: [\n         { \n             access_level_name: \"Administrator\",\n             access_level_int: 1,\n             in_use: true\n         }\n     ],\n     project_name: \"My Project\",\n     max_cache_age: 250000,\n     custom_css: \"h2:{color:red;}\"\n}",
+          "content": "{\n     collaborators: [\n         {\n             user_id: 65742,\n             display_name: \"Laura Pigott\",\n             email_address: \"pigottlaura@gmail.com\"\n             access_level_int: 1,\n             access_level_name: \"Administrator\"\n         }\n     ],\n     access_levels: [\n         { \n             access_level_name: \"Administrator\",\n             access_level_int: 1,\n             in_use: true\n         }\n     ],\n     project_name: \"My Project\",\n     max_cache_age: 250000,\n     custom_css: \"h2:{color:red;}\"\n}",
           "type": "json"
         }
       ]
