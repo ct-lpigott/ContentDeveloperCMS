@@ -37,8 +37,9 @@ var accessLevels = require("../../../custom_modules/access_levels");
  * {
  *      collaborators: [
  *          {
- *              display_name: "Laura Pigott",
  *              user_id: 65742,
+ *              display_name: "Laura Pigott",
+ *              email_address: "pigottlaura@gmail.com"
  *              access_level_int: 1,
  *              access_level_name: "Administrator"
  *          }
@@ -497,10 +498,11 @@ router.put("/:projectID", function(req, res, next){
  * @apiSuccessExample {json} Success-Response:
  * collaborators: [
  *      {
- *          display_name: {string},
- *          user_id: {int},
- *          access_level_int: {int},
- *          access_level_name: {string}
+ *          user_id: 65742,
+ *          display_name: "Laura Pigott",
+ *          email_address: "pigottlaura@gmail.com"
+ *          access_level_int: 1,
+ *          access_level_name: "Administrator"
  *      }
  * ]
  * @apiName Get Collaborators
@@ -509,7 +511,7 @@ router.put("/:projectID", function(req, res, next){
 router.get("/:projectID", function(req, res, next){
     if(req.query.action == "collaborators"){
         // Getting the details of all collaborators for this project
-        dbQuery.get_UserProjects_forProject("u.display_name, up.user_id, up.access_level_int", req.params.projectID, function(err, rows){
+        dbQuery.get_UserProjects_forProject("u.display_name, u.email_address, up.user_id, up.access_level_int", req.params.projectID, function(err, rows){
             if(err){console.log(err);}
             if(rows){
                 // Appending the names of all access levels to the rows returned, as currently
