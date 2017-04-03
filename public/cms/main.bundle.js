@@ -164,8 +164,11 @@ var ContentDeveloperServerService = (function () {
     };
     ContentDeveloperServerService.prototype._stopIntervalTimer = function () {
         this._activeSessionTime = 0;
-        clearInterval(this._activeSessionInterval);
         this._warnTimeoutSent = false;
+        if (this._activeSessionInterval != null) {
+            clearInterval(this._activeSessionInterval);
+            this._activeSessionInterval = null;
+        }
     };
     ContentDeveloperServerService.prototype.logout = function () {
         var _this = this;
