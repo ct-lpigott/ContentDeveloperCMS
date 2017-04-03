@@ -153,7 +153,7 @@ var ContentDeveloperServerService = (function () {
                             }
                         }
                     }
-                }, 1000);
+                }, 10000);
                 _this._currentUser = responseObject.user;
             }
         });
@@ -1025,6 +1025,7 @@ var AppComponent = (function () {
         this.pageTitle = "Content Developer CMS";
         this._sessionMinutesRemaining = -1;
         this._sessionExpired = false;
+        this._sessionWarningDismissed = false;
     }
     AppComponent.prototype.ngOnInit = function () {
         var _this = this;
@@ -1032,8 +1033,10 @@ var AppComponent = (function () {
             _this.loginRequired();
         });
         this._cdService.setTimoutWarningCallback(function (remainingMinutes, sessionExpired) {
-            _this._sessionMinutesRemaining = remainingMinutes;
-            _this._sessionExpired = sessionExpired;
+            if (sessionExpired || _this._sessionWarningDismissed == false) {
+                _this._sessionMinutesRemaining = remainingMinutes;
+                _this._sessionExpired = sessionExpired;
+            }
         });
         this._cdService.loadUser().subscribe(function (responseObject) {
             if (responseObject.loginRequired) {
@@ -1042,6 +1045,7 @@ var AppComponent = (function () {
             else {
                 _this._sessionMinutesRemaining = -1;
                 _this._sessionExpired = false;
+                _this._sessionWarningDismissed = false;
                 _this.user = _this._cdService.getCurrentUser();
                 if (_this.user == {}) {
                     _this.loginRequired();
@@ -1057,6 +1061,7 @@ var AppComponent = (function () {
             this.logout();
         }
         else {
+            this._sessionWarningDismissed = true;
             this._sessionMinutesRemaining = -1;
         }
     };
@@ -4083,11 +4088,8 @@ var TimeoutComponent = (function () {
         this._warningMessage = "";
     }
     TimeoutComponent.prototype.ngOnChanges = function (changes) {
-        if (changes.sessionExpired && this.sessionExpired) {
-            this._warningMessage = "Your session has expired.Please log in again to access your admin panel.";
-        }
-        else if (changes.minutesRemaining) {
-            this._warningMessage = "Your session will expire in " + Math.floor(this.minutesRemaining) + " minutes. Please refresh or save your content to the server to remain logged in";
+        if (changes.minutesRemaining) {
+            this.minutesRemaining = Math.floor(this.minutesRemaining);
         }
     };
     TimeoutComponent.prototype.dismissWarning = function () {
@@ -4607,7 +4609,7 @@ module.exports = "<div class=\"row\">\r\n  <div class=\"col-6-12\">\r\n    <h1>{
 /***/ 695:
 /***/ (function(module, exports) {
 
-module.exports = "<div>\n  <div id=\"warning\">\n    {{_warningMessage}}\n  </div>\n  <button (click)=\"dismissWarning()\" class=\"button cms small dark\">Ok</button>\n</div>"
+module.exports = "<div>\n  <div id=\"warning\">\n    <ng-container *ngIf=\"sessionExpired\">\n      Your session has expired.<br>\n      Please log in again to access your admin panel.\n    </ng-container>\n    <ng-container *ngIf=\"sessionExpired == false\">\n      Your session will expire in {{minutesRemaining}} minutes.<br>\n      Please refresh or save your content to the server to remain logged in\n    </ng-container>\n  </div>\n  <button (click)=\"dismissWarning()\" class=\"button cms small dark\">Ok</button>\n</div>"
 
 /***/ }),
 
