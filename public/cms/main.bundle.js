@@ -91,7 +91,7 @@ var ContentDeveloperServerService = (function () {
         this._kvaPipe = _kvaPipe;
         this._serverUrl = "./..";
         this._contentErrors = {};
-        this._serverSessionMaxSeconds = 30; //60 * 30
+        this._serverSessionMaxSeconds = 60 * 30; //30 Minutes
         this._warnTimeoutAt = 0.80; // Percentage of server session max time
         this._warnTimeoutSent = false;
         this._headers = new __WEBPACK_IMPORTED_MODULE_1__angular_http__["b" /* Headers */]();
@@ -138,7 +138,7 @@ var ContentDeveloperServerService = (function () {
             else {
                 _this._resetIntervalTimer();
                 _this._activeSessionInterval = setInterval(function () {
-                    _this._activeSessionTime += 10;
+                    _this._activeSessionTime += 5; // Add 5 seconds
                     if (_this._activeSessionTime > _this._serverSessionMaxSeconds) {
                         _this._stopIntervalTimer();
                         _this._notifyAppComponentOfImpendingTimeout(0, true);
@@ -153,7 +153,7 @@ var ContentDeveloperServerService = (function () {
                             }
                         }
                     }
-                }, 10000);
+                }, 5000); // Every 5 seconds
                 _this._currentUser = responseObject.user;
             }
         });
@@ -179,7 +179,6 @@ var ContentDeveloperServerService = (function () {
             .map(function (responseObject) { return responseObject.json(); })
             .catch(function (error) { return __WEBPACK_IMPORTED_MODULE_2_rxjs_Observable__["Observable"].throw(error) || "Unknown error when logging user out"; });
         logoutObservable.subscribe(function (responseObject) {
-            clearInterval(_this._activeSessionInterval);
             _this._notifyAppComponentOfLogout();
             console.log("User logged out");
         });
