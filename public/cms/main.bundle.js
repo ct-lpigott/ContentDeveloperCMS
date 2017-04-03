@@ -130,10 +130,15 @@ var ContentDeveloperServerService = (function () {
                 _this.logout();
             }
             else {
+                _this._checkCookieInterval = setInterval(_this._checkCookie, 2000);
                 _this._currentUser = responseObject.user;
             }
         });
         return loadUserObservable;
+    };
+    ContentDeveloperServerService.prototype._checkCookie = function () {
+        var allCookies = document.cookie.split(";");
+        console.log(allCookies);
     };
     ContentDeveloperServerService.prototype.logout = function () {
         var _this = this;
