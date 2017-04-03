@@ -7,6 +7,10 @@
 .sidenav > li > a {
     display: inline;
 }
+.sidenav {
+    position: static;
+    top: 0;
+}
 #sidenav {
     width: 25%;
     position: fixed;
@@ -21,15 +25,16 @@
     display: inline-block;
 }
 #sidenav.miniNav {
-    padding: 50px 0 0 0;
+    padding: 0;
     top: 0;
     overflow-y: hidden;
 }
 .sidenav, .sidenav-search {
     width: 100%;
-    position: static;
 }
-
+.sidenav-search {
+    position: relative;
+}
 .sidenav > li.active > a, #miniNav > li.active > a, #miniNav > li.isactive > a {
     background-color: #337ab7;
     color: #ffffff;
@@ -53,10 +58,10 @@
     text-decoration: none;
 }
 .subNav a {
-    padding-left: 20px;
+    padding-left: 40px;
 }
 .subSubNav a {
-    padding-left: 40px;
+    padding-left: 70px;
 }
 .subNav, .subSubNav {
     list-style: none;

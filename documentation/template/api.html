@@ -14,16 +14,16 @@
 <body>
 
 <script id="template-sidenav" type="text/x-handlebars-template">
+<ul id="miniNav" class="nav nav-list list">
+    <li><a href="./index.html#basics">Basics</a></li>
+    <li><a href="./index.html#examples">Examples</a></li>
+    <li class="isactive"><a href="#">API Documentation</a></li>
+</ul>
 <nav id="scrollingNav">
   <div class="sidenav-search">
     <input class="form-control search" type="text" placeholder="{{__ "Filter..."}}">
     <span class="search-reset">x</span>
   </div>
-  <ul id="miniNav" class="nav nav-list list">
-      <li><a href="./index.html#basics">Basics</a></li>
-      <li><a href="./index.html#examples">Examples</a></li>
-      <li class="isactive"><a href="#">API Documentation</a></li>
-  </ul>
   <ul class="sidenav nav nav-list list">
   {{#each nav}}
     {{#if title}}
