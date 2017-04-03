@@ -138,7 +138,9 @@ var ContentDeveloperServerService = (function () {
             .get(logoutUrl)
             .map(function (responseObject) { return responseObject.json(); })
             .catch(function (error) { return __WEBPACK_IMPORTED_MODULE_2_rxjs_Observable__["Observable"].throw(error) || "Unknown error when logging user out"; })
-            .do(function (responseObject) { return console.log("User logged out"); });
+            .do(function (responseObject) {
+            console.log("User logged out");
+        });
         this._currentUser = null;
         this.leaveProject();
         return logoutObservable;
@@ -973,7 +975,9 @@ var AppComponent = (function () {
     };
     AppComponent.prototype.logout = function () {
         var _this = this;
-        this._cdService.logout().subscribe(function (responseObject) { return _this.loginRequired(); });
+        this._cdService.logout().subscribe(function (responseObject) {
+            _this.loginRequired();
+        });
         this.loginRequired();
     };
     AppComponent.prototype.updatePageTitle = function (title) {
