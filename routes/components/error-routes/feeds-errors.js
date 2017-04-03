@@ -57,6 +57,14 @@ module.exports = function (err, req, res, next) {
         // route
         res.send(req.responseObject);
     } else {
+        req.responseObject = {};
+        // If a login is required, adding a loginRequired property to the response
+        // to notify the user and/or CMS
+        if(err.message == "loginRequired"){
+            req.responseObject.loginRequired = true;
+            res.clearCookie("connect.sid");
+        }
+        res.send(req.responseObject);
         console.log(err);
     }
 };
