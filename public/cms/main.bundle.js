@@ -133,14 +133,16 @@ var ContentDeveloperServerService = (function () {
         return loadUserObservable;
     };
     ContentDeveloperServerService.prototype.logout = function () {
-        var logoutUrl = this._serverUrl + "/admin/logout";
-        var logoutObservable = this._http
-            .get(logoutUrl)
-            .map(function (responseObject) { return responseObject.json(); })
-            .catch(function (error) { return __WEBPACK_IMPORTED_MODULE_2_rxjs_Observable__["Observable"].throw(error) || "Unknown error when logging user out"; });
-        this._currentUser = null;
+        if (this._currentUser != null) {
+            var logoutUrl = this._serverUrl + "/admin/logout";
+            var logoutObservable = this._http
+                .get(logoutUrl)
+                .map(function (responseObject) { return responseObject.json(); })
+                .catch(function (error) { return __WEBPACK_IMPORTED_MODULE_2_rxjs_Observable__["Observable"].throw(error) || "Unknown error when logging user out"; })
+                .do(function (responseObject) { return console.log("User logged out"); });
+            this._currentUser = null;
+        }
         this.leaveProject();
-        return logoutObservable;
     };
     ContentDeveloperServerService.prototype.loadUserProjects = function () {
         var _this = this;
@@ -275,7 +277,6 @@ var ContentDeveloperServerService = (function () {
     ContentDeveloperServerService.prototype.updateProjectStructure = function (projectStructure, commitMessage) {
         var _this = this;
         if (commitMessage === void 0) { commitMessage = null; }
-        console.log(commitMessage);
         var requestUrl = this._serverUrl + "/feeds/" + this._currentProjectId;
         var structureUpdateObservable = this._http
             .put(requestUrl, { structure: projectStructure, commit_message: commitMessage }, { headers: this._headers })
@@ -298,7 +299,6 @@ var ContentDeveloperServerService = (function () {
         if (commitMessage === void 0) { commitMessage = null; }
         if (encapsulationPath === void 0) { encapsulationPath = ""; }
         if (this._kvaPipe.transform(this._contentErrors, "values").length == 0) {
-            console.log(projectContent);
             var requestUrl = this._serverUrl + "/feeds/" + this._currentProjectId + "/" + encapsulationPath;
             var contentUpdateObservable = this._http
                 .put(requestUrl, { content: projectContent, commit_message: commitMessage }, { headers: this._headers })
@@ -389,7 +389,6 @@ var ContentDeveloperServerService = (function () {
     };
     ContentDeveloperServerService.prototype.addNewCollaborator = function (emailAddress, accessLevelInt) {
         var _this = this;
-        console.log("CDService");
         var requestUrl = this._serverUrl + "/feeds/" + this._currentProjectId + "?action=collaborators";
         var addNewCollaboratorObservable = this._http
             .post(requestUrl, { email: emailAddress, access_level_int: accessLevelInt }, { headers: this._headers })
@@ -409,7 +408,6 @@ var ContentDeveloperServerService = (function () {
     };
     ContentDeveloperServerService.prototype.removeCollaborator = function (collaboratorId) {
         var _this = this;
-        console.log("CDService");
         var requestUrl = this._serverUrl + "/feeds/" + this._currentProjectId + "?action=collaborators";
         var removeCollaboratorObservable = this._http
             .delete(requestUrl + "&collaborator_id=" + collaboratorId, { headers: this._headers })
@@ -975,7 +973,7 @@ var AppComponent = (function () {
         });
     };
     AppComponent.prototype.logout = function () {
-        this._cdService.logout().subscribe(function (response) { return console.log("Logout"); });
+        this._cdService.logout();
         this.loginRequired();
     };
     AppComponent.prototype.updatePageTitle = function (title) {
@@ -1573,8 +1571,15 @@ var UserProjectsComponent = (function () {
         if (template === void 0) { template = ""; }
         if (projectNameInput.value.length > 0) {
             this._cdService.createNewProject(projectNameInput.value, template).subscribe(function (responseObject) {
-                _this.editProject(responseObject.new_project_id, projectNameInput.value, 1);
-                projectNameInput.value = "";
+                if (responseObject.loginRequired) {
+                    _this.viewLoginRequired.emit();
+                }
+                else {
+                    if (responseObject != null) {
+                        _this.editProject(responseObject.new_project_id, projectNameInput.value, 1);
+                        projectNameInput.value = "";
+                    }
+                }
             });
         }
     };
@@ -2162,7 +2167,6 @@ var CollectionComponent = (function () {
         this.contentChanged.emit(contentData);
     };
     CollectionComponent.prototype.collectionContentChanged = function (contentData) {
-        console.log(contentData);
         this.contentChanged.emit(contentData);
     };
     CollectionComponent.prototype.deleteItem = function (encapsulationPath, index) {
@@ -2310,7 +2314,6 @@ var ContentEditorComponent = (function () {
             }
         }
         if (changes.userAccessLevel) {
-            console.log(this.userAccessLevel);
             if (changes.userAccessLevel.currentValue != changes.userAccessLevel.previousValue) {
                 if (this.userAccessLevel == 3) {
                     this.viewOnly = true;
@@ -2619,12 +2622,17 @@ var FileUploadComponent = (function () {
         if (fileInput.files != null && fileInput.files.length > 0) {
             this._warning = "Uploading...";
             this._cdService.uploadMediaItem(fileInput.files[0]).subscribe(function (responseObject) {
-                if (responseObject.media_item_url != null) {
-                    _this.itemContent = responseObject.media_item_url;
-                    _this.fileChanged.emit(responseObject.media_item_url);
-                    _this._fileInputElement.setAttribute("data-url", _this.itemContent);
-                    _this._warning = _this._contentError = null;
-                    _this.hideMediaItemGallery();
+                if (responseObject.loginRequired) {
+                    _this._cdService.logout();
+                }
+                else {
+                    if (responseObject.success) {
+                        _this.itemContent = responseObject.media_item_url;
+                        _this.fileChanged.emit(responseObject.media_item_url);
+                        _this._fileInputElement.setAttribute("data-url", _this.itemContent);
+                        _this._warning = _this._contentError = null;
+                        _this.hideMediaItemGallery();
+                    }
                 }
             });
         }
@@ -2804,7 +2812,6 @@ var WysiwygHtmlComponent = (function () {
     WysiwygHtmlComponent.prototype.ngOnChanges = function (changes) {
         if (changes.itemContent) {
             this.updateTextAreaToItemContent();
-            console.log(this._cursorPosition);
         }
     };
     WysiwygHtmlComponent.prototype.ngDoCheck = function () {
@@ -2830,7 +2837,6 @@ var WysiwygHtmlComponent = (function () {
     WysiwygHtmlComponent.prototype.updateCursorPosition = function () {
         this._cursorPosition = this._getCursorPosition(this._textareaElement);
         this.updateContent();
-        //console.log(this._cursorPosition);
     };
     WysiwygHtmlComponent.prototype.updateContent = function () {
         this.itemContent = this._textareaElement.innerHTML.toString().replace(/\"/g, "'");
@@ -2851,7 +2857,6 @@ var WysiwygHtmlComponent = (function () {
         this._insertType = "link";
     };
     WysiwygHtmlComponent.prototype.clearAllContent = function () {
-        console.log("Clear all Content");
         this._textareaElement.innerHTML = "";
         this.updateContent();
         this.clear();
@@ -2861,28 +2866,21 @@ var WysiwygHtmlComponent = (function () {
     };
     WysiwygHtmlComponent.prototype.imageSelected = function (imageUrl) {
         this._imageUrl = imageUrl;
-        console.log("WYSIWYG - " + this._imageUrl);
     };
     WysiwygHtmlComponent.prototype.insertImage = function (altTextInput) {
-        console.log("Insert Image");
         if (this._imageUrl != null) {
             var newImage = "<img src='" + this._imageUrl + "' alt='" + altTextInput.value + "'>";
-            console.log(newImage);
             this.appendToContent(newImage);
             this.clear([altTextInput]);
         }
     };
     WysiwygHtmlComponent.prototype.insertHeading = function (hTextInput) {
-        console.log("Insert Heading - " + this._headingType);
         var newHeading = "<" + this._headingType + ">" + hTextInput.value + "</" + this._headingType + ">";
-        console.log(newHeading);
         this.appendToContent(newHeading);
         this.clear([hTextInput]);
     };
     WysiwygHtmlComponent.prototype.insertLink = function (linkTextInput, linkHrefInput) {
-        console.log("Insert Link");
         var newLink = "<a href='" + linkHrefInput.value + "'>" + linkHrefInput.value + "</a>";
-        console.log(newLink);
         this.appendToContent(newLink);
         this.clear([linkTextInput, linkHrefInput]);
     };
@@ -2897,7 +2895,6 @@ var WysiwygHtmlComponent = (function () {
         this._textareaElement.innerHTML = currentContent.slice(0, this._cursorPosition) + newElement + currentContent.slice(this._cursorPosition);
         this._textareaElement.selectionStart = this._textareaElement.selectionEnd = this._cursorPosition;
         this.updateContent();
-        console.log(this._textareaElement.innerHTML);
     };
     WysiwygHtmlComponent.prototype.cancel = function () {
         this.clear();
@@ -2940,7 +2937,6 @@ var WysiwygHtmlComponent = (function () {
                         contentBeforeCursor += nodeContent;
                     }
                 }
-                console.log(contentBeforeCursor);
                 cursorPosition = contentBeforeCursor.length;
             }
         }
@@ -3300,16 +3296,23 @@ var HistoryDisplayComponent = (function () {
     HistoryDisplayComponent.prototype.preview = function (historyObject) {
         var _this = this;
         this._previewHistoryObject = this._cdService.getContentofCommit(historyObject.hash, this.historyOf).subscribe(function (responseObject) {
-            if (_this.showPreview) {
-                _this._previewHistoryObject = _this.historyOf == 'structure' ? responseObject.commit_structure : responseObject.commit_content;
-                _this._previewHistoryHash = historyObject.hash;
+            if (responseObject.loginRequired) {
+                _this._cdService.logout();
             }
             else {
-                var previewData = {
-                    data: _this.historyOf == 'structure' ? responseObject.commit_structure : responseObject.commit_content,
-                    hash: historyObject.hash
-                };
-                _this.previewCommit.emit(previewData);
+                if (responseObject != null) {
+                    if (_this.showPreview) {
+                        _this._previewHistoryObject = _this.historyOf == 'structure' ? responseObject.commit_structure : responseObject.commit_content;
+                        _this._previewHistoryHash = historyObject.hash;
+                    }
+                    else {
+                        var previewData = {
+                            data: _this.historyOf == 'structure' ? responseObject.commit_structure : responseObject.commit_content,
+                            hash: historyObject.hash
+                        };
+                        _this.previewCommit.emit(previewData);
+                    }
+                }
             }
         });
     };
@@ -3398,10 +3401,14 @@ var MediaItemGalleryComponent = (function () {
         if (useNextPageToken === void 0) { useNextPageToken = true; }
         var nextPageToken = useNextPageToken ? this._mediaItemNextPageToken : null;
         this._cdService.loadProjectMediaItems(this.numItemsPerPage, nextPageToken).subscribe(function (responseObject) {
-            console.log(responseObject);
-            _this._mediaItemNextPageToken = responseObject.next_page_token;
-            if (responseObject.media_items != null) {
-                _this._mediaItems = responseObject.media_items;
+            if (responseObject.loginRequired) {
+                _this._cdService.logout();
+            }
+            else {
+                _this._mediaItemNextPageToken = responseObject.next_page_token;
+                if (responseObject.media_items != null) {
+                    _this._mediaItems = responseObject.media_items;
+                }
             }
         });
     };
@@ -3526,19 +3533,29 @@ var AccessLevelsComponent = (function () {
             requestedAccessLevel++;
         }
         this._cdService.createAccessLevel(requestedAccessLevel, accessLevelNameInput.value).subscribe(function (responseObject) {
-            if (responseObject.success) {
-                console.log("Access level added!!");
-                accessLevelIntInput.value = accessLevelNameInput.value = "";
-                _this.accessLevelsUpdated.emit();
+            if (responseObject.loginRequired) {
+                _this._cdService.logout();
+            }
+            else {
+                if (responseObject.success) {
+                    console.log("Access level added!!");
+                    accessLevelIntInput.value = accessLevelNameInput.value = "";
+                    _this.accessLevelsUpdated.emit();
+                }
             }
         });
     };
     AccessLevelsComponent.prototype.deleteAccessLevel = function (accessLevelInt) {
         var _this = this;
         this._cdService.deleteAccessLevel(accessLevelInt).subscribe(function (responseObject) {
-            if (responseObject.success) {
-                console.log("Access level deleted");
-                _this.accessLevelsUpdated.emit();
+            if (responseObject.loginRequired) {
+                _this._cdService.logout();
+            }
+            else {
+                if (responseObject.success) {
+                    console.log("Access level deleted");
+                    _this.accessLevelsUpdated.emit();
+                }
             }
         });
     };
@@ -3603,19 +3620,31 @@ var CollaboratorsComponent = (function () {
     };
     CollaboratorsComponent.prototype.addCollaborator = function (emailInput, accessLevelIntInput) {
         var _this = this;
-        console.log(emailInput.value, accessLevelIntInput.value);
         this._cdService.addNewCollaborator(emailInput.value, accessLevelIntInput.value).subscribe(function (responseObject) {
-            console.log("Collaborator added!!");
-            emailInput.value = accessLevelIntInput.value = "";
-            _this.collaboratorsUpdated.emit();
+            if (responseObject.loginRequired) {
+                _this._cdService.logout();
+            }
+            else {
+                if (responseObject.success) {
+                    console.log("Collaborator added!!");
+                    emailInput.value = accessLevelIntInput.value = "";
+                    _this.collaboratorsUpdated.emit();
+                }
+            }
         });
     };
     CollaboratorsComponent.prototype.deleteCollaborator = function (collaborator) {
         var _this = this;
-        console.log(collaborator);
         this._cdService.removeCollaborator(collaborator.user_id).subscribe(function (responseObject) {
-            console.log("Collaborator removed!!");
-            _this.collaboratorsUpdated.emit();
+            if (responseObject.loginRequired) {
+                _this._cdService.logout();
+            }
+            else {
+                if (responseObject.success) {
+                    console.log("Collaborator removed!!");
+                    _this.collaboratorsUpdated.emit();
+                }
+            }
         });
     };
     __decorate([
@@ -3674,9 +3703,14 @@ var SettingsViewComponent = (function () {
         var _this = this;
         if (this.isAdmin && projectName == this.projectSettings.project_name) {
             this._cdService.deleteProject(projectName).subscribe(function (responseObject) {
-                if (responseObject.success) {
-                    _this.viewNotifyingOfProjectDeletion.emit();
-                    console.log("Project deleted");
+                if (responseObject.loginRequired) {
+                    _this._cdService.logout();
+                }
+                else {
+                    if (responseObject.success) {
+                        _this.viewNotifyingOfProjectDeletion.emit();
+                        console.log("Project deleted");
+                    }
                 }
             });
         }
@@ -3685,9 +3719,14 @@ var SettingsViewComponent = (function () {
         var _this = this;
         if (this.isAdmin && currentAuthTokenInput.value == this.projectSettings.public_auth_token) {
             this._cdService.generateNewPublicAuthToken(currentAuthTokenInput.value).subscribe(function (responseObject) {
-                if (responseObject.success) {
-                    currentAuthTokenInput.value = "";
-                    _this.settingsUpdated.emit();
+                if (responseObject.loginRequired) {
+                    _this._cdService.logout();
+                }
+                else {
+                    if (responseObject.success) {
+                        currentAuthTokenInput.value = "";
+                        _this.settingsUpdated.emit();
+                    }
                 }
             });
         }
@@ -3702,8 +3741,22 @@ var SettingsViewComponent = (function () {
         var _this = this;
         var currentProjectSettings = this._cdService.getCurrentProjectSettings();
         if (this.isAdmin) {
-            this._cdService.updateProjectSettings(this.projectSettings.project_name, this.projectSettings.max_cache_age, this.projectSettings.custom_css).subscribe(function (responseObject) { return _this.settingsUpdated.emit(); });
-            this._cdService.updateAdminSettings(this.projectSettings.update_origins, this.projectSettings.read_origins).subscribe(function (responseObject) { return _this.settingsUpdated.emit(); });
+            this._cdService.updateProjectSettings(this.projectSettings.project_name, this.projectSettings.max_cache_age, this.projectSettings.custom_css).subscribe(function (responseObject) {
+                if (responseObject.loginRequired) {
+                    _this._cdService.logout();
+                }
+                else {
+                    _this.settingsUpdated.emit();
+                }
+            });
+            this._cdService.updateAdminSettings(this.projectSettings.update_origins, this.projectSettings.read_origins).subscribe(function (responseObject) {
+                if (responseObject.loginRequired) {
+                    _this._cdService.logout();
+                }
+                else {
+                    _this.settingsUpdated.emit();
+                }
+            });
             if (currentProjectSettings.access_levels != this.projectSettings.access_levels) {
                 var updatedAccessLevels = [];
                 for (var _i = 0, _a = this.projectSettings.access_levels; _i < _a.length; _i++) {
@@ -3724,7 +3777,14 @@ var SettingsViewComponent = (function () {
             }
         }
         else {
-            this._cdService.updateProjectSettings(this.projectSettings.project_name).subscribe(function (responseObject) { return _this.settingsUpdated.emit(); });
+            this._cdService.updateProjectSettings(this.projectSettings.project_name).subscribe(function (responseObject) {
+                if (responseObject.loginRequired) {
+                    _this._cdService.logout();
+                }
+                else {
+                    _this.settingsUpdated.emit();
+                }
+            });
         }
         if (currentProjectSettings.collaborators != this.projectSettings.collaborators) {
             var updatedCollaborators = [];
@@ -3751,9 +3811,14 @@ var SettingsViewComponent = (function () {
         var _this = this;
         if (accessLevelName != null && accessLevelName.length > 0) {
             this._cdService.updateAccessLevel(accessLevelInt, accessLevelName).subscribe(function (responseObject) {
-                if (responseObject.success) {
-                    console.log("Access level updated");
-                    _this.settingsUpdated.emit();
+                if (responseObject.loginRequired) {
+                    _this._cdService.logout();
+                }
+                else {
+                    if (responseObject.success) {
+                        console.log("Access level updated");
+                        _this.settingsUpdated.emit();
+                    }
                 }
             });
         }
@@ -3762,9 +3827,14 @@ var SettingsViewComponent = (function () {
         var _this = this;
         collaborator.access_level_int = accessLevelInt;
         this._cdService.updateCollaborator(collaborator.user_id, accessLevelInt).subscribe(function (responseObject) {
-            if (responseObject.success) {
-                console.log("Collaborator updated!!");
-                _this.settingsUpdated.emit();
+            if (responseObject.loginRequired) {
+                _this._cdService.logout();
+            }
+            else {
+                if (responseObject.success) {
+                    console.log("Collaborator updated!!");
+                    _this.settingsUpdated.emit();
+                }
             }
         });
     };
@@ -3864,7 +3934,11 @@ var HeaderComponent = (function () {
     }
     HeaderComponent.prototype.ngOnInit = function () {
         var _this = this;
-        this._cdService.getLoginUrl().subscribe(function (responseObject) { return _this._loginUrl = responseObject.loginUrl; });
+        this._cdService.getLoginUrl().subscribe(function (responseObject) {
+            if (responseObject != null) {
+                _this._loginUrl = responseObject.loginUrl;
+            }
+        });
     };
     HeaderComponent.prototype.logoutClicked = function () {
         this.requestToLogout.emit();
