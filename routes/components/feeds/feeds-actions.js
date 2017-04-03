@@ -582,6 +582,7 @@ router.delete("/:projectID", function(req, res, next){
  *      <strong>REQUEST BODY:</strong> { file: {file} }
  * @apiSuccessExample {json} Success-Response:
  * {
+ *      success: true,
  *      media_item_url: https://drive.google.com/uc?id=0Bzkz0DzYRLAuUHRzVmFXZFF3dDQ
  * }
  * @apiName Upload Media Item
@@ -605,7 +606,7 @@ router.post("/:projectID", function(req, res, next){
                         // Sending the file URL for the new media item to the caller, by 
                         // prepending the id with the appropriate google drive url
                         var fileUrl = "https://drive.google.com/uc?id=" + fileUrl;
-                        res.send({media_item_url: fileUrl});
+                        res.send({success: fileUrl != null, media_item_url: fileUrl});
                     });
                 }                
             });

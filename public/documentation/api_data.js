@@ -607,7 +607,7 @@ define({ "api": [
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "{\n     media_item_url: https://drive.google.com/uc?id=0Bzkz0DzYRLAuUHRzVmFXZFF3dDQ\n}",
+          "content": "{\n     success: true,\n     media_item_url: https://drive.google.com/uc?id=0Bzkz0DzYRLAuUHRzVmFXZFF3dDQ\n}",
           "type": "json"
         }
       ]
