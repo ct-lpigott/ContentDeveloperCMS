@@ -91,7 +91,7 @@ var ContentDeveloperServerService = (function () {
         this._kvaPipe = _kvaPipe;
         this._serverUrl = "./..";
         this._contentErrors = {};
-        this._serverSessionMax = 60 * 15; //60 * 30
+        this._serverSessionMaxSeconds = 15; //60 * 30
         this._warnTimeoutAt = 0.80; // Percentage of server session max time
         this._headers = new __WEBPACK_IMPORTED_MODULE_1__angular_http__["b" /* Headers */]();
         this._headers.append("Content-Type", "application/json");
@@ -135,13 +135,13 @@ var ContentDeveloperServerService = (function () {
                 _this._resetIntervalTimer();
                 _this._activeSessionInterval = setInterval(function () {
                     _this._activeSessionTime++;
-                    if (_this._activeSessionTime > (_this._serverSessionMax * _this._warnTimeoutAt)) {
-                        var remainingMinutes = (_this._serverSessionMax - _this._activeSessionTime) / 1000 / 60;
-                        console.log("Your session will expire in " + remainingMinutes + " minutes");
-                    }
-                    else if (_this._activeSessionInterval > _this._serverSessionMax) {
+                    if (_this._activeSessionInterval > _this._serverSessionMaxSeconds) {
                         clearInterval(_this._activeSessionInterval);
                         console.log("Your session has expired");
+                    }
+                    else if (_this._activeSessionTime > (_this._serverSessionMaxSeconds * _this._warnTimeoutAt)) {
+                        var remainingMinutes = _this._serverSessionMaxSeconds - _this._activeSessionTime;
+                        console.log("Your session will expire in " + remainingMinutes + " minutes");
                     }
                 }, 1000);
                 _this._currentUser = responseObject.user;
