@@ -333,7 +333,7 @@ function sanitise(data, cssAllowed=false, htmlAllowed=false){
 
         // Allowing certain characters if HTML is allowed
         if(htmlAllowed == false){
-            sanitisedData = sanitisedData.replace(/(&)(?!(amp|equals|lt|gt|sol|bsol|lcub|rcub|grave|lpar|rpar|lsqb|rbrack))/g, "&amp;");
+            sanitisedData = sanitisedData.replace(/(&)(?!(amp|equals|lt|gt|sol|bsol|lcub|rcub|grave|lpar|rpar|lsqb|rbrack|nbsp))/g, "&amp;");
             sanitisedData = sanitisedData.replace(/=/g, "&equals;");
             sanitisedData = sanitisedData.replace(/</g, "&lt;");
             sanitisedData = sanitisedData.replace(/>/g, "&gt;");
