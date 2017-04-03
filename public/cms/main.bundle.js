@@ -1787,9 +1787,12 @@ var CmsComponent = (function () {
     };
     CmsComponent.prototype.resetProjectSettings = function () {
         this.projectSettings = this._cdService.getCurrentProjectSettings();
-        if (this._projectId != null) {
+        if (this._projectId != null && this.projectSettings != null) {
             this._projectName = this.projectSettings.project_name;
             this.updatePageTitle(this._projectName);
+        }
+        else {
+            this.loginRequired.emit();
         }
     };
     CmsComponent.prototype.resetProjectHistory = function () {
