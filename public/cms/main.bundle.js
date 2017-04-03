@@ -138,7 +138,7 @@ var ContentDeveloperServerService = (function () {
             else {
                 _this._resetIntervalTimer();
                 _this._activeSessionInterval = setInterval(function () {
-                    _this._activeSessionTime++;
+                    _this._activeSessionTime += 10;
                     if (_this._activeSessionTime > _this._serverSessionMaxSeconds) {
                         _this._stopIntervalTimer();
                         _this._notifyAppComponentOfImpendingTimeout(0, true);
