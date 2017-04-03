@@ -28,7 +28,7 @@ module.exports = function (err, req, res, next) {
             for(var i=0; i<req.feedsErrors.length; i++){
                 req.responseObject.errors.push(req.feedsErrors[i]);
             }
-            
+            req.responseObject.success = false;
         }
         if(req.adminErrors != null){
             // Adding any errors that occurred within the admin route, so that they

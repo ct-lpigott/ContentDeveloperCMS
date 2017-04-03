@@ -417,14 +417,7 @@ router.post("/:projectID", function(req, res, next){
                             // accessible from the feedsErrors array).
                             next(new Error());
                         } else {
-                            // Ideally, would prefer to redirect all request to get the updated list of 
-                            // collaborators, but due to restrictions with cross origin requests, redirects
-                            // are not currently supported, so just sending them an boolean response
-                            if(req.headers.origin != process.env.SITE_URL){
-                                res.send({success: true});
-                            } else {
-                                res.redirect(303, "/feeds/" + req.params.projectID + "?action=collaborators");
-                            }
+                            res.send({success: true});
                         }
                     });
                 }
@@ -472,14 +465,7 @@ router.put("/:projectID", function(req, res, next){
             // Checking if this user already has a relationship with this project, and if not,
             // then creating it
             dbQuery.check_UserProject(req.userID, req.body.collaborator_id, req.params.projectID, req.body.access_level_int, function(err, success){
-                // Ideally, would prefer to redirect all request to get the updated list of 
-                // collaborators, but due to restrictions with cross origin requests, redirects
-                // are not currently supported, so just sending them a boolean response
-                if(req.headers.origin != process.env.SITE_URL){
-                    res.send({success: success});
-                } else {
-                    res.redirect(303, "/feeds/" + req.params.projectID + "?action=collaborators");
-                } 
+                res.send({success: success});
             });
         }
     } else {
@@ -568,14 +554,7 @@ router.delete("/:projectID", function(req, res, next){
             if(collaboratorID != req.userID){
                 // Deleting the users relationship with this project
                 dbQuery.delete_UserProject(req.userID, collaboratorID, req.params.projectID, function(err, success){
-                    // Ideally, would prefer to redirect all request to get the updated list of 
-                    // collaborators, but due to restrictions with cross origin requests, redirects
-                    // are not currently supported, so just sending them a boolean response
-                    if(req.headers.origin != process.env.SITE_URL){
-                        res.send({success: success});
-                    } else {
-                        res.redirect(303, "/feeds/" + req.params.projectID + "?action=collaborators");
-                    }
+                    res.send({success: success});
                 });
             } else {
                 req.feedsErrors.push("You cannot delete yourself from a project");
@@ -709,14 +688,7 @@ router.post("/:projectID", function(req, res, next){
             // access_level_int from the request to be included, even if it
             // is null, as a default access level will be supplied if it is
             accessLevels.createNewAccessLevel(req.userID, req.params.projectID, req.body.access_level_name, req.body.access_level_int, function(success){
-                // Ideally, would prefer to redirect all request to get the updated list of 
-                // access levels, but due to restrictions with cross origin requests, redirects
-                // are not currently supported, so just sending them a boolean response
-                if(req.headers.origin != process.env.SITE_URL){
-                    res.send({success: success});
-                } else {
-                    res.redirect(303, "/feeds/" + req.params.projectID + "?action=accessLevels");
-                }
+                res.send({success: success});
             });
         } else {
             req.feedsErrors.push("No access level name included in the request");
@@ -754,14 +726,7 @@ router.delete("/:projectID", function(req, res, next){
         if(accessLevelInt != null){
             // Deleting this access level from the project
             accessLevels.removeAccessLevel(req.userID, req.params.projectID, accessLevelInt, function(success){
-                // Ideally, would prefer to redirect all request to get the updated list of 
-                // access levels, but due to restrictions with cross origin requests, redirects
-                // are not currently supported, so just sending them a boolean response
-                if(req.headers.origin != process.env.SITE_URL){
-                    res.send({success: success});
-                } else {
-                    res.redirect(303, "/feeds/" + req.params.projectID + "?action=accessLevels");
-                }
+                res.send({success: success});
             });
         } else {
             req.feedsErrors.push("No access level int included in the request");
@@ -796,14 +761,7 @@ router.put("/:projectID", function(req, res, next){
         if(req.body.access_level_int != null && req.body.access_level_name != null){
             // Updating this access level name for the project
             accessLevels.updateAccessLevelName(req.userID, req.params.projectID, req.body.access_level_int, req.body.access_level_name, function(success){
-                // Ideally, would prefer to redirect all request to get the updated list of 
-                // access levels, but due to restrictions with cross origin requests, redirects
-                // are not currently supported, so just sending them a boolean response
-                if(req.headers.origin != process.env.SITE_URL){
-                    res.send({success: success});
-                } else {
-                    res.redirect(303, "/feeds/" + req.params.projectID + "?action=accessLevels");
-                }
+                res.send({success: success});
             });
         } else {
             req.feedsErrors.push("No access level name or int included in the request");
@@ -927,12 +885,7 @@ router.put("/:projectID", function(req, res, next){
                     req.query.action = "cache";
                     next();
                 } else {
-                    if(success){
-                        res.send({success: success});
-                    } else {
-                        res.send({success: success});
-                    }
-                    
+                    res.send({success: success});                    
                 }    
             });
         } else {
@@ -1170,14 +1123,7 @@ router.all("/:projectID", function(req, res, next){
                     req.responseObject.custom_css = success;
                     next();
                 } else {
-                    // Ideally, would prefer to redirect all request to get the updated
-                    // css, but due to restrictions with cross origin requests, redirects
-                    // are not currently supported, so just sending them a boolean response
-                    if(req.headers.origin != process.env.SITE_URL){
-                        res.send({success: success});
-                    } else {
-                        res.redirect(303, "/feeds/" + req.params.projectID + "?action=css");
-                    }
+                    res.send({success: success});
                 }
             });
         } else {
