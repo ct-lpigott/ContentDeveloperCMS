@@ -122,7 +122,14 @@ var ContentDeveloperServerService = (function () {
             .get(requestUrl)
             .map(function (responseObject) { return responseObject.json(); })
             .catch(function (error) { return __WEBPACK_IMPORTED_MODULE_2_rxjs_Observable__["Observable"].throw(error) || "Unknown error getting users details"; })
-            .do(function (responseObject) { return _this._currentUser = responseObject.user; });
+            .do(function (responseObject) {
+            if (responseObject.loginRequired) {
+                _this.logout();
+            }
+            else {
+                _this._currentUser = responseObject.user;
+            }
+        });
         return loadUserObservable;
     };
     ContentDeveloperServerService.prototype.logout = function () {
@@ -136,11 +143,17 @@ var ContentDeveloperServerService = (function () {
         return logoutObservable;
     };
     ContentDeveloperServerService.prototype.loadUserProjects = function () {
+        var _this = this;
         var requestUrl = this._serverUrl + "/feeds/?action=collaborators";
         var loadUserProjectsObservable = this._http
             .get(requestUrl, { headers: this._headers })
             .map(function (responseObject) { return responseObject.json(); })
-            .catch(function (error) { return __WEBPACK_IMPORTED_MODULE_2_rxjs_Observable__["Observable"].throw(error.json().error) || "Unknown error getting users projects"; });
+            .catch(function (error) { return __WEBPACK_IMPORTED_MODULE_2_rxjs_Observable__["Observable"].throw(error.json().error) || "Unknown error getting users projects"; })
+            .do(function (responseObject) {
+            if (responseObject.loginRequired) {
+                _this.logout();
+            }
+        });
         return loadUserProjectsObservable;
     };
     ContentDeveloperServerService.prototype.loadProjectContentStructureHistory = function (projectId) {
@@ -153,9 +166,12 @@ var ContentDeveloperServerService = (function () {
             .map(function (responseObject) { return responseObject.json(); })
             .catch(function (error) { return __WEBPACK_IMPORTED_MODULE_2_rxjs_Observable__["Observable"].throw(error.json().error) || "Unknown error getting project content and structure"; })
             .do(function (responseObject) {
-            _this._currentProjectContentStructureHistory = responseObject;
-            _this._currentProjectContentStructureHistory.content_history = _this._currentProjectContentStructureHistory.content_history;
-            _this._currentProjectContentStructureHistory.structure_history = _this._currentProjectContentStructureHistory.structure_history;
+            if (responseObject.loginRequired) {
+                _this.logout();
+            }
+            else {
+                _this._currentProjectContentStructureHistory = responseObject;
+            }
         });
         return loadProjectContentAndStructureObservable;
     };
@@ -167,11 +183,17 @@ var ContentDeveloperServerService = (function () {
             .map(function (responseObject) { return responseObject.json(); })
             .catch(function (error) { return __WEBPACK_IMPORTED_MODULE_2_rxjs_Observable__["Observable"].throw(error.json().error); })
             .do(function (responseObject) {
-            _this._currentProjectSettings = responseObject;
+            if (responseObject.loginRequired) {
+                _this.logout();
+            }
+            else {
+                _this._currentProjectSettings = responseObject;
+            }
         });
         return loadProjectSettingsObservable;
     };
     ContentDeveloperServerService.prototype.updateProjectSettings = function (projectName, maxCacheAge, customCss) {
+        var _this = this;
         if (projectName === void 0) { projectName = null; }
         if (maxCacheAge === void 0) { maxCacheAge = null; }
         if (customCss === void 0) { customCss = null; }
@@ -180,7 +202,14 @@ var ContentDeveloperServerService = (function () {
             .put(requestUrl, { project_name: projectName, max_cache_age: maxCacheAge, custom_css: customCss }, { headers: this._headers })
             .map(function (responseObject) { return responseObject.json(); })
             .catch(function (error) { return __WEBPACK_IMPORTED_MODULE_2_rxjs_Observable__["Observable"].throw(error.json().error); })
-            .do(function (responseObject) { return console.log("Project settings updated!!"); });
+            .do(function (responseObject) {
+            if (responseObject.loginRequired) {
+                _this.logout();
+            }
+            else {
+                console.log("Project settings updated!!");
+            }
+        });
         return updateProjectSettingsObservable;
     };
     ContentDeveloperServerService.prototype.loadAdminSettings = function () {
@@ -191,13 +220,21 @@ var ContentDeveloperServerService = (function () {
             .map(function (responseObject) { return responseObject.json(); })
             .catch(function (error) { return __WEBPACK_IMPORTED_MODULE_2_rxjs_Observable__["Observable"].throw(error.json().error); })
             .do(function (responseObject) {
-            _this._currentProjectSettings.update_origins = responseObject.update_origins;
-            _this._currentProjectSettings.read_origins = responseObject.read_origins;
-            _this._currentProjectSettings.public_auth_token = responseObject.public_auth_token;
+            if (responseObject.loginRequired) {
+                _this.logout();
+            }
+            else {
+                if (responseObject != null) {
+                    _this._currentProjectSettings.update_origins = responseObject.update_origins;
+                    _this._currentProjectSettings.read_origins = responseObject.read_origins;
+                    _this._currentProjectSettings.public_auth_token = responseObject.public_auth_token;
+                }
+            }
         });
         return loadAdminSettingsObservable;
     };
     ContentDeveloperServerService.prototype.updateAdminSettings = function (updateOrigins, readOrigins) {
+        var _this = this;
         if (updateOrigins === void 0) { updateOrigins = null; }
         if (readOrigins === void 0) { readOrigins = null; }
         var requestUrl = this._serverUrl + "/admin/settings/" + this._currentProjectId;
@@ -205,7 +242,14 @@ var ContentDeveloperServerService = (function () {
             .put(requestUrl, { update_origins: updateOrigins, read_origins: readOrigins }, { headers: this._headers })
             .map(function (responseObject) { return responseObject.json(); })
             .catch(function (error) { return __WEBPACK_IMPORTED_MODULE_2_rxjs_Observable__["Observable"].throw(error.json().error); })
-            .do(function (responseObject) { return console.log("Admin settings updated!!"); });
+            .do(function (responseObject) {
+            if (responseObject.loginRequired) {
+                _this.logout();
+            }
+            else {
+                console.log("Admin settings updated!!");
+            }
+        });
         return updateProjectSettingsObservable;
     };
     ContentDeveloperServerService.prototype.generateNewPublicAuthToken = function (currentAuthToken) {
@@ -216,9 +260,14 @@ var ContentDeveloperServerService = (function () {
             .map(function (responseObject) { return responseObject.json(); })
             .catch(function (error) { return __WEBPACK_IMPORTED_MODULE_2_rxjs_Observable__["Observable"].throw(error.json().error); })
             .do(function (responseObject) {
-            if (responseObject.public_auth_token != null) {
-                _this._currentProjectSettings.public_auth_token = responseObject.public_auth_token;
-                console.log("New public auth token generated!!");
+            if (responseObject.loginRequired) {
+                _this.logout();
+            }
+            else {
+                if (responseObject.success) {
+                    _this._currentProjectSettings.public_auth_token = responseObject.public_auth_token;
+                    console.log("New public auth token generated!!");
+                }
             }
         });
         return generateNewPublicAuthTokenObservable;
@@ -233,7 +282,14 @@ var ContentDeveloperServerService = (function () {
             .map(function (responseObject) { return responseObject.json(); })
             .catch(function (error) { return __WEBPACK_IMPORTED_MODULE_2_rxjs_Observable__["Observable"].throw(error.json().error) || "Unknown error updating project structure"; })
             .do(function (responseObject) {
-            _this._currentProjectContentStructureHistory.structure = responseObject.structure;
+            if (responseObject.loginRequired) {
+                _this.logout();
+            }
+            else {
+                if (responseObject != null) {
+                    _this._currentProjectContentStructureHistory.structure = responseObject.structure;
+                }
+            }
         });
         return structureUpdateObservable;
     };
@@ -249,10 +305,13 @@ var ContentDeveloperServerService = (function () {
                 .map(function (responseObject) { return responseObject.json(); })
                 .catch(function (error) { return __WEBPACK_IMPORTED_MODULE_2_rxjs_Observable__["Observable"].throw(error.json().error) || "Unknown error updating project content"; })
                 .do(function (responseObject) {
-                if (encapsulationPath.length == 0) {
-                    _this._currentProjectContentStructureHistory.content = responseObject.content;
+                if (responseObject.loginRequired) {
+                    _this.logout();
                 }
                 else {
+                    if (responseObject != null) {
+                        _this._currentProjectContentStructureHistory.content = responseObject.content;
+                    }
                 }
             });
             return contentUpdateObservable;
@@ -269,31 +328,49 @@ var ContentDeveloperServerService = (function () {
             .map(function (responseObject) { return responseObject.json(); })
             .catch(function (error) { return __WEBPACK_IMPORTED_MODULE_2_rxjs_Observable__["Observable"].throw(error.json().error) || "Unknown error refreshing project history"; })
             .do(function (responseObject) {
-            if (_this._currentProjectContentStructureHistory != null) {
-                _this._currentProjectContentStructureHistory.content_history = responseObject.content_history;
-                _this._currentProjectContentStructureHistory.structure_hisory = responseObject.structure_history;
+            if (responseObject.loginRequired) {
+                _this.logout();
+            }
+            else {
+                if (_this._currentProjectContentStructureHistory != null && responseObject != null) {
+                    _this._currentProjectContentStructureHistory.content_history = responseObject.content_history;
+                    _this._currentProjectContentStructureHistory.structure_hisory = responseObject.structure_history;
+                }
             }
         });
         return refreshProjectHistoryObservable;
     };
     ContentDeveloperServerService.prototype.getContentofCommit = function (commitHash, historyOf) {
+        var _this = this;
         var requestUrl = this._serverUrl + "/feeds/" + this._currentProjectId + "?action=previewCommit&commitHash=" + commitHash + "&historyOf=" + historyOf;
         var commitContentObservable = this._http
             .get(requestUrl, { headers: this._headers })
             .map(function (responseObject) { return responseObject.json(); })
-            .catch(function (error) { return __WEBPACK_IMPORTED_MODULE_2_rxjs_Observable__["Observable"].throw(error.json().error) || "Unknown error getting commit content"; });
+            .catch(function (error) { return __WEBPACK_IMPORTED_MODULE_2_rxjs_Observable__["Observable"].throw(error.json().error) || "Unknown error getting commit content"; })
+            .do(function (responseObject) {
+            if (responseObject.loginRequired) {
+                _this.logout();
+            }
+        });
         return commitContentObservable;
     };
     ContentDeveloperServerService.prototype.createNewProject = function (projectName, template) {
+        var _this = this;
         if (template === void 0) { template = ""; }
         var requestUrl = this._serverUrl + "/feeds/?action=createProject";
         var createProjectObservable = this._http
             .post(requestUrl, { project_name: projectName, template: template }, { headers: this._headers })
             .map(function (responseObject) { return responseObject.json(); })
-            .catch(function (error) { return __WEBPACK_IMPORTED_MODULE_2_rxjs_Observable__["Observable"].throw(error.json().error) || "Unknown error creating project content"; });
+            .catch(function (error) { return __WEBPACK_IMPORTED_MODULE_2_rxjs_Observable__["Observable"].throw(error.json().error) || "Unknown error creating project content"; })
+            .do(function (responseObject) {
+            if (responseObject.loginRequired) {
+                _this.logout();
+            }
+        });
         return createProjectObservable;
     };
     ContentDeveloperServerService.prototype.createProjectContent = function (projectContent, encapsulationPath) {
+        var _this = this;
         if (encapsulationPath === void 0) { encapsulationPath = ""; }
         var requestUrl = this._serverUrl + "/feeds/" + this._currentProjectId + "/" + encapsulationPath;
         var createContentObservable = this._http
@@ -301,11 +378,17 @@ var ContentDeveloperServerService = (function () {
             .map(function (responseObject) { return responseObject.json(); })
             .catch(function (error) { return __WEBPACK_IMPORTED_MODULE_2_rxjs_Observable__["Observable"].throw(error.json().error) || "Unknown error creating project content"; })
             .do(function (responseObject) {
-            console.log(responseObject);
+            if (responseObject.loginRequired) {
+                _this.logout();
+            }
+            else {
+                console.log("Project content created");
+            }
         });
         return createContentObservable;
     };
     ContentDeveloperServerService.prototype.addNewCollaborator = function (emailAddress, accessLevelInt) {
+        var _this = this;
         console.log("CDService");
         var requestUrl = this._serverUrl + "/feeds/" + this._currentProjectId + "?action=collaborators";
         var addNewCollaboratorObservable = this._http
@@ -313,12 +396,19 @@ var ContentDeveloperServerService = (function () {
             .map(function (responseObject) { return responseObject.json(); })
             .catch(function (error) { return __WEBPACK_IMPORTED_MODULE_2_rxjs_Observable__["Observable"].throw(error.json().error) || "Unknown error adding new collaborator to project"; })
             .do(function (responseObject) {
-            console.log("New Collaborator Added");
-            //this._currentProjectSettings.collaborators = responseObject;
+            if (responseObject.loginRequired) {
+                _this.logout();
+            }
+            else {
+                if (responseObject.success) {
+                    console.log("New Collaborator Added");
+                }
+            }
         });
         return addNewCollaboratorObservable;
     };
     ContentDeveloperServerService.prototype.removeCollaborator = function (collaboratorId) {
+        var _this = this;
         console.log("CDService");
         var requestUrl = this._serverUrl + "/feeds/" + this._currentProjectId + "?action=collaborators";
         var removeCollaboratorObservable = this._http
@@ -326,12 +416,19 @@ var ContentDeveloperServerService = (function () {
             .map(function (responseObject) { return responseObject.json(); })
             .catch(function (error) { return __WEBPACK_IMPORTED_MODULE_2_rxjs_Observable__["Observable"].throw(error.json().error) || "Unknown error adding new collaborator to project"; })
             .do(function (responseObject) {
-            console.log("Collaborator Removed");
-            //this._currentProjectSettings.collaborators = responseObject;
+            if (responseObject.loginRequired) {
+                _this.logout();
+            }
+            else {
+                if (responseObject.success) {
+                    console.log("Collaborator Removed");
+                }
+            }
         });
         return removeCollaboratorObservable;
     };
     ContentDeveloperServerService.prototype.updateCollaborator = function (collaboratorId, accessLevelInt) {
+        var _this = this;
         console.log("About to updated " + collaboratorId + " to access level " + accessLevelInt);
         var requestUrl = this._serverUrl + "/feeds/" + this._currentProjectId + "?action=collaborators";
         var addNewCollaboratorObservable = this._http
@@ -339,12 +436,19 @@ var ContentDeveloperServerService = (function () {
             .map(function (responseObject) { return responseObject.json(); })
             .catch(function (error) { return __WEBPACK_IMPORTED_MODULE_2_rxjs_Observable__["Observable"].throw(error.json().error) || "Unknown error adding new collaborator to project"; })
             .do(function (responseObject) {
-            console.log("Collaborator Updated");
-            //this._currentProjectSettings.collaborators = responseObject;
+            if (responseObject.loginRequired) {
+                _this.logout();
+            }
+            else {
+                if (responseObject.success) {
+                    console.log("Collaborator Updated");
+                }
+            }
         });
         return addNewCollaboratorObservable;
     };
     ContentDeveloperServerService.prototype.createAccessLevel = function (accessLevelInt, accessLevelName) {
+        var _this = this;
         console.log("About to create access level " + accessLevelInt + " with the name " + accessLevelName);
         var requestUrl = this._serverUrl + "/feeds/" + this._currentProjectId + "?action=accessLevels";
         var addNewCollaboratorObservable = this._http
@@ -352,8 +456,14 @@ var ContentDeveloperServerService = (function () {
             .map(function (responseObject) { return responseObject.json(); })
             .catch(function (error) { return __WEBPACK_IMPORTED_MODULE_2_rxjs_Observable__["Observable"].throw(error.json().error) || "Unknown error creating project access level"; })
             .do(function (responseObject) {
-            console.log("Access Level Created");
-            //this._currentProjectSettings.access_levels = responseObject;
+            if (responseObject.loginRequired) {
+                _this.logout();
+            }
+            else {
+                if (responseObject.success) {
+                    console.log("Access Level Created");
+                }
+            }
         });
         return addNewCollaboratorObservable;
     };
@@ -365,14 +475,20 @@ var ContentDeveloperServerService = (function () {
             .map(function (responseObject) { return responseObject.json(); })
             .catch(function (error) { return __WEBPACK_IMPORTED_MODULE_2_rxjs_Observable__["Observable"].throw(error.json().error) || "Unknown error deleting project"; })
             .do(function (responseObject) {
-            if (responseObject.success) {
-                console.log("Project deleted");
-                _this.leaveProject();
+            if (responseObject.loginRequired) {
+                _this.logout();
+            }
+            else {
+                if (responseObject.success) {
+                    console.log("Project deleted");
+                    _this.leaveProject();
+                }
             }
         });
         return deleteProjectObservable;
     };
     ContentDeveloperServerService.prototype.deleteAccessLevel = function (accessLevelInt) {
+        var _this = this;
         if (accessLevelInt > 3) {
             console.log("About to delete access level " + accessLevelInt);
             var requestUrl = this._serverUrl + "/feeds/" + this._currentProjectId + "?action=accessLevels";
@@ -381,13 +497,20 @@ var ContentDeveloperServerService = (function () {
                 .map(function (responseObject) { return responseObject.json(); })
                 .catch(function (error) { return __WEBPACK_IMPORTED_MODULE_2_rxjs_Observable__["Observable"].throw(error.json().error) || "Unknown error deleting project access level"; })
                 .do(function (responseObject) {
-                console.log("Access Level deleted");
-                //this._currentProjectSettings.access_levels = responseObject;
+                if (responseObject.loginRequired) {
+                    _this.logout();
+                }
+                else {
+                    if (responseObject.success) {
+                        console.log("Access Level deleted");
+                    }
+                }
             });
             return deleteAccessLevelObservable;
         }
     };
     ContentDeveloperServerService.prototype.updateAccessLevel = function (accessLevelInt, accessLevelName) {
+        var _this = this;
         console.log("About to updated access level " + accessLevelInt + " to have the name " + accessLevelName);
         var requestUrl = this._serverUrl + "/feeds/" + this._currentProjectId + "?action=accessLevels";
         var addNewCollaboratorObservable = this._http
@@ -395,28 +518,51 @@ var ContentDeveloperServerService = (function () {
             .map(function (responseObject) { return responseObject.json(); })
             .catch(function (error) { return __WEBPACK_IMPORTED_MODULE_2_rxjs_Observable__["Observable"].throw(error.json().error) || "Unknown error updating project access level"; })
             .do(function (responseObject) {
-            console.log("Access Level Updated Updated");
-            //this._currentProjectSettings.access_levels = responseObject;
+            if (responseObject.loginRequired) {
+                _this.logout();
+            }
+            else {
+                if (responseObject.success) {
+                    console.log("Access Level Updated Updated");
+                }
+            }
         });
         return addNewCollaboratorObservable;
     };
     ContentDeveloperServerService.prototype.loadProjectMediaItems = function (numItems, nextPageToken) {
+        var _this = this;
         if (nextPageToken === void 0) { nextPageToken = null; }
         var requestUrl = this._serverUrl + "/feeds/" + this._currentProjectId + "?action=mediaItems&numFiles=" + numItems + "&nextPageToken=" + nextPageToken;
         var loadMediaItemsObservable = this._http
             .get(requestUrl, { headers: this._headers })
             .map(function (responseObject) { return responseObject.json(); })
-            .catch(function (error) { return __WEBPACK_IMPORTED_MODULE_2_rxjs_Observable__["Observable"].throw(error.json().error) || "Unknown error updating project access level"; });
+            .catch(function (error) { return __WEBPACK_IMPORTED_MODULE_2_rxjs_Observable__["Observable"].throw(error.json().error) || "Unknown error updating project access level"; })
+            .do(function (responseObject) {
+            if (responseObject.loginRequired) {
+                _this.logout();
+            }
+        });
         return loadMediaItemsObservable;
     };
     ContentDeveloperServerService.prototype.uploadMediaItem = function (mediaItemFile) {
+        var _this = this;
         var formData = new FormData();
         formData.append("file", mediaItemFile);
         var requestUrl = this._serverUrl + "/feeds/" + this._currentProjectId + "?action=mediaItems";
         var uploadMediaItemObservable = this._http
             .post(requestUrl, formData)
             .map(function (responseObject) { return responseObject.json(); })
-            .catch(function (error) { return __WEBPACK_IMPORTED_MODULE_2_rxjs_Observable__["Observable"].throw(error) || "Unknown error uploading media item"; });
+            .catch(function (error) { return __WEBPACK_IMPORTED_MODULE_2_rxjs_Observable__["Observable"].throw(error) || "Unknown error uploading media item"; })
+            .do(function (responseObject) {
+            if (responseObject.loginRequired) {
+                _this.logout();
+            }
+            else {
+                if (responseObject.media_item_url != null) {
+                    console.log("Media item successfully uploaded");
+                }
+            }
+        });
         return uploadMediaItemObservable;
     };
     ContentDeveloperServerService.prototype.getCurrentUser = function () {
@@ -3369,20 +3515,24 @@ var AccessLevelsComponent = (function () {
     AccessLevelsComponent.prototype.addNewAccessLevel = function (accessLevelNameInput, accessLevelIntInput) {
         var _this = this;
         var requestedAccessLevel = accessLevelIntInput.value;
-        while (this._accessLevelExists(requestedAccessLevel)) {
+        while (this._accessLevelExists(requestedAccessLevel) || requestedAccessLevel < 4) {
             requestedAccessLevel++;
         }
         this._cdService.createAccessLevel(requestedAccessLevel, accessLevelNameInput.value).subscribe(function (responseObject) {
-            console.log("Access level added!!");
-            accessLevelIntInput.value = accessLevelNameInput.value = "";
-            _this.accessLevelsUpdated.emit();
+            if (responseObject.success) {
+                console.log("Access level added!!");
+                accessLevelIntInput.value = accessLevelNameInput.value = "";
+                _this.accessLevelsUpdated.emit();
+            }
         });
     };
     AccessLevelsComponent.prototype.deleteAccessLevel = function (accessLevelInt) {
         var _this = this;
         this._cdService.deleteAccessLevel(accessLevelInt).subscribe(function (responseObject) {
-            console.log("Access level deleted");
-            _this.accessLevelsUpdated.emit();
+            if (responseObject.success) {
+                console.log("Access level deleted");
+                _this.accessLevelsUpdated.emit();
+            }
         });
     };
     AccessLevelsComponent.prototype._accessLevelExists = function (requestedAccessLevelInt) {
@@ -3528,7 +3678,7 @@ var SettingsViewComponent = (function () {
         var _this = this;
         if (this.isAdmin && currentAuthTokenInput.value == this.projectSettings.public_auth_token) {
             this._cdService.generateNewPublicAuthToken(currentAuthTokenInput.value).subscribe(function (responseObject) {
-                if (responseObject.public_auth_token != null) {
+                if (responseObject.success) {
                     currentAuthTokenInput.value = "";
                     _this.settingsUpdated.emit();
                 }
@@ -3554,7 +3704,6 @@ var SettingsViewComponent = (function () {
                     for (var i = 0; i < currentProjectSettings.access_levels.length; i++) {
                         if (currentProjectSettings.access_levels[i].access_level_int == accessLevel.access_level_int) {
                             if (currentProjectSettings.access_levels[i].access_level_name != accessLevel.access_level_name) {
-                                console.log(accessLevel.access_level_name);
                                 updatedAccessLevels.push(accessLevel);
                             }
                         }
@@ -3595,8 +3744,10 @@ var SettingsViewComponent = (function () {
         var _this = this;
         if (accessLevelName != null && accessLevelName.length > 0) {
             this._cdService.updateAccessLevel(accessLevelInt, accessLevelName).subscribe(function (responseObject) {
-                console.log("Access level updated");
-                _this.settingsUpdated.emit();
+                if (responseObject.success) {
+                    console.log("Access level updated");
+                    _this.settingsUpdated.emit();
+                }
             });
         }
     };
@@ -3604,8 +3755,10 @@ var SettingsViewComponent = (function () {
         var _this = this;
         collaborator.access_level_int = accessLevelInt;
         this._cdService.updateCollaborator(collaborator.user_id, accessLevelInt).subscribe(function (responseObject) {
-            console.log("Collaborator updated!!");
-            _this.settingsUpdated.emit();
+            if (responseObject.success) {
+                console.log("Collaborator updated!!");
+                _this.settingsUpdated.emit();
+            }
         });
     };
     __decorate([
