@@ -3,7 +3,7 @@
 // should ever request this connection, as all other modules
 // will use the prepared query statements below
 var database = require("./database_connection");
-var dbconn = database.connection;
+var dbconn = database.getDatabaseConnection();
 
 // Requiring the sendEmail module, which is used to send emails to
 // collaborators when they are added/updated/removed from a project,
@@ -42,7 +42,7 @@ function get_User(selectCols="", userId, cb){
     userId = validation.sanitise(userId);
 
     // Reloading the database connection incase it has disconnected
-    dbconn = database.connection;
+    dbconn = database.getDatabaseConnection();
 
     // Querying the database, with the sanitised data
     dbconn.query("SELECT " + selectCols + " FROM User WHERE id=" + dbconn.escape(userId), function(err, rows, fields){
@@ -62,7 +62,7 @@ function get_Project(selectCols="", projectId, cb){
     projectId = validation.sanitise(projectId);
 
     // Reloading the database connection incase it has disconnected
-    dbconn = database.connection;
+    dbconn = database.getDatabaseConnection();
 
     // Querying the database, with the sanitised data
     dbconn.query("SELECT " + selectCols + " FROM Project WHERE id=" + dbconn.escape(projectId), function(err, rows, fields){
@@ -83,7 +83,7 @@ function get_UserProject(selectCols="", userId, projectId, cb){
     projectId = validation.sanitise(projectId);
 
     // Reloading the database connection incase it has disconnected
-    dbconn = database.connection;
+    dbconn = database.getDatabaseConnection();
 
     // Querying the database, with the sanitised data
     dbconn.query("SELECT " + selectCols + " FROM User_Project WHERE user_id=" + dbconn.escape(userId) + " AND project_id=" + dbconn.escape(projectId), function(err, rows, fields){
@@ -103,7 +103,7 @@ function get_UserProjects_forUser(selectCols, userId, cb){
     userId = validation.sanitise(userId);
 
     // Reloading the database connection incase it has disconnected
-    dbconn = database.connection;
+    dbconn = database.getDatabaseConnection();
 
     // Querying the database, with the sanitised data
     dbconn.query("SELECT " + selectCols + " FROM User_Project up LEFT JOIN Project p ON up.project_id = p.id WHERE up.user_id=" + dbconn.escape(userId), function(err, rows, fields){
@@ -123,7 +123,7 @@ function get_UserProjects_forProject(selectCols, projectId, cb){
     projectId = validation.sanitise(projectId);
 
     // Reloading the database connection incase it has disconnected
-    dbconn = database.connection;
+    dbconn = database.getDatabaseConnection();
 
     // Querying the database, with the sanitised data
     dbconn.query("SELECT " + selectCols + " FROM User_Project up LEFT JOIN User u ON up.user_id = u.id LEFT JOIN Project p ON up.project_id = p.id WHERE up.project_id=" + dbconn.escape(projectId), function(err, rows, fields){
@@ -144,7 +144,7 @@ function get_UserProject_Project(selectCols, userId, projectId, cb){
     projectId = validation.sanitise(projectId);
 
     // Reloading the database connection incase it has disconnected
-    dbconn = database.connection;
+    dbconn = database.getDatabaseConnection();
 
     // Querying the database, with the sanitised data
     dbconn.query("SELECT " + selectCols + " FROM User_Project up LEFT JOIN Project p ON up.project_id = p.id WHERE up.user_id=" + dbconn.escape(userId) + " AND up.project_id=" + dbconn.escape(projectId), function(err, rows, fields){
@@ -165,7 +165,7 @@ function get_UserProject_Project_User(selectCols, userId, projectId, cb){
     projectId = validation.sanitise(projectId);
 
     // Reloading the database connection incase it has disconnected
-    dbconn = database.connection;
+    dbconn = database.getDatabaseConnection();
 
     // Querying the database, with the sanitised data
     dbconn.query("SELECT " + selectCols + " FROM User_Project up LEFT JOIN Project p ON up.project_id = p.id LEFT JOIN User u ON up.user_id = u.id WHERE up.user_id=" + dbconn.escape(userId) + " AND up.project_id=" + dbconn.escape(projectId), function(err, rows, fields){
@@ -189,7 +189,7 @@ function getWhere_User(selectCols="", whereCols=[], whereVals=[], cb){
     console.log(where);
 
     // Reloading the database connection incase it has disconnected
-    dbconn = database.connection;
+    dbconn = database.getDatabaseConnection();
     console.log("Database connection - " + dbconn.threadId);
     
     // Querying the database, with the sanitised data
@@ -211,7 +211,7 @@ function getWhere_UserProject(selectCols="", whereCols=[], whereVals=[], cb){
     var where = "WHERE " + combineColVals(whereCols, whereVals, "where",  " AND ");
 
     // Reloading the database connection incase it has disconnected
-    dbconn = database.connection;
+    dbconn = database.getDatabaseConnection();
 
     // Querying the database, with the sanitised data
     dbconn.query("SELECT " + selectCols + " FROM User_Project " + where, function(err, rows, fields){
@@ -232,7 +232,7 @@ function update_User(updateCols=[], updateVals=[], userId, cb){
     userId = validation.sanitise(userId);
 
     // Reloading the database connection incase it has disconnected
-    dbconn = database.connection;
+    dbconn = database.getDatabaseConnection();
 
     // Querying the database, with the sanitised data
     dbconn.query("UPDATE User " + setCols + " WHERE id=" + dbconn.escape(userId), function(err, result){
@@ -253,7 +253,7 @@ function update_Project(updateCols=[], updateVals=[], userId, projectId, cb){
     projectId = validation.sanitise(projectId);
 
     // Reloading the database connection incase it has disconnected
-    dbconn = database.connection;
+    dbconn = database.getDatabaseConnection();
     
     // Querying the database, with the sanitised data
     dbconn.query("UPDATE Project p LEFT JOIN User_Project up ON p.id = up.project_id " + setCols + " WHERE up.project_id=" + dbconn.escape(projectId) + " AND up.user_id=" + dbconn.escape(userId), function(err, result){
@@ -276,7 +276,7 @@ function update_UserProject(updateCols=[], updateVals=[], currentUserId, updateU
             projectId = validation.sanitise(projectId);
 
             // Reloading the database connection incase it has disconnected
-            dbconn = database.connection;
+            dbconn = database.getDatabaseConnection();
 
             // Querying the database, with the sanitised data
             dbconn.query("UPDATE User_Project " + setCols + " WHERE user_id=" + updateUserId  + " AND project_id=" + projectId, function(err, result) {
@@ -366,7 +366,7 @@ function update_UserProject_PublicAuthToken(userId, projectId, currentPublicAuth
                     var setCols = "SET " + combineColVals(["public_auth_token"], [newPublicAuthToken], "set", ", ", false);
                     
                     // Reloading the database connection incase it has disconnected
-                    dbconn = database.connection;
+                    dbconn = database.getDatabaseConnection();
 
                     // Querying the database, with the sanitised data
                     dbconn.query("UPDATE User_Project " + setCols + " WHERE user_id=" + userId + " AND project_id=" + projectId, function(err, result){
@@ -408,7 +408,7 @@ function create_User(emailAddress, cb){
         console.log(encryptedValues);
 
         // Reloading the database connection incase it has disconnected
-        dbconn = database.connection;
+        dbconn = database.getDatabaseConnection();
         
         // Querying the database, with the sanitised data
         dbconn.query("INSERT INTO User(email_address, cd_user_auth_token) VALUES(" + encryptedValues + ")", function(err, result){
@@ -431,7 +431,7 @@ function create_Project(projectName, accessLevels, mediaFolderId, userPermission
     var encryptedValues = combineColVals(["project_name", "access_levels", "media_folder_id"], [projectName, accessLevels, mediaFolderId], "insert");
     
     // Reloading the database connection incase it has disconnected
-    dbconn = database.connection;
+    dbconn = database.getDatabaseConnection();
 
     // Querying the database, with the sanitised data
     dbconn.query("INSERT INTO Project(project_name, access_levels, media_folder_id) VALUES(" + encryptedValues + ")", function(err, result){
@@ -466,7 +466,7 @@ function create_UserProject(currentUserId, newUserId, projectId, accessLevelInt,
         var encryptedValues = combineColVals(["user_id", "project_id", "access_level_int", "media_folder_permission_id", "public_auth_token"], [newUserId, projectId, accessLevelInt, userPermissionId, newPublicAuthToken], "insert");
         
         // Reloading the database connection incase it has disconnected
-        dbconn = database.connection;
+        dbconn = database.getDatabaseConnection();
 
         // Querying the database, with the sanitised data
         dbconn.query("INSERT INTO User_Project(user_id, project_id, access_level_int, media_folder_permission_id, public_auth_token) VALUES(" + encryptedValues + ")", function(err, result){
@@ -608,7 +608,7 @@ function delete_Project(userId, projectId, projectName, cb){
                 }
                 if(allowDelete){
                     // Reloading the database connection incase it has disconnected
-                    dbconn = database.connection;
+                    dbconn = database.getDatabaseConnection();
 
                     // Deleting all user realtionships for this project
                     dbconn.query("DELETE FROM User_Project WHERE project_id=" + dbconn.escape(projectId), function(err, result){
@@ -651,7 +651,7 @@ function delete_UserProject(currentUserId, removeUserId, projectId, cb){
     // project, so that they can be notified once it is deleted
     get_UserProject_Project_User("u.email_address, u.display_name, p.project_name, p.media_folder_id, up.media_folder_permission_id", removeUserId, projectId, function(err, row){
         // Reloading the database connection incase it has disconnected
-        dbconn = database.connection;
+        dbconn = database.getDatabaseConnection();
         
         // Deleting this users relationship with the project
         dbconn.query("DELETE FROM User_Project WHERE user_id=" + dbconn.escape(removeUserId) + " AND project_id=" + dbconn.escape(projectId), function(err, result){

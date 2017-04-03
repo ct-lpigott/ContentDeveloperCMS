@@ -38,10 +38,15 @@ function connectToDatabase(){
     });
 }
 
+function getDatabaseConnection(){
+    console.log("Getting DB connection - " + threadId);
+    return connection;
+}
+
 // Returning the database connection as the export for this module,
 // so that no many how many files request it, only one connection will
 // ever be used
 module.exports = {
-    connection: connection,
+    getDatabaseConnection: getDatabaseConnection,
     reconnectToDatabase: connectToDatabase
 };
