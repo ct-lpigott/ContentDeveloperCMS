@@ -133,16 +133,15 @@ var ContentDeveloperServerService = (function () {
         return loadUserObservable;
     };
     ContentDeveloperServerService.prototype.logout = function () {
-        if (this._currentUser != null) {
-            var logoutUrl = this._serverUrl + "/admin/logout";
-            var logoutObservable = this._http
-                .get(logoutUrl)
-                .map(function (responseObject) { return responseObject.json(); })
-                .catch(function (error) { return __WEBPACK_IMPORTED_MODULE_2_rxjs_Observable__["Observable"].throw(error) || "Unknown error when logging user out"; })
-                .do(function (responseObject) { return console.log("User logged out"); });
-            this._currentUser = null;
-        }
+        var logoutUrl = this._serverUrl + "/admin/logout";
+        var logoutObservable = this._http
+            .get(logoutUrl)
+            .map(function (responseObject) { return responseObject.json(); })
+            .catch(function (error) { return __WEBPACK_IMPORTED_MODULE_2_rxjs_Observable__["Observable"].throw(error) || "Unknown error when logging user out"; })
+            .do(function (responseObject) { return console.log("User logged out"); });
+        this._currentUser = null;
         this.leaveProject();
+        return logoutObservable;
     };
     ContentDeveloperServerService.prototype.loadUserProjects = function () {
         var _this = this;
@@ -973,7 +972,8 @@ var AppComponent = (function () {
         });
     };
     AppComponent.prototype.logout = function () {
-        this._cdService.logout();
+        var _this = this;
+        this._cdService.logout().subscribe(function (responseObject) { return _this.loginRequired(); });
         this.loginRequired();
     };
     AppComponent.prototype.updatePageTitle = function (title) {
