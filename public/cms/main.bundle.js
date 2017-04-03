@@ -106,6 +106,14 @@ var ContentDeveloperServerService = (function () {
     ContentDeveloperServerService.prototype.clearContentErrors = function () {
         this._contentErrors = {};
     };
+    ContentDeveloperServerService.prototype.setupLogoutObservable = function (appComponentLogoutFunction) {
+        this._notifyAppComponentOfLogout = appComponentLogoutFunction;
+        var logoutUrl = this._serverUrl + "/admin/logout";
+        this._logoutObservable = this._http
+            .get(logoutUrl)
+            .map(function (responseObject) { return responseObject.json(); })
+            .catch(function (error) { return __WEBPACK_IMPORTED_MODULE_2_rxjs_Observable__["Observable"].throw(error) || "Unknown error when logging user out"; });
+    };
     ContentDeveloperServerService.prototype.getLoginUrl = function () {
         var requestUrl = this._serverUrl + "/admin/loginUrl";
         var getLoginUrlObservable = this._http
@@ -133,17 +141,13 @@ var ContentDeveloperServerService = (function () {
         return loadUserObservable;
     };
     ContentDeveloperServerService.prototype.logout = function () {
-        var logoutUrl = this._serverUrl + "/admin/logout";
-        var logoutObservable = this._http
-            .get(logoutUrl)
-            .map(function (responseObject) { return responseObject.json(); })
-            .catch(function (error) { return __WEBPACK_IMPORTED_MODULE_2_rxjs_Observable__["Observable"].throw(error) || "Unknown error when logging user out"; });
-        logoutObservable.subscribe(function (responseObject) {
+        var _this = this;
+        this._logoutObservable.subscribe(function (responseObject) {
+            _this._notifyAppComponentOfLogout();
             console.log("User logged out");
         });
         this._currentUser = null;
         this.leaveProject();
-        return logoutObservable;
     };
     ContentDeveloperServerService.prototype.loadUserProjects = function () {
         var _this = this;
@@ -958,6 +962,9 @@ var AppComponent = (function () {
     }
     AppComponent.prototype.ngOnInit = function () {
         var _this = this;
+        this._cdService.setupLogoutObservable(function () {
+            _this.loginRequired();
+        });
         this._cdService.loadUser().subscribe(function (responseObject) {
             if (responseObject.loginRequired) {
                 _this.loginRequired();
@@ -974,10 +981,7 @@ var AppComponent = (function () {
         });
     };
     AppComponent.prototype.logout = function () {
-        var _this = this;
-        this._cdService.logout().subscribe(function (responseObject) {
-            _this.loginRequired();
-        });
+        this._cdService.logout();
         this.loginRequired();
     };
     AppComponent.prototype.updatePageTitle = function (title) {
