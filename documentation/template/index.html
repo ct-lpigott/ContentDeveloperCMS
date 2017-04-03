@@ -60,7 +60,9 @@
 				<li>Every project has three <strong>default access levels</strong>: Administrator (can update structure and content), Content Editor (can update content) and View Only (can only view content)</li>
 				<li><strong>Custom access levels</strong> can be created, each with a unique number (or int, as it is referred to in the API), to allow more restricted access to some users. By default, all custom access levels are granted Content Editor permissions</li>
 				<li>By defining a <strong>"no_access" property</strong>, with an array of access level ints, on any object in the projects structure, you can prevent a user with this access level from being able to edit this content. In fact, they wont even be able to see it when they log in to edit the project</li>
-				<li>The Content Management System is built on top of a <strong>REST API</strong>, and so content can be dynamically added/updated/deleted through calls to the endpoints defined in the <a href="api.html">API Documentation</a></li>
+        <li><strong>Custom CSS</strong> can be added by administrators in the <strong>settings</strong> panel, to control the style of the <strong>content</strong> view for all access levels</li>
+				<li>Every input is contained within an <strong>&lt;app-collection-item&gt;</strong> container, which has classes automatically applied to it, depending on the items encapsulation path i.e. the input for <em>{"contact_details": {"address":"LIT Clonmel"}}</em> is contained within <strong>&lt;app-collection-item class="contact_details address"&gt;</strong></li>
+        <li>The Content Management System is built on top of a <strong>REST API</strong>, and so content can be dynamically added/updated/deleted through calls to the endpoints defined in the <a href="api.html">API Documentation</a></li>
 			</ul>
 		</section>
 	 <section id="rules">
