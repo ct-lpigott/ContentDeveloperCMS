@@ -22,7 +22,7 @@ var drive = require("googleapis").drive("v3");
 // so that they can be used when setting up new OAuth2Clients.
 // Completing this task synchronously, as it will only
 // be done once at start up.
-var clientSecretData = JSON.parse(fs.readFileSync("./google/client_secret.json"));
+var clientSecretData = JSON.parse(fs.readFileSync("./configuration/google/client_secret.json"));
 
 // Setting the redirectURL (which will be used by the OAuth2
 // request to return a user to the server following a successful login)

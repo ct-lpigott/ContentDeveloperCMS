@@ -14,10 +14,10 @@ var SessionFileStore = require('session-file-store')(session);
 // Checking if the env_config file exists, which 
 // contains a self invoking function, to set up all
 // configuration variables for the app
-if(fs.existsSync("./env_config.js")){
+if(fs.existsSync("./configuration/env_config.js")){
   // Requiring the env_config file, so that it can invoke
   // its module exports to set up the env vars
-  require("./env_config.js");
+  require("./configuration/env_config.js");
 }
 
 // Checking that all required directories exist (and creating

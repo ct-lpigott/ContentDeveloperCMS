@@ -1,11 +1,10 @@
 node_modules
 .vscode
 letsencrypt
-*.sql
+local_testing_script.sql
 projects/*
 forever
 public/uploads
-!projects/project_template.json
 ContentDeveloperCMS-AngularApp
 env_config.js
 server-tests/reports
