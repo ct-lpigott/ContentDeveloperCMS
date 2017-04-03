@@ -39,7 +39,7 @@ function connectToDatabase(){
 }
 
 function getDatabaseConnection(){
-    console.log("Getting DB connection - " + threadId);
+    console.log("Getting DB connection - " + connection.threadId);
     return connection;
 }
 
