@@ -137,8 +137,8 @@ var ContentDeveloperServerService = (function () {
         var logoutObservable = this._http
             .get(logoutUrl)
             .map(function (responseObject) { return responseObject.json(); })
-            .catch(function (error) { return __WEBPACK_IMPORTED_MODULE_2_rxjs_Observable__["Observable"].throw(error) || "Unknown error when logging user out"; })
-            .do(function (responseObject) {
+            .catch(function (error) { return __WEBPACK_IMPORTED_MODULE_2_rxjs_Observable__["Observable"].throw(error) || "Unknown error when logging user out"; });
+        logoutObservable.subscribe(function (responseObject) {
             console.log("User logged out");
         });
         this._currentUser = null;
