@@ -91,6 +91,8 @@ var ContentDeveloperServerService = (function () {
         this._kvaPipe = _kvaPipe;
         this._serverUrl = "./..";
         this._contentErrors = {};
+        this._serverSessionMax = 1000 * 60 * 30;
+        this._warnTimeoutAt = 0.80; // Percentage of server session max time
         this._headers = new __WEBPACK_IMPORTED_MODULE_1__angular_http__["b" /* Headers */]();
         this._headers.append("Content-Type", "application/json");
     }
@@ -130,25 +132,26 @@ var ContentDeveloperServerService = (function () {
                 _this.logout();
             }
             else {
-                _this._checkCookieInterval = setInterval(_this._checkCookie, 2000);
+                _this._resetIntervalTimer();
+                _this._activeSessionInterval = setInterval(_this._intervalTick, 1000);
                 _this._currentUser = responseObject.user;
             }
         });
         return loadUserObservable;
     };
-    ContentDeveloperServerService.prototype._checkCookie = function () {
-        var allCookies = document.cookie.split(";");
-        for (var i = 0; i < allCookies.length; i++) {
-            var cookieDataArray = allCookies[i].split("=");
-            if (cookieDataArray[0] == "loggedIn") {
-                console.log(cookieDataArray[1]);
-            }
+    ContentDeveloperServerService.prototype._intervalTick = function () {
+        this._activeSessionTime++;
+        if (this._activeSessionTime > (this._serverSessionMax * this._warnTimeoutAt)) {
+            var remainingMinutes = (this._serverSessionMax - this._activeSessionTime) / 1000 / 60;
+            console.log("Your session will expire in " + remainingMinutes + " minutes");
+        }
+        else if (this._activeSessionInterval > this._serverSessionMax) {
+            clearInterval(this._activeSessionInterval);
+            console.log("Your session has expired");
         }
     };
-    ContentDeveloperServerService.prototype._updateCookie = function () {
-        var currentDateTime = new Date();
-        currentDateTime.setMinutes(currentDateTime.getMinutes() + 0.2);
-        document.cookie = "loggedIn=true; expires=" + currentDateTime.toISOString() + ";";
+    ContentDeveloperServerService.prototype._resetIntervalTimer = function () {
+        this._activeSessionTime = 0;
     };
     ContentDeveloperServerService.prototype.logout = function () {
         var _this = this;
@@ -158,7 +161,7 @@ var ContentDeveloperServerService = (function () {
             .map(function (responseObject) { return responseObject.json(); })
             .catch(function (error) { return __WEBPACK_IMPORTED_MODULE_2_rxjs_Observable__["Observable"].throw(error) || "Unknown error when logging user out"; });
         logoutObservable.subscribe(function (responseObject) {
-            clearInterval(_this._checkCookieInterval);
+            clearInterval(_this._activeSessionInterval);
             _this._notifyAppComponentOfLogout();
             console.log("User logged out");
         });
@@ -177,7 +180,7 @@ var ContentDeveloperServerService = (function () {
                 _this.logout();
             }
             else {
-                _this._updateCookie();
+                _this._resetIntervalTimer();
             }
         });
         return loadUserProjectsObservable;
@@ -196,7 +199,7 @@ var ContentDeveloperServerService = (function () {
                 _this.logout();
             }
             else {
-                _this._updateCookie();
+                _this._resetIntervalTimer();
                 _this._currentProjectContentStructureHistory = responseObject;
             }
         });
@@ -214,7 +217,7 @@ var ContentDeveloperServerService = (function () {
                 _this.logout();
             }
             else {
-                _this._updateCookie();
+                _this._resetIntervalTimer();
                 _this._currentProjectSettings = responseObject;
             }
         });
@@ -235,7 +238,7 @@ var ContentDeveloperServerService = (function () {
                 _this.logout();
             }
             else {
-                _this._updateCookie();
+                _this._resetIntervalTimer();
                 console.log("Project settings updated!!");
             }
         });
@@ -253,7 +256,7 @@ var ContentDeveloperServerService = (function () {
                 _this.logout();
             }
             else {
-                _this._updateCookie();
+                _this._resetIntervalTimer();
                 if (responseObject != null) {
                     _this._currentProjectSettings.update_origins = responseObject.update_origins;
                     _this._currentProjectSettings.read_origins = responseObject.read_origins;
@@ -277,7 +280,7 @@ var ContentDeveloperServerService = (function () {
                 _this.logout();
             }
             else {
-                _this._updateCookie();
+                _this._resetIntervalTimer();
                 console.log("Admin settings updated!!");
             }
         });
@@ -295,7 +298,7 @@ var ContentDeveloperServerService = (function () {
                 _this.logout();
             }
             else {
-                _this._updateCookie();
+                _this._resetIntervalTimer();
                 if (responseObject.success) {
                     _this._currentProjectSettings.public_auth_token = responseObject.public_auth_token;
                     console.log("New public auth token generated!!");
@@ -317,7 +320,7 @@ var ContentDeveloperServerService = (function () {
                 _this.logout();
             }
             else {
-                _this._updateCookie();
+                _this._resetIntervalTimer();
                 if (responseObject != null) {
                     _this._currentProjectContentStructureHistory.structure = responseObject.structure;
                 }
@@ -340,7 +343,7 @@ var ContentDeveloperServerService = (function () {
                     _this.logout();
                 }
                 else {
-                    _this._updateCookie();
+                    _this._resetIntervalTimer();
                     if (responseObject != null) {
                         _this._currentProjectContentStructureHistory.content = responseObject.content;
                     }
@@ -364,7 +367,7 @@ var ContentDeveloperServerService = (function () {
                 _this.logout();
             }
             else {
-                _this._updateCookie();
+                _this._resetIntervalTimer();
                 if (_this._currentProjectContentStructureHistory != null && responseObject != null) {
                     _this._currentProjectContentStructureHistory.content_history = responseObject.content_history;
                     _this._currentProjectContentStructureHistory.structure_hisory = responseObject.structure_history;
@@ -385,7 +388,7 @@ var ContentDeveloperServerService = (function () {
                 _this.logout();
             }
             else {
-                _this._updateCookie();
+                _this._resetIntervalTimer();
             }
         });
         return commitContentObservable;
@@ -403,7 +406,7 @@ var ContentDeveloperServerService = (function () {
                 _this.logout();
             }
             else {
-                _this._updateCookie();
+                _this._resetIntervalTimer();
             }
         });
         return createProjectObservable;
@@ -421,7 +424,7 @@ var ContentDeveloperServerService = (function () {
                 _this.logout();
             }
             else {
-                _this._updateCookie();
+                _this._resetIntervalTimer();
                 console.log("Project content created");
             }
         });
@@ -440,7 +443,7 @@ var ContentDeveloperServerService = (function () {
             }
             else {
                 if (responseObject.success) {
-                    _this._updateCookie();
+                    _this._resetIntervalTimer();
                     console.log("New Collaborator Added");
                 }
             }
@@ -459,7 +462,7 @@ var ContentDeveloperServerService = (function () {
                 _this.logout();
             }
             else {
-                _this._updateCookie();
+                _this._resetIntervalTimer();
                 if (responseObject.success) {
                     console.log("Collaborator Removed");
                 }
@@ -480,7 +483,7 @@ var ContentDeveloperServerService = (function () {
                 _this.logout();
             }
             else {
-                _this._updateCookie();
+                _this._resetIntervalTimer();
                 if (responseObject.success) {
                     console.log("Collaborator Updated");
                 }
@@ -501,7 +504,7 @@ var ContentDeveloperServerService = (function () {
                 _this.logout();
             }
             else {
-                _this._updateCookie();
+                _this._resetIntervalTimer();
                 if (responseObject.success) {
                     console.log("Access Level Created");
                 }
@@ -521,7 +524,7 @@ var ContentDeveloperServerService = (function () {
                 _this.logout();
             }
             else {
-                _this._updateCookie();
+                _this._resetIntervalTimer();
                 if (responseObject.success) {
                     console.log("Project deleted");
                     _this.leaveProject();
@@ -544,7 +547,7 @@ var ContentDeveloperServerService = (function () {
                     _this.logout();
                 }
                 else {
-                    _this._updateCookie();
+                    _this._resetIntervalTimer();
                     if (responseObject.success) {
                         console.log("Access Level deleted");
                     }
@@ -566,7 +569,7 @@ var ContentDeveloperServerService = (function () {
                 _this.logout();
             }
             else {
-                _this._updateCookie();
+                _this._resetIntervalTimer();
                 if (responseObject.success) {
                     console.log("Access Level Updated Updated");
                 }
@@ -587,7 +590,7 @@ var ContentDeveloperServerService = (function () {
                 _this.logout();
             }
             else {
-                _this._updateCookie();
+                _this._resetIntervalTimer();
             }
         });
         return loadMediaItemsObservable;
@@ -606,7 +609,7 @@ var ContentDeveloperServerService = (function () {
                 _this.logout();
             }
             else {
-                _this._updateCookie();
+                _this._resetIntervalTimer();
                 if (responseObject.media_item_url != null) {
                     console.log("Media item successfully uploaded");
                 }
