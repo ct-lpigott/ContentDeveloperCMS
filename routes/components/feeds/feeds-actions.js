@@ -101,7 +101,7 @@ router.put("/:projectID", function(req, res, next){
     next();
 });
 
-router.all("/", function(req, res, next){
+router.all("/*", function(req, res, next){
     // Checking that the query string contains an action, as this
     // route only deals with actions
     if(req.query.action != null){
