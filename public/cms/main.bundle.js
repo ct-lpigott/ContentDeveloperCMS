@@ -91,7 +91,7 @@ var ContentDeveloperServerService = (function () {
         this._kvaPipe = _kvaPipe;
         this._serverUrl = "./..";
         this._contentErrors = {};
-        this._serverSessionMax = 1000 * 15; //1000 * 60 * 30
+        this._serverSessionMax = 60 * 15; //60 * 30
         this._warnTimeoutAt = 0.80; // Percentage of server session max time
         this._headers = new __WEBPACK_IMPORTED_MODULE_1__angular_http__["b" /* Headers */]();
         this._headers.append("Content-Type", "application/json");
