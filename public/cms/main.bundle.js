@@ -1061,6 +1061,8 @@ var AppComponent = (function () {
     };
     AppComponent.prototype.requestToDismissTimeoutWarning = function () {
         if (this._sessionExpired) {
+            this._sessionExpired = false;
+            this._sessionMinutesRemaining = -1;
             this.logout();
         }
         else {
@@ -4437,7 +4439,7 @@ module.exports = ":host {\r\n    display: block;\r\n    position: fixed;\r\n    
 /***/ 670:
 /***/ (function(module, exports) {
 
-module.exports = "<app-header\r\n    [user]=\"user\"\r\n    [pageTitle]=\"pageTitle\"\r\n    (requestToLogout)=\"logout()\"\r\n    [class]=\"user != null ? 'loggedIn' : 'loggedOut'\"></app-header>\r\n\r\n    <app-cms \r\n        *ngIf=\"user != null\"\r\n        (requestToUpdatePageTitle)=\"updatePageTitle($event)\"\r\n        (loginRequired)=\"loginRequired($event)\">\r\n    </app-cms>\r\n<app-footer\r\n    [class]=\"user != null ? 'loggedIn' : 'loggedOut'\"></app-footer>\r\n<app-timeout\r\n    *ngIf=\"_sessionMinutesRemaining > -1\"\r\n    (requestToDismissWarning)=\"requestToDismissTimeoutWarning()\"\r\n    [minutesRemaining]=\"_sessionMinutesRemaining\"\r\n    [sessionExpired]=\"_sessionExpired\">\r\n</app-timeout>\r\n"
+module.exports = "<app-header\r\n    [user]=\"user\"\r\n    [pageTitle]=\"pageTitle\"\r\n    (requestToLogout)=\"logout()\"\r\n    [class]=\"user != null ? 'loggedIn' : 'loggedOut'\"></app-header>\r\n\r\n    <app-cms \r\n        *ngIf=\"user != null\"\r\n        (requestToUpdatePageTitle)=\"updatePageTitle($event)\"\r\n        (loginRequired)=\"loginRequired($event)\">\r\n    </app-cms>\r\n<app-footer\r\n    [class]=\"user != null ? 'loggedIn' : 'loggedOut'\"></app-footer>\r\n<app-timeout\r\n    *ngIf=\"_sessionMinutesRemaining > -1 && (sessionExpired || _sessionWarningDismissed == false)\"\r\n    (requestToDismissWarning)=\"requestToDismissTimeoutWarning()\"\r\n    [minutesRemaining]=\"_sessionMinutesRemaining\"\r\n    [sessionExpired]=\"_sessionExpired\">\r\n</app-timeout>\r\n"
 
 /***/ }),
 
