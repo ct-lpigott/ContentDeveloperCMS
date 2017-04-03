@@ -49,6 +49,7 @@ module.exports = function (err, req, res, next) {
         // to notify the user and/or CMS
         if(err.message == "loginRequired"){
             req.responseObject.loginRequired = true;
+            res.clearCookie("connect.sid");
         }
 
         // Sending the responseObject back as the response for this request. This 
