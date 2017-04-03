@@ -1731,8 +1731,12 @@ var CmsComponent = (function () {
             }
             else {
                 _this._cdService.loadAdminSettings().subscribe(function (responseObject) {
-                    _this.resetProjectSettings();
-                    console.log(_this.projectSettings);
+                    if (responseObject.loginRequired) {
+                        _this.loginRequired.emit();
+                    }
+                    else {
+                        _this.resetProjectSettings();
+                    }
                 });
             }
         });
