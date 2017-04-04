@@ -93,7 +93,6 @@ var ContentDeveloperServerService = (function () {
         this._contentErrors = {};
         this._serverSessionMaxSeconds = 60 * 30; //30 Minutes
         this._warnTimeoutAt = 0.80; // Percentage of server session max time
-        this._warnTimeoutSent = false;
         this._headers = new __WEBPACK_IMPORTED_MODULE_1__angular_http__["b" /* Headers */]();
         this._headers.append("Content-Type", "application/json");
     }
@@ -144,13 +143,10 @@ var ContentDeveloperServerService = (function () {
                         _this._notifyAppComponentOfImpendingTimeout(0, true);
                         console.log("Your session has expired");
                     }
-                    else if (!_this._warnTimeoutSent) {
-                        if (_this._activeSessionTime > (_this._serverSessionMaxSeconds * _this._warnTimeoutAt)) {
-                            var remainingMinutes = (_this._serverSessionMaxSeconds - _this._activeSessionTime) / 60;
-                            if (remainingMinutes >= 0) {
-                                _this._notifyAppComponentOfImpendingTimeout(remainingMinutes, false);
-                                _this._warnTimeoutSent = true;
-                            }
+                    if (_this._activeSessionTime > (_this._serverSessionMaxSeconds * _this._warnTimeoutAt)) {
+                        var remainingMinutes = (_this._serverSessionMaxSeconds - _this._activeSessionTime) / 60;
+                        if (remainingMinutes >= 0) {
+                            _this._notifyAppComponentOfImpendingTimeout(remainingMinutes, false);
                         }
                     }
                 }, 5000); // Every 5 seconds
@@ -164,7 +160,6 @@ var ContentDeveloperServerService = (function () {
     };
     ContentDeveloperServerService.prototype._stopIntervalTimer = function () {
         this._activeSessionTime = 0;
-        this._warnTimeoutSent = false;
         if (this._activeSessionInterval != null) {
             clearInterval(this._activeSessionInterval);
             this._activeSessionInterval = null;
