@@ -1,5 +1,5 @@
 (function(){
-    require("./../env_config.js");
+    require("./../configuration/env_config.js");
     process.env.DEBUG_FEEDS_URL = process.env.SITE_URL + "/feeds/";
 
     // NEEDS TO BE UPDATED THE REFLECT THE APPROPRIATE PROJECT
