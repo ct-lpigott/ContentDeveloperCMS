@@ -1,6 +1,6 @@
 // Requiring the file system module, so that this module
-// can have access to the file system (to read in the credentials
-// of the projects client secret keys)
+// can have access to the file system (to create read
+// streams for updloading files to Google)
 var fs = require("fs");
 
 // Including the dbQuery module, which contains prepared queries to the 
@@ -17,12 +17,6 @@ var googleAuth = require("google-auth-library");
 // googleapis module, which will be used to make requests
 // to the Google Drive API
 var drive = require("googleapis").drive("v3");
-
-// Storing the client secret data for the servers Google projects
-// so that they can be used when setting up new OAuth2Clients.
-// Completing this task synchronously, as it will only
-// be done once at start up.
-var clientSecretData = JSON.parse(fs.readFileSync("./configuration/google/client_secret.json"));
 
 // Setting the redirectURL (which will be used by the OAuth2
 // request to return a user to the server following a successful login)
@@ -63,8 +57,8 @@ function generateOAuth2Client(currentUserID, cb){
   // and the redirect URL to return the user to the server following
   // successful login
   var newOAuth2Client = new auth.OAuth2(
-    clientSecretData.web.client_id,
-    clientSecretData.web.client_secret
+    process.env.GOOGLE_CLIENT_ID,
+    process.env.GOOGLE_CLIENT_SECRET
   );
 
   if(currentUserID == null){
