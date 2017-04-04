@@ -34,6 +34,16 @@ function connectToDatabase(){
             }
             connection = newConnection;
             console.log("Successfully connected to database \n");
+
+            setInterval(()=>{
+                connection.query("SELECT id FROM User WHERE id=1", function(err, rows, fields){
+                    if(err){console.log(err);}
+                    if(rows != null && rows.length > 0){
+                        var now = new Date();
+                        console.log("Got user at " + now.toDateString() + " " + now.toLocaleTimeString());
+                    }
+                });
+            }, 1000 * 60 * 5); // Once every 5 minutes
         }
     });
 }

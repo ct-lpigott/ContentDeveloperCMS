@@ -24,7 +24,6 @@ var googleOAuth = require("../custom_modules/google_oauth");
 // their Google account
 router.get("/oauthRedirectURL", function(req, res, next){
     req.loginErrors = [];
-    database.reconnectToDatabase();
 
     // Temporarily storing the auth code, included in the request, as this will be used
     // request the access token from the Google API i.e. it proves that the user has 
