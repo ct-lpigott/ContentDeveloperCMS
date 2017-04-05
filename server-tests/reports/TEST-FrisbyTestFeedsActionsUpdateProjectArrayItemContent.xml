@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites>
+<testsuite name="Frisby Test: Feeds - Actions - Update Project Array Item Content" errors="0" tests="1" failures="0" time="0.844" timestamp="2017-04-05T14:00:36">
+  <testcase classname="Frisby Test: Feeds - Actions - Update Project Array Item Content" name="
+	[ PUT http://localhost:3000/feeds/16/home_page/further_info/0/link ]" time="0.844"></testcase>
+</testsuite>
+</testsuites>

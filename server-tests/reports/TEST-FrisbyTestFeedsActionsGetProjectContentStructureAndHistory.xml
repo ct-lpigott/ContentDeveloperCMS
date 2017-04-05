@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites>
+<testsuite name="Frisby Test: Feeds - Actions - Get Project Content Structure And History" errors="0" tests="1" failures="0" time="0.285" timestamp="2017-04-05T14:00:22">
+  <testcase classname="Frisby Test: Feeds - Actions - Get Project Content Structure And History" name="
+	[ GET http://localhost:3000/feeds/16?include=content,structure,history ]" time="0.284"></testcase>
+</testsuite>
+</testsuites>

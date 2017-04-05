@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites>
+<testsuite name="Frisby Test: Feeds - Actions - Create New Project" errors="0" tests="1" failures="0" time="2.796" timestamp="2017-04-05T13:58:27">
+  <testcase classname="Frisby Test: Feeds - Actions - Create New Project" name="
+	[ POST http://localhost:3000/feeds/?action=createProject ]" time="2.792"></testcase>
+</testsuite>
+</testsuites>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites>
+<testsuite name="Frisby Test: Feeds - Actions - Get Project Access Levels" errors="0" tests="1" failures="0" time="0.024" timestamp="2017-04-05T14:00:22">
+  <testcase classname="Frisby Test: Feeds - Actions - Get Project Access Levels" name="
+	[ GET http://localhost:3000/feeds/16?action=accessLevels ]" time="0.023"></testcase>
+</testsuite>
+</testsuites>

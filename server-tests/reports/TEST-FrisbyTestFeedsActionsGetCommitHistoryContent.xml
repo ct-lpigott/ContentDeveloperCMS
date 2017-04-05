@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites>
+<testsuite name="Frisby Test: Feeds - Actions - Get Commit History Content" errors="0" tests="1" failures="0" time="0.142" timestamp="2017-04-05T14:00:22">
+  <testcase classname="Frisby Test: Feeds - Actions - Get Commit History Content" name="
+	[ GET http://localhost:3000/feeds/16?action=previewCommit&amp;commitHash=de1adb26e74ee486a59f1000b2a077ba626ac79a&amp;historyOf=structure ]" time="0.142"></testcase>
+</testsuite>
+</testsuites>

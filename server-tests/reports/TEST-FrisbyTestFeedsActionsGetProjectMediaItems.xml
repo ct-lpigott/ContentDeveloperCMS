@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites>
+<testsuite name="Frisby Test: Feeds - Actions - Get Project Media Items" errors="0" tests="1" failures="0" time="1.74" timestamp="2017-04-05T14:00:20">
+  <testcase classname="Frisby Test: Feeds - Actions - Get Project Media Items" name="
+	[ GET http://localhost:3000/feeds/16?action=mediaItems ]" time="1.739"></testcase>
+</testsuite>
+</testsuites>

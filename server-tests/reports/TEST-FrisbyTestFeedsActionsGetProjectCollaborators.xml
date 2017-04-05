@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites>
+<testsuite name="Frisby Test: Feeds - Actions - Get Project Collaborators" errors="0" tests="1" failures="0" time="0.134" timestamp="2017-04-05T14:00:20">
+  <testcase classname="Frisby Test: Feeds - Actions - Get Project Collaborators" name="
+	[ GET http://localhost:3000/feeds/16?action=collaborators ]" time="0.121"></testcase>
+</testsuite>
+</testsuites>
