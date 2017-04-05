@@ -186,8 +186,6 @@ function getWhere_User(selectCols="", whereCols=[], whereVals=[], cb){
     // encrypted columns set to be decrypted (for WHERE statements)
     var where = "WHERE " + combineColVals(whereCols, whereVals, "where",  " AND ");
 
-    console.log(where);
-
     // Reloading the database connection incase it has disconnected
     dbconn = database.getDatabaseConnection();
     console.log("Database connection - " + dbconn.threadId);
@@ -404,8 +402,6 @@ function create_User(emailAddress, cb){
         // Joining the columns/values arrays into a string, all values sanitised and escaped, and all encrypted 
         // columns data set to be encrypted (for INSERT and UPDATE statements)
         var encryptedValues = combineColVals(["email_address", "cd_user_auth_token"], [emailAddress, newAuthToken], "insert");
-        
-        console.log(encryptedValues);
 
         // Reloading the database connection incase it has disconnected
         dbconn = database.getDatabaseConnection();

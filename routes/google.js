@@ -8,8 +8,6 @@ var router = require('express').Router();
 // i.e. to make request to the Plus API, to get the users email address
 var google = require("googleapis");
 
-var database = require("../custom_modules/database_connection");
-
 // Including the dbQuery module, which contains prepared queries to the 
 // database, which ensure that all data used within them is sanitised and
 // escaped before being included in a statement
