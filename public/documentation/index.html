@@ -63,6 +63,13 @@
         <li><strong>Custom CSS</strong> can be added by administrators in the <strong>settings</strong> panel, to control the style of the <strong>content</strong> view for all access levels</li>
 				<li>Every input is contained within an <strong>&lt;app-collection-item&gt;</strong> container, which has classes automatically applied to it, depending on the items encapsulation path i.e. the input for <em>{"contact_details": {"address":"LIT Clonmel"}}</em> is contained within <strong>&lt;app-collection-item class="contact_details address"&gt;</strong></li>
         <li>The Content Management System is built on top of a <strong>REST API</strong>, and so content can be dynamically added/updated/deleted through calls to the endpoints defined in the <a href="api.html">API Documentation</a></li>
+        <li>Project settings
+          <ul>
+            <li><strong>Only Administators</strong> of a project (access level 1) will have <strong>access to all settings</strong> for a project i.e. to update allowed origins, delete the project etc</li>
+            <li>The only settings that Content Editors (access level 2) are able to access are the name of the project, add/remove/update collaborators on a project, and add/remove/update access levels for a project</li>
+            <li>All other access levels (level 3 onwards) have no access to project settings</li>
+          </ul>
+        </li>
 			</ul>
 		</section>
 	 <section id="rules">
