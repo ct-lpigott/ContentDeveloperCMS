@@ -24,7 +24,11 @@ Full Documentation available at [https://contentdevelopercms.eu/documentation](h
 * __Custom CSS__ can be added by administrators in the __settings__ panel, to control the style of the __content__ view for all access levels
 * Every input is contained within an __&lt;app-collection-item&gt;__ container, which has classes automatically applied to it, depending on the items encapsulation path i.e. the input for ```{"contact_details": {"address":"LIT Clonmel"}}``` is contained within __&lt;app-collection-item class="contact_details address"&gt;__
 * The Content Management System is built on top of a __REST API__, and so content can be dynamically added/updated/deleted through calls to the endpoints defined in the [API Documentation](https://contentdevelopercms.eu/documentation/api.html)
-
+* Project settings
+	* __Only Administators__ of a project (access level 1) will have __access to all settings__ for a project i.e. to update allowed origins, delete the project etc
+	* The only settings that Content Editors (access level 2) are able to access are the name of the project, add/remove/update collaborators on a project, and add/remove/update access levels for a project
+	* All other access levels (level 3 onwards) have no access to project settings
+	
 ## Rules
 * All objects in a projects structure must contain either an __items__ property or an __attributes__ property
           ```
