@@ -12,6 +12,11 @@ frisby.create("Feeds - Actions - Create Project Structure")
                 heading: {
                     attributes: {type:"string"}
                 },
+                telephone: {
+                    attributes: {
+                        type: "tel"
+                    }
+                },
                 further_info: {
                     type: "array",
                     items: {
@@ -45,26 +50,5 @@ frisby.create("Feeds - Actions - Create Project Structure")
   .expectJSONTypes("structure.home_page",{
     heading: Object,
     further_info: Object
-  })
-.toss();
-
-frisby.create("Feeds - Actions - Create Project Structure")
-  .post(process.env.DEBUG_FEEDS_URL + process.env.DEBUG_PROJECT_ID + "/home_page/telephone",{
-    structure: {
-        attributes: {type:"tel"}
-    }
-  }, {json: true})
-  .expectMaxResponseTime(10000)
-  .expectStatus(200)
-  .expectHeaderContains("Content-Type", "application/json")
-  .expectJSONTypes({
-      structure: Object,
-      errors: function(val){
-        expect(val).toBeTypeOrNull(Array);
-        console.log(val);
-      }
-  })
-  .expectJSONTypes("structure", {
-    telephone: Object
   })
 .toss();

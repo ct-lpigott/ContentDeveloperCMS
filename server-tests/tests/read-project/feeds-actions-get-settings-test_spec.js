@@ -21,7 +21,10 @@ frisby.create("Feeds - Actions - Get Project Access Levels")
   .get(process.env.DEBUG_FEEDS_URL + process.env.DEBUG_PROJECT_ID + "?action=accessLevels")
   .expectStatus(200)
   .expectHeaderContains("Content-Type", "application/json")
-  .expectJSONTypes("0", {
+  .expectJSONTypes({
+    access_levels: Array
+  })
+  .expectJSONTypes("access_levels.0", {
     access_level_name: String,
     access_level_int: Number,
     in_use: Boolean

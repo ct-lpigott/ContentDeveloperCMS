@@ -12,17 +12,15 @@ frisby.create("Feeds - Actions - Update Project All Content")
               further_info: [{title: "Updated Google Frisby", link: "www.frisbyjs.com"}],
               telephone: "123"
         }
-      }
+      },
+      errors: Array
   }, {json: true})
   .expectMaxResponseTime(2000)
   .expectStatus(200)
   .expectHeaderContains("Content-Type", "application/json")
   .expectJSONTypes({
       content: Object,
-      errors: function(val){
-        expect(val).toBeTypeOrNull(Array);
-        console.log(val);
-      }
+      errors: Array
   })
   .expectJSONTypes("content.home_page",{
     heading: Object,
@@ -39,13 +37,10 @@ frisby.create("Feeds - Actions - Update Project Item Content")
   .expectHeaderContains("Content-Type", "application/json")
   .expectJSONTypes({
       content: Object,
-      errors: function(val){
-        expect(val).toBeTypeOrNull(Array);
-        console.log(val);
-      }
+      errors: Array
   })
   .expectJSONTypes("content.home_page",{
-    telephone: Number
+    telephone: String
   })
 .toss();
 
@@ -58,10 +53,7 @@ frisby.create("Feeds - Actions - Update Project Array Item Content")
   .expectHeaderContains("Content-Type", "application/json")
   .expectJSONTypes({
       content: Object,
-      errors: function(val){
-        expect(val).toBeTypeOrNull(Array);
-        console.log(val);
-      }
+      errors: Array
   })
   .expectJSONTypes("content.0",{
     link: String
