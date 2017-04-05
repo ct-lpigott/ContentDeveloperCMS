@@ -31,7 +31,8 @@ var validation = require("../../../custom_modules/validation");
  *                  }
  *              }
  *          }
- *      }
+ *      },
+ *      errors: []
  * }
  * @apiName Create New Item Structure
  * @apiGroup Project Structure

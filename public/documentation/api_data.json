@@ -1412,7 +1412,7 @@
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "{\n     structure: {\n         books: {\n             type: \"array\",\n             items: {\n                 title: {\n                     attributes: {\n                         required: \"required\"\n                     }\n                 }\n             }\n         }\n     }\n}",
+          "content": "{\n     structure: {\n         books: {\n             type: \"array\",\n             items: {\n                 title: {\n                     attributes: {\n                         required: \"required\"\n                     }\n                 }\n             }\n         }\n     },\n     errors: []\n}",
           "type": "json"
         }
       ]
@@ -1576,7 +1576,7 @@
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "{\n     structure: {\n         albums: {\n             type: \"array\",\n             items: {\n                 artist: {\n                     attributes: {\n                         required: \"required\"\n                     }\n                 }\n             }\n         }\n     }\n}",
+          "content": "{\n     structure: {\n         albums: {\n             type: \"array\",\n             items: {\n                 artist: {\n                     attributes: {\n                         required: \"required\"\n                     }\n                 }\n             }\n         }\n     },\n     errors: []\n}",
           "type": "json"
         }
       ]
