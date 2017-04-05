@@ -676,7 +676,6 @@ function delete_UserProject(currentUserId, removeUserId, projectId, cb){
 
 // RESULT HANDLERS
 function handleGetResult(err, rows, numRows="single", cb){
-    console.log("Handling get result - " + err + " - " + rows);
     // Handling all get results i.e. to check if
     // there was an error, check that the appropriate number of rows
     // were returned, and pass them back to the callback function

@@ -81,7 +81,6 @@ router.get("/oauthRedirectURL", function(req, res, next){
                         // Checking if the user exists, and if not, then creating them
                         dbQuery.check_User(googleUser.emails[0].value, function(err, userId){
                             console.log("Found user - " + userId);
-                            console.log(err);
                             // Getting the details of this user (either new or existing)
                             dbQuery.get_User("cd_user_auth_token", userId, function(err, row){
                                 if(row != null && row.cd_user_auth_token != null){
