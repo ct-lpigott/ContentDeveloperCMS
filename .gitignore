@@ -2,6 +2,7 @@ node_modules
 .vscode
 letsencrypt
 local_testing_script.sql
+testing_db.sql
 projects/*
 forever
 public/uploads
