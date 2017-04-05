@@ -3,6 +3,10 @@
 // which this route will accept.
 var router = require('express').Router();
 
+// Requiring the path module, so that strings can be joined and 
+// normalised as paths to files on the server
+var path = require('path');
+
 // Requiring the file system module, so that this route can have access
 // to the file system of the server i.e. to be able to create, open, edit 
 // and save project files to the /projects directory
@@ -26,7 +30,8 @@ router.use(function(req, res, next){
             if(validation.objectToJson(req.fileData.content)){
                 // Updating this project's content.json file, passing the JSON stringified version
                 // of the fileData content object as the contents
-                fs.writeFile("./projects/" + req.projectID + "/content.json", JSON.stringify(req.fileData.content), function(err){
+                var contentJsonPath = path.join(process.env.ROOT_DIR, "/projects/", req.projectID, "/content.json");
+                fs.writeFile(contentJsonPath, JSON.stringify(req.fileData.content), function(err){
                     if(err) {
                         // Logging the error to the console
                         console.log("Error updating project content file " + err);
@@ -91,7 +96,8 @@ router.use(function(req, res, next){
         if(validation.objectToJson(req.fileData.admin)){
             // Updating this project's admin.json file, passing the JSON stringified version
             // of the fileData object as the contents
-            fs.writeFile("./projects/" + req.projectID + "/admin.json", JSON.stringify(req.fileData.admin), function(err){
+            var adminJsonPath = path.join(process.env.ROOT_DIR, "/projects/", req.projectID, "/admin.json");
+            fs.writeFile(adminJsonPath, JSON.stringify(req.fileData.admin), function(err){
                 if(err) {
                     // Logging the error to the console
                     console.log("Error updating project admin file " + err);

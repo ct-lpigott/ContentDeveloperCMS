@@ -11,23 +11,30 @@ var dbQuery = require("./database_query");
 // the server's file system
 var fs = require("fs");
 
+// Requiring the path module, so that strings can be joined and 
+// normalised as paths to files on the server
+var path = require('path');
+
 // Storing the path to the projects directory, so that it can be reused
-var projectsDir = "./projects/";
+var allProjectsDirectory = path.join(process.env.ROOT_DIR, "/projects/");
 
 // Using a function to get the git repo directory for all other functions
 // in this module, so that if the directory does not exist, an attempt
 // to access a git repo will not be made
 function getGitRepoDirectory(projectId, cb){
+    var projectDir = path.join(allProjectsDirectory, projectId.toString());
+    var adminJsonFile = path.join(projectDir, "admin.json");
     // Using the file system module to check if this project's 
-    // directory exists
-    fs.exists(projectsDir + projectId, function(exists){
+    // directory exists, by searching for the JSON file (to ensure
+    // the project files have been created aswell)
+    fs.exists(adminJsonFile, function(exists){
         // Defaulting the git repo to null
         var gitRepoDir = null;
         
         if(exists){
             // If the directory exists, then setting the git repo
             // to be a simpleGit object, based on this directory
-            gitRepoDir = simpleGit(projectsDir + projectId);
+            gitRepoDir = simpleGit(projectDir);
         }
 
         // Returning the git repo directory to the caller

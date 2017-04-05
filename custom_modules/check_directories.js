@@ -2,14 +2,18 @@
 // the server's file system
 var fs = require("fs");
 
+// Requiring the path module, so that strings can be joined and 
+// normalised as paths to files on the server
+var path = require('path');
+
 // Creating an array of directories that are required, but may need to 
 // be created dynamically i.e. they are ignored by Git, and so will not
 // exist in a remote location by default
 var requiredDirectories = [
-    "./uploads",
-    "./projects",
-    "./forever",
-    "./sessions"
+    "/uploads",
+    "/projects",
+    "/forever",
+    "/sessions"
 ];
 
 // Creating a function to check if a directory exists, and creating it
@@ -31,6 +35,7 @@ function checkDirectory(directoryPath){
 // this module can be invoked directly, as it only does one thing
 module.exports = function(){
     for(var i=0; i<requiredDirectories.length; i++){
-        checkDirectory(requiredDirectories[i]);
+        var dirPath = path.join(process.env.ROOT_DIR, requiredDirectories[i]);
+        checkDirectory(dirPath);
     }
 }

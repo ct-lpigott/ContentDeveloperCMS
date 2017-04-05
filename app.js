@@ -11,6 +11,15 @@ var checkDirectories = require("./custom_modules/check_directories");
 var session = require("express-session");
 var SessionFileStore = require('session-file-store')(session);
 
+// Requiring the path module, so that strings can be joined and 
+// normalised as paths to files on the server
+var path = require('path');
+
+// Storing the absolute path to the directory that app.js
+// is in, so that it can be used throughout the app to create
+// absolute paths i.e. to the projects folder
+process.env.ROOT_DIR = __dirname;
+
 // Checking if the env_config file exists, which 
 // contains a self invoking function, to set up all
 // configuration variables for the app
@@ -87,7 +96,8 @@ var multerUpload = multer({
       // Files will only be stored here temporarily, while they are being 
       // uploaded to the relevant project's Google Drive folder, after which
       // they will be deleted from the server
-      cb(null, "./uploads");
+      var uploadsDir = path.join(process.env.ROOT_DIR, "/uploads");
+      cb(null, uploadsDir);
     },
     filename: function (req, file, cb) {
       // Prepending the filename with the current timestamp, so as to avoid 

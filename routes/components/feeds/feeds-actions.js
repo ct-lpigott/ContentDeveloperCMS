@@ -3,6 +3,10 @@
 // which this route will accept.
 var router = require('express').Router();
 
+// Requiring the path module, so that strings can be joined and 
+// normalised as paths to files on the server
+var path = require('path');
+
 // Requiring the file system module, so that this route can have access
 // to the file system of the server i.e. to be able to create, open, edit 
 // and save project files to the /projects directory
@@ -200,7 +204,8 @@ router.post("/", function(req, res, next){
                         // relating to this project can be stored within it. Setting the directory name
                         // to be equal to the ID of the new project i.e. the first project created on this
                         // server will have all of its project files stores in /projects/1/
-                        fs.mkdir("./projects/" + req.projectID, function(err){
+                        var newProjectPath = path.join(process.env.ROOT_DIR, "/projects/", req.projectID);
+                        fs.mkdir(newProjectPath, function(err){
                             if(err){
                                 // Logging the error to the console
                                 console.log("Error making folder " + err);
@@ -266,7 +271,8 @@ router.post("/", function(req, res, next){
         // was created above. Passing in a JSON string of the projectTemplate
         // object created above, so that this will be the initial content for this
         // file.
-        fs.writeFile("./projects/" + req.projectID + "/admin.json", JSON.stringify(projectAdmin), function(err){
+        var newAdminJsonPath = path.join(process.env.ROOT_DIR, "/projects/", req.projectID, "/admin.json");
+        fs.writeFile(newAdminJsonPath, JSON.stringify(projectAdmin), function(err){
             if(err) {
                 // Logging the error to the console
                 console.log("Error making admin.json file " + err);
@@ -285,7 +291,8 @@ router.post("/", function(req, res, next){
                 // Creating a new content.json file for this project, within the project
                 // directory created above. Passing in an empty object (as a JSON string)
                 // as this file will not yet contain any content
-                fs.writeFile("./projects/" + req.projectID + "/content.json", "{}", function(err){
+                var newContentJsonPath = path.join(process.env.ROOT_DIR, "/projects/", req.projectID, "/content.json");
+                fs.writeFile(newContentJsonPath, "{}", function(err){
                     if(err) {
                         // Logging the error to the console
                         console.log("Error making file " + err);

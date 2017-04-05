@@ -3,6 +3,10 @@
 // which this route will accept.
 var router = require('express').Router();
 
+// Requiring the path module, so that strings can be joined and 
+// normalised as paths to files on the server
+var path = require('path');
+
 // Requiring the file system module, so that this route can have access
 // to the file system of the server i.e. to be able to create, open, edit 
 // and save project files to the /projects directory
@@ -94,7 +98,8 @@ router.use(function(req, res, next){
     if(req.projectID != null){
         // Reading this projects admin.json file from the project directory (which is named
         // as per the projects ID), so that the project structure can be returned to the user
-        fs.readFile("./projects/" + req.projectID + "/admin.json", {encoding: "utf-8"}, function(err, data){
+        var adminJsonPath = path.join(process.env.ROOT_DIR, "/projects/", req.projectID, "/admin.json");
+        fs.readFile(adminJsonPath, {encoding: "utf-8"}, function(err, data){
             if(err){
                 // Logging this error to the console
                 console.log(err);
@@ -133,7 +138,8 @@ router.use(function(req, res, next){
     if(req.projectID != null){
         // Reading the contents of the content.json file of the project, from the project directory
         // (named as per the projectID), so that the contents of the project can be returned to the user
-        fs.readFile("./projects/" + req.projectID + "/content.json", {encoding: "utf-8"}, function(err, projectContent){
+        var contentJsonPath = path.join(process.env.ROOT_DIR, "/projects/", req.projectID, "/content.json");
+        fs.readFile(contentJsonPath, {encoding: "utf-8"}, function(err, projectContent){
             if(err){
                 // Logging error to the database
                 console.log(err);
