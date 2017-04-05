@@ -144,3 +144,7 @@ Full Documentation available at [https://contentdevelopercms.eu/documentation](h
 * If at any time you feel that your __public_auth_token__ has become compromised, or you just want to revoke access for all existing connections using it, you can regenerate a new token at any time in the settings panel of the project (Note - this cannot be undone)
 
 &copy; [Laura Pigott](http://www.pigottlaura.com) 2017
+
+_____________________________________________________
+
+_The background image used in the app was sourced from "https://pixabay.com/en/computer-smartphone-online-digital-1231889/" and is "Free for commercial use, No attribution required" under CC0 Public Domain_
