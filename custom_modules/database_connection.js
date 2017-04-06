@@ -33,6 +33,7 @@ function connectToDatabase(){
     newConnection.connect(function (err) {
         if (err) {
             console.error("Unable to connect to server " + err.stack + "\n");
+            connectToDatabase();
         } else {
             // Checking if a test interval currently exists
             if(testConnectionInterval != null){

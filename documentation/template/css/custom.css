@@ -12,14 +12,14 @@
     top: 0;
 }
 #sidenav {
-    width: 25%;
+    width: 300px;
     position: fixed;
     height: 100vh;
     overflow-y: scroll;
 }
 #content {
-    width: 72%;
-    margin-left: 29%;
+    width: 100%;
+    margin-left: 330px;
 }
 #sidenav, #content {
     display: inline-block;
