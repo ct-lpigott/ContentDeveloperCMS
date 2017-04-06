@@ -18,7 +18,6 @@
     overflow-y: scroll;
 }
 #content {
-    width: 100%;
     margin-left: 330px;
 }
 #sidenav, #content {
