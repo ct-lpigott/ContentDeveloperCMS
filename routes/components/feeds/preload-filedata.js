@@ -98,7 +98,7 @@ router.use(function(req, res, next){
     if(req.projectID != null){
         // Reading this projects admin.json file from the project directory (which is named
         // as per the projects ID), so that the project structure can be returned to the user
-        var adminJsonPath = path.join(process.env.ROOT_DIR, "/projects/", req.projectID, "/admin.json");
+        var adminJsonPath = path.join(process.env.ROOT_DIR, "/projects/", req.projectID.toString(), "/admin.json");
         fs.readFile(adminJsonPath, {encoding: "utf-8"}, function(err, data){
             if(err){
                 // Logging this error to the console
@@ -138,7 +138,7 @@ router.use(function(req, res, next){
     if(req.projectID != null){
         // Reading the contents of the content.json file of the project, from the project directory
         // (named as per the projectID), so that the contents of the project can be returned to the user
-        var contentJsonPath = path.join(process.env.ROOT_DIR, "/projects/", req.projectID, "/content.json");
+        var contentJsonPath = path.join(process.env.ROOT_DIR, "/projects/", req.projectID.toString(), "/content.json");
         fs.readFile(contentJsonPath, {encoding: "utf-8"}, function(err, projectContent){
             if(err){
                 // Logging error to the database

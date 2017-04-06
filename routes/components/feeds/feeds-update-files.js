@@ -30,7 +30,7 @@ router.use(function(req, res, next){
             if(validation.objectToJson(req.fileData.content)){
                 // Updating this project's content.json file, passing the JSON stringified version
                 // of the fileData content object as the contents
-                var contentJsonPath = path.join(process.env.ROOT_DIR, "/projects/", req.projectID, "/content.json");
+                var contentJsonPath = path.join(process.env.ROOT_DIR, "/projects/", req.projectID.toString(), "/content.json");
                 fs.writeFile(contentJsonPath, JSON.stringify(req.fileData.content), function(err){
                     if(err) {
                         // Logging the error to the console
@@ -96,7 +96,7 @@ router.use(function(req, res, next){
         if(validation.objectToJson(req.fileData.admin)){
             // Updating this project's admin.json file, passing the JSON stringified version
             // of the fileData object as the contents
-            var adminJsonPath = path.join(process.env.ROOT_DIR, "/projects/", req.projectID, "/admin.json");
+            var adminJsonPath = path.join(process.env.ROOT_DIR, "/projects/", req.projectID.toString(), "/admin.json");
             fs.writeFile(adminJsonPath, JSON.stringify(req.fileData.admin), function(err){
                 if(err) {
                     // Logging the error to the console

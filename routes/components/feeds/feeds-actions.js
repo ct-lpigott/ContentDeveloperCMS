@@ -204,7 +204,7 @@ router.post("/", function(req, res, next){
                         // relating to this project can be stored within it. Setting the directory name
                         // to be equal to the ID of the new project i.e. the first project created on this
                         // server will have all of its project files stores in /projects/1/
-                        var newProjectPath = path.join(process.env.ROOT_DIR, "/projects/", req.projectID);
+                        var newProjectPath = path.join(process.env.ROOT_DIR, "/projects/", req.projectID.toString());
                         fs.mkdir(newProjectPath, function(err){
                             if(err){
                                 // Logging the error to the console
@@ -271,7 +271,7 @@ router.post("/", function(req, res, next){
         // was created above. Passing in a JSON string of the projectTemplate
         // object created above, so that this will be the initial content for this
         // file.
-        var newAdminJsonPath = path.join(process.env.ROOT_DIR, "/projects/", req.projectID, "/admin.json");
+        var newAdminJsonPath = path.join(process.env.ROOT_DIR, "/projects/", req.projectID.toString(), "/admin.json");
         fs.writeFile(newAdminJsonPath, JSON.stringify(projectAdmin), function(err){
             if(err) {
                 // Logging the error to the console
@@ -291,7 +291,7 @@ router.post("/", function(req, res, next){
                 // Creating a new content.json file for this project, within the project
                 // directory created above. Passing in an empty object (as a JSON string)
                 // as this file will not yet contain any content
-                var newContentJsonPath = path.join(process.env.ROOT_DIR, "/projects/", req.projectID, "/content.json");
+                var newContentJsonPath = path.join(process.env.ROOT_DIR, "/projects/", req.projectID.toString(), "/content.json");
                 fs.writeFile(newContentJsonPath, "{}", function(err){
                     if(err) {
                         // Logging the error to the console
