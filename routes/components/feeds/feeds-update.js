@@ -536,7 +536,7 @@ function parseSanitisedContent(originalContent, sanitisedContent){
 
 function checkObjectForProperties(originalContent, sanitisedContent){
     for(var property in sanitisedContent){
-        if(typeof originalContent[property] == "object"){
+        if(originalContent[property] != null && typeof originalContent[property] == "object"){
             originalContent[property] = checkObjectForProperties(originalContent[property], sanitisedContent[property]);
         } else {
             originalContent[property] = sanitisedContent[property];
